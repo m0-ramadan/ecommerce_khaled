@@ -3,8 +3,6 @@
 @endsection
 
 @section('content')
-
-
     <div class="container page-container relative z-1 product-has-options">
         <div class="main-content flex flex-col md:flex-row md:pb-16" id="product-671683967">
             <div class="flex-1 sticky top-0 h-full md:z-1 w-full md:w-1/2 mb-6 md:mb-0 ">
@@ -178,7 +176,8 @@
                             <ul>
                                 <li class="ql-direction-rtl"><span style="background-color: transparent;">يجب أن يكون
                                         التصميم بدقة عالية لضمان جودة مخرجات الطباعة.</span></li>
-                                <li class="ql-direction-rtl"><span style="background-color: transparent;">تتم الطباعة بنظام
+                                <li class="ql-direction-rtl"><span style="background-color: transparent;">تتم الطباعة
+                                        بنظام
                                         CMYK وليس RGB.</span></li>
                                 <li class="ql-direction-rtl"><span style="background-color: transparent;">يُرفع التصميم
                                         بصيغة PDF من خلال خيار (إرفاق ملف) أو عبر البريد الإلكتروني <a
@@ -210,7 +209,8 @@
                             <p class=""><br></p>
                             <p class="text-right ql-align-right"><a
                                     href="https://printnes.co/%D9%85%D8%B7%D8%A8%D9%88%D8%B9%D8%A7%D8%AA-%D9%88%D8%B1%D9%82%D9%8A%D8%A9/c104553209"
-                                    target="_blank" style="color: rgb(17, 85, 204);"><strong>مطبوعات ورقية</strong></a></p>
+                                    target="_blank" style="color: rgb(17, 85, 204);"><strong>مطبوعات ورقية</strong></a>
+                            </p>
                             <p class="text-right ql-align-right"><a
                                     href="https://printnes.co/%D8%A7%D9%84%D8%AA%D8%BA%D9%84%D9%8A%D9%81-%D9%88%D8%A7%D9%84%D8%AA%D8%B9%D8%A8%D8%A6%D8%A9/c1108661200"
                                     target="_blank" style="color: rgb(17, 85, 204);"><strong>التغليف والتعبئة</strong></a>
@@ -253,7 +253,8 @@
                     </div>
 
 
-                    <form class="form product-form" id="single-product-form" enctype="multipart/form-data" method="post"
+                    <form class="form product-form" id="single-product-form" enctype="multipart/form-data"
+                        method="post"
                         onchange="if (!window.__cfRLUnblockHandlers) return false; salla.product.getPrice(new FormData(event.currentTarget))"
                         onsubmit="if (!window.__cfRLUnblockHandlers) return false; return salla.form.onSubmit('cart.addItem', event)"
                         novalidate data-cf-modified-eb4ee2de01f1a29bcd3ae79a-="">
@@ -299,10 +300,8 @@
 
                                                 <div class="h-0 overflow-hidden opacity-0 is-closed" id="note_671683967">
                                                     <div class="pt-2.5 sm:pt-4">
-                                                        <textarea
-                                                            class="animated animatedfadeInDown fadeInDown form-input h-16 bg-gray-50 block"
-                                                            placeholder="أضف ملاحظات" name="notes" cols="30"
-                                                            rows="10"></textarea>
+                                                        <textarea class="animated animatedfadeInDown fadeInDown form-input h-16 bg-gray-50 block" placeholder="أضف ملاحظات"
+                                                            name="notes" cols="30" rows="10"></textarea>
                                                     </div>
                                                 </div>
 
@@ -324,8 +323,8 @@
 
                         <div class="product-fixed-bar">
                             <div class="hidden lg:flex items-center rtl:space-x-reverse space-x-5">
-                                <img src="https://cdn.salla.sa/rDvVQ/e762cd2e-98db-4ec1-98e6-e822b72d9a1d-1000x684.64730290456-m2vM5aSNUCt4njXi5UdoeW8WVk7yK8PNYPYkJyIc.png"
-                                    alt="ستيكر شيت A5 طباعة" class="h-[60px] w-[60px] object-cover rounded">
+                                <img src="{{ asset('website/images/box1.png') }}" alt="ستيكر شيت A5 طباعة"
+                                    class="h-[60px] w-[60px] object-cover rounded">
                                 <div>
                                     <a href="https://printnes.co/استيكرات-3d/c792440767"
                                         class="text-sm text-gray-500 hover:underline">
@@ -357,7 +356,8 @@
                                 <div class="!m-0 min-w-[240px] grow md:grow-0">
                                     <salla-add-product-button quick-buy support-sticky-bar required-shipping amount="0"
                                         product-status="sale" product-type="service" product-id="671683967"
-                                        loader-position="end" type="submit" width="wide" id="product-add-to-cart-btn">
+                                        loader-position="end" type="submit" width="wide"
+                                        id="product-add-to-cart-btn">
                                         إضافة للسلة
                                     </salla-add-product-button>
 
@@ -374,7 +374,8 @@
             </div>
 
 
-            <div class="self-start -order-1 mb-6 md:mb-0 md:order-2 md:sticky top-16 w-full md:!w-1/2 shrink-0  has-one-image
+            <div
+                class="self-start -order-1 mb-6 md:mb-0 md:order-2 md:sticky top-16 w-full md:!w-1/2 shrink-0  has-one-image
 
                    has-promotion-title">
                 <div class="details-slider-wrapper">
@@ -387,7 +388,8 @@
                         <span class="md:hidden absolute bottom-3 rtl:right-3 ltr:left-3 z-1">
                             <salla-button class="btn--wishlist animated" data-id="671683967"
                                 onclick="if (!window.__cfRLUnblockHandlers) return false; salla.wishlist.toggle('671683967')"
-                                shape="icon" fill="outline" color="light" data-cf-modified-eb4ee2de01f1a29bcd3ae79a-="">
+                                shape="icon" fill="outline" color="light"
+                                data-cf-modified-eb4ee2de01f1a29bcd3ae79a-="">
                                 <i class="sicon-heart"></i>
                             </salla-button>
                         </span>
@@ -399,11 +401,10 @@
                                     ">
                                 <a data-fslightbox="product_671683967" data-img-id="214910827" data-slid-index="0"
                                     data-caption="ستيكر شيت A5 طباعة" data-infinite="false" data-type="image"
-                                    href="https://cdn.salla.sa/rDvVQ/e762cd2e-98db-4ec1-98e6-e822b72d9a1d-1000x684.64730290456-m2vM5aSNUCt4njXi5UdoeW8WVk7yK8PNYPYkJyIc.png"
-                                    aria-label="ستيكرات في شيت A5 - 3D">
+                                    href="{{ asset('website/images/box1.png') }}" aria-label="ستيكرات في شيت A5 - 3D">
                                     <img fetchpriority="high" loading="eager"
-                                        src="https://cdn.salla.sa/rDvVQ/e762cd2e-98db-4ec1-98e6-e822b72d9a1d-1000x684.64730290456-m2vM5aSNUCt4njXi5UdoeW8WVk7yK8PNYPYkJyIc.png"
-                                        alt="ستيكر شيت A5 طباعة" class="h-full object-contain w-full ">
+                                        src="{{ asset('website/images/box1.png') }}" alt="ستيكر شيت A5 طباعة"
+                                        class="h-full object-contain w-full ">
                                 </a>
 
                             </div>
@@ -426,7 +427,6 @@
             </section>
         </div>
     </div>
-
 @endsection
 
 @section('js')

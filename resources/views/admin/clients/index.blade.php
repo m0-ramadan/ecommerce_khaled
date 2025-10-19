@@ -48,7 +48,7 @@
                                             <th>#</th>
                                             <th style="font-family: 'Cairo', sans-serif;">اســــــم المستخــــــدم</th>
                                             <th style="font-family: 'Cairo', sans-serif;">رقــــــم الهاتــــف</th>
-                                            <th style="font-family: 'Cairo', sans-serif;"> تاريخ الانضمام </th>  
+                                            <th style="font-family: 'Cairo', sans-serif;"> تاريخ الانضمام </th>
                                             <th style="font-family: 'Cairo', sans-serif;">البريــد الالكتروني</th>
                                             <th style="font-family: 'Cairo', sans-serif;">العنوان</th>
                                             <th style="font-family: 'Cairo', sans-serif;">العمليـــات</th>
@@ -62,13 +62,16 @@
                                                 <td>{{ $i }}</td>
                                                 <td>{{ $client->name }}</td>
                                                 <td>{{ $client->phone }}</td>
-                                                 <td>{{date('Y-m-d', strtotime( $client->created_at)); }}</td>
+                                                <td>{{ date('Y-m-d', strtotime($client->created_at)) }}</td>
                                                 <td>{{ $client->email }}</td>
                                                 <td>{{ $client->address }}</td>
-                                                {{--<td><img width="50" src="{{asset('public/' . $store->image)}}"></td> --}}
+                                                {{-- <td><img width="50" src="{{asset('public/' . $store->image)}}"></td> --}}
                                                 <td>
                                                     <!-- Edit Button -->
-                                                    <button class="btn btn-sm btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#editRoleModal{{ $client->id }}" title="تعديل بيانات العميل">
+                                                    <button class="btn btn-sm btn-primary" type="button"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#editRoleModal{{ $client->id }}"
+                                                        title="تعديل بيانات العميل">
                                                         <i class="fa fa-edit"></i>
                                                     </button>
                                                     <button class="btn btn-sm btn-danger" type="button"
@@ -83,44 +86,65 @@
                                                     </button>
                                                 </td>
                                             </tr>
-                                             <!-- Edit Client Modal -->
-                                            <div class="modal fade" id="editRoleModal{{ $client->id }}" tabindex="-1" aria-labelledby="editRoleModalLabel{{ $client->id }}" aria-hidden="true">
+                                            <!-- Edit Client Modal -->
+                                            <div class="modal fade" id="editRoleModal{{ $client->id }}" tabindex="-1"
+                                                aria-labelledby="editRoleModalLabel{{ $client->id }}" aria-hidden="true">
                                                 <div class="modal-dialog">
                                                     <div class="modal-content">
                                                         <div class="modal-header">
-                                                            <h5 class="modal-title" id="editRoleModalLabel{{ $client->id }}">تعديل بيانات العميل</h5>
-                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            <h5 class="modal-title"
+                                                                id="editRoleModalLabel{{ $client->id }}">تعديل بيانات
+                                                                العميل</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                                aria-label="Close"></button>
                                                         </div>
                                                         <div class="modal-body">
-                                                            <form id="editClientForm{{ $client->id }}" method="POST" action="{{ route('client.update', $client->id) }}">
+                                                            <form id="editClientForm{{ $client->id }}" method="POST"
+                                                                action="{{ route('client.update', $client->id) }}">
                                                                 @csrf
                                                                 @method('PUT')
                                                                 <div class="mb-3">
-                                                                    <label for="name" class="form-label">اسم العميل</label>
-                                                                    <input type="text" class="form-control" name="name" value="{{ $client->name }}" required>
+                                                                    <label for="name" class="form-label">اسم
+                                                                        العميل</label>
+                                                                    <input type="text" class="form-control"
+                                                                        name="name" value="{{ $client->name }}"
+                                                                        required>
                                                                 </div>
                                                                 <div class="mb-3">
-                                                                    <label for="email" class="form-label">البريد الإلكتروني</label>
-                                                                    <input type="email" class="form-control" name="email" value="{{ $client->email }}" required>
+                                                                    <label for="email" class="form-label">البريد
+                                                                        الإلكتروني</label>
+                                                                    <input type="email" class="form-control"
+                                                                        name="email" value="{{ $client->email }}"
+                                                                        required>
                                                                 </div>
                                                                 <div class="mb-3">
-                                                                    <label for="password" class="form-label">كلمة المرور</label>
-                                                                    <input type="password" class="form-control" name="password" placeholder="اترك فارغًا إذا لم ترغب في تغيير كلمة المرور">
+                                                                    <label for="password" class="form-label">كلمة
+                                                                        المرور</label>
+                                                                    <input type="password" class="form-control"
+                                                                        name="password"
+                                                                        placeholder="اترك فارغًا إذا لم ترغب في تغيير كلمة المرور">
                                                                 </div>
                                                                 <div class="mb-3">
-                                                                    <label for="password_confirmation" class="form-label">تأكيد كلمة المرور</label>
-                                                                    <input type="password" class="form-control" name="password_confirmation" placeholder="تأكيد كلمة المرور">
+                                                                    <label for="password_confirmation"
+                                                                        class="form-label">تأكيد كلمة المرور</label>
+                                                                    <input type="password" class="form-control"
+                                                                        name="password_confirmation"
+                                                                        placeholder="تأكيد كلمة المرور">
                                                                 </div>
                                                                 <div class="mb-3">
-                                                                    <label for="phone" class="form-label">رقم الهاتف</label>
-                                                                    <input type="text" class="form-control" name="phone" value="{{ $client->phone }}">
+                                                                    <label for="phone" class="form-label">رقم
+                                                                        الهاتف</label>
+                                                                    <input type="text" class="form-control"
+                                                                        name="phone" value="{{ $client->phone }}">
                                                                 </div>
                                                                 <div class="mb-3">
-                                                                    <label for="state_id" class="form-label">المحافظة </label>
+                                                                    <label for="state_id" class="form-label">المحافظة
+                                                                    </label>
                                                                     <select name="state_id" class="form-select">
                                                                         <option value="">اختر المحافظة</option>
                                                                         @foreach ($cities as $city)
-                                                                            <option value="{{ $city->id }}" {{ $city->id == $client->state_id ? 'selected' : '' }}>
+                                                                            <option value="{{ $city->id }}"
+                                                                                {{ $city->id == $client->state_id ? 'selected' : '' }}>
                                                                                 {{ $city->name }}
                                                                             </option>
                                                                         @endforeach
@@ -128,24 +152,29 @@
                                                                 </div>
 
                                                                 <div class="mb-3">
-                                                                    <label for="address" class="form-label">العنوان</label>
-                                                                    <input type="text" class="form-control" name="address" value="{{ $client->address }}">
+                                                                    <label for="address"
+                                                                        class="form-label">العنوان</label>
+                                                                    <input type="text" class="form-control"
+                                                                        name="address" value="{{ $client->address }}">
                                                                 </div>
-                                                                <button type="submit" class="btn btn-primary">تحديث</button>
+                                                                <button type="submit"
+                                                                    class="btn btn-primary">تحديث</button>
                                                             </form>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                             <!-- SendNotification_modal_Grade -->
-                                            <div class="modal fade" id="notificationModal{{ $client->id }}" tabindex="-1"
-                                                role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                            <div class="modal fade" id="notificationModal{{ $client->id }}"
+                                                tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                                                aria-hidden="true">
                                                 <div class="modal-dialog" role="document">
                                                     <div class="modal-content">
                                                         <div class="modal-header">
-                                                            <h5 class="modal-title" id="exampleModalLabel">ارسال اشعار</h5>
-                                                            <button class="btn-close" type="button" data-bs-dismiss="modal"
-                                                                aria-label="Close"></button>
+                                                            <h5 class="modal-title" id="exampleModalLabel">ارسال اشعار
+                                                            </h5>
+                                                            <button class="btn-close" type="button"
+                                                                data-bs-dismiss="modal" aria-label="Close"></button>
                                                         </div>
                                                         <div class="modal-body">
                                                             @if (session('status'))
@@ -153,7 +182,8 @@
                                                                     {{ session('status') }}
                                                                 </div>
                                                             @endif
-                                                            <form action="{{ route('sendNotification') }}" method="POST">
+                                                            <form action="{{ route('sendNotification') }}"
+                                                                method="POST">
                                                                 @csrf
                                                                 <input id="id" type="hidden" name="client_id"
                                                                     class="form-control" value="{{ $client->id }}">
@@ -181,9 +211,10 @@
                                                 <div class="modal-dialog" role="document">
                                                     <div class="modal-content">
                                                         <div class="modal-header">
-                                                            <h5 class="modal-title" id="exampleModalLabel">حذف المستخدم</h5>
-                                                            <button class="btn-close" type="button" data-bs-dismiss="modal"
-                                                                aria-label="Close"></button>
+                                                            <h5 class="modal-title" id="exampleModalLabel">حذف المستخدم
+                                                            </h5>
+                                                            <button class="btn-close" type="button"
+                                                                data-bs-dismiss="modal" aria-label="Close"></button>
                                                         </div>
                                                         <form action="{{ route('client.destroy', $client->id) }}"
                                                             method="post">

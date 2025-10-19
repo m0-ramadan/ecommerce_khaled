@@ -37,3 +37,18 @@ Route::get('/f-a-q', function () {
     return view('website.pages.faq');
 })->name('website.faq');
 
+Route::get('/complain', function () {
+    return view('website.pages.complain');
+})->name('website.complain');
+
+Route::get('/gifts', function () {
+    return view('website.pages.gifts');
+})->name('website.gifts');
+
+Route::get('/replace', function () {
+    return view('website.pages.replace');
+})->name('website.replace');
+
+Route::get('/static_print', function () {
+    return view('website.pages.static_print');
+})->name('website.static_print');
