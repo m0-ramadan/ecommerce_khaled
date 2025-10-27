@@ -1,17 +1,16 @@
 <?php
 
+
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Spatie\Translatable\HasTranslations;
 
 class Offer extends Model
 {
-    use HasTranslations;
-    public $translatable = ['title','title2','title3','title4','title5','content','details','image','mob_image'];
+    use HasFactory;
 
-    protected $table = 'offers';
-    public $timestamps = true;
+    protected $fillable = ['image', 'description', 'price', 'duration'];
 
-    protected $fillable = ['title','title2','title3','title4','title5','content','image','discount','details','mob_image'];
+    // If you need any relationships, define them here
 }

@@ -2,22 +2,37 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Spatie\Translatable\HasTranslations;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class Country extends Model
 {
-    use HasTranslations;
-    public $translatable = ['name'];
-    protected $table = 'countries';
-    public $timestamps = true;
-    protected $fillable = ['name', 'country_ref_code', 'phone_prefix'];
+    use HasFactory;
 
-    protected function countryRefCode(): Attribute
+    protected $fillable = [
+        'country',
+        'country_ar',
+        'status',
+        'item_order',
+        'message',
+        'collection_commission',
+        'currency_id'
+    ];
+
+    /**
+     * Get the regions associated with the country.
+     */
+    public function region()
     {
-        return Attribute::make(
-            set: fn (string $value) => strtoupper(substr($value, 0, 2)),
-        );
+        return $this->hasMany(Region::class);
     }
+    public function regions()
+    {
+        return $this->hasMany(Region::class);
+    }
+    public function branchs()
+    {
+        return $this->hasMany(Branchs::class);
+    }
+
 }

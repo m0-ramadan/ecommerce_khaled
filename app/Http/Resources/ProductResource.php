@@ -1,11 +1,8 @@
 <?php
 
+// app/Http/Resources/ProductResource.php
 namespace App\Http\Resources;
 
-use App\Models\CartItem;
-use App\Models\Favorite;
-use App\Models\Image;
-use App\Models\ProductFeatures;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class ProductResource extends JsonResource
@@ -14,97 +11,48 @@ class ProductResource extends JsonResource
      * Transform the resource into an array.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return array
+     * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
      */
     public function toArray($request)
     {
-        $attributes = parent::toArray($request);
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'code' => $this->code,
+            'description' => $this->description,
+            'category' => $this->category,
+            'brand' => $this->brand,
+            'in_stock_quantity' => $this->in_stock_quantity,
+            'reorder_limit' => $this->reorder_limit,
+            'minimum_stock' => $this->minimum_stock,
+            'location_in_stock' => $this->location_in_stock,
+            'product_details' => $this->product_details,
+            'purchase_price' => $this->purchase_price,
+            'sale_price' => $this->sale_price,
+            'discounts' => $this->discounts,
+            'expected_profit_margin' => $this->expected_profit_margin,
+            'supplier_name' => $this->supplier_name,
+            'supplier_contact_information' => $this->supplier_contact_information,
+            'expected_delivery_time' => $this->expected_delivery_time,
+            'status' => $this->status,
+            'date_added_to_stock' => $this->date_added_to_stock,
+            'date_last_updated_to_stock' => $this->date_last_updated_to_stock,
+            'expiry_date' => $this->expiry_date,
+            'unit_type' => $this->unit_type,
+            'product_size' => $this->product_size,
+            'currency'      => $this->currency,
 
-        foreach ($this->getTranslatableAttributes() as $field) {
-            $attributes[$field] = $this->getTranslation($field, \App::getLocale());
-        }
-        
-        if ($attributes['old_price'] == null) {
-             $attributes['old_price'] = 0;
-        }
+            // Polymorphic relationship with person
+            'person' => [
+                'id' => $this->person_id,
+                'type' => $this->person_type,
+            ],
 
-        if ($attributes['sub_category_id'] == null) {
-              $attributes['sub_category_id'] = 0;
-        }
+            // Relationship with images
+            'images' => ImageResource::collection($this->whenLoaded('images')),
 
-        if ($attributes['store_id']   == null) {
-             $attributes['store_id'] = 0;
-        }
-        $attributes['image'] = asset('public/' . $attributes['image']);
-         $user = auth('api')->user();
-
-        if ($user) {
-            if ($this->Favorites->count() == 0) {
-                $attributes["hasFavorites"] = 0;
-            } else {
-                $attributes["hasFavorites"] = 1;
-            }
-            if ($this->Rosters->count() == 0) {
-                $attributes["hasRosters"] = 0;
-            } else {
-                $attributes["hasRosters"] = 1;
-            }
-            if ($this->reviews->count() == 0) {
-                $attributes["hasReviews"] = "0";
-            } else {
-                foreach ($this->reviews as $review)
-                    $resrate = $review->rate;
-                $attributes["hasReviews"] = "$resrate";
-                $attributes["ReviewComment"] = $review->comment;
-            }
-        } else {
-            $attributes["hasFavorites"] = 0;
-            $attributes["hasRosters"] = 0;
-            $attributes["hasReviews"] = "0";
-            $attributes["ReviewComment"] = "";
-        }
-        if ($this->reviews->count() == 0) {
-            $attributes["hasReviews"] = "0";
-        } else {
-            foreach ($this->reviews as $review)
-                $resrate = $review->rate;
-            $attributes["hasReviews"] = "$resrate";
-            $attributes["ReviewComment"] = $review->comment;
-        }
-
-        return $attributes;
-        
-        // $attributes = parent::toArray($request);
-    
-        // $attributes['old_price'] = $attributes['old_price'] ?? 0;
-        // $attributes['sub_category_id'] = $attributes['sub_category_id'] ?? 0;
-        // $attributes['store_id'] = $attributes['store_id'] ?? 0;
-    
-        // $attributes['image'] = isset($attributes['image']) ? asset('public/' . $attributes['image']) : "";
-    
-        // $user = auth('api')->user();
-    
-        // if ($user) {
-        //     // Use ternary operator for setting hasFavorites and hasRosters
-        //     $attributes["hasFavorites"] = property_exists($this, 'Favorites') && $this->Favorites->count() > 0 ? 1 : 0;
-        //     $attributes["hasRosters"] = property_exists($this, 'Rosters') && $this->Rosters->count() > 0 ? 1 : 0;
-    
-        //     if ( property_exists($this, 'reviews') && $this->reviews->count() > 0) {
-        //         // Use implode to concatenate all review rates
-        //         $attributes["hasReviews"] = property_exists($this, 'reviews') ? implode('', $this->reviews->pluck('rate')->toArray()) : "";
-        //         $attributes["ReviewComment"] = property_exists($this, 'reviews') ? $this->reviews->first()->comment : "";
-        //     } else {
-        //         $attributes["hasReviews"] = "0";
-        //         $attributes["ReviewComment"] = "";
-        //     }
-        // } else {
-        //     // Use ternary operator for setting default values
-        //     $attributes["hasFavorites"] = 0;
-        //     $attributes["hasRosters"] = 0;
-        //     $attributes["hasReviews"] = "0";
-        //     $attributes["ReviewComment"] = "";
-        // }
-    
-        // return $attributes;
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+        ];
     }
 }

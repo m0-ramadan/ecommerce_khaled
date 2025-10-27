@@ -2,28 +2,18 @@
 
 namespace App\Http\Resources;
 
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class CitiesResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
-     */
-    public function toArray($request)
+    public function toArray(Request $request): array
     {
-         foreach ($this->getTranslatableAttributes() as $field) {
-            $data[$field] = $this->getTranslation($field, \App::getLocale());
-        }
-        
-        $data = [
-            'ID'=>$this->id,
-            'Name'=>$this->name,
-            'Country-id'=>$this->countries_id,
+        $language = $request->header('lang', 'ar');
+        return [
+            'id' => $this->id,
+            'region' => $this->region_ar,
+            'item_order' => $this->item_order,
         ];
-
-        return $data;
     }
 }

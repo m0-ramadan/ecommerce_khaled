@@ -1,18 +1,35 @@
 <?php
 
+
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Notification extends Model
 {
-    protected $table='notifications';
-    public $timestamps=true;
+    use HasFactory;
 
-    public $fillable = ['title','body','client_id'];
+    protected $table = 'notifications'; // اسم الجدول
+    protected $primaryKey = 'id'; // المفتاح الأساسي
+    public $incrementing = false; // تعطيل الزيادة التلقائية للمفتاح الأساسي
+    protected $keyType = 'string'; // نوع المفتاح الأساسي
 
-    public function notifications()
+    protected $fillable = [
+        'id',
+        'type',
+        'notifiable_type',
+        'notifiable_id',
+        'data',
+        'read_at',
+        'is_active',
+    ];
+
+    protected $casts = [
+        'data' => 'array', // تحويل حقل data إلى array
+    ];
+    public function notifiable()
     {
-        return $this->belongsTo('App\Models\Client','client_id');
+        return $this->morphTo();
     }
 }

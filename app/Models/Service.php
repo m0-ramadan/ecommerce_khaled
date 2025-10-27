@@ -2,16 +2,31 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Spatie\Translatable\HasTranslations;
 
 class Service extends Model
 {
-    use HasTranslations;
-    public $translatable = ['title','content','details'];
+    use HasFactory;
 
-    protected $table='services';
-    public $timestamps=true;
+    // Table name (optional, if not using default naming convention)
+    protected $table = 'services';
 
-    public $fillable=['title','content','img','details'];
+    // Mass assignable attributes
+    protected $fillable = ['name', 'image','parent_id','description'];
+
+    // // Cast the `name` column to JSON
+    // protected $casts = [
+    //     'name' => 'array',
+    // ];
+        public function parent()
+    {
+        return $this->belongsTo(Service::class, 'parent_id');
+    }
+
+    // Define the children relationship
+    public function children()
+    {
+        return $this->hasMany(Service::class, 'parent_id');
+    }
 }

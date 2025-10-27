@@ -2,16 +2,25 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Image extends Model
 {
-    protected $table = 'images';
+    use HasFactory;
 
-    public $fillable=['name','src','product_id','alttxt','titletxt'];
+    protected $fillable = [
+        'url',
+        'caption',
+        'imageable_id',
+        'imageable_type',
+    ];
 
-    public function product()
+    /**
+     * Get the parent imageable model (e.g., Product).
+     */
+    public function imageable()
     {
-        return $this->belongsTo('App\Models\Product','product_id');
+        return $this->morphTo();
     }
 }

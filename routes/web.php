@@ -13,27 +13,27 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('website.pages.home');
-})->name('website.home');
+// Route::get('/', function () {
+//     return view('website.pages.home');
+// })->name('website.home');
 
-Route::get('/privacy-police', function () {
-    return view('website.pages.privacy');
-})->name('website.privacy');
+// Route::get('/privacy-police', function () {
+//     return view('website.pages.privacy');
+// })->name('website.privacy');
 
-Route::get('/products', function () {
-    return view('website.pages.privacy');
-})->name('website.products');
+// Route::get('/products', function () {
+//     return view('website.pages.privacy');
+// })->name('website.products');
 
-Route::get('/product/{id}', function () {
-    return view('website.pages.product.product');
-})->name('website.product');
+// Route::get('/product/{id}', function () {
+//     return view('website.pages.product.product');
+// })->name('website.product');
 
-Route::get('/unreachable-product', function () {
-    return view('website.pages.product.unreachable');
-})->name('website.product.unreachable');
+// Route::get('/unreachable-product', function () {
+//     return view('website.pages.product.unreachable');
+// })->name('website.product.unreachable');
 
-Route::get('/f-a-q', function () {
-    return view('website.pages.faq');
-})->name('website.faq');
+// Route::get('/f-a-q', function () {
+//     return view('website.pages.faq');
+// })->name('website.faq');
 

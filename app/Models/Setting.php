@@ -2,39 +2,37 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Notifications\Notifiable;
-use Spatie\Translatable\HasTranslations;
-
 
 class Setting extends Model
 {
-    use Notifiable;
-     use HasTranslations;
-    public $translatable = ['offer_image','about_footer'];
-    protected $table='settings';
-    public $timestamps=true;
+    use HasFactory;
+    protected $fillable=[
+     'logo','email','phone','linkedin','facebook','twitter','work_time','bag_price',
+    'about_title','about_description','about_image','packagestatus',
+    'home_cost',
+    'home_speed',
+    'home_pay',
+    'home_image',
+    'home_work',
+    'home_create_description',
+    'home_start_description',
+    'home_pay_description',
+    'home_recive_description',
+    'slider_title','slider_description',
+    'pages_image','home_title','home_description',
+    'privacy_policy','terms_conditions','messenger','whatsapp'
+    ,'support_description',
+    'calc_description',
+    'no_payment',
+    'our_goals_description',
+    'our_goal_title',
+    'meta_description',
+    'meta_keyword',
+    'terms_conditions_en',
+    'privacy_policy_en',
+    'instagram','snapchat','tiktok','commission'
 
-    public $fillable =['image','about_footer','offer_image','promo_code_name','key_offer','link_video','about_us','Terms_Conditions','whatsApp','keywords','metadescription', 'cashback_value','mount_pound','lower_cashback'];
-
-    public function clientCategory()
-    {
-        return $this->hasMany(ClientCategory::class);
-    }
-
-    public function store()
-    {
-        return $this->belongsTo('App\Models\Store','store_id');
-    }
-
-    public function subCategories()
-    {
-        return $this->hasMany('App\Models\SubCategory');
-    }
-
-    public function products()
-    {
-        return $this->hasMany('App\Models\Product');
-    }
-
+    ];
 }

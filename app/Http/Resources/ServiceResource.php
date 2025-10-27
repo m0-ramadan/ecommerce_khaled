@@ -2,7 +2,6 @@
 
 namespace App\Http\Resources;
 
-use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class ServiceResource extends JsonResource
@@ -10,15 +9,19 @@ class ServiceResource extends JsonResource
     /**
      * Transform the resource into an array.
      *
-     * @return array<string, mixed>
+     * @param  \Illuminate\Http\Request  $request
+     * @return array
      */
-    public function toArray(Request $request): array
+    public function toArray($request)
     {
+        // Retrieve language from the request header (defaults to 'en' if not provided)
+         
         return [
             'id' => $this->id,
-            'title' => $this->title,
-            'description' => $this->content,
-            'image' => $this->img ? "public/" . $this->img : "",
+            'name' => $this->name, // Fallback to 'en' if language not available
+            'image' => asset($this->image),
+             'description' => $this->description,
+       
         ];
     }
 }

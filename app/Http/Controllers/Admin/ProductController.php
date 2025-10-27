@@ -2,330 +2,305 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
-use App\Models\Category;
-use App\Models\Image;
-use App\Models\MetaTag;
-use App\Models\Contact;
+use App\Models\Clients;
 use App\Models\Product;
-use App\Models\Inspiration;
-use App\Models\Favorite;
-use App\Models\Store;
-use App\Models\SubCategory;
-use App\Models\ProductFeature;
+use App\Traits\ImageTrait;
 use Illuminate\Http\Request;
-use Auth;
-use App\Traits\UploadFileTrait;
-
+use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Storage;
+use App\Traits\FirebaseNotificationTrait;
+use Flasher\Toastr\Laravel\Facade\Toastr;
+use Illuminate\Support\Facades\Validator;
+use App\Http\Requests\Admin\Product\StoreProductRequest;
+use App\Http\Requests\Admin\Product\UpdateProductRequest;
+use App\Models\Branchs;
 
 class ProductController extends Controller
 {
-    use UploadFileTrait;
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    use ImageTrait, FirebaseNotificationTrait;
+
     public function index()
     {
-        $products = Product::Active()->get();
-        $categories = Category::get();
-        $subcategories = SubCategory::get();
-        $stores = Store::where('is_active', 1)->get();;
+        $products = Product::get();
+        $clients = Clients::where('type', 2)->get();
 
-        return view('admin.products.index', compact(['products', 'categories', 'subcategories', 'stores']));
+        return view('Admin.product.index', compact('products', 'clients'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        $subcategories = SubCategory::where('is_active', 1)->get();
-        $categories = Category::where('is_active', 1)->get();
-        $stores = Store::where('is_active', 1)->get();
-        return view('admin.products.add', compact(['subcategories', 'categories', 'stores']));
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        
-        
-        if ($request->hasFile('image')) {
-
-            $imageNameToStore = $this->uploadImage('product', $request->image);
-        }
-        
-         
-
-
-        $setting = Contact::first();
-        $current_price = $request->current_price;
-        $old_price = $request->old_price;
-        $tax_rate = $setting->tax_rate;
-        $profit_product    = $setting->profit_product;
-        $profit_product_old    = $setting->profit_product_old;
-
-        //old price
-        $profit_product_price = ($current_price + (($current_price * $profit_product) / 100));
-        $tax_rate_finalprice = ($profit_product_price + (($tax_rate * $profit_product_price) / 100));
-
-        //old price
-        $profit_product_price_old = ($current_price + (($old_price * $profit_product_old) / 100));
-        $tax_rate_finalprice_old = ($profit_product_price_old + (($tax_rate * $profit_product_price_old) / 100));
-
-
-        $finaloldprice = str_replace(',', '', number_format($tax_rate_finalprice_old, 2));
-        $finalcrrentprice = str_replace(',', '', number_format($tax_rate_finalprice, 2));
-
-
-
-
-        $validatedData = $request->validate([
-            'name_ar'                          => 'required',
-            'category_id'                      => 'required',
-        ]);
- 
-    
-        $product = new Product;
-        $product->name                             = ['en' => $request->name_en, 'ar' => $request->name_ar, 'it' => $request->name_it];
-        $product->name_url                             = ['en' => $request->name_url_en, 'ar' => $request->name_url_ar, 'it' => $request->name_url_it];
-       $product->detailsweb                         = ['en' => $request->detailsweb_en, 'ar' => $request->detailsweb_ar, 'it' => $request->detailsweb_it];
-        $product->name_search                      = $request->name_en . ',' . $request->name_ar . ',' . $request->name_it;
-        $product->details                          = ['en' => $request->details_en, 'ar' => $request->details_ar, 'it' => $request->details_it];
-        $product->title_img                        = $request->img_title;
-        $product->alt_text                         = $request->alt_title;
-        $product->slug                             = $request->slug;
-        $product->serial_no                        = $request->serail_no;
-        $product->tax_amount                       = $request->tax_amount;
-        $product->store_id                         = $request->store_id;
-        $product->smart_price                      = $request->smart_price;
-        $product->old_price                        = $finaloldprice;
-        $product->ref_name                         = $request->ref_name;
-        $product->url                              = $request->url;
-        $product->ref_name1                        = $request->ref_name1;
-        $product->mainoldprice                     = $request->old_price;
-        $product->mainprice                        = $request->current_price;
-        $product->aliexpress                       = $request->aliexpress_url;
-        $product->keywords                         = $request->keywords;
-        $product->current_price                    = $finalcrrentprice;
-        $product->quantity                         = $request->quantity;
-        $product->original_quantity                = $request->quantity;
-        $product->category_id                      = $request->category_id;
-        $product->delivery_time                    = ['en' => $request->delivery_time_en, 'ar' => $request->delivery_time_ar, 'it' => $request->delivery_time_it];
-        $product->shippingcharges                  = ['en' => $request->shippingcharges_en, 'ar' => $request->shippingcharges_ar, 'it' => $request->shippingcharges_it];
-        $product->shippingcharges_value            = $request->shippingcharges_value;
-        $product->sub_category_id                  = $request->sub_category_id ?? null;
-        $product->image                            = $imageNameToStore ?? null;
-         $product->deleted_at                       = Now();
-        $product->save();
-
-
-
-
-
-        $feature = ProductFeature::create([
-            'name' =>   ['en' => $request->productfeaturename_en, 'ar' => $request->productfeaturename_ar, 'it' => $request->productfeaturename_it],
-            'description' =>  ['en' => $request->productfeaturedescription_en, 'ar' => $request->productfeaturedescription_ar, 'it' => $request->productfeaturedescription_it],
-            'product_id' => $product->id
-
-        ]);
-
-
-        if ($request->hasFile('images')) {
-            $images = $request->file('images');
-            foreach ($images as $key => $image) {
- 
-                $filename = time() . $key . '.' . $image->extension();
-                $fileNameToStore = $this->uploadImages($image, 'product', $filename);
-                $imagenew = Image::create([
-                    'product_id'       => $product->id,
-                    'src'               => $fileNameToStore,
-                ]);
-            }
-        } else {
-            $image = Image::create([
-                'product_id'       => $product->id,
-                'src'              => Null,
-            ]);
-        }
-        $metaTags = new MetaTag;
-        $metaTags->product_id                   = $product->id;
-        $metaTags->text                         = $product->details;
-        $metaTags->save();
-
-        toastr()->success('تم اضافة المنتج بنجاح');
-        return redirect('admin/product');
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function show($id)
     {
-        //
+        // $branches = Branchs::all();
+        $client = Clients::find($id);
+        return view('Admin.product.show', compact('client'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+    public function create($id)
+    {
+        $branches = Branchs::all();
+        $client = Clients::find($id);
+        return view('Admin.product.create', compact('branches', 'client'));
+    }
+
+    public function store(Request $request)
+    {
+        try {
+            // Validate the request
+            $validator = Validator::make($request->all(), [
+                'name' => 'required|string|max:255',
+                'sale_price' => 'required|numeric|min:0',
+                'discounts' => 'nullable|numeric|min:0|max:100',
+                'expected_delivery_time' => 'nullable|string|max:255',
+                'person_id' => 'required|integer|exists:clients,id',
+                'code' => 'required|string|max:255|unique:products,code',
+                'category' => 'nullable|string|max:255',
+                'brand' => 'nullable|string|max:255',
+                'unit_type' => 'nullable|string|max:255',
+                'in_stock_quantity' => 'required|integer|min:0',
+                'reorder_limit' => 'nullable|integer|min:0',
+                'minimum_stock' => 'nullable|integer|min:0',
+                'location_in_stock' => 'nullable|string|max:255',
+                'product_size' => 'nullable|string|max:255',
+                'expiry_date' => 'nullable|date|after_or_equal:today',
+                'description' => 'nullable|string',
+                'details' => 'nullable|string|max:1000',
+                'image' => 'nullable|file|image|mimes:jpg,jpeg,png|max:2048',
+            ]);
+
+            if ($validator->fails()) {
+                return redirect()->back()->withErrors($validator)->withInput();
+            }
+
+            DB::beginTransaction();
+
+            // Handle image upload
+            $image = "";
+            if ($request->hasFile('image') && $request->file('image')->isValid()) {
+                $filename = time() . '.' . $request->file('image')->extension();
+                $image = $this->uploadImg($request->file('image'), $filename, 'product');
+                if (!$image) {
+                    DB::rollBack();
+                    return redirect()->back()->withInput()->with('error', 'فشل في رفع الصورة الرئيسية');
+                }
+            }
+
+            // Find the client
+            $client = Clients::findOrFail($request->person_id);
+
+            // Create the product
+            $product = Product::create([
+                'name' => $request->name,
+                'price' => $request->sale_price, // Map sale_price to price
+                'description' => $request->details,
+                'product_details' => $request->details,
+                'image' => $image,
+                'code' => $request->code,
+                'category' => $request->category,
+                'brand' => $request->brand,
+                'in_stock_quantity' => $request->in_stock_quantity,
+                'reorder_limit' => $request->reorder_limit,
+                'minimum_stock' => $request->minimum_stock,
+                'location_in_stock' => $request->location_in_stock,
+                'purchase_price' => $request->purchase_price ?? 0, // Default to 0 if not provided
+                'sale_price' => $request->sale_price,
+                'discounts' => $request->discounts,
+                'unit_type' => $request->unit_type,
+                'product_size' => $request->product_size,
+                'person_type' => 'App\Models\Clients',
+                'supplier_name' => $client->name,
+                'status' => 'In Stock',
+                'person_id' => $request->person_id,
+                'expiry_date' => $request->expiry_date,
+                'date_added_to_stock' => date('Y-m-d'),
+                'expected_profit_margin' => $request->expected_profit_margin ?? 0,
+                'supplier_contact_information' => $client->phone,
+                'expected_delivery_time' => $request->expected_delivery_time,
+                'branch_id' => $client->branch_id,
+            ]);
+
+            $notificationSent = false;
+            if ($client) {
+                $deviceTokens = $client->deviceToken()->pluck('device_token')->toArray();
+                foreach ($deviceTokens as $deviceToken) {
+                    $notificationRequest = new Request([
+                        'device_token' => $deviceToken,
+                        'title' => 'إضافة منتج جديد',
+                        'body' => "تم إضافة منتج جديد بكود {$product->code} إلى المخزون الخاص بك.",
+                        'icon' => '',
+                    ]);
+
+                    $response = $this->sendFirebaseNotification($notificationRequest);
+                    if ($response && $response->getStatusCode() === 200) {
+                        $notificationSent = true;
+                    } else {
+                        \Log::error('Failed to send product creation notification to client', [
+                            'product_id' => $product->id,
+                            'client_id' => $client->id,
+                            'device_token' => $deviceToken,
+                            'error' => $response ? ($response->getData()->error ?? 'Unknown error') : 'No response',
+                        ]);
+                    }
+                }
+            }
+
+            DB::commit();
+
+            Toastr::success('تم إضافة المنتج بنجاح' . ($notificationSent ? ' وتم إرسال الإشعار' : ''), 'نجاح');
+            return redirect()->route('admin.product.show', [$client->id]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            DB::rollBack();
+            Toastr::error('العملاء غير موجود', 'خطأ');
+            return redirect()->back()->withInput();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Toastr::error('حدث خطأ: ' . $e->getMessage(), 'خطأ');
+            return redirect()->back()->withInput();
+        }
+    }
     public function edit($id)
     {
-        //
+        $product = Product::find($id);
+        $clients = Clients::where('type', 2)->get();
+        $branches = Branchs::all();
+
+        return view('Admin.product.edit', compact('product', 'clients', 'branches'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        $setting = Contact::first();
-        $current_price = $request->mainprice;
-        $old_price = $request->mainoldprice;
-        $tax_rate = $setting->tax_rate;
-        $profit_product    = $setting->profit_product;
-        $profit_product_old    = $setting->profit_product_old;
-
-        //old price
-        $profit_product_price = ($current_price + (($current_price * $profit_product) / 100));
-        $tax_rate_finalprice = ($profit_product_price + (($tax_rate * $profit_product_price) / 100));
-
-        //old price
-        $profit_product_price_old = ($old_price + (($old_price * $profit_product_old) / 100));
-        $tax_rate_finalprice_old = ($profit_product_price_old + (($tax_rate * $profit_product_price_old) / 100));
-
-
-
-
-        $product = Product::withTrashed()->findOrFail($request->id);
-
-        $ProductFeature = ProductFeature::where('product_id', $request->id)->first();
-        if ($ProductFeature) {
-            $feature = ProductFeature::where('product_id', $request->id)->update([
-                'name' =>   ['en' => $request->productfeaturename_en, 'ar' => $request->productfeaturename_ar, 'it' => $request->productfeaturename_it],
-                'description' =>  ['en' => $request->productfeaturedescription_en, 'ar' => $request->productfeaturedescription_ar, 'it' => $request->productfeaturedescription_it],
+        try {
+            // Validate the request
+            $validator = Validator::make($request->all(), [
+                'id' => 'required|integer|exists:products,id',
+                'name' => 'required|string|max:255',
+                'sale_price' => 'required|numeric|min:0',
+                'discounts' => 'nullable|numeric|min:0|max:100',
+                'expected_delivery_time' => 'nullable|string|max:255',
+                'person_id' => 'required|integer|exists:clients,id',
+                'code' => 'required|string|max:255|unique:products,code,' . $request->id,
+                'category' => 'required|string|max:255',
+                'brand' => 'nullable|string|max:255',
+                'unit_type' => 'nullable|string|max:255',
+                'in_stock_quantity' => 'required|integer|min:0',
+                'reorder_limit' => 'nullable|integer|min:0',
+                'minimum_stock' => 'nullable|integer|min:0',
+                'location_in_stock' => 'nullable|string|max:255',
+                'product_size' => 'nullable|string|max:255',
+                'expiry_date' => 'nullable|date|after_or_equal:today',
+                'description' => 'nullable|string',
+                'details' => 'nullable|string|max:1000',
+                'image' => 'nullable|file|image|mimes:jpg,jpeg,png|max:2048',
+                'purchase_price' => 'nullable|numeric|min:0',
+                'expected_profit_margin' => 'nullable|numeric|min:0',
             ]);
-        } else {
 
-            $feature = ProductFeature::create([
-                'name' =>   ['en' => $request->productfeaturename_en, 'ar' => $request->productfeaturename_ar, 'it' => $request->productfeaturename_it],
-                'description' =>  ['en' => $request->productfeaturedescription_en, 'ar' => $request->productfeaturedescription_ar, 'it' => $request->productfeaturedescription_it],
-                'product_id' => $request->id
-
-            ]);
-        }
-
-        if ($request->hasFile('image')) {
-            $imageNameToStore = $this->uploadImage('product', $request->image);
-        }
-
-        if ($request->hasFile('images')) {
-
-            $oldimages = Image::where('product_id', $id)->get();
-
-            foreach ($oldimages as $oldimage) {
-                $oldimage->delete();
+            if ($validator->fails()) {
+                return redirect()->back()->withErrors($validator)->withInput();
             }
-            $images = $request->file('images');
-            foreach ($images as $key => $image) {
 
-                $filename = time() . $key . '.' . $image->extension();
-                $fileNameToStore = $this->uploadImages($image, 'product', $filename);
-                $imagenew = Image::create([
-                    'product_id'       => $product->id,
-                    'src'               => $fileNameToStore,
-                ]);
+            DB::beginTransaction();
+
+            // Find the product and client
+            $product = Product::findOrFail($request->id);
+            $client = Clients::findOrFail($request->person_id);
+
+            // Handle image upload
+            $image = $product->image; // Preserve existing image if no new image
+            if ($request->hasFile('image') && $request->file('image')->isValid()) {
+                // Delete old image if it exists
+                if ($product->image && Storage::disk('public')->exists($product->image)) {
+                    Storage::disk('public')->delete($product->image);
+                }
+                $filename = time() . '.' . $request->file('image')->extension();
+                $image = $this->uploadImg($request->file('image'), $filename, 'product');
+                if (!$image) {
+                    DB::rollBack();
+                    return redirect()->back()->withInput()->with('error', 'فشل في رفع الصورة الرئيسية');
+                }
             }
-        };
 
-        $finaloldprice = str_replace(',', '', number_format($tax_rate_finalprice_old, 2));
-        $finalcrrentprice = str_replace(',', '', number_format($tax_rate_finalprice, 2));
-
-    
-
-        $product->update([
-            $product->name                          = ['en' => $request->name_en, 'ar' => $request->name_ar, 'it' => $request->name_it],
-             $product->name_url                             = ['en' => $request->name_url_en, 'ar' => $request->name_url_ar, 'it' => $request->name_url_it],
-            $product->details                       = ['en' => $request->details_en, 'ar' => $request->details_ar, 'it' => $request->details_it],
-            $product->detailsweb                    = ['en' => $request->detailsweb_en, 'ar' => $request->detailsweb_ar, 'it' => $request->detailsweb_it],
-            $product->old_price                     =  $finaloldprice,
-            $product->current_price                 =  $finalcrrentprice,
-            $product->title_img                     = $request->img_title,
-            $product->alt_text                      = $request->alt_title,
-            $product->slug                          = $request->slug,
-            $product->serial_no                     = $request->serail_no,
-            $product->tax_amount                    = $request->tax_amount,
-            $product->mainoldprice                  = $request->mainoldprice,
-            $product->mainprice                     = $request->mainprice,
-            $product->aliexpress                    = $request->aliexpress_url,
-            $product->keywords                      = $request->keywords,
-            $product->metadescription               = $request->metadescription,
-            $product->smart_price                   = $request->smart_price,
-            $product->quantity                      = $request->quantity,
-            $product->ref_name                      = $request->ref_name,
-            $product->url                           = $request->url,
-            $product->ref_name1                     = $request->ref_name1,
-            $product->delivery_time                 = ['en' => $request->delivery_time_en, 'ar' => $request->delivery_time_ar, 'it' => $request->delivery_time_it],
-            $product->shippingcharges               = ['en' => $request->shippingcharges_en, 'ar' => $request->shippingcharges_ar, 'it' => $request->shippingcharges_it],
-            $product->shippingcharges_value         = $request->shippingcharges_value,
-            $product->sub_category_id               = $request->sub_category_id ?? null,
-            $product->image                         =  ($request->has('image')) ? $imageNameToStore : $product->image,
-        ]);
-
-        if ($request->category_id != "") {
+            // Update the product
             $product->update([
-                $product->category_id                     = $request->category_id
-            ]);
-        }
+                'name' => $request->name,
+                'price' => $request->sale_price, // Map sale_price to price
+                'description' => $request->description,
+                'product_details' => $request->details,
+                'image' => $image,
+                'code' => $request->code,
+                'category' => $request->category,
+                'brand' => $request->brand,
+                'in_stock_quantity' => $request->in_stock_quantity,
+                'reorder_limit' => $request->reorder_limit,
+                'minimum_stock' => $request->minimum_stock,
+                'location_in_stock' => $request->location_in_stock,
+                'purchase_price' => $request->purchase_price ?? 0,
+                'sale_price' => $request->sale_price,
+                'discounts' => $request->discounts,
+                'unit_type' => $request->unit_type,
+                'product_size' => $request->product_size,
+                'person_type' => 'App\Models\Clients',
+                'supplier_name' => $client->name,
+                'status' => 'In Stock',
+                'person_id' => $request->person_id,
+                'expiry_date' => $request->expiry_date,
+                'date_added_to_stock' => date('Y-m-d'),
+                'expected_profit_margin' => $request->expected_profit_margin ?? 0,
+                'supplier_contact_information' => $client->phone,
+                'branch_id' => $request->branch_id ?? $product->branch_id,
 
-
-        if ($request->store_id != "") {
-            $product->update([
-                $product->store_id                     = $request->store_id
             ]);
+
+            // Send notification to the client
+            $notificationSent = false;
+            if ($client) {
+                $deviceTokens = $client->deviceToken()->pluck('device_token')->toArray();
+                foreach ($deviceTokens as $deviceToken) {
+                    $notificationRequest = new Request([
+                        'device_token' => $deviceToken,
+                        'title' => 'تحديث منتج',
+                        'body' => "تم تحديث المنتج بكود {$product->code} في المخزون الخاص بك.",
+                        'icon' => '',
+                    ]);
+
+                    $response = $this->sendFirebaseNotification($notificationRequest);
+                    if ($response && $response->getStatusCode() === 200) {
+                        $notificationSent = true;
+                    } else {
+                        \Log::error('Failed to send product update notification to client', [
+                            'product_id' => $product->id,
+                            'client_id' => $client->id,
+                            'device_token' => $deviceToken,
+                            'error' => $response ? ($response->getData()->error ?? 'Unknown error') : 'No response',
+                        ]);
+                    }
+                }
+            }
+
+            DB::commit();
+
+            Toastr::success('تم تحديث المنتج بنجاح' . ($notificationSent ? ' وتم إرسال الإشعار' : ''), 'نجاح');
+            return redirect()->route('admin.product.index');
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            DB::rollBack();
+            Toastr::error('المنتج أو العميل غير موجود', 'خطأ');
+            return redirect()->back()->withInput();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Toastr::error('حدث خطأ: ' . $e->getMessage(), 'خطأ');
+            return redirect()->back()->withInput();
         }
-        toastr()->success('تم التعديل بنجاح');
-        return back();
     }
 
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Request $request)
+    public function destroy($id)
     {
-        $product = Product::findOrFail($request->id);
+        $product = Product::find($id);
         if ($product) {
             $product->delete();
-            $product->is_Active = false;
-            $product->save();
-            Favorite::where("product_id", $request->id)->delete();
-            Inspiration::where("link_id", $request->id)->delete();
+            Toastr::success('success', 'sucessfully updated');
+            return redirect()->route('admin.product.index');
         }
-
-        toastr()->error('تم حذف المنتج بنجاح');
-        return redirect('admin/product');
+        Toastr::error('error', 'not found');
+        return redirect()->route('admin.product.index');
     }
 }
