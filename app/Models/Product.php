@@ -1,61 +1,83 @@
 <?php
-
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Product extends Model
 {
-    use HasFactory;
+    use SoftDeletes;
 
     protected $fillable = [
-        'name',
-        'code',
-        'description',
-        'category',
-        'brand',
-        'in_stock_quantity',
-        'reorder_limit',
-        'minimum_stock',
-        'location_in_stock',
-        'product_details',
-        'purchase_price',
-        'sale_price',
-        'discounts',
-        'expected_profit_margin',
-        'supplier_name',
-        'supplier_contact_information',
-        'expected_delivery_time',
-        'status',
-        'date_added_to_stock',
-        'date_last_updated_to_stock',
-        'expiry_date',
-        'unit_type',
-        'product_size',
-        'person_id',
-        'person_type',
-        'image',
-        'currency',
-        'branch_id'
+        'category_id', 'name', 'description', 'price', 'has_discount', 
+        'includes_tax', 'includes_shipping', 'stock'
     ];
 
-    /**
-     * Get the associated person (polymorphic relationship).
-     */
-    public function person()
+    protected $casts = [
+        'has_discount' => 'boolean',
+        'includes_tax' => 'boolean',
+        'includes_shipping' => 'boolean',
+        'price' => 'decimal:2',
+    ];
+
+    public function category()
     {
-        return $this->morphTo();
+        return $this->belongsTo(Category::class);
     }
-    /**
-     * Get the images for the product.
-     */
-    public function images()
+
+    public function discount()
     {
-        return $this->morphMany(Image::class, 'imageable');
+        return $this->hasOne(Discount::class);
     }
-    public function shipmentsClient()
+
+    public function colors()
     {
-        return $this->belongsTo(Shipment::class, 'shipments_client_id');
+        return $this->belongsToMany(Color::class);
+    }
+
+    public function deliveryTime()
+    {
+        return $this->hasOne(DeliveryTime::class);
+    }
+
+    public function warranty()
+    {
+        return $this->hasOne(Warranty::class);
+    }
+
+    public function features()
+    {
+        return $this->hasMany(Feature::class);
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    public function sizes()
+    {
+        return $this->hasMany(Size::class);
+    }
+
+    public function offers()
+    {
+        return $this->belongsToMany(Offer::class);
+    }
+
+    public function getFinalPriceAttribute()
+    {
+        if ($this->has_discount && $this->discount) {
+            if ($this->discount->discount_type === 'percentage') {
+                return $this->price - ($this->price * $this->discount->discount_value / 100);
+            }
+            return $this->price - $this->discount->discount_value;
+        }
+        return $this->price;
+    }
+
+    public function getAverageRatingAttribute()
+    {
+        return $this->reviews()->avg('rating') ?? 0;
     }
 }
