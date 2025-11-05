@@ -2,7 +2,7 @@
 
 namespace App\Http\Resources\Website;
 
-use Str;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -22,7 +22,6 @@ class ProductResource extends JsonResource
             'includes_shipping' => $this->includes_shipping,
             'stock'             => $this->stock,
             'average_rating'    => round($this->average_rating, 1),
-
             // Relationships
             'category'     => new CategoryResource($this->whenLoaded('category')),
             'discount'     => new DiscountResource($this->whenLoaded('discount')),

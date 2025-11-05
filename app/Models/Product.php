@@ -80,4 +80,9 @@ class Product extends Model
     {
         return $this->reviews()->avg('rating') ?? 0;
     }
+    public function favouritedBy()
+{
+    return $this->belongsToMany(\App\Models\User::class, 'favourites');
+}
+
 }

@@ -14,7 +14,7 @@ class ReviewSeeder extends Seeder
     public function run()
     {
         $products = Product::all();
-        $users = User::where('role', 'user')->get();
+        $users = User::all();
 
         $comments = [
             'منتج ممتاز وجودة عالية جداً',

@@ -5,7 +5,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Color extends Model
 {
-    protected $fillable = ['name', 'image'];
+    protected $fillable = ['name', 'image','hex_code'];
 
     public function products()
     {
