@@ -6,7 +6,7 @@ use Illuminate\Support\Str;
 
 class Category extends Model
 {
-    protected $fillable = ['name', 'slug', 'description', 'parent_id', 'order'];
+    protected $fillable = ['name', 'slug', 'description', 'parent_id', 'order','status_id'];
 
     protected static function boot()
     {

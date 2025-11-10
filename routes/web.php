@@ -13,9 +13,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// Route::get('/', function () {
-//     return view('website.pages.home');
-// })->name('website.home');
+Route::get('/', function () {
+    return view('welcome');
+})->name('website.home');
 
 // Route::get('/privacy-police', function () {
 //     return view('website.pages.privacy');
