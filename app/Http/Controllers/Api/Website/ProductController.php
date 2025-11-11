@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers\Api\Website;
 
+use App\Http\Resources\Website\ColorResource;
+use App\Models\Material;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Traits\ApiResponseTrait;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Website\MaterialResource;
 use App\Http\Resources\Website\ProductResource;
+use App\Models\Color;
 
 class ProductController extends Controller
 {
@@ -15,39 +19,39 @@ class ProductController extends Controller
     /**
      * 🔹 عرض جميع المنتجات
      */
-    public function index(Request $request)
+public function index(Request $request)
     {
         try {
-            $query = Product::query();
+            $query = Product::with([
+                'category',
+                'discount',
+                'colors',
+                'deliveryTime',
+                'warranty',
+                'features',
+                'reviews',
+                'sizes',
+                'offers',
+                'materials'
+            ]);
 
-            // 🔍 فلترة حسب القسم (اختياري)
-            if ($request->filled('category_id')) {
-                $query->where('category_id', $request->get('category_id'));
-            }
+            $products = $query
+                ->filtered($request)
+                ->searched($request->get('search'))
+                ->sorted($request)
+                ->paginate($request->get('per_page', 10));
 
-            // 🔍 فلترة حسب الحالة (مثلاً: متاح / غير متاح)
-            if ($request->filled('status_id')) {
-                $query->where('status_id', $request->get('status_id'));
-            }
-
-            // 🔍 بحث بالاسم
-            if ($request->filled('search')) {
-                $query->where('name', 'like', '%' . $request->get('search') . '%');
-            }
-
-            // 🔽 ترتيب
-            $query->orderBy('id', 'desc');
-
-            // 📄 ترقيم النتائج (10 عناصر بالصفحة)
-            $products = $query->paginate(10);
-
-            return $this->paginated(ProductResource::collection($products), 'تم جلب المنتجات بنجاح');
-        } catch (\Exception $e) {
+            return $this->paginated(
+                ProductResource::collection($products),
+                'تم جلب المنتجات بنجاح'
+            );
+        } catch (\Throwable $e) {
             return $this->error('حدث خطأ أثناء جلب المنتجات', 500, [
                 'exception' => $e->getMessage(),
             ]);
         }
     }
+
 
     /**
      * 🔹 عرض منتج واحد بالتفصيل
@@ -64,6 +68,34 @@ class ProductController extends Controller
             return $this->success(new ProductResource($product), 'تم جلب بيانات المنتج بنجاح');
         } catch (\Exception $e) {
             return $this->error('حدث خطأ أثناء جلب بيانات المنتج', 500, [
+                'exception' => $e->getMessage(),
+            ]);
+        }
+    }
+    /**
+     * 🔹 جلب جميع الألوان المتاحة للمنتجات
+     */
+    public function getColor()
+    {
+        try {
+            $colors = Color::get();
+            return $this->success(ColorResource::collection($colors), 'تم جلب الألوان بنجاح');
+        } catch (\Exception $e) {
+            return $this->error('حدث خطأ أثناء جلب الألوان', 500, [
+                'exception' => $e->getMessage(),
+            ]);
+        }
+    }
+    /**
+     * 🔹 جلب جميع المواد المتاحة للمنتجات
+     */
+    public function getMaterial()
+    {
+        try {
+            $materials = Material::get();
+            return $this->success(MaterialResource::collection($materials), 'تم جلب المواد بنجاح');
+        } catch (\Exception $e) {
+            return $this->error('حدث خطأ أثناء جلب المواد', 500, [
                 'exception' => $e->getMessage(),
             ]);
         }

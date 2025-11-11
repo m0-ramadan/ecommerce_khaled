@@ -32,9 +32,10 @@ class ProductResource extends JsonResource
             'reviews'       => ReviewResource::collection($this->reviews),
             'sizes'         => SizeResource::collection($this->sizes),
             'offers'        => OfferResource::collection($this->offers),
+            'materials'     => MaterialResource::collection($this->materials),
 
-            'created_at'   => $this->created_at?->format('Y-m-d'),
-            'updated_at'   => $this->updated_at?->format('Y-m-d'),
+            // 'created_at'   => $this->created_at?->format('Y-m-d'),
+            // 'updated_at'   => $this->updated_at?->format('Y-m-d'),
         ];
     }
 }

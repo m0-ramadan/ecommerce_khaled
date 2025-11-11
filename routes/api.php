@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\Website\AuthController;
 use App\Http\Controllers\Api\Website\CartController;
 use App\Http\Controllers\Api\Website\HomeController;
 use App\Http\Controllers\Api\Website\ProductController;
@@ -18,6 +19,7 @@ Route::prefix('v1')->group(function () {
             Route::put('/{id}', [UserAddressController::class, 'update']);
             Route::delete('/{id}', [UserAddressController::class, 'destroy']);
         });
+
         Route::prefix('carts')->group(function () {
             Route::get('/', [CartController::class, 'index']);
             //   Route::get('/{id}', [CartController::class, 'show']);
@@ -25,14 +27,32 @@ Route::prefix('v1')->group(function () {
             Route::put('/{id}', [CartController::class, 'update']);
             Route::delete('/{id}/item', [CartController::class, 'destroy']);
         });
+
+        Route::prefix('auth')->group(function () {
+            Route::get('/profile', [AuthController::class, 'profile']);
+            Route::post('/logout', [AuthController::class, 'logout']);
+        });
+
     });
+
+    Route::prefix('auth')->group(function () {
+        Route::post('/register', [AuthController::class, 'register']);
+        Route::post('/login', [AuthController::class, 'login']);
+        Route::post('/social', [AuthController::class, 'socialLogin']);
+    });
+
     Route::get('home', [HomeController::class, 'index']);
+
     Route::prefix('categories')->group(function () {
         Route::get('/', [CategoryController::class, 'index']);
         Route::get('/{id}', [CategoryController::class, 'show']);
     });
+
     Route::prefix('products')->group(function () {
         Route::get('/', [ProductController::class, 'index']);
+        Route::get('/color', [ProductController::class, 'getColor']);
+        Route::get('/material', [ProductController::class, 'getMaterial']);
         Route::get('/{id}', [ProductController::class, 'show']);
     });
+
 });

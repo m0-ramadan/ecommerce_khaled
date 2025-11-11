@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('categories', function (Blueprint $table) {
-                      $table->integer('status_id')->unsigned()->default('1')->after('order');
-
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('apple_id')->nullable()->after('facebook_id');
+            $table->string('phone')->nullable();
         });
     }
 
@@ -22,7 +22,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('categories', function (Blueprint $table) {
+        Schema::table('users', function (Blueprint $table) {
             //
         });
     }

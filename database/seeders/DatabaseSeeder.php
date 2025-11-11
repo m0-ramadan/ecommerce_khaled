@@ -24,15 +24,15 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
  $this->call([
-          //  CategorySeeder::class,
-           // ColorSeeder::class,
-          //  UserSeeder::class,
-           // ProductSeeder::class,
-           // ReviewSeeder::class,
-           // OfferSeeder::class,
-           // SocialMediaSeeder::class,
-          //  ImportantLinksSeeder::class,
-          //  BranchSeeder::class,
+           CategorySeeder::class,
+           ColorSeeder::class,
+           UserSeeder::class,
+           ProductSeeder::class,
+           ReviewSeeder::class,
+           OfferSeeder::class,
+           SocialMediaSeeder::class,
+           ImportantLinksSeeder::class,
+           BranchSeeder::class,
             PaymentMethodSeeder::class,
         ]);
     }
