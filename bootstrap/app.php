@@ -17,6 +17,31 @@ $app = new Illuminate\Foundation\Application(
 
 /*
 |--------------------------------------------------------------------------
+| Load environment file based on domain
+|--------------------------------------------------------------------------
+|
+| Load .env.local if running on localhost, otherwise load .env.production.
+|
+*/
+
+use Dotenv\Dotenv;
+
+// تحديد الدومين أو اسم السيرفر
+$host = $_SERVER['HTTP_HOST'] ?? php_uname('n');
+
+if (str_contains($host, 'localhost') || str_contains($host, '127.0.0.1')) {
+    $envFile = '.env.local';
+} else {
+    $envFile = '.env.production';
+}
+
+// تحميل ملف .env المناسب
+$dotenv = Dotenv::createImmutable($app->basePath(), $envFile);
+$dotenv->safeLoad(); // safeLoad أفضل لو الملف غير موجود على السيرفر المحلي
+$dotenv->load();
+
+/*
+|--------------------------------------------------------------------------
 | Bind Important Interfaces
 |--------------------------------------------------------------------------
 |

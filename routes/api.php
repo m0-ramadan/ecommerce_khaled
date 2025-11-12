@@ -32,13 +32,14 @@ Route::prefix('v1')->group(function () {
             Route::get('/profile', [AuthController::class, 'profile']);
             Route::post('/logout', [AuthController::class, 'logout']);
         });
-
     });
 
     Route::prefix('auth')->group(function () {
         Route::post('/register', [AuthController::class, 'register']);
-        Route::post('/login', [AuthController::class, 'login']);
-        Route::post('/social', [AuthController::class, 'socialLogin']);
+        Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
+        Route::post('/social-login', [AuthController::class, 'socialLogin']);
+        Route::post('send-otp', [AuthController::class, 'sendOtp']);
+        Route::post('verify-otp',  [AuthController::class, 'verifyOtp']);
     });
 
     Route::get('home', [HomeController::class, 'index']);
@@ -54,5 +55,4 @@ Route::prefix('v1')->group(function () {
         Route::get('/material', [ProductController::class, 'getMaterial']);
         Route::get('/{id}', [ProductController::class, 'show']);
     });
-
 });

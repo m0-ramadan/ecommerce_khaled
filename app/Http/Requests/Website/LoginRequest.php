@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\Api\Auth;
+namespace App\Http\Requests\Website;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -15,7 +15,17 @@ class LoginRequest extends FormRequest
     {
         return [
             'email'    => 'required|email',
-            'password' => 'required|min:6',
+            'password' => 'nullable|min:6',
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'email.required' => 'البريد الإلكتروني مطلوب.',
+            'email.email'    => 'يرجى إدخال بريد إلكتروني صالح.',
+
+            'password.min'   => 'كلمة المرور يجب ألا تقل عن 6 أحرف.',
         ];
     }
 }
