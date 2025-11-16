@@ -43,4 +43,5 @@ class BannerItem extends Model
     {
         return $this->hasMany(BannerAnalytics::class);
     }
+    
 }

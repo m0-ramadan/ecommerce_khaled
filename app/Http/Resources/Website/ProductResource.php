@@ -21,6 +21,8 @@ class ProductResource extends JsonResource
             'includes_tax'      => $this->includes_tax,
             'includes_shipping' => $this->includes_shipping,
             'stock'             => $this->stock,
+            'image'             => $this->image ? get_user_image($this->image) : null ,
+
             'average_rating'    => round($this->average_rating, 1),
             // Relationships
             'category'      => new CategoryResource($this->category),

@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers\Api\Website;
 
-use App\Http\Controllers\Controller;
-use App\Traits\ApiResponseTrait;
-use Illuminate\Http\Request;
-use App\Models\Category;
 use App\Models\Product;
+
+use App\Models\Category;
+use Illuminate\Http\Request;
+use App\Traits\ApiResponseTrait;
+use App\Http\Controllers\Controller;
+use App\Http\Resources\Website\ProductResource;
+use App\Http\Resources\Website\CategoryResource;
 
 class HomeController extends Controller
 {
@@ -19,7 +22,7 @@ class HomeController extends Controller
     {
         try {
             // 🟢 جلب الأقسام النشطة فقط
-            $categories = Category::where('status_id', 1)
+            $categories = Category::where('status_id', 1)->whereNull('parent_id')
                 ->get();
 
             // 🟢 جلب 10 منتجات نشطة للعرض في الصفحة الرئيسية
@@ -29,8 +32,8 @@ class HomeController extends Controller
 
             // 📦 البيانات النهائية
             $data = [
-                'categories' => $categories,
-                'products'   => $products,
+                'categories' =>CategoryResource::collection($categories) ,
+                'products'   =>ProductResource::collection($products) ,
             ];
 
             return $this->success($data, 'تم جلب بيانات الصفحة الرئيسية بنجاح');

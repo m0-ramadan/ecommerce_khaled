@@ -12,7 +12,7 @@ use App\Models\OtpVerification;
 use App\Traits\ApiResponseTrait;
 
 use App\Http\Controllers\Controller;
-
+use App\Http\Requests\Website\Auth\ResetPasswordRequest;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 
@@ -22,7 +22,7 @@ use App\Http\Resources\Website\UserResource;
 use App\Http\Requests\Website\RegisterRequest;
 
 
-use App\Http\Requests\Website\VerifyOtpRequest;
+use App\Http\Requests\Website\Auth\VerifyOtpRequest;
 
 use App\Http\Requests\Website\Auth\SendOtpRequest;
 use App\Http\Requests\Website\SocialMediaLoginRequest;
@@ -85,7 +85,7 @@ class AuthController extends Controller
      */
     public function socialLogin(SocialMediaLoginRequest $request)
     {
-      
+
         try {
             $column = "{$request->provider}_id";
 
@@ -177,7 +177,7 @@ class AuthController extends Controller
     /**
      * Verify OTP + Reset Password
      */
-    public function verifyOtp(VerifyOtpRequest $request)
+    public function resetPassword(ResetPasswordRequest $request)
     {
         try {
             $email = $request->email;
@@ -215,13 +215,48 @@ class AuthController extends Controller
             // Create new token
             $token = $user->createToken('api_token')->plainTextToken;
 
-            // Clean up
+            // Cleanup OTP records
             OtpVerification::where('email', $email)->delete();
 
             return $this->success([
                 'user'  => new UserResource($user),
                 'token' => $token,
-            ], 'تم التحقق من رمز OTP وإعادة تعيين كلمة المرور بنجاح');
+            ], 'تم إعادة تعيين كلمة المرور بنجاح');
+        } catch (\Exception $e) {
+            return $this->error('حدث خطأ أثناء إعادة تعيين كلمة المرور', 500, [
+                'exception' => $e->getMessage()
+            ]);
+        }
+    }
+
+
+    public function verifyOtp(VerifyOtpRequest $request)
+    {
+        try {
+            $email = $request->email;
+            $plainOtp = $request->otp;
+
+            $record = OtpVerification::where('email', $email)
+                ->whereNull('used_at')
+                ->first();
+
+            if (!$record) {
+                return $this->error('رمز OTP غير صالح أو تم استخدامه', 422);
+            }
+
+            if ($record->isExpired()) {
+                $record->delete();
+                return $this->error('انتهت صلاحية رمز OTP', 422);
+            }
+
+            if (!Hash::check($plainOtp, $record->otp)) {
+                return $this->error('رمز OTP غير صحيح', 422);
+            }
+
+            // يمكن فقط تمييزه مؤقتاً أو تركه كما هو بدون حذف
+            return $this->success([
+                'email' => $email,
+            ], 'تم التحقق من رمز OTP بنجاح');
         } catch (\Exception $e) {
             return $this->error('حدث خطأ أثناء التحقق من OTP', 500, [
                 'exception' => $e->getMessage()

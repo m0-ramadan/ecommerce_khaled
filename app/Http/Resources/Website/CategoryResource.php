@@ -18,6 +18,8 @@ class CategoryResource extends JsonResource
             'parent'      => $this->whenLoaded('parent', fn() => new self($this->parent)),
             'children'    => self::collection($this->children),
             'order'       => $this->order,
+            'image'       => $this->image ? get_user_image($this->image) : null ,
+            'sub_image'       => $this->sub_image ? get_user_image($this->sub_image) : null ,
             'is_parent'   => $this->isParent(),
         ];
     }

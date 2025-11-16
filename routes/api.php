@@ -39,7 +39,9 @@ Route::prefix('v1')->group(function () {
         Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
         Route::post('/social-login', [AuthController::class, 'socialLogin']);
         Route::post('send-otp', [AuthController::class, 'sendOtp']);
+        Route::post('reset-password',  [AuthController::class, 'resetPassword']);
         Route::post('verify-otp',  [AuthController::class, 'verifyOtp']);
+
     });
 
     Route::get('home', [HomeController::class, 'index']);

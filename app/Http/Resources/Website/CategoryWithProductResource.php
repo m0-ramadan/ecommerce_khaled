@@ -18,6 +18,8 @@ class CategoryWithProductResource extends JsonResource
             'parent'      => $this->whenLoaded('parent', fn() => new self($this->parent)),
             'children'    => self::collection(CategoryResource::collection($this->children)),
             'order'       => $this->order,
+            'image'       => $this->image,
+            'sub_image' => $this->sub_image,
             'is_parent'   => $this->isParent(),
             'products'    => ProductResource::collection($this->products),
         ];

@@ -26,10 +26,12 @@ $app = new Illuminate\Foundation\Application(
 
 use Dotenv\Dotenv;
 
-// تحديد الدومين أو اسم السيرفر
-$host = $_SERVER['HTTP_HOST'] ?? php_uname('n');
+$host = $_SERVER['HTTP_HOST'] ?? null;
 
-if (str_contains($host, 'localhost') || str_contains($host, '127.0.0.1')) {
+if (app()->runningInConsole()) {
+    // أي أمر artisan يستخدم .env.local
+    $envFile = '.env.local';
+} elseif (str_contains($host, 'localhost') || str_contains($host, '127.0.0.1')) {
     $envFile = '.env.local';
 } else {
     $envFile = '.env.production';

@@ -18,7 +18,7 @@ class Product extends Model
         'includes_tax',
         'includes_shipping',
         'stock',
-        'status_id'
+        'status_id','image',
     ];
 
     protected $casts = [
