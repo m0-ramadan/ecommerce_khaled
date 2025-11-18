@@ -16,9 +16,7 @@ class ProductController extends Controller
 {
     use ApiResponseTrait;
 
-    /**
-     * 🔹 عرض جميع المنتجات
-     */
+
 public function index(Request $request)
     {
         try {
@@ -53,9 +51,6 @@ public function index(Request $request)
     }
 
 
-    /**
-     * 🔹 عرض منتج واحد بالتفصيل
-     */
     public function show($id)
     {
         try {

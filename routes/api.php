@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Website\AuthController;
 use App\Http\Controllers\Api\Website\CartController;
 use App\Http\Controllers\Api\Website\HomeController;
+use App\Http\Controllers\Api\Website\BannerController;
 use App\Http\Controllers\Api\Website\ProductController;
 use App\Http\Controllers\Api\Website\CategoryController;
 use App\Http\Controllers\Api\Website\UserAddressController;
@@ -57,4 +58,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/material', [ProductController::class, 'getMaterial']);
         Route::get('/{id}', [ProductController::class, 'show']);
     });
+
+    Route::get('/banners', [BannerController::class, 'index']);
+
 });

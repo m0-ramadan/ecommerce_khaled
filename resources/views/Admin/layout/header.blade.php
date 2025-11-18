@@ -1,7 +1,7 @@
 <div class="page-main-header">
         <div class="main-header-right row m-0">
           <div class="main-header-left">
-            <div class="logo-wrapper"><a href="{{route('admin.home')}}">OYA</a></div>
+            <div class="logo-wrapper"><a href="{{route('admin.home')}}">{{ env('APP_NAME') }}</a></div>
             <div class="dark-logo-wrapper"><a href="index.html"><img class="img-fluid" src="../assets/images/logo/dark-logo.png" alt=""></a></div>
             <div class="toggle-sidebar"><i class="status_toggle middle" data-feather="align-center" id="sidebar-toggle"></i></div>
           </div>
@@ -37,10 +37,10 @@
 
 
               <li class="onhover-dropdown p-0">
-              <button class="btn btn-primary-light" type="button"><a href="{{ route('logout') }}"
+              <button class="btn btn-primary-light" type="button"><a href="{{ route('admin.logout') }}"
                                      onclick="event.preventDefault();document.getElementById('logout-form').submit();"><i data-feather="log-out"></i>Log out</a></button>
            
-           <form id="logout-form"action="{{route('logout')}}" method="post">
+           <form id="logout-form"action="{{route('admin.logout')}}" method="post">
               @csrf
              </form>
               </li>

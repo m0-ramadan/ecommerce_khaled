@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Http\Request;
+
 class Product extends Model
 {
     use SoftDeletes;
@@ -18,7 +19,8 @@ class Product extends Model
         'includes_tax',
         'includes_shipping',
         'stock',
-        'status_id','image',
+        'status_id',
+        'image',
     ];
 
     protected $casts = [
@@ -72,6 +74,12 @@ class Product extends Model
     {
         return $this->belongsToMany(Offer::class);
     }
+
+    public function images()
+    {
+        return $this->morphMany(Image::class, 'imageable');
+    }
+
 
     public function getFinalPriceAttribute()
     {
@@ -158,12 +166,12 @@ class Product extends Model
 
         return $query->where(function ($q) use ($search) {
             $q->where('name', 'like', "%{$search}%")
-              ->orWhere('description', 'like', "%{$search}%")
-              ->orWhereHas('category', fn($c) => $c->where('name', 'like', "%{$search}%"))
-              ->orWhereHas('features', fn($f) => $f
-                  ->where('name', 'like', "%{$search}%")
-                  ->orWhere('value', 'like', "%{$search}%"))
-              ->orWhereHas('materials', fn($m) => $m->where('name', 'like', "%{$search}%"));
+                ->orWhere('description', 'like', "%{$search}%")
+                ->orWhereHas('category', fn($c) => $c->where('name', 'like', "%{$search}%"))
+                ->orWhereHas('features', fn($f) => $f
+                    ->where('name', 'like', "%{$search}%")
+                    ->orWhere('value', 'like', "%{$search}%"))
+                ->orWhereHas('materials', fn($m) => $m->where('name', 'like', "%{$search}%"));
         });
     }
 

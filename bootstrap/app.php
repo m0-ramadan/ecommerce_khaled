@@ -1,15 +1,6 @@
 <?php
 
-/*
-|--------------------------------------------------------------------------
-| Create The Application
-|--------------------------------------------------------------------------
-|
-| The first thing we will do is create a new Laravel application instance
-| which serves as the "glue" for all the components of Laravel, and is
-| the IoC container for the system binding all of the various parts.
-|
-*/
+use Dotenv\Dotenv;
 
 $app = new Illuminate\Foundation\Application(
     $_ENV['APP_BASE_PATH'] ?? dirname(__DIR__)
@@ -17,40 +8,37 @@ $app = new Illuminate\Foundation\Application(
 
 /*
 |--------------------------------------------------------------------------
-| Load environment file based on domain
+| Load Environment File Dynamically
 |--------------------------------------------------------------------------
 |
-| Load .env.local if running on localhost, otherwise load .env.production.
+| 1. CLI commands (artisan) تستخدم .env.local
+| 2. Web server: إذا الدومين يحتوي localhost أو 127.0.0.1 استخدم .env.local
+| 3. باقي الحالات استخدم .env.production
 |
 */
 
-use Dotenv\Dotenv;
-
-$host = $_SERVER['HTTP_HOST'] ?? null;
+$envFile = '.env.production'; // الافتراضي
 
 if (app()->runningInConsole()) {
-    // أي أمر artisan يستخدم .env.local
-    $envFile = '.env.local';
-} elseif (str_contains($host, 'localhost') || str_contains($host, '127.0.0.1')) {
     $envFile = '.env.local';
 } else {
-    $envFile = '.env.production';
+    $host = $_SERVER['HTTP_HOST'] ?? '';
+    if (str_contains($host, 'localhost') || str_contains($host, '127.0.0.1')) {
+        $envFile = '.env.local';
+    }
 }
 
 // تحميل ملف .env المناسب
 $dotenv = Dotenv::createImmutable($app->basePath(), $envFile);
-$dotenv->safeLoad(); // safeLoad أفضل لو الملف غير موجود على السيرفر المحلي
-$dotenv->load();
+$dotenv->safeLoad(); // safeLoad أفضل لو الملف غير موجود
+
+// Optional: debug values to confirm
+// dd(env('DB_CONNECTION'), env('DB_USERNAME'), env('DB_DATABASE'));
 
 /*
 |--------------------------------------------------------------------------
 | Bind Important Interfaces
 |--------------------------------------------------------------------------
-|
-| Next, we need to bind some important interfaces into the container so
-| we will be able to resolve them when needed. The kernels serve the
-| incoming requests to this application from both the web and CLI.
-|
 */
 
 $app->singleton(
@@ -67,16 +55,5 @@ $app->singleton(
     Illuminate\Contracts\Debug\ExceptionHandler::class,
     App\Exceptions\Handler::class
 );
-
-/*
-|--------------------------------------------------------------------------
-| Return The Application
-|--------------------------------------------------------------------------
-|
-| This script returns the application instance. The instance is given to
-| the calling script so we can separate the building of the instances
-| from the actual running of the application and sending responses.
-|
-*/
 
 return $app;

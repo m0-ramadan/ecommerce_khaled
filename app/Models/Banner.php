@@ -12,7 +12,7 @@ class Banner extends Model
         'section_order',
         'is_active',
         'start_date',
-        'end_date',
+        'end_date'
     ];
 
     protected $casts = [

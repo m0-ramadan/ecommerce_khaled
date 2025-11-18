@@ -63,7 +63,7 @@ class LogVisitor
                 'session_id' => session()->getId(),
             ]);
         } catch (\Throwable $e) {
-            \Log::warning('Visitor logging failed: ' . $e->getMessage());
+            \Illuminate\Support\Facades\Log::warning('Visitor logging failed: ' . $e->getMessage());
         }
 
         return $response;

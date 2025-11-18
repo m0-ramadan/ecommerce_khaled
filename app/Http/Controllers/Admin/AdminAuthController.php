@@ -24,10 +24,10 @@ class AdminAuthController extends Controller
     // No middleware applied here to allow access to login and password reset pages
   }
 
-  public function register()
-  {
-    return $this->adminAuthInterface->register();
-  }
+  // public function register()
+  // {
+  //   return $this->adminAuthInterface->register();
+  // }
 
   public function loginPage()
   {

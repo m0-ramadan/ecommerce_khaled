@@ -21,6 +21,7 @@ class CategoryResource extends JsonResource
             'image'       => $this->image ? get_user_image($this->image) : null ,
             'sub_image'       => $this->sub_image ? get_user_image($this->sub_image) : null ,
             'is_parent'   => $this->isParent(),
+            'category_banners' => BannerItemResource::collection($this->categoryBanners),
         ];
     }
 }

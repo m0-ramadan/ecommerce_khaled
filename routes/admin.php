@@ -39,8 +39,8 @@ use App\Http\Controllers\Admin\LogisticServiceController;
 */
 
 // Authentication Routes
-Route::prefix('auth')->name('admin.')->middleware('guest:admin')->group(function () {
-    Route::get('login', [AdminAuthController::class, 'loginPage'])->name('loginpage');
+Route::prefix('admin')->name('admin.')->middleware('guest:admin')->group(function () {
+    Route::get('login', [AdminAuthController::class, 'loginPage'])->name('login');
     Route::post('login', [AdminAuthController::class, 'login'])->name('login');
     Route::post('logout', [AdminAuthController::class, 'logout'])->name('logout');
 
@@ -71,17 +71,11 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
         'permissions' => PermissionsController::class,
         'roles' => RolesController::class,
         'countries' => CountryController::class,
-        'lockers' => LockerController::class,
         'payments' => PaymentController::class,
-        'vehicles' => VehicleController::class,
-        'currencies' => CurrencyController::class,
-        'notes' => NoteController::class,
         'contactus' => ContactUsController::class,
         'faqs' => FaqController::class,
-        'packages' => PackageController::class,
         'products' => ProductController::class,
         'sliders' => SliderController::class,
-        'codes' => CodeController::class,
         'logistic-services' => LogisticServiceController::class,
         'employees' => EmployeeController::class,
         'managers' => ManagerController::class,

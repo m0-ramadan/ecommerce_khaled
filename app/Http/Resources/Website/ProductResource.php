@@ -21,8 +21,7 @@ class ProductResource extends JsonResource
             'includes_tax'      => $this->includes_tax,
             'includes_shipping' => $this->includes_shipping,
             'stock'             => $this->stock,
-            'image'             => $this->image ? get_user_image($this->image) : null ,
-
+            'image'             => $this->image ? get_user_image($this->image) : "https://eg-rv.homzmart.net/catalog/product/J/O/JOUFURH08142090-1-Navyblue.jpg" ,
             'average_rating'    => round($this->average_rating, 1),
             // Relationships
             'category'      => new CategoryResource($this->category),
@@ -35,6 +34,8 @@ class ProductResource extends JsonResource
             'sizes'         => SizeResource::collection($this->sizes),
             'offers'        => OfferResource::collection($this->offers),
             'materials'     => MaterialResource::collection($this->materials),
+            'images' => ImageResource::collection($this->images),
+
 
             // 'created_at'   => $this->created_at?->format('Y-m-d'),
             // 'updated_at'   => $this->updated_at?->format('Y-m-d'),

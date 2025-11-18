@@ -6,245 +6,164 @@
 @endsection
 
 @section('content')
-    <div class="row">
-        <div class="col-xl-12 box-col-12 des-xl-100">
-            <div class="row">
-                <!-- قسم المستخدمين -->
-                <div class="col-xl-3 col-md-4 col-sm-6 box-col-3 des-xl-25 rate-sec">
-                    <a href="#">
-                        <div class="card income-card card-primary">
-                            <div class="card-body text-center">
-                                <div class="round-box">
-                                    <i data-feather="user"></i>
-                                </div>
-                                <h5>
-                                    {{ \App\Models\Clients::where(['type' => 1, 'status' => 0])->when(auth()->user()->branch_id, function ($query) {
-                                            return $query->where('branch_id', auth()->user()->branch_id);
-                                        })->count() }}
-                                </h5>
-                                <p style="font-family: 'Cairo', sans-serif;">عدد المستخدمين</p>
-                            </div>
-                        </div>
-                    </a>
-                </div>
+<div class="row">
+    <div class="col-xl-12 box-col-12 des-xl-100">
+        <div class="row">
 
-                <!-- قسم التجار -->
-                <div class="col-xl-3 col-md-4 col-sm-6 box-col-3 des-xl-25 rate-sec">
-                    <a href="#">
-                        <div class="card income-card card-primary">
-                            <div class="card-body text-center">
-                                <div class="round-box">
-                                    <i data-feather="briefcase"></i>
-                                </div>
-                                <h5>
-                                    {{ \App\Models\Clients::where(['type' => 2, 'status' => 0])->when(auth()->user()->branch_id, function ($query) {
-                                            return $query->where('branch_id', auth()->user()->branch_id);
-                                        })->count() }}
-                                </h5>
-                                <p style="font-family: 'Cairo', sans-serif;">عدد التجار</p>
+            <!-- عدد المستخدمين -->
+            <div class="col-xl-3 col-md-4 col-sm-6 box-col-3 des-xl-25 rate-sec">
+                <a href="#">
+                    <div class="card income-card card-primary">
+                        <div class="card-body text-center">
+                            <div class="round-box">
+                                <i data-feather="user"></i>
                             </div>
+                            <h5>{{ \App\Models\User::count() }}</h5>
+                            <p style="font-family: 'Cairo', sans-serif;">عدد المستخدمين</p>
                         </div>
-                    </a>
-                </div>
-
-                @if (auth()->user()->hasRole('super_admin'))
-                    <!-- قسم المندوبين -->
-                    <div class="col-xl-3 col-md-4 col-sm-6 box-col-3 des-xl-25 rate-sec">
-                        <a href="#">
-                            <div class="card income-card card-primary">
-                                <div class="card-body text-center">
-                                    <div class="round-box">
-                                        <i data-feather="user-check"></i>
-                                    </div>
-                                    <h5>{{ \App\Models\Representative::where('status', 0)->count() }}</h5>
-                                    <p style="font-family: 'Cairo', sans-serif;">عدد المندوبين</p>
-                                </div>
-                            </div>
-                        </a>
                     </div>
-                @endif
+                </a>
+            </div>
 
-                <!-- قسم الرحلات -->
-                <div class="col-xl-3 col-md-3 col-sm-6 box-col-3 des-xl-25 rate-sec">
-                    <a href="#">
-                        <div class="card income-card card-primary">
-                            <div class="card-body text-center">
-                                <div class="round-box">
-                                    <i data-feather="map"></i>
-                                </div>
-                                <h5>
-                                    {{ \App\Models\Trip::when(auth()->user()->branch_id, function ($query) {
-                                        return $query->where(function ($q) {
-                                            $q->where('branches_from', auth()->user()->branch_id)->orWhere('branches_to', auth()->user()->branch_id);
-                                        });
-                                    })->count() }}
-                                </h5>
-                                <p style="font-family: 'Cairo', sans-serif;">عدد الرحلات</p>
+            <!-- عدد الزوار -->
+            <div class="col-xl-3 col-md-4 col-sm-6 box-col-3 des-xl-25 rate-sec">
+                <a href="#">
+                    <div class="card income-card card-primary">
+                        <div class="card-body text-center">
+                            <div class="round-box">
+                                <i data-feather="user-check"></i>
                             </div>
+                            <h5>{{ \App\Models\Visitor::count() }}</h5>
+                            <p style="font-family: 'Cairo', sans-serif;">عدد الزوار</p>
                         </div>
-                    </a>
-                </div>
+                    </div>
+                </a>
+            </div>
 
-                <!-- شحنات بدون رحلات -->
-                <div class="col-xl-3 col-md-3 col-sm-6 box-col-3 des-xl-25 rate-sec">
-                    <a href="#">
-                        <div class="card income-card card-danger">
-                            <div class="card-body text-center">
-                                <div class="round-box">
-                                    <i data-feather="truck"></i>
-                                </div>
-                                <h5>
-                                    {{ \App\Models\Shipment::doesntHave('trips')->where('status_id', '!=', 5)->when(auth()->user()->branch_id, function ($query) {
-                                            return $query->where('branches_from', auth()->user()->branch_id);
-                                        })->count() }}
-                                </h5>
-                                <p style="font-family: 'Cairo', sans-serif;">شحنات بدون رحلات</p>
+            <!-- عدد المنتجات -->
+            <div class="col-xl-3 col-md-4 col-sm-6 box-col-3 des-xl-25 rate-sec">
+                <a href="#">
+                    <div class="card income-card card-primary">
+                        <div class="card-body text-center">
+                            <div class="round-box">
+                                <i data-feather="package"></i>
                             </div>
+                            <h5>{{ \App\Models\Product::count() }}</h5>
+                            <p style="font-family: 'Cairo', sans-serif;">عدد المنتجات</p>
                         </div>
-                    </a>
-                </div>
+                    </div>
+                </a>
+            </div>
 
-                <!-- شحنات الزبائن منتظرة التسعير -->
-                <div class="col-xl-3 col-md-3 col-sm-6 box-col-3 des-xl-25 rate-sec">
-                    <a href="{{ route('admin.shipment.n_priced') }}">
-                        <div class="card income-card card-danger">
-                            <div class="card-body text-center">
-                                <div class="round-box">
-                                    <i data-feather="truck"></i>
-                                </div>
-                                <h5>
-                                    {{ \App\Models\Shipment::where(['type' => 1, 'is_priced' => 0])->when(auth()->user()->branch_id, function ($query) {
-                                            return $query->where('branches_from', auth()->user()->branch_id);
-                                        })->count() }}
-                                </h5>
-                                <p style="font-family: 'Cairo', sans-serif;">شحنات الزبائن منتظرة التسعير</p>
+            <!-- عدد الأقسام -->
+            <div class="col-xl-3 col-md-4 col-sm-6 box-col-3 des-xl-25 rate-sec">
+                <a href="#">
+                    <div class="card income-card card-primary">
+                        <div class="card-body text-center">
+                            <div class="round-box">
+                                <i data-feather="grid"></i>
                             </div>
+                            <h5>{{ \App\Models\Category::count() }}</h5>
+                            <p style="font-family: 'Cairo', sans-serif;">عدد الأقسام</p>
                         </div>
-                    </a>
-                </div>
+                    </div>
+                </a>
+            </div>
 
-                <!-- شحنات الزبائن منتظرة التاكيد -->
-                <div class="col-xl-3 col-md-3 col-sm-6 box-col-3 des-xl-25 rate-sec">
-                    <a href="{{ route('admin.shipment.priced') }}">
-                        <div class="card income-card card-danger">
-                            <div class="card-body text-center">
-                                <div class="round-box">
-                                    <i data-feather="truck"></i>
-                                </div>
-                                <h5>
-                                    {{ \App\Models\Shipment::where(['type' => 1, 'is_priced' => 1, 'active' => 0])->when(auth()->user()->branch_id, function ($query) {
-                                            return $query->where(function ($q) {
-                                                $q->where('branches_from', auth()->user()->branch_id)->orWhere('branches_to', auth()->user()->branch_id);
-                                            });
-                                        })->count() }}
-                                </h5>
-                                <p style="font-family: 'Cairo', sans-serif;">شحنات الزبائن منتظرة التاكيد</p>
+            <!-- عدد الطلبات -->
+            <div class="col-xl-3 col-md-4 col-sm-6 box-col-3 des-xl-25 rate-sec">
+                <a href="#">
+                    <div class="card income-card card-primary">
+                        <div class="card-body text-center">
+                            <div class="round-box">
+                                <i data-feather="shopping-cart"></i>
                             </div>
+                            <h5>5</h5>
+                            <p style="font-family: 'Cairo', sans-serif;">عدد الطلبات</p>
                         </div>
-                    </a>
-                </div>
+                    </div>
+                </a>
+            </div>
 
-                <!-- شحنات الزبائن منتظرة تاكيد الإدارة -->
-                <div class="col-xl-3 col-md-3 col-sm-6 box-col-3 des-xl-25 rate-sec">
-                    <a href="{{ route('admin.shipment.n_active') }}">
-                        <div class="card income-card card-danger">
-                            <div class="card-body text-center">
-                                <div class="round-box">
-                                    <i data-feather="truck"></i>
-                                </div>
-                                <h5>
-                                    {{ \App\Models\Shipment::where(['type' => 1, 'is_priced' => 2, 'active' => 0])->when(auth()->user()->branch_id, function ($query) {
-                                            return $query->where(function ($q) {
-                                                $q->where('branches_from', auth()->user()->branch_id)->orWhere('branches_to', auth()->user()->branch_id);
-                                            });
-                                        })->count() }}
-                                </h5>
-                                <p style="font-family: 'Cairo', sans-serif;">شحنات الزبائن منتظرة تاكيد الإدارة</p>
-                            </div>
-                        </div>
-                    </a>
-                </div>
+        </div>
+    </div>
+</div>
 
-                <!-- شحنات الزبائن -->
-                <div class="col-xl-3 col-md-3 col-sm-6 box-col-3 des-xl-25 rate-sec">
-                    <a href="{{ route('admin.shipment.client') }}">
-                        <div class="card income-card card-danger">
-                            <div class="card-body text-center">
-                                <div class="round-box">
-                                    <i data-feather="truck"></i>
-                                </div>
-                                <h5>
-                                    {{ \App\Models\Shipment::where(['type' => 1, 'active' => 1])->when(auth()->user()->branch_id, function ($query) {
-                                            return $query->where('branches_from', auth()->user()->branch_id);
-                                        })->count() }}
-                                </h5>
-                                <p style="font-family: 'Cairo', sans-serif;">شحنات الزبائن</p>
-                            </div>
-                        </div>
-                    </a>
-                </div>
+{{-- Charts --}}
+<div class="row mt-4">
 
-                <!-- شحنات التجار منتظرة تأكيد -->
-                <div class="col-xl-3 col-md-3 col-sm-6 box-col-3 des-xl-25 rate-sec">
-                    <a href="{{ route('admin.shipment.n_activeMerch') }}">
-                        <div class="card income-card card-danger">
-                            <div class="card-body text-center">
-                                <div class="round-box">
-                                    <i data-feather="truck"></i>
-                                </div>
-                                <h5>
-                                    {{ \App\Models\Shipment::where(['type' => 2, 'is_priced' => 2, 'active' => 0])->when(auth()->user()->branch_id, function ($query) {
-                                            return $query->where('branches_from', auth()->user()->branch_id);
-                                        })->count() }}
-                                </h5>
-                                <p style="font-family: 'Cairo', sans-serif;">شحنات التجار منتظرة تأكيد</p>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-
-                <!-- شحنات التجار -->
-                <div class="col-xl-3 col-md-3 col-sm-6 box-col-3 des-xl-25 rate-sec">
-                    <a href="{{ route('admin.shipment.index') }}">
-                        <div class="card income-card card-danger">
-                            <div class="card-body text-center">
-                                <div class="round-box">
-                                    <i data-feather="truck"></i>
-                                </div>
-                                <h5>
-                                    {{ \App\Models\Shipment::where(['type' => 2, 'active' => 1])->when(auth()->user()->branch_id, function ($query) {
-                                            return $query->where('branches_from', auth()->user()->branch_id);
-                                        })->count() }}
-                                </h5>
-                                <p style="font-family: 'Cairo', sans-serif;">شحنات التجار</p>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-
-                <!-- الشحنات الملغاة -->
-                <div class="col-xl-3 col-md-3 col-sm-6 box-col-3 des-xl-25 rate-sec">
-                    <a href="#">
-                        <div class="card income-card card-primary">
-                            <div class="card-body text-center">
-                                <div class="round-box">
-                                    <i data-feather="x-circle"></i>
-                                </div>
-                                <h5>
-                                    {{ \App\Models\Shipment::where('status_id', 5)->when(auth()->user()->branch_id, function ($query) {
-                                            return $query->where('branches_from', auth()->user()->branch_id);
-                                        })->count() }}
-                                </h5>
-                                <p style="font-family: 'Cairo', sans-serif;">عدد الشحنات الملغاة</p>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-
+    <!-- زيارات حسب الدول -->
+    <div class="col-xl-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>الزيارات حسب الدول</h5>
+            </div>
+            <div class="card-body">
+                <div id="visitsByCountry"></div>
             </div>
         </div>
     </div>
+
+    <!-- الطلبات خلال آخر 10 أيام -->
+    <div class="col-xl-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>الطلبات خلال آخر 10 أيام</h5>
+            </div>
+            <div class="card-body">
+                <div id="ordersChart"></div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
 @endsection
 
 @section('js')
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // بيانات الدول
+    const visitsLabels = {!! json_encode(array_keys($countriesData)) !!};
+    const visitsData = {!! json_encode(array_values($countriesData)) !!};
+
+    // بيانات الطلبات
+    const ordersLabels = {!! json_encode($visitsLabels) !!};
+    const ordersData = {!! json_encode($visitsData) !!};
+
+    // شارت زيارات حسب الدول
+    var visitsChart = new ApexCharts(document.querySelector("#visitsByCountry"), {
+        chart: {
+            type: 'bar',
+            height: 350
+        },
+        series: [{
+            name: 'الزيارات',
+            data: visitsData
+        }],
+        xaxis: {
+            categories: visitsLabels
+        }
+    });
+    visitsChart.render();
+
+    // شارت الطلبات آخر 10 أيام
+    var ordersChart = new ApexCharts(document.querySelector("#ordersChart"), {
+        chart: {
+            type: 'line',
+            height: 350
+        },
+        series: [{
+            name: 'الطلبات',
+            data: ordersData
+        }],
+        xaxis: {
+            categories: ordersLabels
+        }
+    });
+    ordersChart.render();
+});
+</script>
 @endsection

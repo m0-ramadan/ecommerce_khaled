@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
+use Carbon\Carbon;
 use App\Models\Admin;
 use App\Models\Branchs;
+use App\Models\Visitor;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Log;
@@ -27,10 +29,64 @@ class AdminController extends Controller
         $admins = Admin::all();
         return view('Admin.index', compact('admins'));
     }
-    public function index()
+  public function index()
     {
-        $admins = Admin::all();
-        return view('Admin.admin.index', compact('admins'));
+        // ---------------------------------------
+        // زيارات آخر 10 أيام
+        // ---------------------------------------
+
+        $visits = Visitor::selectRaw('DATE(created_at) as date, COUNT(*) as count')
+            ->where('created_at', '>=', Carbon::now()->subDays(10))
+            ->groupBy('date')
+            ->orderBy('date')
+            ->pluck('count', 'date');  // → return: ['2025-11-10' => 10, ...]
+
+        $visitsLabels = [];
+        $visitsData = [];
+
+        for ($i = 9; $i >= 0; $i--) {
+            $date = Carbon::now()->subDays($i)->format('Y-m-d');
+            $visitsLabels[] = Carbon::now()->subDays($i)->format('d M');
+            $visitsData[] = $visits[$date] ?? 0;
+        }
+
+        // ---------------------------------------
+        // الدول الأكثر زيارة (Top Countries)
+        // ---------------------------------------
+
+        $countriesData = Visitor::selectRaw('country, COUNT(*) as count')
+            ->whereNotNull('country')
+            ->where('country', '!=', '')
+            ->groupBy('country')
+            ->orderByDesc('count')
+            ->limit(6)
+            ->pluck('count', 'country')
+            ->toArray();
+
+
+        // ---------------------------------------
+        // حالة الطلبات (Orders Status)
+        // ---------------------------------------
+
+        // $ordersStatus = Order::selectRaw('status, COUNT(*) as count')
+        //     ->groupBy('status')
+        //     ->pluck('count', 'status')
+        //     ->mapWithKeys(function ($count, $status) {
+        //         return [trans("orders.status.$status") => $count];
+        //     })
+        //     ->toArray();
+$ordersStatus = [];
+
+        // ---------------------------------------
+        // إرجاع البيانات للصفحة
+        // ---------------------------------------
+
+        return view('Admin.index', compact(
+            'visitsLabels',
+            'visitsData',
+            'countriesData',
+            'ordersStatus'
+        ));
     }
 
     public function create()

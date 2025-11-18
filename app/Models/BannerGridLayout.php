@@ -17,6 +17,8 @@ class BannerGridLayout extends Model
     ];
 
     public $timestamps = false;
+    public $table = 'banner_grid_layout';
+
 
     public function banner()
     {
