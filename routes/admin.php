@@ -46,7 +46,7 @@ Route::prefix('admin')->name('admin.')->middleware('guest:admin')->group(functio
 
     // Password Reset Routes
     Route::get('forgot-password', [AdminAuthController::class, 'showForgotPasswordForm'])->name('password.request');
-    Route::post('forgot-password', [AdminAuthController::class, 'sendResetLinkEmail'])->name('password.email');
+    Route::post('forgot-password', [AdminAuthController::class, 'sendResetOtp'])->name('password.email');
     Route::get('reset-password/{token}', [AdminAuthController::class, 'showResetPasswordForm'])->name('password.reset');
     Route::post('reset-password', [AdminAuthController::class, 'resetPassword'])->name('password.update');
 });
@@ -55,7 +55,7 @@ Route::prefix('admin')->name('admin.')->middleware('guest:admin')->group(functio
 Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function () {
     // Dashboard
     Route::get('/', [AdminController::class, 'index'])->name('index');
-    Route::get('home', [AdminController::class, 'home'])->name('home');
+   // Route::get('home', [AdminController::class, 'home'])->name('home');
 
     // Settings
     Route::prefix('settings')->as('setting.')->group(function () {

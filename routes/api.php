@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\Website\HomeController;
 use App\Http\Controllers\Api\Website\BannerController;
 use App\Http\Controllers\Api\Website\ProductController;
 use App\Http\Controllers\Api\Website\CategoryController;
+use App\Http\Controllers\Api\Website\FavoriteController;
 use App\Http\Controllers\Api\Website\UserAddressController;
 
 
@@ -23,7 +24,6 @@ Route::prefix('v1')->group(function () {
 
         Route::prefix('carts')->group(function () {
             Route::get('/', [CartController::class, 'index']);
-            //   Route::get('/{id}', [CartController::class, 'show']);
             Route::post('/', [CartController::class, 'store']);
             Route::put('/{id}', [CartController::class, 'update']);
             Route::delete('/{id}/item', [CartController::class, 'destroy']);
@@ -32,6 +32,11 @@ Route::prefix('v1')->group(function () {
         Route::prefix('auth')->group(function () {
             Route::get('/profile', [AuthController::class, 'profile']);
             Route::post('/logout', [AuthController::class, 'logout']);
+        });
+
+        Route::prefix('favorites')->group(function () {
+            Route::get('/', [FavoriteController::class, 'index']);
+            Route::post('/toggle', [FavoriteController::class, 'toggle']);
         });
     });
 
@@ -42,7 +47,6 @@ Route::prefix('v1')->group(function () {
         Route::post('send-otp', [AuthController::class, 'sendOtp']);
         Route::post('reset-password',  [AuthController::class, 'resetPassword']);
         Route::post('verify-otp',  [AuthController::class, 'verifyOtp']);
-
     });
 
     Route::get('home', [HomeController::class, 'index']);
@@ -60,5 +64,4 @@ Route::prefix('v1')->group(function () {
     });
 
     Route::get('/banners', [BannerController::class, 'index']);
-
 });

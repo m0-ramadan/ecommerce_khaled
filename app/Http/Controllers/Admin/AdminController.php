@@ -29,7 +29,7 @@ class AdminController extends Controller
         $admins = Admin::all();
         return view('Admin.index', compact('admins'));
     }
-  public function index()
+    public function index()
     {
         // ---------------------------------------
         // زيارات آخر 10 أيام
@@ -39,7 +39,7 @@ class AdminController extends Controller
             ->where('created_at', '>=', Carbon::now()->subDays(10))
             ->groupBy('date')
             ->orderBy('date')
-            ->pluck('count', 'date');  // → return: ['2025-11-10' => 10, ...]
+            ->pluck('count', 'date');
 
         $visitsLabels = [];
         $visitsData = [];
@@ -62,20 +62,12 @@ class AdminController extends Controller
             ->limit(6)
             ->pluck('count', 'country')
             ->toArray();
-
-
+// dd( $countriesData);
         // ---------------------------------------
         // حالة الطلبات (Orders Status)
         // ---------------------------------------
 
-        // $ordersStatus = Order::selectRaw('status, COUNT(*) as count')
-        //     ->groupBy('status')
-        //     ->pluck('count', 'status')
-        //     ->mapWithKeys(function ($count, $status) {
-        //         return [trans("orders.status.$status") => $count];
-        //     })
-        //     ->toArray();
-$ordersStatus = [];
+        $ordersStatus = []; // You can uncomment and use your orders logic when ready
 
         // ---------------------------------------
         // إرجاع البيانات للصفحة

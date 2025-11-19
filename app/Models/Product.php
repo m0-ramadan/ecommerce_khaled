@@ -190,4 +190,10 @@ class Product extends Model
 
         return $query->orderBy('id', 'desc');
     }
+
+    public function favorites()
+{
+    return $this->morphMany(Favorite::class, 'favouritable');
+}
+
 }

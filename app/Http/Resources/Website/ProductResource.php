@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Website;
 
+use App\Models\Favorite;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -23,6 +24,11 @@ class ProductResource extends JsonResource
             'stock'             => $this->stock,
             'image'             => $this->image ? get_user_image($this->image) : "https://eg-rv.homzmart.net/catalog/product/J/O/JOUFURH08142090-1-Navyblue.jpg" ,
             'average_rating'    => round($this->average_rating, 1),
+             'is_favorite' => auth()->check()
+            ? Favorite::where('user_id', auth()->id())
+                ->where('product_id', $this->id)
+                ->exists()
+            : false,
             // Relationships
             'category'      => new CategoryResource($this->category),
             'discount'      => new DiscountResource($this->discount),

@@ -48,4 +48,9 @@ public function favouriteProducts()
     return $this->belongsToMany(\App\Models\Product::class, 'favourites');
 }
 
+public function favorites()
+{
+    return $this->hasMany(Favorite::class);
+}
+
 }
