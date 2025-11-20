@@ -40,7 +40,7 @@ class ProductResource extends JsonResource
             'sizes'         => SizeResource::collection($this->sizes),
             'offers'        => OfferResource::collection($this->offers),
             'materials'     => MaterialResource::collection($this->materials),
-            'images' => ImageResource::collection($this->images),
+            'images'        => ImageResource::collection($this->images),
 
 
             // 'created_at'   => $this->created_at?->format('Y-m-d'),

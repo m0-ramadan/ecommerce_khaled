@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\Website\BannerController;
 use App\Http\Controllers\Api\Website\ProductController;
 use App\Http\Controllers\Api\Website\CategoryController;
 use App\Http\Controllers\Api\Website\FavoriteController;
+use App\Http\Controllers\Api\Website\SocialMediaController;
 use App\Http\Controllers\Api\Website\UserAddressController;
 
 
@@ -50,6 +51,9 @@ Route::prefix('v1')->group(function () {
     });
 
     Route::get('home', [HomeController::class, 'index']);
+
+    Route::get('social-media', [SocialMediaController::class, 'index']);
+
 
     Route::prefix('categories')->group(function () {
         Route::get('/', [CategoryController::class, 'index']);
