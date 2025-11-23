@@ -7,8 +7,11 @@ use App\Http\Controllers\Api\Website\HomeController;
 use App\Http\Controllers\Api\Website\BannerController;
 use App\Http\Controllers\Api\Website\ProductController;
 use App\Http\Controllers\Api\Website\CategoryController;
+use App\Http\Controllers\Api\Website\ContactUsController;
+use App\Http\Controllers\Api\Website\FaqController;
 use App\Http\Controllers\Api\Website\FavoriteController;
 use App\Http\Controllers\Api\Website\SocialMediaController;
+use App\Http\Controllers\Api\Website\StaticPagesController;
 use App\Http\Controllers\Api\Website\UserAddressController;
 
 
@@ -53,6 +56,13 @@ Route::prefix('v1')->group(function () {
     Route::get('home', [HomeController::class, 'index']);
 
     Route::get('social-media', [SocialMediaController::class, 'index']);
+    
+    Route::get('static-pages/{slug}', [StaticPagesController::class, 'index']);
+
+    Route::get('faqs', [FaqController::class, 'index']);
+
+    Route::post('contact-us', [ContactUsController::class, 'store']);
+
 
 
     Route::prefix('categories')->group(function () {
