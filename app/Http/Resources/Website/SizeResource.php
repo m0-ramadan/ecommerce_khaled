@@ -10,7 +10,10 @@ class SizeResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'value' => $this->value,
+            'name' => $this->name,
+            'tiers' => SizeTierResource::collection(
+    $this->productTiers()->where('product_id', $this->product_id)->get()),
+
         ];
     }
 }

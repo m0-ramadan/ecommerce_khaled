@@ -192,8 +192,57 @@ class Product extends Model
     }
 
     public function favorites()
-{
-    return $this->morphMany(Favorite::class, 'favouritable');
-}
+    {
+        return $this->morphMany(Favorite::class, 'favouritable');
+    }
 
+    // العلاقات
+    public function pricingTiers()
+    {
+        return $this->hasMany(PricingTiers::class)->orderBy('quantity');
+    }
+
+    // public function sizes()
+    // {
+    //     return $this->hasMany(ProductSize::class)->where('stock', '>', 0);
+    //     // أو لو عندك pivot: return $this->belongsToMany(Size::class, 'product_sizes');
+    // }
+
+
+    public function options()
+    {
+        return $this->hasMany(ProductOptions::class);
+    }
+
+    public function primaryImage()
+    {
+        return $this->hasOne(Image::class)->where('is_primary', true);
+    }
+
+
+    // public static function boot()
+    // {
+    //     parent::boot();
+
+    //     static::addGlobalScope('available', function ($query) {
+    //         $query->where('is_active', true)->whereNull('deleted_at');
+    //     });
+    // }
+
+    // لو عايز تتأكد إن المنتج موجود ونشط قبل الحقن
+    public function resolveRouteBinding($value, $field = null)
+    {
+        $product = parent::resolveRouteBinding($value, $field);
+
+        if (!$product || $product->trashed() || !$product->is_active) {
+            abort(404, 'المنتج غير موجود أو غير متاح');
+        }
+
+        return $product;
+    }
+
+    public function sizeTiers()
+    {
+        return $this->hasMany(ProductSizeTier::class);
+    }
 }

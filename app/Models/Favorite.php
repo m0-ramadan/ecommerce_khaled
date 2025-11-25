@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Favorite extends Model
 {
-    protected $table = 'favorites'; // اسم الجدول
+    protected $table = 'favourites'; // اسم الجدول
 
     protected $fillable = [
         'user_id',
