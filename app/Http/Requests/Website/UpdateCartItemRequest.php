@@ -8,18 +8,18 @@ class UpdateCartItemRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->cartItem->cart->is($this->user()?->cart);
+        return true;
     }
 
   public function rules(): array
 {
     return [
-        'quantity'             => 'required|integer|min:1',
+        'quantity'             => 'nullable|integer|min:1',
         'size_id'              => 'nullable|exists:sizes,id',
         'color_id'             => 'nullable|exists:colors,id',
         'printing_method_id'   => 'nullable|exists:printing_methods,id',
         'print_locations'      => 'nullable|array',
-        'print_locations.*'    => 'exists:print_locations,id',
+        'print_locations.*'    => 'nullable|exists:print_locations,id',
         'embroider_locations'  => 'nullable|array',
         'embroider_locations.*'=> 'exists:print_locations,id',
         'selected_options'     => 'nullable|array',

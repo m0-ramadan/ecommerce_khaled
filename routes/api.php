@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\Website\FaqController;
 use App\Http\Controllers\Api\Website\AuthController;
 use App\Http\Controllers\Api\Website\CartController;
 use App\Http\Controllers\Api\Website\HomeController;
+use App\Http\Controllers\Api\Website\OrderController;
 use App\Http\Controllers\Api\Website\BannerController;
 use App\Http\Controllers\Api\Website\ProductController;
 use App\Http\Controllers\Api\Website\CategoryController;
@@ -30,7 +31,7 @@ Route::prefix('v1')->group(function () {
         Route::prefix('cart')->name('cart.')->group(function () {
             Route::get('/', [CartController::class, 'index'])->name('index');
             Route::post('/add', [CartController::class, 'add'])->name('add');
-            Route::patch('/items/{cartItem}', [CartController::class, 'update'])->name('update');
+            Route::put('/items/{cartItem}', [CartController::class, 'update'])->name('update');
             Route::delete('/items/{cartItem}', [CartController::class, 'remove'])->name('remove');
             Route::delete('/clear', [CartController::class, 'clear'])->name('clear');
         });
@@ -45,6 +46,17 @@ Route::prefix('v1')->group(function () {
             Route::get('/', [FavoriteController::class, 'index']);
             Route::post('/toggle', [FavoriteController::class, 'toggle']);
         });
+
+        Route::prefix('order')->name('order.')->group(function () {
+            Route::get('/', [OrderController::class, 'index'])->name('index');
+            Route::get('/{orderID}', [OrderController::class, 'show'])->name('show');
+            Route::post('/', [OrderController::class, 'store'])->name('store');
+            Route::post('cancel/{codeOrder}', [OrderController::class, 'cancelled'])->name('cancel');
+            Route::get('trace/{codeOrder}', [OrderController::class, 'traceOrder'])->name('trace');
+        });
+
+        Route::post('coupon/apply', [OrderController::class, 'applyCoupon']);
+
     });
 
     Route::prefix('auth')->group(function () {
@@ -67,7 +79,6 @@ Route::prefix('v1')->group(function () {
     Route::post('contact-us', [ContactUsController::class, 'store']);
 
 
-
     Route::prefix('categories')->group(function () {
         Route::get('/', [CategoryController::class, 'index']);
         Route::get('/{id}', [CategoryController::class, 'show']);
@@ -83,5 +94,4 @@ Route::prefix('v1')->group(function () {
     Route::get('/banners', [BannerController::class, 'index']);
 
     Route::get('/customization-options', [CustomizationOptionsController::class, 'index'])->name('customization_options');
-
 });
