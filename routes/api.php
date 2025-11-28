@@ -39,6 +39,7 @@ Route::prefix('v1')->group(function () {
 
         Route::prefix('auth')->group(function () {
             Route::get('/profile', [AuthController::class, 'profile']);
+            Route::post('/change-password', [AuthController::class, 'changePassword']);
             Route::post('/logout', [AuthController::class, 'logout']);
         });
 
@@ -56,7 +57,6 @@ Route::prefix('v1')->group(function () {
         });
 
         Route::post('coupon/apply', [OrderController::class, 'applyCoupon']);
-
     });
 
     Route::prefix('auth')->group(function () {

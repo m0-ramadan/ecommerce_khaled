@@ -3,135 +3,105 @@
 namespace App\Traits;
 
 use App\Models\Order;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
-
 
 trait HandlesPaymobPayment
 {
     /**
-     * بدء عملية الدفع عبر PayMob
+     * بدء عملية الدفع عبر PayMob KSA باستخدام Payment Links (الطريقة الجديدة والموصى بها)
      */
-    public function initiatePaymobPayment($order, $returnUrl = null)
+    public function initiatePaymobPayment($order)
     {
+        // 1. Authentication
         $auth = $this->paymobAuthenticate();
-
         if (!$auth['success']) {
-            return ['success' => false, 'message' => 'فشل الاتصال ببوابة الدفع'];
+            return response()->json($auth, 400);
         }
 
-        $token = $auth['token'];
+        // 2. Create Payment Link
+        $paymentLink = $this->createPaymobPaymentLink($auth['token'], $order);
 
-        // 1. تسجيل الطلب في PayMob
-        $orderRegistration = $this->paymobRegisterOrder($token, $order);
-
-        if (!$orderRegistration['success']) {
-            return $orderRegistration;
+        if (!$paymentLink['success']) {
+            return response()->json($paymentLink, 500);
         }
-
-        $paymentKey = $this->paymobGetPaymentKey(
-            token: $token,
-            orderId: $orderRegistration['order_id'],
-            amountCents: $order->total_amount * 100,
-            billingData: $this->getBillingData($order)
-        );
-
-        if (!$paymentKey['success']) {
-            return $paymentKey;
-        }
-
-        // رابط الـ iframe للدفع
-        $iframeUrl = "https://accept.paymob.com/api/acceptance/iframes/" . config('services.paymob.iframe_id') . "?payment_token=" . $paymentKey['token'];
-
+        // نجح كل شيء → نرجع رابط الدفع للموبايل
         return [
-            'success' => true,
-            'payment_url' => $iframeUrl,
+            'success'      => true,
+            'payment_url'  => $paymentLink['payment_url'],
+            'shorten_url'  => $paymentLink['shorten_url'] ?? null,
             'order_number' => $order->order_number,
-            'message' => 'جاري توجيهك إلى بوابة الدفع...'
-        ];
-    }
-
-    private function paymobAuthenticate(): array
-    {
-        $response = Http::post('https://accept.paymob.com/api/auth/tokens', [
-            'api_key' => config('services.paymob.api_key'),
-        ]);
-
-        if ($response->failed()) {
-            return ['success' => false, 'message' => 'فشل الاتصال بـ PayMob'];
-        }
-
-        return [
-            'success' => true,
-            'token' => $response->json('token')
-        ];
-    }
-
-    private function paymobRegisterOrder(string $token, $order): array
-    {
-        $response = Http::post('https://accept.paymob.com/api/ecommerce/orders', [
-            'auth_token' => $token,
-            'delivery_needed' => false,
-            'amount_cents' => $order->total_amount * 100,
-            'currency' => 'EGP',
-            'items' => [],
-            'merchant_order_id' => $order->id,
-        ]);
-
-        if ($response->failed()) {
-            return ['success' => false, 'message' => 'فشل تسجيل الطلب في PayMob'];
-        }
-
-        return [
-            'success' => true,
-            'order_id' => $response->json('id')
-        ];
-    }
-
-    private function paymobGetPaymentKey(string $token, int $orderId, int $amountCents, array $billingData): array
-    {
-        $response = Http::post('https://accept.paymob.com/api/acceptance/payment_keys', [
-            'auth_token' => $token,
-            'amount_cents' => $amountCents,
-            'expiration' => 3600,
-            'order_id' => $orderId,
-            'billing_data' => $billingData,
-            'currency' => 'EGP',
-            'integration_id' => config('services.paymob.integration_id'),
-        ]);
-
-        if ($response->failed()) {
-            return ['success' => false, 'message' => 'فشل إنشاء مفتاح الدفع'];
-        }
-
-        return [
-            'success' => true,
-            'token' => $response->json('token')
-        ];
-    }
-
-    private function getBillingData($order): array
-    {
-        return [
-            "apartment" => "NA",
-            "email" => $order->customer_email ?? "customer@example.com",
-            "floor" => "NA",
-            "first_name" => explode(' ', $order->customer_name)[0] ?? 'Customer',
-            "street" => $order->shipping_address ?? 'NA',
-            "building" => "NA",
-            "phone_number" => $order->customer_phone,
-            "shipping_method" => "PKG",
-            "postal_code" => "00000",
-            "city" => "Cairo",
-            "country" => "EG",
-            "last_name" => explode(' ', $order->customer_name)[1] ?? 'User',
-            "state" => "Cairo"
+            'message'      => 'تم إنشاء رابط الدفع بنجاح'
         ];
     }
 
     /**
-     * التحقق من الـ HMAC (Webhook)
+     * تسجيل الدخول وجلب التوكن
+     */
+    private function paymobAuthenticate(): array
+    {
+        $response = Http::post('https://ksa.paymob.com/api/auth/tokens', [
+            'username' => config('services.paymob.username'),
+            'password' => config('services.paymob.password'),
+        ]);
+
+        if ($response->failed()) {
+            return [
+                'success' => false,
+                'message' => 'فشل تسجيل الدخول في PayMob',
+                'error'   => $response->json(),
+            ];
+        }
+
+        return [
+            'success' => true,
+            'token'   => $response->json('token'),
+        ];
+    }
+
+    /**
+     * إنشاء رابط دفع PayMob (الطريقة الصحيحة الجديدة)
+     */
+    private function createPaymobPaymentLink($token, $order)
+    {
+        $amountInCents = max(100, (int) round(($order->total ?? 0) * 100));
+
+        $response = Http::withToken($token)
+            ->asForm()
+            ->post('https://ksa.paymob.com/api/ecommerce/payment-links', [
+                'amount_cents'     => $amountInCents,
+                'currency'         => 'SAR',
+                'reference_id'     => $order->order_number,
+                'payment_methods'  => [config('services.paymob.integration_id')],
+                'full_name'        => $order->customer_name,
+                'email'            => $order->customer_email ?? 'customer@example.com',
+                'phone_number'     => $order->customer_phone,
+                'expires_at'       => now()->setTimezone('Asia/Riyadh')->addHours(2)->format('Y-m-d\TH:i:s'),
+                'save_selection'   => true,
+                'is_live'          => config('services.paymob.mode') === 'live',
+
+                'redirect_url'     => 'https://web.whatsapp.com/',
+                'cancel_url'       => 'https://web.whatsapp.com/',
+            ]);
+
+        if ($response->failed()) {
+            return [
+                'success' => false,
+                'message' => 'فشل إنشاء رابط الدفع',
+                'error'   => $response->json(),
+            ];
+        }
+        $data = $response->json();
+        return [
+            'success'      => true,
+            'payment_url'  => $data['client_url'] ?? $data['shorten_url'] ?? null,
+            'shorten_url'  => $data['shorten_url'] ?? null,
+
+        ];
+    }
+
+    /**
+     * التحقق من HMAC للـ Webhook
      */
     public function verifyPaymobHmac(array $payload): bool
     {
@@ -140,14 +110,13 @@ trait HandlesPaymobPayment
 
         ksort($payload);
         $concatenated = collect($payload)->flatten()->implode('');
+        $secret = config('services.paymob.hmac_secret');
 
-        $calculatedHmac = hash_hmac('sha512', $concatenated, config('services.paymob.hmac_secret'));
-
-        return hash_equals($calculatedHmac, $hmac);
+        return hash_equals(hash_hmac('sha512', $concatenated, $secret), $hmac);
     }
 
     /**
-     * معالجة الـ Webhook من PayMob
+     * معالجة Webhook من PayMob
      */
     public function handlePaymobWebhook(Request $request)
     {
@@ -156,21 +125,23 @@ trait HandlesPaymobPayment
         }
 
         $type = $request->input('type');
-        $obj = $request->input('obj');
+        $obj  = $request->input('obj');
 
+        // دفع ناجح
         if ($type === 'TRANSACTION' && $obj['success'] === true && $obj['is_capture']) {
-            $orderId = $obj['order']['merchant_order_id'];
+            $orderNumber = $obj['order']['merchant_order_id'] ?? null;
             $transactionId = $obj['id'];
 
-            $order = Order::find($orderId);
+            $order = Order::where('order_number', $orderNumber)->first();
+
             if ($order && $order->status === 'pending') {
                 $order->update([
-                    'status' => 'paid',
-                    'payment_method' => 'credit_card',
+                    'status'         => 'paid',
+                    'payment_method' => 'paymob',
                     'transaction_id' => $transactionId,
                 ]);
 
-                // إرسال إشعار، إيميل، إلخ...
+                // إشعارات، إيميل، تفريغ المخزون، إلخ...
             }
         }
 

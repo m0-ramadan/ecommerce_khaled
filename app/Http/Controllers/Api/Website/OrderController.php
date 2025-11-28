@@ -115,7 +115,7 @@ class OrderController extends Controller
                     'design_service_id'     => $item->design_service_id,
                     'quantity'              => $item->quantity,
                     'price_per_unit'        => $item->price_per_unit,
-                    'total_price'           => $item->line_total,
+                    'total_price'           => $item->line_total ?? $item->price_per_unit * $item->quantity,
                     'is_sample'             => $item->is_sample,
                     'note'                  => $item->note,
                     'quantity_id'           => $item->quantity_id,
@@ -131,11 +131,12 @@ class OrderController extends Controller
                 $payment = $this->initiatePaymobPayment($order);
 
                 if (!$payment['success']) {
-                    return $this->errorResponse($payment['message'], 400);
+                    return $this->errorResponse([$payment['message']], 400);
                 }
 
                 return $this->successResponse([
                     'payment_url' => $payment['payment_url'],
+                    'shorten_url' => $payment['shorten_url'],
                     'order_number' => $order->order_number,
                     'message' => 'جاري توجيهك إلى بوابة الدفع الآمنة...'
                 ]);

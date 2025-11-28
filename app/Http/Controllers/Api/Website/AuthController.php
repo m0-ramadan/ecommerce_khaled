@@ -12,20 +12,21 @@ use App\Models\OtpVerification;
 use App\Traits\ApiResponseTrait;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Website\Auth\ResetPasswordRequest;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
-
 use App\Http\Requests\Website\LoginRequest;
-use App\Http\Resources\Website\UserResource;
 
+use App\Http\Resources\Website\UserResource;
 use App\Http\Requests\Website\RegisterRequest;
+
+use App\Http\Requests\Website\Auth\SendOtpRequest;
 
 
 use App\Http\Requests\Website\Auth\VerifyOtpRequest;
 
-use App\Http\Requests\Website\Auth\SendOtpRequest;
+use App\Http\Requests\Website\ChangePasswordRequest;
 use App\Http\Requests\Website\SocialMediaLoginRequest;
+use App\Http\Requests\Website\Auth\ResetPasswordRequest;
 
 class AuthController extends Controller
 {
@@ -259,6 +260,36 @@ class AuthController extends Controller
             ], 'تم التحقق من رمز OTP بنجاح');
         } catch (\Exception $e) {
             return $this->error('حدث خطأ أثناء التحقق من OTP', 500, [
+                'exception' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public function changePassword(ChangePasswordRequest $request)
+    {
+        try {
+            $user = $request->user();
+            // Check old password
+            if (!Hash::check($request->old_password, $user->password)) {
+                return $this->error('كلمة المرور الحالية غير صحيحة', 422);
+            }
+            if ($request->old_password === $request->new_password) {
+                return $this->error('لا يمكن استخدام نفس كلمة المرور القديمة', 422);
+            }
+
+            $user->update([
+                'password' => Hash::make($request->new_password),
+            ]);
+
+            $user->tokens()->delete();
+            $token = $user->createToken('api_token')->plainTextToken;
+
+            return $this->success([
+                'user'  => new UserResource($user),
+                'token' => $token,
+            ], 'تم تغيير كلمة المرور بنجاح');
+        } catch (\Exception $e) {
+            return $this->error('حدث خطأ أثناء تغيير كلمة المرور', 500, [
                 'exception' => $e->getMessage()
             ]);
         }
