@@ -33,7 +33,7 @@ class OrderController extends Controller
             return $this->errorResponse('يجب تسجيل الدخول لعرض الطلبات', 401);
         }
 
-        $orders = Order::with(['address', 'items.product'])
+        $orders = Order::with(['address', 'items.product','items'])
             ->where('user_id', $user->id)
             ->latest()
             ->paginate(15);
@@ -89,7 +89,7 @@ class OrderController extends Controller
                 'customer_name'     => $request->customer_name ?? $user?->name,
                 'customer_phone'    => $request->customer_phone ?? $user?->phone,
                 'customer_email'    => $request->customer_email ?? $user?->email,
-                'shipping_address'  => $address?->getFullAddressAttribute() ?? $request->shipping_address,
+                'shipping_address'  => $address??$request->shipping_address,
                 'subtotal'          => $cart->subtotal,
                 'shipping_amount'   => 0, // لاحقًا: حسب المنطقة
                 'discount_amount'   => $discountAmount,
@@ -122,12 +122,13 @@ class OrderController extends Controller
                     'image_design'          => $item->image_design,
                 ]);
             }
-
+        
             // تفريغ السلة بعد الطلب
-            $cart->items()->delete();
-            $cart->update(['subtotal' => 0, 'total' => 0]);
+           //  $cart->items()->delete();
+           //  $cart->update(['subtotal' => 0, 'total' => 0]);
 
             if ($request->payment_method === 'credit_card') {
+               
                 $payment = $this->initiatePaymobPayment($order);
 
                 if (!$payment['success']) {

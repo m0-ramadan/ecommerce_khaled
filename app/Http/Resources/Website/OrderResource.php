@@ -2,27 +2,43 @@
 
 namespace App\Http\Resources\Website;
 
-use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class OrderResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
     public function toArray($request)
     {
         return [
-            'order_number' => $this->order_number,
-            'status'       => $this->status,
-            'status_label' => __('order.status.' . $this->status),
-            'total'        => $this->total_amount,
-            'formatted_total' => number_format($this->total_amount, 2) . ' ج.م',
-            'items_count'  => $this->items->sum('quantity'),
-            'created_at'   => $this->created_at->format('Y-m-d H:i'),
-            'can_cancel'   => in_array($this->status, ['pending', 'processing']),
+            'id'               => $this->id,
+            'order_number'     => $this->order_number,
+            'status'           => $this->status,
+            'status_label'     => $this->getStatusLabelAttribute(), // أو __('order.status.' . $this->status)
+            'total_amount'     => $this->total_amount,
+            'formatted_total'  => number_format($this->total_amount, 2) . ' ج.م',
+            'items_count'      => $this->orderItems?->sum('quantity'),
+            'created_at'       => $this->created_at->format('Y-m-d H:i'),
+            'can_cancel'       => in_array($this->status, ['pending', 'processing']),
+
+            // كل تفاصيل العناصر مع المنتج كامل
+            'items'            => OrderItemResource::collection($this->orderItems),
+
+            // معلومات العميل (اختياري)
+            'customer' => [
+                'name'  => $this->customer_name,
+                'phone' => $this->customer_phone,
+                'email' => $this->customer_email,
+            ],
+
+            // عنوان الشحن
+            'address' => $this->whenLoaded('address', fn() => [
+                'city'       => $this->address?->city?->name ?? null,
+                'area'       => $this->address?->area ?? null,
+                'street'     => $this->address?->street ?? null,
+                'building'   => $this->address?->building ?? null,
+                'floor'      => $this->address?->floor ?? null,
+                'apartment'  => $this->address?->apartment ?? null,
+                'full_address' => $this->address?->full_address ?? null,
+            ]),
         ];
     }
 }

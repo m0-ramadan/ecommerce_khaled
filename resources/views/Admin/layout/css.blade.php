@@ -1,35 +1,63 @@
-    <!-- External CSS Libraries -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css"
-        integrity="sha512-SzlrxWUlpfuzQ+pcUCosxcglQRNAq/DZjVsC0lE40xsADsfeQoEypE+enwcOiGjk/bSuGGKHEyjSoQ1zVisanQ=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
-    
-    <!-- Local CSS -->
-    <!-- Font Awesome-->
-    <link rel="stylesheet" type="text/css" href="{{asset('dashboard/assets/css/fontawesome.css')}}">
-    <!-- ico-font-->
-    <link rel="stylesheet" type="text/css" href="{{asset('dashboard/assets/css/icofont.css')}}">
-    <!-- Themify icon-->
-    <link rel="stylesheet" type="text/css" href="{{asset('dashboard/assets/css/themify.css')}}">
-    <!-- Flag icon-->
-    <link rel="stylesheet" type="text/css" href="{{asset('dashboard/assets/css/flag-icon.css')}}">
-    <!-- Feather icon-->
-    <link rel="stylesheet" type="text/css" href="{{asset('dashboard/assets/css/feather-icon.css')}}">
-    <!-- Plugins css start-->
-    <link rel="stylesheet" type="text/css" href="{{asset('dashboard/assets/css/animate.css')}}">
-    <link rel="stylesheet" type="text/css" href="{{asset('dashboard/assets/css/chartist.css')}}">
-    <link rel="stylesheet" type="text/css" href="{{asset('dashboard/assets/css/date-picker.css')}}">
-    <link rel="stylesheet" type="text/css" href="{{asset('dashboard/assets/css/prism.css')}}">
-    <link rel="stylesheet" type="text/css" href="{{asset('dashboard/assets/css/vector-map.css')}}">
-    <!-- Plugins css Ends-->
-    <!-- Bootstrap css-->
-    <link rel="stylesheet" type="text/css" href="{{asset('dashboard/assets/css/bootstrap.css')}}">
-    <!-- App css-->
-    <link rel="stylesheet" type="text/css" href="{{asset('dashboard/assets/css/style.css')}}">
-    <link id="color" rel="stylesheet" href="{{asset('dashboard/assets/css/color-1.css')}}" media="screen">
-    <!-- Responsive css-->
-    <link rel="stylesheet" type="text/css" href="{{asset('dashboard/assets/css/responsive.css')}}">
-    
-    <!-- DataTables CSS -->
-    <link rel="stylesheet" type="text/css" href="{{asset('dashboard/assets/app/css/jquery.dataTables.min.css')}}">
-    <link rel="stylesheet" type="text/css" href="{{asset('dashboard/assets/app/css/buttons.dataTables.min.css')}}">
+
+<!-- Favicon -->
+<link rel="icon" type="image/x-icon" href="https://seda.codeella.com/assets/img/favicon/favicon.ico" />
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&ampdisplay=swap"
+  rel="stylesheet" />
+
+
+
+<!-- Icons -->
+<link rel="stylesheet" href="{{ asset('dashboard/assets/vendor/fonts/fontawesome.css') }}">
+
+<!-- Fonts -->
+<link rel="stylesheet" href="{{ asset('dashboard/assets/vendor/fonts/tabler-icons.css') }}" />
+<link rel="stylesheet" href="{{ asset('dashboard/assets/vendor/fonts/flag-icons.css') }}" />
+
+<!-- Core CSS -->
+<link rel="stylesheet" href="{{ asset('dashboard/assets/vendor/css/rtl/core.css') }}" />
+<link rel="stylesheet" href="{{ asset('dashboard/assets/vendor/css/rtl/theme-default.css') }}" />
+<link rel="stylesheet" href="{{ asset('dashboard/assets/css/demo.css') }}" />
+
+<!-- Vendors CSS -->
+<link rel="stylesheet" href="{{ asset('dashboard/assets/vendor/libs/node-waves/node-waves.css') }}" />
+<link rel="stylesheet" href="{{ asset('dashboard/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css') }}" />
+<link rel="stylesheet" href="{{ asset('dashboard/assets/vendor/libs/typeahead-js/typeahead.css') }}" />
+<link rel="stylesheet" href="{{ asset('dashboard/assets/vendor/libs/apex-charts/apex-charts.css') }}" />
+<link rel="stylesheet" href="{{ asset('dashboard/assets/vendor/libs/swiper/swiper.css') }}" />
+<link rel="stylesheet" href="{{ asset('dashboard/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css') }}" />
+<link rel="stylesheet" href="{{ asset('dashboard/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css') }}" />
+<link rel="stylesheet" href="{{ asset('dashboard/assets/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.css') }}" />
+<link rel="stylesheet" href="{{ asset('dashboard/assets/vendor/libs/datatables-checkboxes-jquery/datatables.checkboxes.css') }}" />
+<link rel="stylesheet" href="{{ asset('dashboard/assets/vendor/css/pages/cards-advance.css') }}" />
+
+<!-- Select Inputs -->
+<link rel="stylesheet" href="{{ asset('dashboard/assets/vendor/libs/select2/select2.css') }}" />
+<link rel="stylesheet" href="{{ asset('dashboard/assets/vendor/libs/bootstrap-select/bootstrap-select.css') }}" />
+
+<!-- SweetAlert -->
+<link rel="stylesheet" href="{{ asset('dashboard/assets/vendor/libs/sweetalert2/sweetalert2.css') }}" />
+
+<!-- Custom CSS -->
+<link rel="stylesheet" href="{{ asset('dashboard/assets/css/custome.css') }}" />
+
+
+
+<!-- Helpers -->
+<script src="https://seda.codeella.com/assets/vendor/js/helpers.js"></script>
+<!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
+<!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
+
+<script src="https://seda.codeella.com/assets/vendor/js/template-customizer.js"></script>
+
+
+<script src="https://seda.codeella.com/assets/js/config.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&family=Noto+Kufi+Arabic:wght@100..900&display=swap"
+        rel="stylesheet">

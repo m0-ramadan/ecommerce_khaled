@@ -1,79 +1,145 @@
 @extends('Admin.auth.layouts.master')
+
+@section('styles')
+    <!-- إضافة دعم RTL للـ Bootstrap إذا لم يكن موجوداً بالفعل -->
+    <link rel="stylesheet" href="{{ asset('dashboard/assets/css/bootstrap-rtl.min.css') }}">
+@endsection
+
 @section('content')
-    <form class="theme-form login-form" action="{{ route('admin.login') }}" method="post">
-        @csrf
-        <h4>تسجيل الدخول</h4>
-        <h6>مرحباً بعودتك! قم بتسجيل الدخول إلى حسابك.</h6>
+<div class="authentication-wrapper authentication-cover authentication-bg" dir="rtl">
+    <div class="authentication-inner row">
 
-        <div class="form-group">
-            <label>البريد الإلكتروني</label>
-            <div class="input-group">
-                <span class="input-group-text"><i class="icon-email"></i></span>
-                <input class="form-control" type="email" name="email" required placeholder="Test@gmail.com" dir="ltr"
-                    style="text-align:left">
+        <!-- الجانب الأيسر (الصورة التوضيحية) - يظهر فقط على الشاشات الكبيرة -->
+        <div class="d-none d-lg-flex col-lg-7 align-items-center p-0">
+            <div class="auth-cover-bg auth-cover-bg-color d-flex justify-content-center align-items-center w-100 h-100">
+                <img src="https://seda.codeella.com/assets/img/illustrations/auth-login-illustration-light.png"
+                     alt="غلاف تسجيل الدخول"
+                     class="img-fluid auth-illustration">
+
+                <img src="{{ asset('dashboard/assets/img/illustrations/bg-shape-image-light.png') }}"
+                     alt="خلفية النظام"
+                     class="platform-bg">
             </div>
         </div>
+        <!-- /الجانب الأيسر -->
 
-        <div class="form-group">
-            <label>كلمة المرور</label>
-            <div class="input-group">
-                <span class="input-group-text"><i class="icon-lock"></i></span>
+        <!-- نموذج تسجيل الدخول (الجانب الأيمن في RTL) -->
+        <div class="d-flex col-12 col-lg-5 align-items-center p-4 p-sm-5">
+            <div class="w-px-400 mx-auto">
 
-                <input class="form-control" type="password" name="password" id="password" required placeholder="*********"
-                    aria-describedby="togglePasswordBtn" autocomplete="current-password">
+                <!-- الشعار -->
+                <div class="app-brand mb-5 text-center">
+                    <a href="{{ url('/') }}" class="app-brand-link">
+                        <img height="90" width="270"
+                             src="https://seda.codeella.com/assets/img/logo_.png"
+                             alt="شعار {{ env('APP_NAME') }}">
+                    </a>
+                </div>
 
-                <!-- استخدم زر type="button" حتى لا يرسل الفورم عند النقر -->
-                <button type="button" class="input-group-text cursor-pointer" id="togglePasswordBtn"
-                    aria-label="Toggle password visibility" title="إظهار/إخفاء كلمة المرور">
-                    <i class="icon-eye-off" id="toggleIcon" aria-hidden="true"></i>
-                </button>
+                <h3 class="mb-2 text-center">مرحباً بك في {{ env('APP_NAME') }} 👋</h3>
+                <p class="mb-4 text-center text-muted">
+                    مرحباً بك في لوحة تحكم تطبيق {{ env('APP_NAME') }}
+                </p>
+
+                <form id="formAuthentication"
+                      class="mb-3"
+                      method="POST"
+                      action="{{ route('admin.login') }}"
+                      novalidate>
+                    @csrf
+
+                    <!-- البريد الإلكتروني -->
+                    <div class="mb-3">
+                        <label for="email" class="form-label">البريد الإلكتروني</label>
+                        <input type="email"
+                               class="form-control text-start"
+                               dir="ltr"
+                               id="email"
+                               name="email"
+                               value="{{ old('email') }}"
+                               placeholder="name@example.com"
+                               autofocus
+                               required>
+                        @error('email')
+                            <div class="text-danger small mt-1">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <!-- كلمة المرور -->
+                    <div class="mb-3 form-password-toggle">
+                        <div class="d-flex justify-content-between mb-2">
+                            <label class="form-label" for="password">كلمة المرور</label>
+                            <a href="{{ route('admin.password.request') }}">
+                                <small>نسيت كلمة المرور؟</small>
+                            </a>
+                        </div>
+
+                        <div class="input-group input-group-merge">
+                            <input type="password"
+                                   id="password"
+                                   class="form-control text-start"
+                                   dir="ltr"
+                                   name="password"
+                                   placeholder="············"
+                                   aria-describedby="password"
+                                   required>
+                            <span class="input-group-text cursor-pointer">
+                                <i class="ti ti-eye-off"></i>
+                            </span>
+                        </div>
+                        @error('password')
+                            <div class="text-danger small mt-1">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <!-- تذكرني -->
+                    <div class="mb-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="remember" id="remember-me">
+                            <label class="form-check-label" for="remember-me">
+                                تذكرني
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- زر تسجيل الدخول -->
+                    <button type="submit" class="btn btn-primary d-grid w-100 mb-3">
+                        تسجيل الدخول
+                    </button>
+                </form>
+
+                <!-- التذييل -->
+                <div class="text-center">
+                    <small class="text-muted">
+                        تم التطوير بواسطة
+                        <a href="https://nofalseo.com" target="_blank" class="text-primary fw-medium">
+                           {{ env('APP_NAME') }}
+                        </a>
+                    </small>
+                </div>
+
             </div>
         </div>
+        <!-- /نموذج تسجيل الدخول -->
 
-        <div class="form-group">
-            <a href="{{ route('admin.password.request') }}" class="text-sm text-primary">هل نسيت كلمة المرور؟</a>
-        </div>
-        <div class="form-group">
-            <button class="btn btn-primary btn-block" type="submit">تسجيل الدخول</button>
-        </div>
-    </form>
+    </div>
+</div>
+@endsection
 
+@section('scripts')
+    <!-- تفعيل زر إظهار/إخفاء كلمة المرور (إذا كان لديك ملف JS للـ template) -->
     <script>
-        (function() {
-            const password = document.getElementById('password');
-            const toggleBtn = document.getElementById('togglePasswordBtn');
-            const icon = document.getElementById('toggleIcon');
-
-            if (!password || !toggleBtn || !icon) return;
-
-            toggleBtn.addEventListener('click', function() {
-                const isHidden = password.type === 'password';
-
-                // بدل نوع الحقل
-                password.type = isHidden ? 'text' : 'password';
-
-                // ---- طريقة آمنة لتبديل كلاسات الأيقونة ----
-                // حذف كل كلاسات العيون الشائعة أولاً (تضمن إزالة أي اسم قديم)
-                icon.classList.remove('icon-eye', 'icon-eye-off', 'fa-eye', 'fa-eye-slash', 'bi-eye',
-                    'bi-eye-slash');
-
-                // أضف الكلاس المناسب لمكتبة الأيقونات عندك
-                if (isHidden) {
-                    // كانت مخفية والآن أظهرناها -> نريد أيقونة "eye" المفتوح
-                    icon.classList.add('icon-eye'); // مثال لـالمشروع الحالي
-                    // إذا تستخدم FontAwesome: icon.classList.add('fa', 'fa-eye');
-                    // إذا تستخدم Bootstrap Icons: icon.classList.add('bi', 'bi-eye');
+        document.querySelectorAll('.form-password-toggle .input-group-text').forEach(el => {
+            el.addEventListener('click', function () {
+                const input = this.closest('.input-group').querySelector('input');
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    this.querySelector('i').classList.replace('ti-eye-off', 'ti-eye');
                 } else {
-                    // كانت ظاهرة والآن أخفيناها -> نريد أيقونة "eye-off"
-                    icon.classList.add('icon-eye-off');
-                    // FontAwesome: icon.classList.add('fa', 'fa-eye-slash');
-                    // Bootstrap Icons: icon.classList.add('bi', 'bi-eye-slash');
+                    input.type = 'password';
+                    this.querySelector('i').classList.replace('ti-eye', 'ti-eye-off');
                 }
-
-                // تحديث سمات الوصول
-                toggleBtn.setAttribute('aria-pressed', String(isHidden));
-                toggleBtn.setAttribute('aria-label', isHidden ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور');
             });
-        })();
+        });
     </script>
 @endsection

@@ -1,64 +1,129 @@
 @extends('Admin.layout.master')
 
 @section('title')
-  طرق الدفع
+    طرق الدفع
 @endsection
 
 @section('css')
-<!-- Plugins css start-->
-<link rel="stylesheet" type="text/css" href="{{asset('assets/css/datatables.css')}}">
-<!-- Plugins css Ends-->
 @endsection
 
 @section('content')
+    <div class="container-xxl flex-grow-1 container-p-y">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="https://seda.codeella.com/home">الرئيسية</a>
+                </li>
+                <li class="breadcrumb-item active">طرق الدفع</li>
 
 
-<div class="col-sm-12">
-    <div class="card">
-        <div class="card-header">
 
-            <a class="btn btn-success" href="{{route('admin.payments.create')}}">اضافة جديد</a>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="display" id="basic-1">
+            </ol>
+        </nav>
+
+
+        <!-- Basic Bootstrap Table -->
+        <div class="card">
+            <div class="p-3 d-flex justify-content-between">
+                <div>
+                    <form>
+                        <div class="input-group">
+                            <input value="" name="key_words" type="text" class="form-control" placeholder="الاسم"
+                                aria-label="Example text with button addon" aria-describedby="button-addon1">
+                            <button type="submit" class="btn btn-outline-primary waves-effect" type="button"
+                                id="button-addon1">ابحث<i class="fa-solid fa-magnifying-glass"></i></button>
+                        </div>
+                    </form>
+                </div>
+                <div>
+                    <div class="btn-group" role="group" aria-label="Basic example">
+
+                        <a href="https://seda.codeella.com/admin/payment-methods/create"
+                            class="btn btn-outline-primary waves-effect text-primary">اضافة<i
+                                class="fa-solid fa-circle-plus"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="table-responsive text-nowrap">
+                <table class="table">
                     <thead>
                         <tr>
-                            <th style="text-align: center;" class="center">#</th>
-                            <th  class="center">المحتوى</th>
-                            <th style="text-align:right !important;">العمليات</th>
-                            
-
+                            <th>#</th>
+                            <th>الاسم</th>
+                            <th>ملاحظات</th>
+                            <th>الاحداث</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        @foreach($listcontactinfo as $key=>$list)
+                    <tbody class="table-border-bottom-0">
+
                         <tr>
-                            <td style="text-align: center;"> {{++$key }}</td>
-                           <td class="text-center">{{$list->name}}</td>
-                              <td style="text-align: center;"   class="d-flex gap-1">
-                               <button class="btn btn-success"> <a  href="{{route('admin.payments.edit',[$list->id])}}"><i class="fa fa-edit text-white"></i>  </a> </button>
-                                <form method="post" action="{{route('admin.payments.destroy',$list->id)}}">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-primary"  ><i class="fa fa-trash-o"></i></button>
-                                </form>
+                            <th>1</th>
+
+
+                            <td>Instapay</td>
+                            <td></td>
+
+                            <td>
+                                <div class="dropdown">
+                                    <button type="button" class="btn p-0 dropdown-toggle hide-arrow"
+                                        data-bs-toggle="dropdown">
+                                        <i class="ti ti-dots-vertical"></i>
+                                    </button>
+                                    <div class="dropdown-menu">
+                                        <a class="dropdown-item"
+                                            href="https://seda.codeella.com/admin/payment-methods/2/edit"><i
+                                                class="ti ti-pencil "></i>تعديل</a>
+
+
+                                        <a data-url="https://seda.codeella.com/admin/payment-methods/2"
+                                            data-text_btn_confirm="تأكيد" data-text_btn_cancel="الغاء" data-method="delete"
+                                            data-message="هل أنت متأكد من الحذف" class="dropdown-item btn-action"
+                                            href="javascript:void(0);"><i class="ti ti-trash "></i> حذف</a>
+                                    </div>
+                                </div>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <th>2</th>
+
+
+                            <td>cash</td>
+                            <td>برجاء التأكد من ان الرقم المدخل به فودافون كاش</td>
+
+                            <td>
+                                <div class="dropdown">
+                                    <button type="button" class="btn p-0 dropdown-toggle hide-arrow"
+                                        data-bs-toggle="dropdown">
+                                        <i class="ti ti-dots-vertical"></i>
+                                    </button>
+                                    <div class="dropdown-menu">
+                                        <a class="dropdown-item"
+                                            href="https://seda.codeella.com/admin/payment-methods/1/edit"><i
+                                                class="ti ti-pencil "></i>تعديل</a>
+
+
+                                        <a data-url="https://seda.codeella.com/admin/payment-methods/1"
+                                            data-text_btn_confirm="تأكيد" data-text_btn_cancel="الغاء" data-method="delete"
+                                            data-message="هل أنت متأكد من الحذف" class="dropdown-item btn-action"
+                                            href="javascript:void(0);"><i class="ti ti-trash "></i> حذف</a>
+                                    </div>
+                                </div>
                             </td>
                         </tr>
-                            @endforeach
                     </tbody>
                 </table>
+                <div class="m-3">
+
+                </div>
+
             </div>
         </div>
+        <!--/ Basic Bootstrap Table -->
+
     </div>
-</div>
 @endsection
 
 
 @section('js')
-<!-- Plugins JS start-->
-<script src="{{asset('assets/js/datatable/datatables/jquery.dataTables.min.js')}}"></script>
-<script src="{{asset('assets/js/datatable/datatables/datatable.custom.js')}}"></script>
-<script src="{{asset('assets/js/tooltip-init.js')}}"></script>
-<!-- Plugins JS Ends-->
 @endsection

@@ -23,8 +23,14 @@ trait HandlesPaymobPayment
         $paymentLink = $this->createPaymobPaymentLink($auth['token'], $order);
 
         if (!$paymentLink['success']) {
-            return response()->json($paymentLink, 500);
+            return [
+                'success' => false,
+                'message' => 'فشل إنشاء رابط الدفع',
+                'error_details' => $paymentLink, // إظهار كل تفاصيل الخطأ
+            ];
         }
+
+
         // نجح كل شيء → نرجع رابط الدفع للموبايل
         return [
             'success'      => true,
@@ -83,7 +89,6 @@ trait HandlesPaymobPayment
                 'redirect_url'     => 'https://web.whatsapp.com/',
                 'cancel_url'       => 'https://web.whatsapp.com/',
             ]);
-
         if ($response->failed()) {
             return [
                 'success' => false,

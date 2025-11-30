@@ -31,6 +31,7 @@ public function toArray($request)
             'price'        => $item->total_price,
             'options'      => $item->selected_options,
             'image'        => $item->image_design,
+            'product'=>new ProductResource( $item->product),
         ]),
     ];
 }
