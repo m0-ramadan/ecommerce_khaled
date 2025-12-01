@@ -80,7 +80,7 @@ class OrderController extends Controller
 
                 $discountAmount = $coupon->calculateDiscount($cart->total);
             }
-
+//dd($cart);
             // إنشاء الطلب
             $order = Order::create([
                 'user_id'           => $user?->id,
@@ -89,7 +89,7 @@ class OrderController extends Controller
                 'customer_name'     => $request->customer_name ?? $user?->name,
                 'customer_phone'    => $request->customer_phone ?? $user?->phone,
                 'customer_email'    => $request->customer_email ?? $user?->email,
-                'shipping_address'  => $address??$request->shipping_address,
+                'shipping_address'  => $request->shipping_address,
                 'subtotal'          => $cart->subtotal,
                 'shipping_amount'   => 0, // لاحقًا: حسب المنطقة
                 'discount_amount'   => $discountAmount,
@@ -136,10 +136,10 @@ class OrderController extends Controller
                 }
 
                 return $this->successResponse([
-                    'payment_url' => $payment['payment_url'],
-                    'shorten_url' => $payment['shorten_url'],
+                    'payment_url'  => $payment['payment_url'],
+                    'shorten_url'  => $payment['shorten_url'],
                     'order_number' => $order->order_number,
-                    'message' => 'جاري توجيهك إلى بوابة الدفع الآمنة...'
+                    'message'      => 'جاري توجيهك إلى بوابة الدفع الآمنة...'
                 ]);
             }
 
@@ -193,17 +193,17 @@ class OrderController extends Controller
         $user = auth('sanctum')->user();
 
         // لو مسجل دخول → تأكد إنه صاحب الطلب
-        if ($user && $order->user_id !== $user->id) {
-            return $this->errorResponse('هذا الطلب ليس لك', 403);
-        }
+        // if ($user && $order->user_id !== $user->id) {
+        //     return $this->errorResponse('هذا الطلب ليس لك', 403);
+        // }
 
         // لو زائر → يطلب رقم التليفون
-        if (!$user) {
-            $phone = $request->input('phone');
-            if (!$phone || $order->customer_phone !== $phone) {
-                return $this->errorResponse('رقم الهاتف غير صحيح', 403);
-            }
-        }
+        // if (!$user) {
+        //     $phone = $request->input('phone');
+        //     if (!$phone || $order->customer_phone !== $phone) {
+        //         return $this->errorResponse('رقم الهاتف غير صحيح', 403);
+        //     }
+        // }
 
         return $this->successResponse(
             new OrderDetailsResource($order),
@@ -264,6 +264,55 @@ class OrderController extends Controller
             'تم تطبيق الكوبون بنجاح'
         );
     }
+
+    public function webhook(Request $request)
+{
+    $hmacSecret = config('services.paymob.hmac_secret');
+
+    $receivedHmac = $request->header('X-Paymob-Hmac-Signature')
+                 ?? $request->input('hmac');
+
+    if (!$receivedHmac || empty($hmacSecret)) {
+        return response('Unauthorized', 401);
+    }
+
+    $obj = $request->input('obj');
+    $concatenated = collect($obj)->flatten()->implode('');
+    $calculatedHmac = hash_hmac('sha512', $concatenated, $hmacSecret);
+
+    if (!hash_equals($calculatedHmac, $receivedHmac)) {
+        \Illuminate\Support\Facades\Log::warning('PayMob Webhook HMAC Invalid', ['ip' => $request->ip()]);
+        return response('Invalid HMAC', 400);
+    }
+
+    if ($request->input('type') === 'TRANSACTION' && $obj['success'] && $obj['is_capture']) {
+        $orderNumber = $obj['merchant_reference'] ?? null;
+
+        if (!$orderNumber) return response('No reference', 400);
+
+        $order = Order::where('order_number', $orderNumber)->first();
+
+        if ($order && $order->status === 'pending') {
+            $order->update([
+                'status'         => 'paid',
+                'payment_method' => 'paymob',
+                'transaction_id' => $obj['id'],
+                'paid_at'        => now(),
+            ]);
+
+            // تفريغ السلة دلوقتي (آمن لأن الدفع تم)
+            $cart = Cart::where('user_id', $order->user_id)->orWhere('session_id', session()->getId())->first();
+            if ($cart) {
+                $cart->items()->delete();
+                $cart->update(['subtotal' => 0, 'total' => 0]);
+            }
+
+            \Illuminate\Support\Facades\Log::info("Order Paid via PayMob: {$orderNumber}");
+        }
+    }
+
+    return response('OK', 200);
+}
     // ==================== Helpers ====================
 
     private function getCurrentCart(): Cart

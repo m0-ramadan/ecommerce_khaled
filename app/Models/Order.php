@@ -24,12 +24,14 @@ class Order extends Model
         'total_amount',
         'payment_method',
         'transaction_id',
+        'shipping_address',
         'notes',
         'customer_name',
         'customer_phone',
         'customer_email',
         'shipped_at',
         'delivered_at',
+        'status_payment',
     ];
 
     protected $casts = [

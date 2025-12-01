@@ -82,6 +82,7 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
         'regions' => RegionController::class,
     ]);
 
+
     // Users
     Route::prefix('users')->as('user.')->group(function () {
         Route::get('/', [UserController::class, 'index'])->name('index')->withoutMiddleware('admin:1')->middleware('admin:1,0');
@@ -128,5 +129,10 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
     //     Route::get('all', [AdminNotificationController::class, 'allNotifications'])->name('all-notifications');
     //     Route::get('mark-read/{id?}', [AdminNotificationController::class, 'markNotification'])->name('mark_read');
     // });
+
+    // Additional Routes can be added here
+    Route::prefix('products')->as('products.')->group(function () {
+        Route::get('/export', [ProductController::class,'export'])->name('export');
+    });
 
 });

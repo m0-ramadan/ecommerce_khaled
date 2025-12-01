@@ -2,305 +2,274 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\Clients;
+use App\Models\Size;
+use App\Models\Color;
+use App\Models\Image;
 use App\Models\Product;
-use App\Traits\ImageTrait;
+use App\Models\Category;
 use Illuminate\Http\Request;
+use App\Exports\ProductsExport;
+use App\Models\ProductSizeTier;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Storage;
-use App\Traits\FirebaseNotificationTrait;
-use Flasher\Toastr\Laravel\Facade\Toastr;
-use Illuminate\Support\Facades\Validator;
-use App\Http\Requests\Admin\Product\StoreProductRequest;
-use App\Http\Requests\Admin\Product\UpdateProductRequest;
-use App\Models\Branchs;
 
 class ProductController extends Controller
 {
-
-    use ImageTrait, FirebaseNotificationTrait;
-
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::get();
-        $clients = Clients::where('type', 2)->get();
+        $query = Product::with(['category', 'colors']);
 
-        return view('Admin.product.index', compact('products', 'clients'));
+        // تطبيق الفلاتر
+        $query = $query->filtered($request)->searched($request->search);
+
+        $products = $query->latest()->paginate(20);
+
+        return view('Admin.product.index', [
+            'products'        => $products,
+            'categories'      => Category::all(),
+            'colors'          => Color::all(),
+            'totalProducts'   => Product::count(),
+            'activeProducts'  => Product::where('status_id', 1)->count(),
+            'inactiveProducts' => Product::where('status_id', 0)->count(),
+        ]);
     }
 
-    public function show($id)
+    public function create()
     {
-        // $branches = Branchs::all();
-        $client = Clients::find($id);
-        return view('Admin.product.show', compact('client'));
-    }
-
-    public function create($id)
-    {
-        $branches = Branchs::all();
-        $client = Clients::find($id);
-        return view('Admin.product.create', compact('branches', 'client'));
+        return view('Admin.product.create', [
+            'categories' => Category::all(),
+            'colors'     => Color::all(),
+            'sizes'      => Size::all(),
+        ]);
     }
 
     public function store(Request $request)
     {
+        $validated = $request->validate([
+            'name'              => 'required|string|max:255',
+            'category_id'       => 'required|exists:categories,id',
+            'description'       => 'nullable|string',
+            'num_faces'         => 'required|in:1,2',
+            'print_locations'   => 'nullable|array',
+            'printing_methods'  => 'nullable|array',
+            'protection_layer'  => 'nullable|in:none,glossy,matte',
+            'design_service'    => 'nullable|in:0,free,paid',
+            'design_service_price' => 'nullable|numeric|min:0',
+            'delivery_time'     => 'required|string',
+            'shipping_fees'     => 'nullable|string',
+            'tags'              => 'nullable|string',
+            'status'            => 'required|in:0,1',
+            'images.*'          => 'image|mimes:jpg,jpeg,png,webp|max:5048',
+            'colors'            => 'array',
+            'colors.*'          => 'exists:colors,id',
+            'sizes.new.*.size_id'       => 'required|exists:sizes,id',
+            'sizes.new.*.quantity'      => 'required|integer|min:1',
+            'sizes.new.*.price_per_unit' => 'required|numeric|min:0',
+        ]);
+
+        DB::beginTransaction();
         try {
-            // Validate the request
-            $validator = Validator::make($request->all(), [
-                'name' => 'required|string|max:255',
-                'sale_price' => 'required|numeric|min:0',
-                'discounts' => 'nullable|numeric|min:0|max:100',
-                'expected_delivery_time' => 'nullable|string|max:255',
-                'person_id' => 'required|integer|exists:clients,id',
-                'code' => 'required|string|max:255|unique:products,code',
-                'category' => 'nullable|string|max:255',
-                'brand' => 'nullable|string|max:255',
-                'unit_type' => 'nullable|string|max:255',
-                'in_stock_quantity' => 'required|integer|min:0',
-                'reorder_limit' => 'nullable|integer|min:0',
-                'minimum_stock' => 'nullable|integer|min:0',
-                'location_in_stock' => 'nullable|string|max:255',
-                'product_size' => 'nullable|string|max:255',
-                'expiry_date' => 'nullable|date|after_or_equal:today',
-                'description' => 'nullable|string',
-                'details' => 'nullable|string|max:1000',
-                'image' => 'nullable|file|image|mimes:jpg,jpeg,png|max:2048',
+            $product = Product::create([
+                'name'              => $request->name,
+                'category_id'       => $request->category_id,
+                'description'       => $request->description,
+                'num_faces'         => $request->num_faces,
+                'print_locations'   => $request->print_locations ? json_encode($request->print_locations) : null,
+                'printing_methods'  => $request->printing_methods ? json_encode($request->printing_methods) : null,
+                'protection_layer'  => $request->protection_layer,
+                'design_service'    => $request->design_service,
+                'design_service_price' => $request->design_service == 'paid' ? $request->design_service_price : null,
+                'delivery_time'     => $request->delivery_time,
+                'shipping_fees'     => $request->shipping_fees,
+                'tags'              => $request->tags,
+                'status'            => $request->status,
             ]);
 
-            if ($validator->fails()) {
-                return redirect()->back()->withErrors($validator)->withInput();
+            // حفظ الألوان
+            if ($request->colors) {
+                $product->colors()->sync($request->colors);
             }
 
-            DB::beginTransaction();
-
-            // Handle image upload
-            $image = "";
-            if ($request->hasFile('image') && $request->file('image')->isValid()) {
-                $filename = time() . '.' . $request->file('image')->extension();
-                $image = $this->uploadImg($request->file('image'), $filename, 'product');
-                if (!$image) {
-                    DB::rollBack();
-                    return redirect()->back()->withInput()->with('error', 'فشل في رفع الصورة الرئيسية');
+            // حفظ الصور
+            if ($request->hasFile('images')) {
+                foreach ($request->file('images') as $index => $file) {
+                    $path = $file->store('products', 'public');
+                    $product->images()->create([
+                        'path' => $path,
+                        'is_primary' => $index === 0,
+                    ]);
                 }
             }
 
-            // Find the client
-            $client = Clients::findOrFail($request->person_id);
-
-            // Create the product
-            $product = Product::create([
-                'name' => $request->name,
-                'price' => $request->sale_price, // Map sale_price to price
-                'description' => $request->details,
-                'product_details' => $request->details,
-                'image' => $image,
-                'code' => $request->code,
-                'category' => $request->category,
-                'brand' => $request->brand,
-                'in_stock_quantity' => $request->in_stock_quantity,
-                'reorder_limit' => $request->reorder_limit,
-                'minimum_stock' => $request->minimum_stock,
-                'location_in_stock' => $request->location_in_stock,
-                'purchase_price' => $request->purchase_price ?? 0, // Default to 0 if not provided
-                'sale_price' => $request->sale_price,
-                'discounts' => $request->discounts,
-                'unit_type' => $request->unit_type,
-                'product_size' => $request->product_size,
-                'person_type' => 'App\Models\Clients',
-                'supplier_name' => $client->name,
-                'status' => 'In Stock',
-                'person_id' => $request->person_id,
-                'expiry_date' => $request->expiry_date,
-                'date_added_to_stock' => date('Y-m-d'),
-                'expected_profit_margin' => $request->expected_profit_margin ?? 0,
-                'supplier_contact_information' => $client->phone,
-                'expected_delivery_time' => $request->expected_delivery_time,
-                'branch_id' => $client->branch_id,
-            ]);
-
-            $notificationSent = false;
-            if ($client) {
-                $deviceTokens = $client->deviceToken()->pluck('device_token')->toArray();
-                foreach ($deviceTokens as $deviceToken) {
-                    $notificationRequest = new Request([
-                        'device_token' => $deviceToken,
-                        'title' => 'إضافة منتج جديد',
-                        'body' => "تم إضافة منتج جديد بكود {$product->code} إلى المخزون الخاص بك.",
-                        'icon' => '',
+            // حفظ التسعير حسب المقاس والكمية
+            if ($request->filled('sizes.new')) {
+                foreach ($request->sizes['new'] as $tier) {
+                    ProductSizeTier::create([
+                        'product_id'     => $product->id,
+                        'size_id'        => $tier['size_id'],
+                        'quantity'       => $tier['quantity'],
+                        'price_per_unit' => $tier['price_per_unit'],
                     ]);
-
-                    $response = $this->sendFirebaseNotification($notificationRequest);
-                    if ($response && $response->getStatusCode() === 200) {
-                        $notificationSent = true;
-                    } else {
-                        \Log::error('Failed to send product creation notification to client', [
-                            'product_id' => $product->id,
-                            'client_id' => $client->id,
-                            'device_token' => $deviceToken,
-                            'error' => $response ? ($response->getData()->error ?? 'Unknown error') : 'No response',
-                        ]);
-                    }
                 }
             }
 
             DB::commit();
-
-            Toastr::success('تم إضافة المنتج بنجاح' . ($notificationSent ? ' وتم إرسال الإشعار' : ''), 'نجاح');
-            return redirect()->route('admin.product.show', [$client->id]);
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            DB::rollBack();
-            Toastr::error('العملاء غير موجود', 'خطأ');
-            return redirect()->back()->withInput();
+            return redirect()->route('Admin.product.show', $product)
+                ->with('success', 'تم إضافة المنتج بنجاح');
         } catch (\Exception $e) {
             DB::rollBack();
-            Toastr::error('حدث خطأ: ' . $e->getMessage(), 'خطأ');
-            return redirect()->back()->withInput();
+            Log::error('Product Store Error: ' . $e->getMessage());
+            return back()->with('error', 'حدث خطأ أثناء حفظ المنتج');
         }
     }
+
+    public function show($id)
+    {
+        $product = Product::with(['category', 'colors', 'images', 'sizeTiers.size', 'reviews'])->find($id);
+
+        return view('Admin.product.show', compact('product'));
+    }
+
     public function edit($id)
     {
-        $product = Product::find($id);
-        $clients = Clients::where('type', 2)->get();
-        $branches = Branchs::all();
+        $product = Product::with(['category', 'colors', 'images', 'sizeTiers.size', 'reviews'])->find($id);
 
-        return view('Admin.product.edit', compact('product', 'clients', 'branches'));
+        return view('Admin.product.edit', [
+            'product'    => $product,
+            'categories' => Category::all(),
+            'colors'     => Color::all(),
+            'sizes'      => Size::all(),
+        ]);
     }
 
-    public function update(Request $request)
+    public function update(Request $request, Product $product)
     {
+        $validated = $request->validate([
+            'name'              => 'required|string|max:255',
+            'category_id'       => 'required|exists:categories,id',
+            'description'       => 'nullable|string',
+            'num_faces'         => 'required|in:1,2',
+            'print_locations'   => 'nullable|array',
+            'printing_methods'  => 'nullable|array',
+            'protection_layer'  => 'nullable|in:none,glossy,matte',
+            'design_service'    => 'nullable|in:0,free,paid',
+            'design_service_price' => 'nullable|numeric|min:0',
+            'delivery_time'     => 'required|string',
+            'shipping_fees'     => 'nullable|string',
+            'tags'              => 'nullable|string',
+            'status'            => 'required|in:0,1',
+            'images.*'          => 'image|mimes:jpg,jpeg,png,webp|max:5048',
+            'colors'            => 'array',
+            'colors.*'          => 'exists:colors,id',
+            'sizes.edit.*.size_id'       => 'required|exists:sizes,id',
+            'sizes.edit.*.quantity'      => 'required|integer|min:1',
+            'sizes.edit.*.price_per_unit' => 'required|numeric|min:0',
+            'sizes.new.*.size_id'        => 'required|exists:sizes,id',
+            'sizes.new.*.quantity'       => 'required|integer|min:1',
+            'sizes.new.*.price_per_unit' => 'required|numeric|min:0',
+        ]);
+
+        DB::beginTransaction();
         try {
-            // Validate the request
-            $validator = Validator::make($request->all(), [
-                'id' => 'required|integer|exists:products,id',
-                'name' => 'required|string|max:255',
-                'sale_price' => 'required|numeric|min:0',
-                'discounts' => 'nullable|numeric|min:0|max:100',
-                'expected_delivery_time' => 'nullable|string|max:255',
-                'person_id' => 'required|integer|exists:clients,id',
-                'code' => 'required|string|max:255|unique:products,code,' . $request->id,
-                'category' => 'required|string|max:255',
-                'brand' => 'nullable|string|max:255',
-                'unit_type' => 'nullable|string|max:255',
-                'in_stock_quantity' => 'required|integer|min:0',
-                'reorder_limit' => 'nullable|integer|min:0',
-                'minimum_stock' => 'nullable|integer|min:0',
-                'location_in_stock' => 'nullable|string|max:255',
-                'product_size' => 'nullable|string|max:255',
-                'expiry_date' => 'nullable|date|after_or_equal:today',
-                'description' => 'nullable|string',
-                'details' => 'nullable|string|max:1000',
-                'image' => 'nullable|file|image|mimes:jpg,jpeg,png|max:2048',
-                'purchase_price' => 'nullable|numeric|min:0',
-                'expected_profit_margin' => 'nullable|numeric|min:0',
-            ]);
-
-            if ($validator->fails()) {
-                return redirect()->back()->withErrors($validator)->withInput();
-            }
-
-            DB::beginTransaction();
-
-            // Find the product and client
-            $product = Product::findOrFail($request->id);
-            $client = Clients::findOrFail($request->person_id);
-
-            // Handle image upload
-            $image = $product->image; // Preserve existing image if no new image
-            if ($request->hasFile('image') && $request->file('image')->isValid()) {
-                // Delete old image if it exists
-                if ($product->image && Storage::disk('public')->exists($product->image)) {
-                    Storage::disk('public')->delete($product->image);
-                }
-                $filename = time() . '.' . $request->file('image')->extension();
-                $image = $this->uploadImg($request->file('image'), $filename, 'product');
-                if (!$image) {
-                    DB::rollBack();
-                    return redirect()->back()->withInput()->with('error', 'فشل في رفع الصورة الرئيسية');
-                }
-            }
-
-            // Update the product
             $product->update([
-                'name' => $request->name,
-                'price' => $request->sale_price, // Map sale_price to price
-                'description' => $request->description,
-                'product_details' => $request->details,
-                'image' => $image,
-                'code' => $request->code,
-                'category' => $request->category,
-                'brand' => $request->brand,
-                'in_stock_quantity' => $request->in_stock_quantity,
-                'reorder_limit' => $request->reorder_limit,
-                'minimum_stock' => $request->minimum_stock,
-                'location_in_stock' => $request->location_in_stock,
-                'purchase_price' => $request->purchase_price ?? 0,
-                'sale_price' => $request->sale_price,
-                'discounts' => $request->discounts,
-                'unit_type' => $request->unit_type,
-                'product_size' => $request->product_size,
-                'person_type' => 'App\Models\Clients',
-                'supplier_name' => $client->name,
-                'status' => 'In Stock',
-                'person_id' => $request->person_id,
-                'expiry_date' => $request->expiry_date,
-                'date_added_to_stock' => date('Y-m-d'),
-                'expected_profit_margin' => $request->expected_profit_margin ?? 0,
-                'supplier_contact_information' => $client->phone,
-                'branch_id' => $request->branch_id ?? $product->branch_id,
-
+                'name'              => $request->name,
+                'category_id'       => $request->category_id,
+                'description'       => $request->description,
+                'num_faces'         => $request->num_faces,
+                'print_locations'   => $request->print_locations ? json_encode($request->print_locations) : null,
+                'printing_methods'  => $request->printing_methods ? json_encode($request->printing_methods) : null,
+                'protection_layer'  => $request->protection_layer,
+                'design_service'    => $request->design_service,
+                'design_service_price' => $request->design_service == 'paid' ? $request->design_service_price : null,
+                'delivery_time'     => $request->delivery_time,
+                'shipping_fees'     => $request->shipping_fees,
+                'tags'              => $request->tags,
+                'status'            => $request->status,
             ]);
 
-            // Send notification to the client
-            $notificationSent = false;
-            if ($client) {
-                $deviceTokens = $client->deviceToken()->pluck('device_token')->toArray();
-                foreach ($deviceTokens as $deviceToken) {
-                    $notificationRequest = new Request([
-                        'device_token' => $deviceToken,
-                        'title' => 'تحديث منتج',
-                        'body' => "تم تحديث المنتج بكود {$product->code} في المخزون الخاص بك.",
-                        'icon' => '',
-                    ]);
+            // تحديث الألوان
+            $product->colors()->sync($request->colors ?? []);
 
-                    $response = $this->sendFirebaseNotification($notificationRequest);
-                    if ($response && $response->getStatusCode() === 200) {
-                        $notificationSent = true;
-                    } else {
-                        \Log::error('Failed to send product update notification to client', [
-                            'product_id' => $product->id,
-                            'client_id' => $client->id,
-                            'device_token' => $deviceToken,
-                            'error' => $response ? ($response->getData()->error ?? 'Unknown error') : 'No response',
-                        ]);
-                    }
+            // إضافة صور جديدة
+            if ($request->hasFile('images')) {
+                foreach ($request->file('images') as $index => $file) {
+                    $path = $file->store('products', 'public');
+                    $product->images()->create([
+                        'path' => $path,
+                        'is_primary' => $index === 0 && !$product->images()->where('is_primary', true)->exists(),
+                    ]);
+                }
+            }
+
+            // تحديث التسعير القديم
+            if ($request->filled('sizes.edit')) {
+                foreach ($request->sizes['edit'] as $id => $data) {
+                    ProductSizeTier::findOrFail($id)->update($data);
+                }
+            }
+
+            // إضافة تسعير جديد
+            if ($request->filled('sizes.new')) {
+                foreach ($request->sizes['new'] as $data) {
+                    $product->sizeTiers()->create($data);
                 }
             }
 
             DB::commit();
-
-            Toastr::success('تم تحديث المنتج بنجاح' . ($notificationSent ? ' وتم إرسال الإشعار' : ''), 'نجاح');
-            return redirect()->route('admin.product.index');
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            DB::rollBack();
-            Toastr::error('المنتج أو العميل غير موجود', 'خطأ');
-            return redirect()->back()->withInput();
+            return redirect()->route('Admin.product.show', $product)
+                ->with('success', 'تم تحديث المنتج بنجاح');
         } catch (\Exception $e) {
             DB::rollBack();
-            Toastr::error('حدث خطأ: ' . $e->getMessage(), 'خطأ');
-            return redirect()->back()->withInput();
+            Log::error('Product Update Error: ' . $e->getMessage());
+            return back()->with('error', 'حدث خطأ أثناء التحديث');
         }
     }
 
-    public function destroy($id)
+    public function destroy(Product $product)
     {
-        $product = Product::find($id);
-        if ($product) {
-            $product->delete();
-            Toastr::success('success', 'sucessfully updated');
-            return redirect()->route('admin.product.index');
+        $product->images()->delete();
+        $product->sizeTiers()->delete();
+        $product->delete();
+
+        return back()->with('success', 'تم حذف المنتج بنجاح');
+    }
+
+    public function bulkDelete(Request $request)
+    {
+        $ids = $request->input('ids');
+        if (!$ids || !is_array($ids)) {
+            return back()->with('error', 'لم يتم تحديد أي منتجات');
         }
-        Toastr::error('error', 'not found');
-        return redirect()->route('admin.product.index');
+
+        $products = Product::whereIn('id', $ids)->get();
+        foreach ($products as $product) {
+            $product->images()->delete();
+            $product->sizeTiers()->delete();
+        }
+        Product::whereIn('id', $ids)->delete();
+
+        return back()->with('success', 'تم حذف المنتجات المحددة بنجاح');
+    }
+
+    public function deleteImage($productId, $imageId)
+    {
+        $image = Image::where('imageable_id', $productId)
+            ->where('imageable_type', Product::class)
+            ->where('id', $imageId)
+            ->firstOrFail();
+
+        Storage::disk('public')->delete($image->path);
+        $image->delete();
+
+        return response()->json(['success' => true]);
+    }
+
+    // تصدير Excel
+    public function export()
+    {
+        return Excel::download(new ProductsExport, 'products_' . now()->format('Y-m-d') . '.xlsx');
     }
 }

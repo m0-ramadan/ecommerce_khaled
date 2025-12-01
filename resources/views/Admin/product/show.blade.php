@@ -1,341 +1,272 @@
 @extends('Admin.layout.master')
 
-@section('title')
-    تفاصيل التاجر
-@endsection
+@section('title', 'تفاصيل المنتج - ' . $product->name)
 
 @section('css')
-    <!-- Plugins css start-->
-    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/datatables.css') }}">
-    <!-- Plugins css Ends-->
-    <style>
-        .nav-tabs .nav-link.active {
-            background-color: #28a745;
-            color: white;
-            border-color: #28a745;
-        }
-
-        .nav-tabs .nav-link {
-            color: #28a745;
-        }
-
-        .tab-content {
-            margin-top: 20px;
-        }
-
-        .card-body {
-            padding: 1.5rem;
-        }
-
-        .table-responsive {
-            margin-top: 10px;
-        }
-    </style>
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<style>
+    .product-image { max-height: 120px; object-fit: cover; border-radius: 8px; margin: 5px; }
+    .price-table th { background: #f8f9fa; }
+    .badge-print { font-size: 0.75rem; padding: 0.4em 0.8em; }
+    .location-item { display: inline-block; background: #e3f2fd; padding: 5px 12px; border-radius: 20px; margin: 3px; font-size: 0.9rem; }
+</style>
 @endsection
 
 @section('content')
-    <div class="col-sm-12">
-        <div class="card">
-            <div class="card-header">
-                <h5>تفاصيل التاجر: {{ $client->name }}</h5>
-                <a class="btn btn-primary" href="{{ route('admin.product.index') }}">رجوع</a>
-                <a class="btn btn-success" href="{{ route('admin.product.create', $client->id) }}"> اضافة منتج
-                    ل{{ $client->name }} </a>
+<div class="container-xxl flex-grow-1 container-p-y">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ route('admin.index') }}">الرئيسية</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('admin.products.index') }}">المنتجات</a></li>
+            <li class="breadcrumb-item active">{{ Str::limit($product->name, 30) }}</li>
+        </ol>
+    </nav>
 
-            </div>
-            <div class="card-body">
-                <!-- Client Details -->
-                <div class="row">
-                    <div class="col-md-6">
-                        <h6>المعلومات الأساسية</h6>
-                        <p><strong>الاسم:</strong> {{ $client->name }}</p>
-                        <p><strong>الكود:</strong> {{ $client->code ?? '--' }}</p>
-                        <p><strong>البريد الإلكتروني:</strong> {{ $client->email ?? '--' }}</p>
-                        <p><strong>رقم الهاتف:</strong> {{ $client->phone ?? '--' }}</p>
-                        <p><strong>رقم الهاتف الثاني:</strong> {{ $client->phone2 ?? '--' }}</p>
-                        <p><strong>العنوان:</strong> {{ $client->address ?? '--' }}</p>
-                    </div>
-                    <div class="col-md-6">
-                        <h6>معلومات إضافية</h6>
-                        <p><strong>الفرع:</strong> {{ $client->branch->name ?? '--' }}</p>
-                        <p><strong>المنطقة:</strong> {{ $client->region->region_ar ?? '--' }}</p>
-                        <p><strong>الدولة:</strong> {{ $client->country->country_ar ?? '--' }}</p>
-                        <p><strong>الحالة:</strong> {{ $client->status_label }}</p>
-                        <p><strong>عدد المنتجات:</strong> {{ $client->product_count }}</p>
-                        <p><strong>إجمالي المخزون:</strong> {{ $client->product_sum }}</p>
+    <div class="row">
+        <!-- الصور + المعلومات الأساسية -->
+        <div class="col-xl-8">
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">{{ $product->name }}</h5>
+                    <div>
+                        <a href="{{ route('admin.products.edit', $product->id) }}" class="btn btn-primary btn-sm">
+                            تعديل
+                        </a>
+                        <button onclick="confirmDelete({{ $product->id }})" class="btn btn-danger btn-sm">
+                            حذف
+                        </button>
                     </div>
                 </div>
-
-                <!-- Tabs for Products and Shipments -->
-                <ul class="nav nav-tabs" id="clientTabs" role="tablist">
-                    <li class="nav-item">
-                        <a class="nav-link active" id="products-tab" data-toggle="tab" href="#products" role="tab"
-                            aria-controls="products" aria-selected="true">المنتجات</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="shipments-tab" data-toggle="tab" href="#shipments" role="tab"
-                            aria-controls="shipments" aria-selected="false">الشحنات</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="tasks-tab" data-toggle="tab" href="#tasks" role="tab"
-                            aria-controls="tasks" aria-selected="false">المهام</a>
-                    </li>
-                </ul>
-
-                <div class="tab-content" id="clientTabsContent">
-                    <!-- Products Tab -->
-                    <div class="tab-pane fade show active" id="products" role="tabpanel" aria-labelledby="products-tab">
-                        @if ($client->products->isEmpty())
-                            <p class="text-center">لا توجد منتجات لهذا التاجر</p>
-                        @else
-                            <div class="table-responsive">
-                                <table class="display" id="products-table">
-                                    <thead>
-                                        <tr>
-                                            <th>#</th>
-                                            <th>اسم المنتج</th>
-                                            <th>الكود</th>
-                                            <th>الفئة</th>
-                                            <th>العلامة التجارية</th>
-                                            <th>الكمية في المخزون</th>
-                                            <th>سعر البيع</th>
-                                            <th>الخصم</th>
-                                            <th>العمليات</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($client->products as $key => $product)
-                                            <tr>
-                                                <td>{{ ++$key }}</td>
-                                                <td>{{ $product->name }}</td>
-                                                <td>{{ $product->code ?? '--' }}</td>
-                                                <td>{{ $product->category ?? '--' }}</td>
-                                                <td>{{ $product->brand ?? '--' }}</td>
-                                                <td>{{ $product->in_stock_quantity ?? '--' }}</td>
-                                                <td>{{ $product->sale_price ?? '--' }}</td>
-                                                <td>{{ $product->discounts ?? '--' }}</td>
-                                                <td class="d-flex gap-1">
-                                                    <a href="{{ route('admin.product.edit', $product->id) }}"
-                                                        class="btn btn-success" title="تعديل">
-                                                        <i class="fa fa-edit text-white"></i>
-                                                    </a>
-                                                    <form method="POST"
-                                                        action="{{ route('admin.product.destroy', $product->id) }}"
-                                                        onsubmit="return confirm('هل أنت متأكد أنك تريد حذف هذا المنتج؟');">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" class="btn btn-danger" title="حذف">
-                                                            <i class="fa fa-trash-o"></i>
-                                                        </button>
-                                                    </form>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        @endif
+                <div class="card-body">
+                    <!-- الصور -->
+                    <div class="mb-4">
+                        <h6>صور المنتج</h6>
+                        <div class="d-flex flex-wrap">
+                            @if($product->images->count() > 0)
+                                @foreach($product->images as $image)
+                                    <img src="{{ asset('storage/' . $image->path) }}"
+                                         alt="صورة المنتج"
+                                         class="product-image shadow-sm {{ $image->is_primary ? 'border border-primary border-3' : '' }}">
+                                @endforeach
+                            @else
+                                <p class="text-muted">لا توجد صور</p>
+                            @endif
+                        </div>
                     </div>
 
-                    <!-- Shipments Tab -->
-                    <div class="tab-pane fade" id="shipments" role="tabpanel" aria-labelledby="shipments-tab">
-                        @if ($client->shipments->isEmpty())
-                            <p class="text-center">لا توجد شحنات لهذا التاجر</p>
-                        @else
-                            <div class="table-responsive">
-                                <table class="display" id="shipments-table">
-                                    <thead>
-                                        <tr>
-                                            <th>#</th>
-                                            <th>رقم الشحنة</th>
-                                            <th>الحالة</th>
-                                            <th>قيمة الشحنة</th>
-                                            <th>تكلفة الشحن</th>
-                                            <th>الوصف</th>
-                                            <th>العمله</th>
-                                            <th>رسوم الشحن</th>
-                                            <th>الإجمالي</th>
-                                            <th>الفرع من</th>
-                                            <th>الفرع إلى</th>
-                                            <th>العمليات</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($client->shipments as $key => $shipment)
-                                            <tr>
-                                                <td>{{ ++$key }}</td>
-                                                <td>{{ $shipment->code ?? '--' }}</td>
-                                                <td>
-                                                    <span class="badge {{ $shipment->status_badge_class }}">
-                                                        {{ $shipment->status_label }}
-                                                    </span>
-                                                </td>
-                                                <td>{{ $shipment->price ?? '--' }}</td>
-                                                <td>{{ $shipment->shipping_cost ?? '--' }}</td>
-                                                <td>{{ $shipment->describe_shipments ?? '--' }}</td>
-                                                <td>{{ $shipment->effective_currency_label ?? '--' }}</td>
-                                                <td>{{ $shipment->additional_shipping_cost == 1 ? ' مرسل ' : ' مستلم ' }}</td>
-
-
-                                                <td>{{ $shipment->additional_shipping_cost == 1 ? $shipment->price - $shipment->shipping_cost : $shipment->price + $shipment->shipping_cost }}
-                                                </td>
-                                                <td>{{ $shipment->branchFrom->name ?? '--' }}</td>
-                                                <td>{{ $shipment->branchTo->name ?? '--' }}</td>
-                                                <td class="d-flex gap-1">
-                                                    <a href="{{ route('admin.shipment.show', $shipment->id) }}"
-                                                        class="btn btn-success" title="عرض">
-                                                        <i class="fa fa-eye text-white"></i>
-                                                    </a>
-                                                    <form method="POST"
-                                                        action="{{ route('admin.shipment.destroy', $shipment->id) }}"
-                                                        onsubmit="return confirm('هل أنت متأكد أنك تريد حذف هذه الشحنة؟');">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" class="btn btn-danger" title="حذف">
-                                                            <i class="fa fa-trash-o"></i>
-                                                        </button>
-                                                    </form>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        @endif
+                    <!-- الوصف -->
+                    <div class="mb-4">
+                        <h6>الوصف</h6>
+                        <div class="border rounded p-3 bg-light">
+                            {!! $product->description ?? '<em class="text-muted">لا يوجد وصف</em>' !!}
+                        </div>
                     </div>
 
-                    <!-- tasks Tab -->
-                    <!-- tasks Tab -->
-                    <div class="tab-pane fade" id="tasks" role="tabpanel" aria-labelledby="tasks-tab">
-                        @if ($client->tasks->isEmpty())
-                            <p class="text-center">لا توجد مهام لهذا التاجر</p>
-                        @else
-                            <div class="table-responsive">
-                                <table class="display" id="tasks-table">
-                                    <thead>
-                                        <tr>
-                                            <th>#</th>
-                                            <th>نوع المهمة</th>
-                                            <th>عدد الطلبات</th>
-                                            <th>العنوان</th>
-                                            <th>تاريخ التنفيذ</th>
-                                            <th>المدة</th>
-                                            <th>الملاحظات</th>
-                                            <th>طريقة الاستلام</th>
-                                            <th>قيمة المبلغ</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($client->tasks as $key => $task)
-                                            <tr>
-                                                <td>{{ ++$key }}</td>
-                                                <td>
-                                                    @switch($task->type_task)
-                                                        @case(\App\Models\Task::TYPE_COLLECT)
-                                                            تجميع
-                                                        @break
+                    <!-- معلومات أساسية -->
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <strong>التصنيف:</strong> {{ $product->category?->name ?? 'غير محدد' }}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>الحالة:</strong>
+                            <span class="badge {{ $product->status ? 'bg-label-success' : 'bg-label-danger' }}">
+                                {{ $product->status ? 'نشط' : 'غير نشط' }}
+                            </span>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>تاريخ الإضافة:</strong> {{ $product->created_at->format('d/m/Y - h:i A') }}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>آخر تحديث:</strong> {{ $product->updated_at->diffForHumans() }}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>التقييم المتوسط:</strong>
+                            <span class="text-warning">
+                                <i class="ti ti-star-filled"></i> {{ number_format($product->average_rating, 1) }} ({{ $product->reviews->count() }} تقييم)
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                                                        @case(\App\Models\Task::TYPE_SETTLE)
-                                                            تسوية
-                                                        @break
+            <!-- جدول التسعير حسب المقاس والكمية -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">جدول التسعير حسب المقاس والكمية</h5>
+                </div>
+                <div class="card-body">
+                    @if($product->sizeTiers->count() > 0)
+                        <div class="table-responsive">
+                            <table class="table table-bordered price-table">
+                                <thead>
+                                    <tr>
+                                        <th>المقاس</th>
+                                        <th>الكمية</th>
+                                        <th>سعر القطعة</th>
+                                        <th>السعر الإجمالي</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($product->sizeTiers->sortBy('size.name')->sortBy('quantity') as $tier)
+                                    <tr>
+                                        <td><strong>{{ $tier->size?->name ?? 'غير محدد' }}</strong></td>
+                                        <td>{{ $tier->quantity }} قطعة</td>
+                                        <td>{{ number_format($tier->price_per_unit, 2) }} ر.س</td>
+                                        <td><strong>{{ number_format($tier->price_per_unit * $tier->quantity, 2) }} ر.س</strong></td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @else
+                        <p class="text-muted text-center py-4">لا توجد أسعار محددة لهذا المنتج بعد</p>
+                    @endif
+                </div>
+            </div>
+        </div>
 
-                                                        @case(\App\Models\Task::TYPE_DELIVER_RETURNS)
-                                                            تسليم مرتجعات
-                                                        @break
+        <!-- الشريط الجانبي (Sidebar) -->
+        <div class="col-xl-4">
+            <!-- الألوان -->
+            <div class="card mb-4">
+                <div class="card-header"><h6 class="mb-0">الألوان المتاحة</h6></div>
+                <div class="card-body">
+                    @if($product->colors->count() > 0)
+                        <div class="d-flex flex-wrap gap-2">
+                            @foreach($product->colors as $color)
+                                <div class="text-center">
+                                    <div class="rounded-circle border" style="width:50px;height:50px;background:#{{ $color->hex }};border:2px solid #ddd;"></div>
+                                    <small>{{ $color->name_ar }}</small>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <p class="text-muted">لا توجد ألوان محددة</p>
+                    @endif
+                </div>
+            </div>
 
-                                                        @default
-                                                            --
-                                                    @endswitch
-                                                </td>
-                                                <td>{{ $task->number_order ?? '--' }}</td>
-                                                <td>{{ $task->address ?? '--' }}</td>
-                                                <td>{{ $task->date_implementation ?? '--' }}</td>
-                                                <td>
-                                                    @switch($task->duration)
-                                                        @case(\App\Models\Task::DURATION_MONTH)
-                                                            شهر
-                                                        @break
-
-                                                        @case(\App\Models\Task::DURATION_TWO_MONTHS)
-                                                            شهرين
-                                                        @break
-
-                                                        @case(\App\Models\Task::DURATION_THREE_MONTHS)
-                                                            ثلاثة أشهر
-                                                        @break
-
-                                                        @default
-                                                            --
-                                                    @endswitch
-                                                </td>
-                                                <td>{{ $task->notes ?? '--' }}</td>
-                                                <td>
-                                                    @switch($task->receive_via)
-                                                        @case(\App\Models\Task::RECEIVE_BRANCH)
-                                                            فرع
-                                                        @break
-
-                                                        @case(\App\Models\Task::RECEIVE_REPRESENTATIVE)
-                                                            مندوب
-                                                        @break
-
-                                                        @case(\App\Models\Task::RECEIVE_BANK)
-                                                            بنك
-                                                        @break
-
-                                                        @default
-                                                            --
-                                                    @endswitch
-                                                </td>
-                                                <td>{{ $task->value_amount ?? '--' }}</td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
+            <!-- تفاصيل الطباعة -->
+            <div class="card mb-4">
+                <div class="card-header"><h6 class="mb-0">إعدادات الطباعة</h6></div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>عدد أوجه الطباعة</span>
+                            <strong>{{ $product->num_faces == 2 ? 'وجهين' : 'وجه واحد' }}</strong>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>طرق الطباعة</span>
+                            <div>
+                                @if($product->printing_methods)
+                                    @foreach(json_decode($product->printing_methods, true) ?? [] as $method)
+                                        <span class="badge badge-print bg-primary me-1">{{ __('dtf') == $method ? 'DTF' : ($method == 'screen' ? 'شاشة' : 'تطريز') }}</span>
+                                    @endforeach
+                                @else
+                                    <span class="text-muted">غير محدد</span>
+                                @endif
                             </div>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>أماكن الطباعة</span>
+                            <div>
+                                @if($product->print_locations)
+                                    @foreach(json_decode($product->print_locations, true) ?? [] as $loc)
+                                        <span class="location-item">
+                                            {{ 
+                                                $loc == 'front_a4' ? 'أمامي A4' :
+                                                ($loc == 'back_a4' ? 'خلفي A4' :
+                                                ($loc == 'chest_small' ? 'شعار صغير' :
+                                                ($loc == 'left_sleeve' ? 'كتف يسار' : 'كتف يمين')))
+                                            }}
+                                        </span>
+                                    @endforeach
+                                @else
+                                    <span class="text-muted">غير محدد</span>
+                                @endif
+                            </div>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>طبقة الحماية</span>
+                            <strong>
+                                {{ $product->protection_layer == 'glossy' ? 'لامع' : ($product->protection_layer == 'matte' ? 'مطفي' : 'بدون') }}
+                            </strong>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- خدمة التصميم ومدة التنفيذ -->
+            <div class="card mb-4">
+                <div class="card-header"><h6 class="mb-0">خدمات إضافية</h6></div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <strong>خدمة التصميم:</strong><br>
+                        @if($product->design_service == 'paid')
+                            مدفوعة ({{ $product->design_service_price }} ر.س)
+                        @elseif($product->design_service == 'free')
+                            <span class="text-success">مجانية</span>
+                        @else
+                            <span class="text-muted">غير متوفرة</span>
                         @endif
                     </div>
+                    <div class="mb-3">
+                        <strong>مدة التنفيذ:</strong><br>
+                        <strong>{{ $product->delivery_time ?? 'غير محدد' }}</strong>
+                    </div>
+                    <div>
+                        <strong>رسوم الشحن:</strong><br>
+                        <small>{!! nl2br(e($product->shipping_fees ?? 'غير محدد')) !!}</small>
+                    </div>
+                </div>
+            </div>
 
+            <!-- Tags -->
+            <div class="card">
+                <div class="card-header"><h6 class="mb-0">كلمات مفتاحية (Tags)</h6></div>
+                <div class="card-body">
+                    @if($product->tags)
+                        <div class="d-flex flex-wrap gap-2">
+                            @foreach(explode(',', $product->tags) as $tag)
+                                <span class="badge bg-label-info">{{ trim($tag) }}</span>
+                            @endforeach
+                        </div>
+                    @else
+                        <p class="text-muted">لا توجد كلمات مفتاحية</p>
+                    @endif
                 </div>
             </div>
         </div>
     </div>
+</div>
+
+<!-- حذف المنتج -->
+<form id="deleteForm" action="{{ route('admin.products.destroy', $product) }}" method="POST" style="display:none;">
+    @csrf @method('DELETE')
+</form>
 @endsection
 
 @section('js')
-    <!-- Plugins JS start-->
-    <script src="{{ asset('assets/js/jquery.min.js') }}"></script>
-    <script src="{{ asset('assets/js/bootstrap/bootstrap.bundle.min.js') }}"></script>
-    <script src="{{ asset('assets/js/datatable/datatables/jquery.dataTables.min.js') }}"></script>
-    <script>
-        $(document).ready(function() {
-            // Initialize Products DataTable
-            $('#products-table').DataTable({
-                language: {
-                    url: '{{ asset('assets/js/datatable/datatables/Arabic.json') }}'
-                }
-            });
-
-            // Initialize Shipments DataTable only when the tab is shown
-            let shipmentsTableInitialized = false;
-            $('#shipments-tab').on('shown.bs.tab', function() {
-                if (!shipmentsTableInitialized) {
-                    $('#shipments-table').DataTable({
-                        language: {
-                            url: '{{ asset('assets/js/datatable/datatables/Arabic.json') }}'
-                        }
-                    });
-                    shipmentsTableInitialized = true;
-                }
-            });
-
-            // Ensure tabs are initialized
-            $('#clientTabs a').on('click', function(e) {
-                e.preventDefault();
-                $(this).tab('show');
-            });
-        });
-    </script>
-    <script src="{{ asset('assets/js/tooltip-init.js') }}"></script>
-    <!-- Plugins JS Ends-->
+<script>
+function confirmDelete(id) {
+    Swal.fire({
+        title: 'تأكيد الحذف',
+        text: "هل أنت متأكد من حذف هذا المنتج نهائيًا؟ لا يمكن التراجع!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'نعم، احذف',
+        cancelButtonText: 'إلغاء',
+        customClass: {
+            confirmButton: 'btn btn-danger me-2',
+            cancelButton: 'btn btn-secondary'
+        },
+        buttonsStyling: false
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById('deleteForm').submit();
+        }
+    });
+}
+</script>
 @endsection

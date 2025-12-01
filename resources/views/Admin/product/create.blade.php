@@ -1,294 +1,236 @@
 @extends('Admin.layout.master')
 
-@section('title', 'إضافة منتج')
+@section('title', 'إضافة منتج جديد')
 
 @section('css')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<style>
+    .select2-container { width: 100% !important; }
+    .image-preview { max-height: 100px; margin: 5px; border-radius: 8px; }
+    .remove-image { position: absolute; top: 5px; right: 5px; background: red; color: white; border: none; border-radius: 50%; width: 25px; height: 25px; }
+    .price-tier { border: 1px solid #ddd; padding: 15px; border-radius: 8px; margin-bottom: 15px; background: #f9f9f9; }
+</style>
 @endsection
 
 @section('content')
+<div class="container-xxl flex-grow-1 container-p-y">
+    <h4 class="py-3 mb-4">إضافة منتج جديد</h4>
+
     <div class="card">
-        <div class="card-header pb-0">
-            <h5>إضافة منتج</h5>
-        </div>
-        @if ($errors->any())
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                <ul class="list-disc list-inside">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-
         <div class="card-body">
-            <form class="form theme-form" action="{{ route('admin.product.store') }}" method="post"
-                enctype="multipart/form-data">
+            <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
-                <div class="row">
-                    <div class="col-12">
-                        <div class="row g-3 mb-3">
-                            <div class="col-md-3">
-                                <label class="mr-sm-2" for="name"
-                                    style="font-family: 'Cairo', sans-serif;">المنتج</label>
-                                <input class="form-control @error('name') is-invalid @enderror" name="name"
-                                    id="name" type="text" placeholder="المنتج" value="{{ old('name') }}">
-                                @error('name')
-                                    <span class="invalid-feedback text-black font-weight-bold text-capitalize mt-2"
-                                        role="alert">
-                                        <p>{{ $message }}</p>
-                                    </span>
-                                @enderror
+
+                <!-- الاسم والتصنيف -->
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">اسم المنتج <span class="text-danger">*</span></label>
+                        <input type="text" name="name" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">التصنيف <span class="text-danger">*</span></label>
+                        <select name="category_id" class="form-control select2" required>
+                            <option value="">اختر التصنيف</option>
+                            @foreach($categories as $cat)
+                                <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+
+                <!-- الوصف -->
+                <div class="mb-3">
+                    <label class="form-label">الوصف الكامل</label>
+                    <textarea name="description" id="description" class="form-control editor"></textarea>
+                </div>
+
+                <!-- الصور -->
+                <div class="mb-3">
+                    <label class="form-label">صور المنتج (متعددة)</label>
+                    <input type="file" name="images[]" class="form-control" multiple accept="image/*">
+                    <small class="text-muted">الصورة الأولى ستكون الصورة الرئيسية</small>
+                </div>
+
+                <!-- الألوان -->
+                <div class="mb-3">
+                    <label class="form-label">الألوان المتاحة</label>
+                    <select name="colors[]" class="form-control select2" multiple>
+                        @foreach($colors as $color)
+                            <option value="{{ $color->id }}">{{ $color->name_ar }} (#{{ $color->hex }})</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- المقاسات مع الأسعار لكل كمية -->
+                <div class="mb-4">
+                    <h5>المقاسات والتسعير حسب الكمية</h5>
+                    <div id="size-tiers">
+                        <!-- يتم إضافته ديناميكيًا -->
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-primary" onclick="addSizeTier()">+ إضافة مقاس جديد</button>
+                </div>
+
+                <script>
+                    let tierIndex = 0;
+                    function addSizeTier() {
+                        const html = `
+                        <div class="price-tier">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <label>المقاس</label>
+                                    <select name="sizes[${tierIndex}][size_id]" class="form-control" required>
+                                        <option value="">اختر المقاس</option>
+                                        @foreach($sizes as $size)
+                                            <option value="{{ $size->id }}">{{ $size->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label>الكمية</label>
+                                    <input type="number" name="sizes[${tierIndex}][quantity]" class="form-control" placeholder="مثال: 10" required>
+                                </div>
+                                <div class="col-md-3">
+                                    <label>السعر للقطعة</label>
+                                    <input type="number" step="0.01" name="sizes[${tierIndex}][price_per_unit]" class="form-control" required>
+                                </div>
+                                <div class="col-md-2 mt-4">
+                                    <button type="button" class="btn btn-danger btn-sm" onclick="this.parentElement.parentElement.parentElement.remove()">حذف</button>
+                                </div>
                             </div>
+                        </div>`;
+                        document.getElementById('size-tiers').insertAdjacentHTML('beforeend', html);
+                        tierIndex++;
+                    }
+                    // إضافة مقاس واحد افتراضي
+                    window.onload = () => addSizeTier();
+                </script>
 
-                            <div class="col-md-3">
-                                <label class="mr-sm-2" for="sale_price" style="font-family: 'Cairo', sans-serif;">سعر
-                                    البيع</label>
-                                <input class="form-control @error('sale_price') is-invalid @enderror" name="sale_price"
-                                    id="sale_price" step="0.01" type="number" placeholder="سعر البيع"
-                                    value="{{ old('sale_price') }}">
-                                @error('sale_price')
-                                    <span class="invalid-feedback text-black font-weight-bold text-capitalize mt-2"
-                                        role="alert">
-                                        <p>{{ $message }}</p>
-                                    </span>
-                                @enderror
-                            </div>
+                <!-- عدد أوجه الطباعة -->
+                <div class="mb-3">
+                    <label class="form-label">عدد أوجه الطباعة</label>
+                    <select name="num_faces" class="form-control">
+                        <option value="1">وجه واحد</option>
+                        <option value="2">وجهين</option>
+                    </select>
+                </div>
 
-                            <div class="col-md-3">
-                                <label class="mr-sm-2" for="discounts" style="font-family: 'Cairo', sans-serif;">نسبة
-                                    الخصم</label>
-                                <input class="form-control @error('discounts') is-invalid @enderror" name="discounts"
-                                    id="discounts" type="number" placeholder="نسبة الخصم" value="{{ old('discounts') }}">
-                                @error('discounts')
-                                    <span class="invalid-feedback text-black font-weight-bold text-capitalize mt-2"
-                                        role="alert">
-                                        <p>{{ $message }}</p>
-                                    </span>
-                                @enderror
-                            </div>
+                <!-- أماكن الطباعة -->
+                <div class="mb-3">
+                    <label class="form-label">أماكن الطباعة المتاحة (متعدد)</label>
+                    <select name="print_locations[]" class="form-control select2" multiple>
+                        <option value="front_a4">الصدر (A4)</option>
+                        <option value="back_a4">الظهر (A4)</option>
+                        <option value="chest_small">شعار صغير أمامي</option>
+                        <option value="left_sleeve">كتف يسار</option>
+                        <option value="right_sleeve">كتف يمين</option>
+                    </select>
+                </div>
 
-                            <div class="col-md-3">
-                                <label class="mr-sm-2" for="expected_delivery_time"
-                                    style="font-family: 'Cairo', sans-serif;">مدة التوصيل
-                                    المتوقع</label>
-                                <input class="form-control @error('expected_delivery_time') is-invalid @enderror"
-                                    name="expected_delivery_time" id="expected_delivery_time" type="text"
-                                    placeholder="مدة التوصيل المتوقع" value="{{ old('expected_delivery_time') }}">
-                                @error('expected_delivery_time')
-                                    <span class="invalid-feedback text-black font-weight-bold text-capitalize mt-2"
-                                        role="alert">
-                                        <p>{{ $message }}</p>
-                                    </span>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-3">
-                                <label class="mr-sm-2" style="font-family: 'Cairo', sans-serif;">التاجر</label>
-                                <input type="text" class="form-control" value="{{ $client->name }}" readonly>
-                                <input type="hidden" name="person_id" value="{{ $client->id }}">
-                            </div>
-
-
-
-                            {{-- <div class="col-md-3">
-                                <label class="mr-sm-2" for="branch_id"
-                                    style="font-family: 'Cairo', sans-serif;">الفروع</label>
-                                <select class="form-select @error('branch_id') is-invalid @enderror" id="branch_id"
-                                    name="branch_id">
-                                    <option value="" selected>من فضلك حدد الفرع</option>
-                                    @foreach ($branches as $branch)
-                                        <option value="{{ $branch->id }}"
-                                            {{ old('branch_id') == $branch->id ? 'selected' : '' }}>{{ $branch->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('branch_id')
-                                    <span class="invalid-feedback text-black font-weight-bold text-capitalize mt-2"
-                                        role="alert">
-                                        <p>{{ $message }}</p>
-                                    </span>
-                                @enderror
-                            </div> --}}
-
-                            <div class="col-md-3">
-                                <label class="mr-sm-2" for="code" style="font-family: 'Cairo', sans-serif;">كود
-                                    المنتج</label>
-                                <input class="form-control @error('code') is-invalid @enderror" name="code"
-                                    id="code" type="text" placeholder="كود المنتج" value="{{ old('code') }}">
-                                @error('code')
-                                    <span class="invalid-feedback text-black font-weight-bold text-capitalize mt-2"
-                                        role="alert">
-                                        <p>{{ $message }}</p>
-                                    </span>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-3">
-                                <label class="mr-sm-2" for="category"
-                                    style="font-family: 'Cairo', sans-serif;">الفئة</label>
-                                <input class="form-control @error('category') is-invalid @enderror" name="category"
-                                    id="category" type="text" placeholder="الفئة" value="{{ old('category') }}">
-                                @error('category')
-                                    <span class="invalid-feedback text-black font-weight-bold text-capitalize mt-2"
-                                        role="alert">
-                                        <p>{{ $message }}</p>
-                                    </span>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-3">
-                                <label class="mr-sm-2" for="brand"
-                                    style="font-family: 'Cairo', sans-serif;">البرند</label>
-                                <input class="form-control @error('brand') is-invalid @enderror" name="brand"
-                                    id="brand" type="text" placeholder="البرند" value="{{ old('brand') }}">
-                                @error('brand')
-                                    <span class="invalid-feedback text-black font-weight-bold text-capitalize mt-2"
-                                        role="alert">
-                                        <p>{{ $message }}</p>
-                                    </span>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-3">
-                                <label class="mr-sm-2" for="unit_type" style="font-family: 'Cairo', sans-serif;">وحدة
-                                    القياس</label>
-                                <input class="form-control @error('unit_type') is-invalid @enderror" name="unit_type"
-                                    id="unit_type" type="text" placeholder="وحدة القياس"
-                                    value="{{ old('unit_type') }}">
-                                @error('unit_type')
-                                    <span class="invalid-feedback text-black font-weight-bold text-capitalize mt-2"
-                                        role="alert">
-                                        <p>{{ $message }}</p>
-                                    </span>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-3">
-                                <label class="mr-sm-2" for="in_stock_quantity"
-                                    style="font-family: 'Cairo', sans-serif;">الكمية في
-                                    المخزن</label>
-                                <input class="form-control @error('in_stock_quantity') is-invalid @enderror"
-                                    name="in_stock_quantity" id="in_stock_quantity" type="number"
-                                    placeholder="الكمية في المخزن" value="{{ old('in_stock_quantity') }}">
-                                @error('in_stock_quantity')
-                                    <span class="invalid-feedback text-black font-weight-bold text-capitalize mt-2"
-                                        role="alert">
-                                        <p>{{ $message }}</p>
-                                    </span>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-3">
-                                <label class="mr-sm-2" for="reorder_limit" style="font-family: 'Cairo', sans-serif;">أقصى
-                                    حد للطلب</label>
-                                <input class="form-control @error('reorder_limit') is-invalid @enderror"
-                                    name="reorder_limit" id="reorder_limit" type="number" placeholder="أقصى حد للطلب"
-                                    value="{{ old('reorder_limit') }}">
-                                @error('reorder_limit')
-                                    <span class="invalid-feedback text-black font-weight-bold text-capitalize mt-2"
-                                        role="alert">
-                                        <p>{{ $message }}</p>
-                                    </span>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-3">
-                                <label class="mr-sm-2" for="minimum_stock" style="font-family: 'Cairo', sans-serif;">أقل
-                                    كمية في
-                                    المخزن</label>
-                                <input class="form-control @error('minimum_stock') is-invalid @enderror"
-                                    name="minimum_stock" id="minimum_stock" type="number"
-                                    placeholder="أقل كمية في المخزن" value="{{ old('minimum_stock') }}">
-                                @error('minimum_stock')
-                                    <span class="invalid-feedback text-black font-weight-bold text-capitalize mt-2"
-                                        role="alert">
-                                        <p>{{ $message }}</p>
-                                    </span>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-3">
-                                <label class="mr-sm-2" for="location_in_stock"
-                                    style="font-family: 'Cairo', sans-serif;">الموقع في
-                                    المخزن</label>
-                                <input class="form-control @error('location_in_stock') is-invalid @enderror"
-                                    name="location_in_stock" id="location_in_stock" type="text"
-                                    placeholder="الموقع في المخزن" value="{{ old('location_in_stock') }}">
-                                @error('location_in_stock')
-                                    <span class="invalid-feedback text-black font-weight-bold text-capitalize mt-2"
-                                        role="alert">
-                                        <p>{{ $message }}</p>
-                                    </span>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-3">
-                                <label class="mr-sm-2" for="product_size" style="font-family: 'Cairo', sans-serif;">مقاس
-                                    المنتج</label>
-                                <input class="form-control @error('product_size') is-invalid @enderror"
-                                    name="product_size" id="product_size" type="text" placeholder="مقاس المنتج"
-                                    value="{{ old('product_size') }}">
-                                @error('product_size')
-                                    <span class="invalid-feedback text-black font-weight-bold text-capitalize mt-2"
-                                        role="alert">
-                                        <p>{{ $message }}</p>
-                                    </span>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-3">
-                                <label class="mr-sm-2" for="expiry_date" style="font-family: 'Cairo', sans-serif;">تاريخ
-                                    الصلاحية</label>
-                                <input class="form-control @error('expiry_date') is-invalid @enderror" name="expiry_date"
-                                    id="expiry_date" type="date" placeholder="تاريخ الصلاحية"
-                                    value="{{ old('expiry_date') }}">
-                                @error('expiry_date')
-                                    <span class="invalid-feedback text-black font-weight-bold text-capitalize mt-2"
-                                        role="alert">
-                                        <p>{{ $message }}</p>
-                                    </span>
-                                @enderror
-                            </div>
+                <!-- طريقة الطباعة -->
+                <div class="mb-3">
+                    <label class="form-label">طرق الطباعة المتاحة</label>
+                    <div>
+                        <div class="form-check">
+                            <input type="checkbox" name="printing_methods[]" value="dtf" class="form-check-input" id="dtf">
+                            <label class="form-check-label" for="dtf">DTF</label>
                         </div>
-
-                        <div class="row g-3 mb-3">
-                            <div class="col-md-12">
-                                <label class="mr-sm-2" for="details" style="font-family: 'Cairo', sans-serif;">تفاصيل
-                                    المنتج</label>
-                                <textarea name="details" id="details" class="form-control @error('details') is-invalid @enderror" rows="4">{{ old('details') }}</textarea>
-                                @error('details')
-                                    <span class="invalid-feedback text-black font-weight-bold text-capitalize mt-2"
-                                        role="alert">
-                                        <p>{{ $message }}</p>
-                                    </span>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-8 m-2">
-                                <label class="mr-sm-2" for="image" style="font-family: 'Cairo', sans-serif;">صورة
-                                    المنتج</label>
-                                <input class="form-control @error('image') is-invalid @enderror" name="image"
-                                    id="image" type="file" placeholder="صورة المنتج">
-                                @error('image')
-                                    <span class="invalid-feedback text-black font-weight-bold text-capitalize mt-2"
-                                        role="alert">
-                                        <p>{{ $message }}</p>
-                                    </span>
-                                @enderror
-                            </div>
+                        <div class="form-check">
+                            <input type="checkbox" name="printing_methods[]" value="screen" class="form-check-input" id="screen">
+                            <label class="form-check-label" for="screen">طباعة شاشة</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" name="printing_methods[]" value="embroidery" class="form-check-input" id="embroidery">
+                            <label class="form-check-label" for="embroidery">تطريز</label>
                         </div>
                     </div>
                 </div>
 
-                <div class="card-footer text-end">
-                    <button class="btn btn-primary" type="submit">حفظ المطلوب</button>
-                    <a class="btn btn-light" href="{{ URL::previous() }}">إلغاء</a>
+                <!-- طبقة الحماية -->
+                <div class="mb-3">
+                    <label class="form-label">طبقة الحماية</label>
+                    <select name="protection_layer" class="form-control">
+                        <option value="none">بدون</option>
+                        <option value="glossy">لامع</option>
+                        <option value="matte">مطفي</option>
+                    </select>
+                </div>
+
+                <!-- خدمة التصميم -->
+                <div class="mb-3">
+                    <label class="form-label">خدمة التصميم</label>
+                    <select name="design_service" class="form-control">
+                        <option value="0">لا نقدم خدمة تصميم</option>
+                        <option value="free">مجانية</option>
+                        <option value="paid">مدفوعة (أدخل السعر)</option>
+                    </select>
+                    <input type="number" name="design_service_price" class="form-control mt-2" placeholder="سعر خدمة التصميم" style="display:none;">
+                </div>
+
+                <!-- مدة التنفيذ -->
+                <div class="mb-3">
+                    <label class="form-label">مدة التنفيذ (أيام عمل)</label>
+                    <input type="text" name="delivery_time" class="form-control" placeholder="مثال: 5-10 أيام عمل" required>
+                </div>
+
+                <!-- رسوم الشحن -->
+                <div class="mb-3">
+                    <label class="form-label">رسوم الشحن (جدول حسب الكمية)</label>
+                    <textarea name="shipping_fees" class="form-control" rows="4" placeholder='مثال:
+10-25 قطعة: شحن مجاني
+50 قطعة: 15 ريال
+100 قطعة: 35 ريال
+1000 قطعة: 230 ريال'></textarea>
+                </div>
+
+                <!-- Tags -->
+                <div class="mb-3">
+                    <label class="form-label">كلمات مفتاحية (Tags)</label>
+                    <input type="text" name="tags" class="form-control" data-role="tagsinput" placeholder="أضف تاج واضغط Enter">
+                </div>
+
+                <!-- الحالة -->
+                <div class="mb-3">
+                    <label class="form-label">حالة المنتج</label>
+                    <select name="status" class="form-control">
+                        <option value="1">نشط</option>
+                        <option value="0">غير نشط</option>
+                    </select>
+                </div>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary">حفظ المنتج</button>
+                    <a href="{{ route('admin.products.index') }}" class="btn btn-secondary">رجوع</a>
                 </div>
             </form>
         </div>
     </div>
+</div>
 @endsection
 
 @section('js')
-    <script src="{{ asset('admin/assets/js/tooltip-init.js') }}"></script>
+<script src="https://cdn.ckeditor.com/ckeditor5/41.0.0/classic/ckeditor.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tagsinput/0.8.0/bootstrap-tagsinput.min.js"></script>
+
+<script>
+    ClassicEditor.create(document.querySelector('#description'), {
+        language: 'ar',
+        toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote']
+    });
+
+    $('.select2').select2({
+        placeholder: "اختر...",
+        allowClear: true
+    });
+
+    // إظهار حقل سعر خدمة التصميم
+    $('select[name="design_service"]').on('change', function() {
+        if ($(this).val() === 'paid') {
+            $('input[name="design_service_price"]').show();
+        } else {
+            $('input[name="design_service_price"]').hide().val('');
+        }
+    });
+</script>
 @endsection

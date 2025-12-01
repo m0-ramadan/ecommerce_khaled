@@ -16,7 +16,7 @@
        <ul class="menu-inner py-1">
 
            <li class="menu-item ">
-               <a href="https://seda.codeella.com/home" class="menu-link">
+               <a href="{{ route('admin.index') }}" class="menu-link">
                    <i class="menu-icon tf-icons ti ti-home"></i>
                    <div>الرئيسية</div>
                </a>
@@ -77,6 +77,13 @@
                <a href="https://seda.codeella.com/admin/payment-methods" class="menu-link">
                    <i class="menua-icon ti ti-credit-card"></i>
                    <div>طرق الدفع</div>
+               </a>
+           </li>
+
+           <li class="menu-item">
+               <a href="{{ route('admin.products.index') }}" class="menu-link">
+                   <i class="menua-icon ti ti-shopping-bag"></i>
+                   <div>المنتجات</div>
                </a>
            </li>
 

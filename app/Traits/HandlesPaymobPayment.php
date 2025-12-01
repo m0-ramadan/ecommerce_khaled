@@ -2,9 +2,10 @@
 
 namespace App\Traits;
 
+use Log;
 use App\Models\Order;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 
 trait HandlesPaymobPayment
 {
@@ -86,8 +87,12 @@ trait HandlesPaymobPayment
                 'save_selection'   => true,
                 'is_live'          => config('services.paymob.mode') === 'live',
 
-                'redirect_url'     => 'https://web.whatsapp.com/',
-                'cancel_url'       => 'https://web.whatsapp.com/',
+                // URLs مهمة جدًا
+                'redirect_url'     => url("/payment/success/{$order->order_number}"),
+               // 'cancel_url'       => url("/payment/cancel/{$order->order_number}"),
+
+                // Webhook بيجي من الداشبورد، بس ممكن تبعته كمان
+                'callback_url'     => url('/api/paymob/webhook'),
             ]);
         if ($response->failed()) {
             return [
@@ -97,6 +102,7 @@ trait HandlesPaymobPayment
             ];
         }
         $data = $response->json();
+
         return [
             'success'      => true,
             'payment_url'  => $data['client_url'] ?? $data['shorten_url'] ?? null,
@@ -132,10 +138,16 @@ trait HandlesPaymobPayment
         $type = $request->input('type');
         $obj  = $request->input('obj');
 
-        // دفع ناجح
-        if ($type === 'TRANSACTION' && $obj['success'] === true && $obj['is_capture']) {
-            $orderNumber = $obj['order']['merchant_order_id'] ?? null;
-            $transactionId = $obj['id'];
+        // دفع ناجح + تم السحب (Capture)
+        if ($type === 'TRANSACTION' && $obj['success'] === true && $obj['is_capture'] === true) {
+
+            // الحقل الصح في KSA هو merchant_reference
+            $orderNumber = $obj['merchant_reference'] ?? null;
+
+            if (!$orderNumber) {
+                \Illuminate\Support\Facades\Log::error('PayMob Webhook: No merchant_reference', $obj);
+                return response('No reference', 400);
+            }
 
             $order = Order::where('order_number', $orderNumber)->first();
 
@@ -143,10 +155,11 @@ trait HandlesPaymobPayment
                 $order->update([
                     'status'         => 'paid',
                     'payment_method' => 'paymob',
-                    'transaction_id' => $transactionId,
+                    'transaction_id' => $obj['id'],
+                    'paid_at'         => now(),
                 ]);
 
-                // إشعارات، إيميل، تفريغ المخزون، إلخ...
+                // هنا نفذ كل حاجة: تفريغ المخزون، إرسال إيميل، إشعار واتساب، إلخ
             }
         }
 
