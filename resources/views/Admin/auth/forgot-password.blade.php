@@ -1,24 +1,112 @@
 @extends('Admin.auth.layouts.master')
-@section('content')
-    <form class="theme-form login-form" action="{{ route('admin.password.email') }}" method="post">
-        @csrf
-        <h4>استعادة كلمة المرور</h4>
-        <h6>أدخل بريدك الإلكتروني لاستلام رابط إعادة تعيين كلمة المرور.</h6>
 
-        <div class="form-group">
-            <label>البريد الإلكتروني</label>
-            <div class="input-group">
-                <span class="input-group-text"><i class="icon-email"></i></span>
-                <input class="form-control" type="email" name="email" required placeholder="Test@gmail.com">
+@section('styles')
+    <link rel="stylesheet" href="{{ asset('dashboard/assets/css/bootstrap-rtl.min.css') }}">
+@endsection
+
+@section('content')
+<div class="authentication-wrapper authentication-cover authentication-bg" dir="rtl">
+    <div class="authentication-inner row">
+
+        <!-- الجانب الأيسر (الصورة التوضيحية) - يظهر فقط على الشاشات الكبيرة -->
+        <div class="d-none d-lg-flex col-lg-7 align-items-center p-0">
+            <div class="auth-cover-bg auth-cover-bg-color d-flex justify-content-center align-items-center w-100 h-100">
+                <img src="https://seda.codeella.com/assets/img/illustrations/auth-login-illustration-light.png"
+                     alt="غلاف استعادة كلمة المرور"
+                     class="img-fluid auth-illustration">
+
+                <img src="{{ asset('dashboard/assets/img/illustrations/bg-shape-image-light.png') }}"
+                     alt="خلفية النظام"
+                     class="platform-bg">
             </div>
         </div>
+        <!-- /الجانب الأيسر -->
 
-        <div class="form-group">
-            <button class="btn btn-primary btn-block" type="submit">إرسال رابط إعادة التعيين</button>
-        </div>
+        <!-- نموذج استعادة كلمة المرور -->
+        <div class="d-flex col-12 col-lg-5 align-items-center p-4 p-sm-5">
+            <div class="w-px-400 mx-auto">
 
-        <div class="form-group">
-            <a href="{{ route('admin.login') }}" class="text-sm text-primary">العودة لتسجيل الدخول</a>
+                <!-- الشعار -->
+                <div class="app-brand mb-5 text-center">
+                    <a href="{{ url('/') }}" class="app-brand-link">
+                        <img height="90" width="270"
+                             src="https://seda.codeella.com/assets/img/logo_.png"
+                             alt="شعار {{ env('APP_NAME') }}">
+                    </a>
+                </div>
+
+                <h3 class="mb-2 text-center">نسيت كلمة المرور؟ 🔒</h3>
+                <p class="mb-4 text-center text-muted">
+                    أدخل بريدك الإلكتروني وسيتم إرسال رابط إعادة تعيين كلمة المرور إليك.
+                </p>
+
+                <!-- رسائل النجاح أو الخطأ العامة -->
+                @if (session('status'))
+                    <div class="alert alert-success text-center" role="alert">
+                        {{ session('status') }}
+                    </div>
+                @endif
+
+                <form id="formForgotPassword"
+                      class="mb-3"
+                      method="POST"
+                      action="{{ route('admin.password.email') }}"
+                      novalidate>
+                    @csrf
+
+                    <!-- البريد الإلكتروني -->
+                    <div class="mb-3">
+                        <label for="email" class="form-label">البريد الإلكتروني</label>
+                        <input type="email"
+                               class="form-control text-start @error('email') is-invalid @enderror"
+                               dir="ltr"
+                               id="email"
+                               name="email"
+                               value="{{ old('email') }}"
+                               placeholder="name@example.com"
+                               autofocus
+                               required>
+
+                        @error('email')
+                            <div class="text-danger small mt-1">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <!-- زر إرسال الرابط -->
+                    <button type="submit" class="btn btn-primary d-grid w-100 mb-3">
+                        إرسال رابط إعادة التعيين
+                    </button>
+
+                    <!-- رابط العودة لتسجيل الدخول -->
+                    <div class="text-center">
+                        <a href="{{ route('admin.login') }}" class="d-flex align-items-center justify-content-center">
+                            <i class="ti ti-chevron-left scaleX-n1-rtl me-1"></i>
+                            العودة إلى تسجيل الدخول
+                        </a>
+                    </div>
+                </form>
+
+                <!-- التذييل -->
+                <div class="text-center mt-5">
+                    <small class="text-muted">
+                        تم التطوير بواسطة
+                        <a href="https://nofalseo.com" target="_blank" class="text-primary fw-medium">
+                            {{ env('APP_NAME') }}
+                        </a>
+                    </small>
+                </div>
+
+            </div>
         </div>
-    </form>
+        <!-- /نموذج استعادة كلمة المرور -->
+
+    </div>
+</div>
+@endsection
+
+@section('scripts')
+    <!-- لا نحتاج JS خاص هنا، لكن نتركه للتوافق مع القالب -->
+    <script>
+        // يمكن إضافة أي تحقق إضافي للـ form إذا أردت
+    </script>
 @endsection

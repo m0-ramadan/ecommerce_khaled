@@ -206,8 +206,8 @@
                                  </div>
 
                                  <div class="flex-grow-1">
-                                     <span class="fw-medium d-block">Nofal Seo</span>
-                                     <small class="text-muted">demo@admin.com</small>
+                                     <span class="fw-medium d-block"> {{ auth()->user()->name }} </span>
+                                     <small class="text-muted">{{ auth()->user()->email }}</small>
                                  </div>
                              </div>
                          </a>
@@ -240,12 +240,12 @@
 
      <!-- Search Small Screens -->
      <div class="navbar-search-wrapper search-input-wrapper d-none">
-         <input type="text" class="form-control search-input container-xxl border-0" placeholder="Search..."
-             aria-label="Search..." />
+         <input type="text" class="form-control search-input container-xxl border-0" placeholder="ابحث..."
+             aria-label="ابحث..." />
          <i class="ti ti-x ti-sm search-toggler cursor-pointer"></i>
      </div>
-
-     <form id="logout-form" action="https://seda.codeella.com/logout" method="POST" class="d-none">
-         <input type="hidden" name="_token" value="0CmaMRSLCe8tBDQHmwjmk1pSKNwNgMufNwSt1m6R" autocomplete="off">
+     <form id="logout-form" action="{{ route('admin.logout') }}" method="POST" class="d-none">
+         @csrf
      </form>
+
  </nav>

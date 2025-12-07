@@ -8,7 +8,7 @@ use Illuminate\Support\Str;
 class Category extends Model
 {
     protected $fillable = ['name', 'slug', 'description', 'parent_id', 'order', 'status_id', 'image', 'sub_image'];
-
+    protected $appends = ['full_slug'];
     protected static function boot()
     {
         parent::boot();
@@ -49,5 +49,24 @@ class Category extends Model
                 });
             })
             ->where('is_active', true);
+    }
+
+    public function getFullSlugAttribute()
+    {
+        if ($this->parent) {
+            return $this->parent->slug . '/' . $this->slug;
+        }
+        return $this->slug;
+    }
+
+    // Add these accessors if needed
+    public function getImageUrlAttribute()
+    {
+        return $this->image ? asset('storage/' . $this->image) : null;
+    }
+
+    public function getSubImageUrlAttribute()
+    {
+        return $this->sub_image ? asset('storage/' . $this->sub_image) : null;
     }
 }

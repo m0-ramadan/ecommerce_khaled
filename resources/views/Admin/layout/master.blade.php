@@ -67,6 +67,7 @@
     </form>
     <!-- Core JS -->
     @include('Admin.layout.js')
+    @yield('js')
 </body>
 
 </html>

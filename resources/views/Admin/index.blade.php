@@ -52,198 +52,240 @@
             <div class="row mb-4 g-4">
 
                 <div class="col-lg-8">
-
                     <div class="row">
 
+                        {{-- الطلبات هذا الشهر --}}
                         <div class="col-sm-6 col-lg-4 mb-4">
                             <div class="card card-border-shadow-warning">
                                 <div class="card-body">
                                     <div class="d-flex align-items-center mb-2 pb-1">
                                         <div class="avatar me-2">
-                                            <span class="avatar-initial rounded bg-label-warning"><i
-                                                    class="ti ti-car ti-md"></i></span>
+                                            <span class="avatar-initial rounded bg-label-warning">
+                                                <i class="ti ti-basket ti-md"></i>
+                                            </span>
                                         </div>
-                                        <h4 class="ms-1 mb-0">0</h4>
+                                        <h4 class="ms-1 mb-0">
+                                            {{ \App\Models\Order::whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])->count() }}
+                                        </h4>
                                     </div>
-                                    <p class="mb-1">الرحلات في الشهر</p>
-
+                                    <p class="mb-1">الطلبات في الشهر</p>
                                 </div>
                             </div>
                         </div>
+
+                        {{-- عدد كل الطلبات --}}
                         <div class="col-sm-6 col-lg-4 mb-4">
                             <div class="card card-border-shadow-primary">
                                 <div class="card-body">
                                     <div class="d-flex align-items-center mb-2 pb-1">
                                         <div class="avatar me-2">
-                                            <span class="avatar-initial rounded bg-label-primary"><i
-                                                    class="ti ti-car ti-md"></i></span>
+                                            <span class="avatar-initial rounded bg-label-primary">
+                                                <i class="ti ti-basket-filled ti-md"></i>
+                                            </span>
                                         </div>
-                                        <h4 class="ms-1 mb-0">63</h4>
+                                        <h4 class="ms-1 mb-0">{{ \App\Models\Order::count() }}</h4>
                                     </div>
-
-                                    <p class="mb-1">عدد الرحلات</p>
+                                    <p class="mb-1">إجمالي الطلبات</p>
                                 </div>
                             </div>
                         </div>
+
+                        {{-- الطلبات الملغية --}}
                         <div class="col-sm-6 col-lg-4 mb-4">
                             <div class="card card-border-shadow-danger">
                                 <div class="card-body">
                                     <div class="d-flex align-items-center mb-2 pb-1">
                                         <div class="avatar me-2">
-                                            <span class="avatar-initial rounded bg-label-danger"><i
-                                                    class="ti ti-car-off ti-md"></i></span>
+                                            <span class="avatar-initial rounded bg-label-danger">
+                                                <i class="ti ti-basket-x ti-md"></i>
+                                            </span>
                                         </div>
-                                        <h4 class="ms-1 mb-0">51</h4>
+                                        <h4 class="ms-1 mb-0">{{ \App\Models\Order::where('status', 'cancelled')->count() }}
+                                        </h4>
                                     </div>
-                                    <p class="mb-1">عدد الرحلات الملغية</p>
-
+                                    <p class="mb-1">الطلبات الملغية</p>
                                 </div>
                             </div>
                         </div>
 
-
+                        {{-- عدد العملاء --}}
                         <div class="col-sm-6 col-lg-4 mb-4">
                             <div class="card card-border-shadow-secondary">
                                 <div class="card-body">
                                     <div class="d-flex align-items-center mb-2 pb-1">
                                         <div class="avatar me-2">
-                                            <span class="avatar-initial rounded bg-label-secondary"><i
-                                                    class="ti ti-users ti-md"></i></span>
+                                            <span class="avatar-initial rounded bg-label-secondary">
+                                                <i class="ti ti-users ti-md"></i>
+                                            </span>
                                         </div>
-                                        <h4 class="ms-1 mb-0">729</h4>
+                                        <h4 class="ms-1 mb-0">{{ \App\Models\User::count() }}</h4>
                                     </div>
                                     <p class="mb-1">عدد العملاء</p>
-
                                 </div>
                             </div>
                         </div>
+
+                        {{-- العملاء هذا الشهر --}}
                         <div class="col-sm-6 col-lg-4 mb-4">
                             <div class="card card-border-shadow-dark">
                                 <div class="card-body">
                                     <div class="d-flex align-items-center mb-2 pb-1">
                                         <div class="avatar me-2">
-                                            <span class="avatar-initial rounded bg-label-dark"><i
-                                                    class="ti ti-users ti-md"></i></span>
+                                            <span class="avatar-initial rounded bg-label-dark">
+                                                <i class="ti ti-user-plus ti-md"></i>
+                                            </span>
                                         </div>
-                                        <h4 class="ms-1 mb-0">0</h4>
+                                        <h4 class="ms-1 mb-0">
+                                            {{ \App\Models\User::whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])->count() }}
+                                        </h4>
                                     </div>
                                     <p class="mb-1">العملاء في الشهر</p>
-
                                 </div>
                             </div>
                         </div>
+
+                        {{-- عدد الموظفين --}}
                         <div class="col-sm-6 col-lg-4 mb-4">
                             <div class="card card-border-shadow-success">
                                 <div class="card-body">
                                     <div class="d-flex align-items-center mb-2 pb-1">
                                         <div class="avatar me-2">
-                                            <span class="avatar-initial rounded bg-label-success"><i
-                                                    class="ti ti-users ti-md"></i></span>
+                                            <span class="avatar-initial rounded bg-label-success">
+                                                <i class="ti ti-user-cog ti-md"></i>
+                                            </span>
                                         </div>
-                                        <h4 class="ms-1 mb-0">933</h4>
+                                        <h4 class="ms-1 mb-0">{{ \App\Models\Admin::count() }}</h4>
                                     </div>
-                                    <p class="mb-1">عدد السائقين</p>
-
+                                    <p class="mb-1">عدد الموظفين</p>
                                 </div>
                             </div>
                         </div>
 
+                        {{-- الزيارات --}}
                         <div class="col-sm-6 col-lg-4 mb-4">
-                            <div class="card card-border-shadow-success">
+                            <div class="card card-border-shadow-info">
                                 <div class="card-body">
                                     <div class="d-flex align-items-center mb-2 pb-1">
                                         <div class="avatar me-2">
-                                            <span class="avatar-initial rounded bg-label-success"><i
-                                                    class="ti ti-users ti-md"></i></span>
+                                            <span class="avatar-initial rounded bg-label-info">
+                                                <i class="ti ti-eye ti-md"></i>
+                                            </span>
                                         </div>
-                                        <h4 class="ms-1 mb-0">0</h4>
+                                        <h4 class="ms-1 mb-0">{{ \App\Models\Visitor::count() }}</h4>
                                     </div>
-                                    <p class="mb-1">السائقين في الشهر</p>
-
+                                    <p class="mb-1">عدد الزيارات</p>
                                 </div>
                             </div>
                         </div>
+
+                        {{-- الزيارات هذا الشهر --}}
                         <div class="col-sm-6 col-lg-4 mb-4">
                             <div class="card card-border-shadow-primary">
                                 <div class="card-body">
                                     <div class="d-flex align-items-center mb-2 pb-1">
                                         <div class="avatar me-2">
-                                            <span class="avatar-initial rounded bg-label-primary"><i
-                                                    class="ti ti-currency-dollar ti-md"></i></span>
+                                            <span class="avatar-initial rounded bg-label-primary">
+                                                <i class="ti ti-eye-check ti-md"></i>
+                                            </span>
                                         </div>
-                                        <h4 class="ms-1 mb-0">EGP 6034.71</h4>
+                                        <h4 class="ms-1 mb-0">
+                                            {{ \App\Models\Visitor::whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])->count() }}
+                                        </h4>
                                     </div>
-                                    <p class="mb-1">الإيرادات</p>
-
+                                    <p class="mb-1">الزيارات في الشهر</p>
                                 </div>
                             </div>
                         </div>
+
+                        {{-- عدد المنتجات --}}
                         <div class="col-sm-6 col-lg-4 mb-4">
                             <div class="card card-border-shadow-warning">
                                 <div class="card-body">
                                     <div class="d-flex align-items-center mb-2 pb-1">
                                         <div class="avatar me-2">
-                                            <span class="avatar-initial rounded bg-label-warning"><i
-                                                    class="ti ti-currency-dollar ti-md"></i></span>
+                                            <span class="avatar-initial rounded bg-label-warning">
+                                                <i class="ti ti-package ti-md"></i>
+                                            </span>
                                         </div>
-                                        <h4 class="ms-1 mb-0">EGP 1206.95</h4>
+                                        <h4 class="ms-1 mb-0">{{ \App\Models\Product::count() }}</h4>
                                     </div>
-                                    <p class="mb-1">ارباح المنصة</p>
-
+                                    <p class="mb-1">عدد المنتجات</p>
                                 </div>
                             </div>
                         </div>
 
+                        {{-- المنتجات هذا الشهر --}}
                         <div class="col-sm-6 col-lg-4 mb-4">
                             <div class="card card-border-shadow-success">
                                 <div class="card-body">
                                     <div class="d-flex align-items-center mb-2 pb-1">
                                         <div class="avatar me-2">
-                                            <span class="avatar-initial rounded bg-label-success"><i
-                                                    class="ti ti-users ti-md"></i></span>
+                                            <span class="avatar-initial rounded bg-label-success">
+                                                <i class="ti ti-package-import ti-md"></i>
+                                            </span>
                                         </div>
-                                        <h4 class="ms-1 mb-0">0</h4>
+                                        <h4 class="ms-1 mb-0">
+                                            {{ \App\Models\Product::whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])->count() }}
+                                        </h4>
                                     </div>
-                                    <p class="mb-1">السائقين في الشهر</p>
-
+                                    <p class="mb-1">المنتجات المضافة هذا الشهر</p>
                                 </div>
                             </div>
                         </div>
+
+                        {{-- الأقسام --}}
+                        <div class="col-sm-6 col-lg-4 mb-4">
+                            <div class="card card-border-shadow-secondary">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-2 pb-1">
+                                        <div class="avatar me-2">
+                                            <span class="avatar-initial rounded bg-label-secondary">
+                                                <i class="ti ti-category ti-md"></i>
+                                            </span>
+                                        </div>
+                                        <h4 class="ms-1 mb-0">{{ \App\Models\Category::count() }}</h4>
+                                    </div>
+                                    <p class="mb-1">عدد الأقسام</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- الإيرادات --}}
                         <div class="col-sm-6 col-lg-4 mb-4">
                             <div class="card card-border-shadow-primary">
                                 <div class="card-body">
                                     <div class="d-flex align-items-center mb-2 pb-1">
                                         <div class="avatar me-2">
-                                            <span class="avatar-initial rounded bg-label-primary"><i
-                                                    class="ti ti-currency-dollar ti-md"></i></span>
+                                            <span class="avatar-initial rounded bg-label-primary">
+                                                <i class="ti ti-currency-pound ti-md"></i>
+                                            </span>
                                         </div>
                                         <h4 class="ms-1 mb-0">EGP 6034.71</h4>
                                     </div>
-                                    <p class="mb-1">الإيرادات</p>
-
+                                    <p class="mb-1">إجمالي الإيرادات</p>
                                 </div>
                             </div>
                         </div>
+
+                        {{-- الأرباح --}}
                         <div class="col-sm-6 col-lg-4 mb-4">
                             <div class="card card-border-shadow-warning">
                                 <div class="card-body">
                                     <div class="d-flex align-items-center mb-2 pb-1">
                                         <div class="avatar me-2">
-                                            <span class="avatar-initial rounded bg-label-warning"><i
-                                                    class="ti ti-currency-dollar ti-md"></i></span>
+                                            <span class="avatar-initial rounded bg-label-warning">
+                                                <i class="ti ti-chart-donut ti-md"></i>
+                                            </span>
                                         </div>
                                         <h4 class="ms-1 mb-0">EGP 1206.95</h4>
                                     </div>
-                                    <p class="mb-1">ارباح المنصة</p>
-
+                                    <p class="mb-1">أرباح المنصة</p>
                                 </div>
                             </div>
                         </div>
-                        
+
                     </div>
                 </div>
-
-
 
                 <div class="col-xxl-4 mb-4 order-5 order-xxl-0">
                     <div class="card mb-4">
@@ -355,134 +397,37 @@
 
 
 
-
-
-
             <div class="row mb-4">
-                <div class="col-12 col-xl-6 col-md-6">
-                    <div class="card h-100">
-                        <div class="card-header d-flex align-items-center justify-content-between">
-                            <div class="card-title mb-0">
-                                <h5 class="m-0 me-2">اكثر السائقين رحلات و تقييم</h5>
+                <div class="col-12 col-xl-6 col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between">
+                            <h4 id="visitors_data">احصائيات الزيارات حسب الدولة</h4>
+
+                            <div class="col-md-4 mb-4">
+                                <select name="visitors_year" id="visitors_year" class="form-control select2">
+                                    <option value="">اختر السنة</option>
+                                    <option value="2025">2025</option>
+                                    <option value="2024">2024</option>
+                                    <option value="2023">2023</option>
+                                    <option value="2022">2022</option>
+                                    <option value="2021">2021</option>
+                                </select>
                             </div>
 
                         </div>
-                        <div class="table-responsive">
-                            <table class="table table-borderless border-top">
-                                <thead class="border-bottom">
-                                    <tr>
-                                        <th>السائق</th>
-                                        <th class="text-end">عدد الرحلات</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td class="pt-2">
-                                            <div class="d-flex justify-content-start align-items-center mt-lg-4">
-                                                <div class="avatar me-3 avatar-sm">
-                                                    <img src="https://seda.codeella.com/uploads/drivers/ch4H5qggWVwLRjt4b3Kd1744623057.jpg"
-                                                        alt="" class="rounded-circle" />
-                                                </div>
 
-                                                <span class="mb-0">alaa ( 0
-                                                    )</span>
-
-                                            </div>
-                                        </td>
-                                        <td class="text-end pt-2">
-                                            <div class="user-progress mt-lg-4">
-                                                <p class="mb-0 fw-medium">4</p>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="pt-2">
-                                            <div class="d-flex justify-content-start align-items-center mt-lg-4">
-                                                <div class="avatar me-3 avatar-sm">
-                                                    <img src="https://seda.codeella.com/uploads/drivers/lBXnq3QMlRPxxyZTMcl41744114748.jpg"
-                                                        alt="" class="rounded-circle" />
-                                                </div>
-
-                                                <span class="mb-0">abdelrahman ( 2.00
-                                                    )</span>
-
-                                            </div>
-                                        </td>
-                                        <td class="text-end pt-2">
-                                            <div class="user-progress mt-lg-4">
-                                                <p class="mb-0 fw-medium">3</p>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="pt-2">
-                                            <div class="d-flex justify-content-start align-items-center mt-lg-4">
-                                                <div class="avatar me-3 avatar-sm">
-                                                    <img src="https://seda.codeella.com/uploads/drivers/KPMsQLYRaZdOfm49AqW71744538198.png"
-                                                        alt="" class="rounded-circle" />
-                                                </div>
-
-                                                <span class="mb-0">haa ( 0
-                                                    )</span>
-
-                                            </div>
-                                        </td>
-                                        <td class="text-end pt-2">
-                                            <div class="user-progress mt-lg-4">
-                                                <p class="mb-0 fw-medium">2</p>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="pt-2">
-                                            <div class="d-flex justify-content-start align-items-center mt-lg-4">
-                                                <div class="avatar me-3 avatar-sm">
-                                                    <img src="https://seda.codeella.com/uploads/drivers/fugh5eXYDWDJXMeaHxbw1745416799.jpg"
-                                                        alt="" class="rounded-circle" />
-                                                </div>
-
-                                                <span class="mb-0">محمود سعد ( 0
-                                                    )</span>
-
-                                            </div>
-                                        </td>
-                                        <td class="text-end pt-2">
-                                            <div class="user-progress mt-lg-4">
-                                                <p class="mb-0 fw-medium">2</p>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="pt-2">
-                                            <div class="d-flex justify-content-start align-items-center mt-lg-4">
-                                                <div class="avatar me-3 avatar-sm">
-                                                    <img src="https://seda.codeella.com/uploads/drivers/ptiPCjvekx7B5l8XrnV21746290899.jpg"
-                                                        alt="" class="rounded-circle" />
-                                                </div>
-
-                                                <span class="mb-0">محروس فتحي محروس ( 0
-                                                    )</span>
-
-                                            </div>
-                                        </td>
-                                        <td class="text-end pt-2">
-                                            <div class="user-progress mt-lg-4">
-                                                <p class="mb-0 fw-medium">0</p>
-                                            </div>
-                                        </td>
-                                    </tr>
-
-                                </tbody>
-                            </table>
+                        <div class="card-body">
+                            <div id="visitorsAreaChart"></div>
                         </div>
                     </div>
                 </div>
 
+
                 <div class="col-12 col-xl-6 col-md-6">
                     <div class="card h-100">
                         <div class="card-header d-flex align-items-center justify-content-between">
                             <div class="card-title mb-0">
-                                <h5 class="m-0 me-2">اكثر العملاء رحلات و تقييم</h5>
+                                <h5 class="m-0 me-2">اكثر العملاء الطلبات و تقييم</h5>
                             </div>
 
                         </div>
@@ -491,102 +436,34 @@
                                 <thead class="border-bottom">
                                     <tr>
                                         <th>العميل</th>
-                                        <th class="text-end">عدد الرحلات</th>
+                                        <th class="text-end">عدد الطلبات</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td class="pt-2">
-                                            <div class="d-flex justify-content-start align-items-center mt-lg-4">
-                                                <div class="avatar me-3 avatar-sm">
-                                                    <img src="https://seda.codeella.com/uploads/drivers/Sp2f7hhqPLGWNmfgArpS1744624881.jpg"
-                                                        alt="" class="rounded-circle" />
+                                    @foreach ($topCustomers as $row)
+                                        <tr>
+                                            <td class="pt-2">
+                                                <div class="d-flex justify-content-start align-items-center mt-lg-4">
+                                                    <div class="avatar me-3 avatar-sm">
+                                                        <img src="{{ $row->user?->image ?? asset('default.png') }}"
+                                                            alt="" class="rounded-circle" />
+                                                    </div>
+
+                                                    <span class="mb-0">
+                                                        {{ $row->user?->name ?? 'بدون اسم' }}
+                                                    </span>
                                                 </div>
-                                                <span class="mb-0">ahmed ( 2.00
-                                                    )</span>
+                                            </td>
 
-                                            </div>
-                                        </td>
-                                        <td class="text-end pt-2">
-                                            <div class="user-progress mt-lg-4">
-                                                <p class="mb-0 fw-medium">3</p>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="pt-2">
-                                            <div class="d-flex justify-content-start align-items-center mt-lg-4">
-                                                <div class="avatar me-3 avatar-sm">
-                                                    <img src="https://seda.codeella.com/uploads/drivers/tW04UDf4lxOAABt1aznM1739448554.jpg"
-                                                        alt="" class="rounded-circle" />
+                                            <td class="text-end pt-2">
+                                                <div class="user-progress mt-lg-4">
+                                                    <p class="mb-0 fw-medium">{{ $row->orders_count }}</p>
                                                 </div>
-                                                <span class="mb-0">1551397516 ( 5.00
-                                                    )</span>
-
-                                            </div>
-                                        </td>
-                                        <td class="text-end pt-2">
-                                            <div class="user-progress mt-lg-4">
-                                                <p class="mb-0 fw-medium">2</p>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="pt-2">
-                                            <div class="d-flex justify-content-start align-items-center mt-lg-4">
-                                                <div class="avatar me-3 avatar-sm">
-                                                    <img src="https://seda.codeella.com/uploads/drivers/gJaaL9wobxfoavXyjEom1745420076.jpg"
-                                                        alt="" class="rounded-circle" />
-                                                </div>
-                                                <span class="mb-0">محمود ناصر ( 0
-                                                    )</span>
-
-                                            </div>
-                                        </td>
-                                        <td class="text-end pt-2">
-                                            <div class="user-progress mt-lg-4">
-                                                <p class="mb-0 fw-medium">2</p>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="pt-2">
-                                            <div class="d-flex justify-content-start align-items-center mt-lg-4">
-                                                <div class="avatar me-3 avatar-sm">
-                                                    <img src="https://seda.codeella.com/uploads/drivers/asCn0Qa3OgCjY3NnBE531745519156.png"
-                                                        alt="" class="rounded-circle" />
-                                                </div>
-                                                <span class="mb-0">ahmed ( 0
-                                                    )</span>
-
-                                            </div>
-                                        </td>
-                                        <td class="text-end pt-2">
-                                            <div class="user-progress mt-lg-4">
-                                                <p class="mb-0 fw-medium">2</p>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="pt-2">
-                                            <div class="d-flex justify-content-start align-items-center mt-lg-4">
-                                                <div class="avatar me-3 avatar-sm">
-                                                    <img src="https://seda.codeella.com/uploads/drivers/v2NVThJKuXpTx8FVkmif1744539355.jpg"
-                                                        alt="" class="rounded-circle" />
-                                                </div>
-                                                <span class="mb-0">client , test ( 0
-                                                    )</span>
-
-                                            </div>
-                                        </td>
-                                        <td class="text-end pt-2">
-                                            <div class="user-progress mt-lg-4">
-                                                <p class="mb-0 fw-medium">2</p>
-                                            </div>
-                                        </td>
-                                    </tr>
-
+                                            </td>
+                                        </tr>
+                                    @endforeach
                                 </tbody>
+
                             </table>
                         </div>
                     </div>
@@ -601,7 +478,7 @@
                 <div class="col-6 col-md-6 mb-4">
                     <div class="card">
                         <div class="card-header d-flex justify-content-between">
-                            <h4 id="sales_data">احصائات الرحلات 2025</h4>
+                            <h4 id="sales_data">احصائات الطلبات 2025</h4>
 
                             <div class="col-md-4 mb-4">
                                 <select name="sales_year" id="year" class="form-control select2 year">
@@ -662,5 +539,109 @@
 @endsection
 
 @section('js')
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+    <script>
+        function loadVisitorsChart(year = null) {
+            $.ajax({
+                url: "{{ route('admin.visitors.chart') }}",
+                data: {
+                    year: year
+                },
+                success: function(response) {
+
+                    console.log("Visitors Chart Data:", response); // ⬅️ Console Log Added
+
+                    var chartEl = document.querySelector("#visitorsAreaChart");
+
+                    var chartOptions = {
+                        series: [{
+                            name: "عدد الزيارات",
+                            data: response.count
+                        }],
+                        chart: {
+                            height: 350,
+                            type: "area",
+                            toolbar: false
+                        },
+                        dataLabels: {
+                            enabled: false
+                        },
+                        stroke: {
+                            curve: "smooth",
+                            width: 2
+                        },
+                        xaxis: {
+                            categories: response.countries
+                        },
+                        colors: ['#7367F0'],
+                        fill: {
+                            type: "gradient",
+                            gradient: {
+                                shadeIntensity: 1,
+                                opacityFrom: 0.5,
+                                opacityTo: 0.3,
+                                stops: [0, 90, 100]
+                            }
+                        }
+                    };
+
+                    var chart = new ApexCharts(chartEl, chartOptions);
+                    chart.render();
+                }
+            });
+        }
+
+        // Initial Load
+        loadVisitorsChart();
+
+        // On Change
+        $('#visitors_year').on('change', function() {
+            let year = $(this).val();
+            $("#visitorsAreaChart").html('');
+            loadVisitorsChart(year);
+        });
+        document.addEventListener('DOMContentLoaded', function () {
+
+    function loadChart(year) {
+        fetch(`/orders/stats/${year}`)
+            .then(res => res.json())
+            .then(data => {
+                let months = data.map(i => i.month);
+                let totals = data.map(i => i.total);
+
+                let options = {
+                    chart: {
+                        height: 350,
+                        type: 'area'
+                    },
+                    series: [{
+                        name: 'عدد الطلبات',
+                        data: totals
+                    }],
+                    xaxis: {
+                        categories: months
+                    }
+                };
+
+                let chartDiv = document.querySelector('#lineAreaChart');
+                chartDiv.innerHTML = ""; // مسح القديم
+                let chart = new ApexCharts(chartDiv, options);
+                chart.render();
+            });
+    }
+
+    // عند اختيار سنة
+    document.querySelector('#year').addEventListener('change', function () {
+        document.getElementById("sales_data").innerHTML = `احصائيات الطلبات ${this.value}`;
+        loadChart(this.value);
+    });
+
+    // تحميل أول سنة تلقائياً
+    loadChart(2025);
+});
+
+    </script>
 
 @endsection

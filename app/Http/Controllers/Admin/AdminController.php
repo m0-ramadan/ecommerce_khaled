@@ -27,7 +27,8 @@ class AdminController extends Controller
     public function home()
     {
         $admins = Admin::all();
-        return view('Admin.index', compact('admins'));
+
+        return view('Admin.index', compact('admins','topCustomers'));
     }
     public function index()
     {
@@ -40,6 +41,7 @@ class AdminController extends Controller
             ->groupBy('date')
             ->orderBy('date')
             ->pluck('count', 'date');
+        $topCustomers = \App\Models\Order::select('user_id')->selectRaw('COUNT(*) as orders_count')->with(['user:id,name,image'])->groupBy('user_id')->orderByDesc('orders_count')->take(10)->get();
 
         $visitsLabels = [];
         $visitsData = [];
@@ -77,13 +79,13 @@ class AdminController extends Controller
             'visitsLabels',
             'visitsData',
             'countriesData',
-            'ordersStatus'
+            'ordersStatus','topCustomers'
         ));
     }
 
     public function create()
     {
-        $branches = Branchs::all();
+      //  $branches = Branchs::all();
         $roles = Role::all();
 
         return view('Admin.admin.create', compact('branches', 'roles'));
@@ -131,7 +133,7 @@ class AdminController extends Controller
     }
     public function edit(Admin $admin)
     {
-        $branches = Branchs::all();
+       // $branches = Branchs::all();
         $roles = Role::all();
 
         return view('Admin.admin.edit', compact('admin', 'branches', 'roles'));

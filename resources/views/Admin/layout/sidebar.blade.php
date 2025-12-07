@@ -87,6 +87,12 @@
                </a>
            </li>
 
+<li class="menu-item">
+    <a href="{{ route('admin.categories.index') }}" class="menu-link">
+        <i class="menua-icon ti ti-category"></i>
+        <div>الأقسام</div>
+    </a>
+</li>
 
            <li class="menu-item ">
                <a href="javascript:void(0);" class="menu-link menu-toggle">
