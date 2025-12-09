@@ -445,7 +445,7 @@
                                             <td class="pt-2">
                                                 <div class="d-flex justify-content-start align-items-center mt-lg-4">
                                                     <div class="avatar me-3 avatar-sm">
-                                                        <img src="{{ $row->user?->image ?? asset('default.png') }}"
+                                                        <img src="{{ get_user_image($row->user?->image) }}"
                                                             alt="" class="rounded-circle" />
                                                     </div>
 
@@ -540,7 +540,7 @@
 
 @section('js')
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
     <script>
         function loadVisitorsChart(year = null) {
@@ -602,46 +602,45 @@
             $("#visitorsAreaChart").html('');
             loadVisitorsChart(year);
         });
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
 
-    function loadChart(year) {
-        fetch(`/orders/stats/${year}`)
-            .then(res => res.json())
-            .then(data => {
-                let months = data.map(i => i.month);
-                let totals = data.map(i => i.total);
+            function loadChart(year) {
+                fetch(`/orders/stats/${year}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        let months = data.map(i => i.month);
+                        let totals = data.map(i => i.total);
 
-                let options = {
-                    chart: {
-                        height: 350,
-                        type: 'area'
-                    },
-                    series: [{
-                        name: 'عدد الطلبات',
-                        data: totals
-                    }],
-                    xaxis: {
-                        categories: months
-                    }
-                };
+                        let options = {
+                            chart: {
+                                height: 350,
+                                type: 'area'
+                            },
+                            series: [{
+                                name: 'عدد الطلبات',
+                                data: totals
+                            }],
+                            xaxis: {
+                                categories: months
+                            }
+                        };
 
-                let chartDiv = document.querySelector('#lineAreaChart');
-                chartDiv.innerHTML = ""; // مسح القديم
-                let chart = new ApexCharts(chartDiv, options);
-                chart.render();
+                        let chartDiv = document.querySelector('#lineAreaChart');
+                        chartDiv.innerHTML = ""; // مسح القديم
+                        let chart = new ApexCharts(chartDiv, options);
+                        chart.render();
+                    });
+            }
+
+            // عند اختيار سنة
+            document.querySelector('#year').addEventListener('change', function() {
+                document.getElementById("sales_data").innerHTML = `احصائيات الطلبات ${this.value}`;
+                loadChart(this.value);
             });
-    }
 
-    // عند اختيار سنة
-    document.querySelector('#year').addEventListener('change', function () {
-        document.getElementById("sales_data").innerHTML = `احصائيات الطلبات ${this.value}`;
-        loadChart(this.value);
-    });
-
-    // تحميل أول سنة تلقائياً
-    loadChart(2025);
-});
-
+            // تحميل أول سنة تلقائياً
+            loadChart(2025);
+        });
     </script>
 
 @endsection

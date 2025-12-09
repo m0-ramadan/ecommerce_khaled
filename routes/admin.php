@@ -46,7 +46,7 @@ Route::get('admin/categories/tree', [CategoryController::class, 'getTree'])->nam
 // Authentication Routes
 Route::prefix('admin')->name('admin.')->middleware('guest:admin')->group(function () {
     Route::get('login', [AdminAuthController::class, 'loginPage'])->name('login');
-    Route::post('login', [AdminAuthController::class, 'login'])->name('login');
+    Route::post('login/post', [AdminAuthController::class, 'login'])->name('login');
 
     // Password Reset Routes
     Route::get('forgot-password', [AdminAuthController::class, 'showForgotPasswordForm'])->name('password.request');

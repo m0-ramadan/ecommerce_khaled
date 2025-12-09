@@ -1,3 +1,6 @@
+ @php
+     $user=auth()->user();
+ @endphp
  <nav class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
      id="layout-navbar">
      <div class="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0 d-xl-none">
@@ -96,81 +99,6 @@
                              </li>
 
 
-                             <li class="list-group item list-group-item-action dropdown-notifications-item">
-                                 <div class="d-flex">
-                                     <div class="flex-shrink-0 me-3">
-
-                                     </div>
-                                     <div class="flex-grow-1">
-
-                                         <h6 class="mb-1">انضمام متسخدم جديد</h6>
-                                         <p class="mb-0">انضم مستخدم جديد الى المنصة</p>
-
-                                         <small class="text-muted text-nowrap">2025-07-14
-                                             14:10:41</small>
-                                     </div>
-
-                                 </div>
-                             </li>
-
-
-                             <li class="list-group item list-group-item-action dropdown-notifications-item">
-                                 <div class="d-flex">
-                                     <div class="flex-shrink-0 me-3">
-
-                                     </div>
-                                     <div class="flex-grow-1">
-
-                                         <h6 class="mb-1">انضمام متسخدم جديد</h6>
-                                         <p class="mb-0">انضم مستخدم جديد الى المنصة</p>
-
-                                         <small class="text-muted text-nowrap">2025-07-09
-                                             08:21:44</small>
-                                     </div>
-
-                                 </div>
-                             </li>
-
-
-                             <li class="list-group item list-group-item-action dropdown-notifications-item">
-                                 <div class="d-flex">
-                                     <div class="flex-shrink-0 me-3">
-
-                                     </div>
-                                     <div class="flex-grow-1">
-
-                                         <h6 class="mb-1">اوراق الفحص</h6>
-                                         <p class="mb-0">تم تعديل اوراق الفحص للسائق لطفى عبده منصور
-                                             سلامة</p>
-
-                                         <small class="text-muted text-nowrap">2025-07-06
-                                             14:19:06</small>
-                                     </div>
-
-                                 </div>
-                             </li>
-
-
-                             <li class="list-group item list-group-item-action dropdown-notifications-item">
-                                 <div class="d-flex">
-                                     <div class="flex-shrink-0 me-3">
-
-                                     </div>
-                                     <div class="flex-grow-1">
-
-                                         <h6 class="mb-1">اوراق الفحص</h6>
-                                         <p class="mb-0">تم تعديل اوراق الفحص للسائق لطفى عبده منصور
-                                             سلامة</p>
-
-                                         <small class="text-muted text-nowrap">2025-07-06
-                                             14:19:04</small>
-                                     </div>
-
-                                 </div>
-                             </li>
-
-
-
                          </ul>
                      </li>
 
@@ -189,7 +117,7 @@
              <li class="nav-item navbar-dropdown dropdown-user dropdown">
                  <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
                      <div class="avatar avatar-online">
-                         <img src="https://seda.codeella.com/assets/img/avatars/1.png" alt
+                         <img src="{{ get_user_image($user->avatar) }}" alt
                              class="h-auto rounded-circle" />
                      </div>
                  </a>
@@ -200,14 +128,14 @@
                              <div class="d-flex">
                                  <div class="flex-shrink-0 me-3">
                                      <div class="avatar avatar-online">
-                                         <img src="https://seda.codeella.com/assets/img/avatars/1.png" alt
+                                         <img src="{{ get_user_image($user->avatar) }}" alt
                                              class="h-auto rounded-circle" />
                                      </div>
                                  </div>
 
                                  <div class="flex-grow-1">
-                                     <span class="fw-medium d-block"> {{ auth()->user()->name }} </span>
-                                     <small class="text-muted">{{ auth()->user()->email }}</small>
+                                     <span class="fw-medium d-block"> {{ $user->name }} </span>
+                                     <small class="text-muted">{{ $user->email }}</small>
                                  </div>
                              </div>
                          </a>

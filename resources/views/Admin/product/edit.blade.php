@@ -672,7 +672,7 @@
                         <div class="preview-card mb-4" bis_skin_checked="1">
                             <div class="row align-items-center" bis_skin_checked="1">
                                 <div class="col-auto" bis_skin_checked="1">
-                                    <img src="{{ $product->image ? get_user_image($product->image) : 'https://via.placeholder.com/100x100?text=No+Image' }}"
+                                    <img src="{{ $product->primaryImage ? get_user_image($product->primaryImage->path) : 'https://via.placeholder.com/100x100?text=No+Image' }}"
                                         alt="{{ $product->name }}" class="preview-image">
                                 </div>
                                 <div class="col" bis_skin_checked="1">
@@ -828,14 +828,15 @@
                                 <!-- Current Main Image -->
                                 <div class="mb-4" bis_skin_checked="1">
                                     <label class="form-label">الصورة الرئيسية الحالية</label>
-                                    @if ($product->image)
+                                    @if ($product->primaryImage)
                                         <div class="image-preview-grid" bis_skin_checked="1">
                                             <div class="image-preview-item">
                                                 <span class="primary-badge">رئيسية</span>
-                                                <img src="{{ get_user_image($product->image) }}" alt="الصورة الرئيسية">
+                                                <img src="{{ get_user_image($product->primaryImage?->path) }}"
+                                                    alt="الصورة الرئيسية">
                                                 <div class="image-actions">
                                                     <button type="button" class="btn btn-info btn-sm"
-                                                        onclick="viewImage('{{ get_user_image($product->image) }}')">
+                                                        onclick="viewImage('{{ get_user_image($product->primaryImage?->path) }}') ">
                                                         <i class="fas fa-eye"></i>
                                                     </button>
                                                     <button type="button" class="btn btn-danger btn-sm"
@@ -923,7 +924,11 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-md-6 mb-3" bis_skin_checked="1">
+                                </div>
+
+                                <!-- Additional Pricing Options -->
+                                <div class="row" bis_skin_checked="1">
+                                    <div class="col-md-4 mb-3" bis_skin_checked="1">
                                         <div class="toggle-container mb-3" bis_skin_checked="1">
                                             <label class="toggle-switch">
                                                 <input type="checkbox" id="has_discount" name="has_discount"
@@ -956,10 +961,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                <!-- Additional Pricing Options -->
-                                <div class="row" bis_skin_checked="1">
                                     <div class="col-md-4 mb-3" bis_skin_checked="1">
                                         <div class="toggle-container" bis_skin_checked="1">
                                             <label class="toggle-switch">

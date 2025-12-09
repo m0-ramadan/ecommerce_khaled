@@ -585,7 +585,7 @@
                     <div class="row" bis_skin_checked="1">
                         <div class="col-md-8" bis_skin_checked="1">
                             <div class="product-main-image" bis_skin_checked="1">
-                                <img src="{{ $product->image ? get_user_image($product->image) : 'https://via.placeholder.com/600x400?text=No+Image' }}"
+                                <img src="{{ $product->primaryImage ? get_user_image($product->primaryImage->path): 'https://via.placeholder.com/600x400?text=No+Image' }}"
                                     alt="{{ $product->name }}" id="mainProductImage">
                                 <div class="image-overlay-buttons" bis_skin_checked="1">
                                     <button class="btn btn-primary" onclick="zoomImage()">

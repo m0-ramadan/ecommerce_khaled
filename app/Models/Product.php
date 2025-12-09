@@ -20,7 +20,7 @@ class Product extends Model
         'includes_shipping',
         'stock',
         'status_id',
-        'image',
+        'image','external_id','sku','weight','url','subtitle','type','meta_title','meta_description','meta_keywords'
     ];
 
     protected $casts = [
@@ -77,7 +77,7 @@ class Product extends Model
 
     public function images()
     {
-        return $this->morphMany(Image::class, 'imageable');
+        return $this->morphMany(Image::class, 'imageable')->where('type', 'additional');
     }
 
 
@@ -100,6 +100,12 @@ class Product extends Model
     {
         return $this->belongsToMany(\App\Models\User::class, 'favourites');
     }
+
+    public function tags()
+    {
+        return $this->belongsToMany(Tag::class);
+    }
+
     public function materials()
     {
         return $this->belongsToMany(Material::class, 'material_product')
@@ -216,7 +222,7 @@ class Product extends Model
 
     public function primaryImage()
     {
-        return $this->hasOne(Image::class)->where('is_primary', true);
+        return $this->hasOne(Image::class,'imageable_id')->where('type', 'main');
     }
 
 

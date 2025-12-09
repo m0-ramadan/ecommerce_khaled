@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\Product\StoreProductRequest;
+use PDF;
 use App\Models\Size;
 use App\Models\Color;
 use App\Models\Image;
@@ -316,239 +318,270 @@ class ProductController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function quickAdd(Request $request)
-    {
-        try {
-            $type = $request->type;
-            $data = [];
+/**
+ * Store a newly created product
+ */
+public function store(StoreProductRequest $request)
+{
+    DB::beginTransaction();
+    
+    try {
+        // Validate main product data
+        $validated = $request->validated();
 
-            switch ($type) {
-                case 'color':
-                    $validated = $request->validate([
-                        'name' => 'required|string|max:255',
-                        'hex_code' => 'required|string|max:7',
-                        'additional_price' => 'nullable|numeric|min:0',
-                        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-                    ]);
-
-                    $color = Color::create([
-                        'name' => $validated['name'],
-                        'hex_code' => $validated['hex_code'],
-                    ]);
-
-                    if ($request->hasFile('image')) {
-                        $imagePath = $request->file('image')->store('colors', 'public');
-                        $color->update(['image' => $imagePath]);
-                    }
-
-                    $data = [
-                        'id' => $color->id,
-                        'name' => $color->name,
-                        'hex_code' => $color->hex_code,
-                        'additional_price' => $validated['additional_price'] ?? 0,
-                    ];
-                    break;
-
-                case 'material':
-                    $validated = $request->validate([
-                        'name' => 'required|string|max:255',
-                        'description' => 'nullable|string',
-                        'additional_price' => 'nullable|numeric|min:0',
-                    ]);
-
-                    $material = Material::create([
-                        'name' => $validated['name'],
-                        'description' => $validated['description'] ?? null,
-                    ]);
-
-                    $data = [
-                        'id' => $material->id,
-                        'name' => $material->name,
-                        'description' => $material->description,
-                        'additional_price' => $validated['additional_price'] ?? 0,
-                    ];
-                    break;
-
-                case 'printing_method':
-                    $validated = $request->validate([
-                        'name' => 'required|string|max:255',
-                        'description' => 'nullable|string',
-                        'base_price' => 'required|numeric|min:0',
-                    ]);
-
-                    $printingMethod = PrintingMethod::create([
-                        'name' => $validated['name'],
-                        'description' => $validated['description'] ?? null,
-                        'base_price' => $validated['base_price'],
-                    ]);
-
-                    $data = [
-                        'id' => $printingMethod->id,
-                        'name' => $printingMethod->name,
-                        'base_price' => $printingMethod->base_price,
-                    ];
-                    break;
-
-                case 'print_location':
-                    $validated = $request->validate([
-                        'name' => 'required|string|max:255',
-                        'type' => 'required|string|max:255',
-                        'additional_price' => 'required|numeric|min:0',
-                    ]);
-
-                    $printLocation = PrintLocation::create([
-                        'name' => $validated['name'],
-                        'type' => $validated['type'],
-                        'additional_price' => $validated['additional_price'],
-                    ]);
-
-                    $data = [
-                        'id' => $printLocation->id,
-                        'name' => $printLocation->name,
-                        'type' => $printLocation->type,
-                        'additional_price' => $printLocation->additional_price,
-                    ];
-                    break;
-
-                case 'offer':
-                    $validated = $request->validate([
-                        'name' => 'required|string|max:255',
-                        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-                    ]);
-
-                    $offer = Offer::create([
-                        'name' => $validated['name'],
-                    ]);
-
-                    if ($request->hasFile('image')) {
-                        $imagePath = $request->file('image')->store('offers', 'public');
-                        $offer->update(['image' => $imagePath]);
-                    }
-
-                    $data = [
-                        'id' => $offer->id,
-                        'name' => $offer->name,
-                    ];
-                    break;
-
-                case 'category':
-                    $validated = $request->validate([
-                        'name' => 'required|string|max:255',
-                        'description' => 'nullable|string',
-                        'parent_id' => 'nullable|exists:categories,id',
-                    ]);
-
-                    $category = Category::create([
-                        'name' => $validated['name'],
-                        'description' => $validated['description'] ?? null,
-                        'parent_id' => $validated['parent_id'] ?? null,
-                        'status_id' => 1,
-                        'order' => 0,
-                    ]);
-
-                    $data = [
-                        'id' => $category->id,
-                        'name' => $category->name,
-                    ];
-                    break;
-
-                default:
-                    throw new \Exception('نوع غير معروف');
-            }
-
-            return response()->json([
-                'success' => true,
-                'message' => 'تمت الإضافة بنجاح',
-                'data' => $data
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Quick add error: ' . $e->getMessage());
-
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 500);
-        }
-    }
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'name'              => 'required|string|max:255',
-            'category_id'       => 'required|exists:categories,id',
-            'description'       => 'nullable|string',
-            'num_faces'         => 'required|in:1,2',
-            'print_locations'   => 'nullable|array',
-            'printing_methods'  => 'nullable|array',
-            'protection_layer'  => 'nullable|in:none,glossy,matte',
-            'design_service'    => 'nullable|in:0,free,paid',
-            'design_service_price' => 'nullable|numeric|min:0',
-            'delivery_time'     => 'required|string',
-            'shipping_fees'     => 'nullable|string',
-            'tags'              => 'nullable|string',
-            'status'            => 'required|in:0,1',
-            'images.*'          => 'image|mimes:jpg,jpeg,png,webp|max:5048',
-            'colors'            => 'array',
-            'colors.*'          => 'exists:colors,id',
-            'sizes.new.*.size_id'       => 'required|exists:sizes,id',
-            'sizes.new.*.quantity'      => 'required|integer|min:1',
-            'sizes.new.*.price_per_unit' => 'required|numeric|min:0',
+        // Create product
+        $product = Product::create([
+            'name' => $validated['name'],
+            'category_id' => $validated['category_id'],
+            'description' => $validated['description'],
+            'price' => $validated['price'],
+            'stock' => $validated['stock'],
+            'status_id' => $validated['status_id'],
+            'has_discount' => $request->boolean('has_discount'),
+            'includes_tax' => $request->boolean('includes_tax'),
+            'includes_shipping' => $request->boolean('includes_shipping'),
         ]);
 
-        DB::beginTransaction();
-        try {
-            $product = Product::create([
-                'name'              => $request->name,
-                'category_id'       => $request->category_id,
-                'description'       => $request->description,
-                'num_faces'         => $request->num_faces,
-                'print_locations'   => $request->print_locations ? json_encode($request->print_locations) : null,
-                'printing_methods'  => $request->printing_methods ? json_encode($request->printing_methods) : null,
-                'protection_layer'  => $request->protection_layer,
-                'design_service'    => $request->design_service,
-                'design_service_price' => $request->design_service == 'paid' ? $request->design_service_price : null,
-                'delivery_time'     => $request->delivery_time,
-                'shipping_fees'     => $request->shipping_fees,
-                'tags'              => $request->tags,
-                'status'            => $request->status,
+        // Handle main image
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('products', 'public');
+            $product->update(['image' => $imagePath]);
+            
+            // Create image record
+            $product->images()->create([
+                'path' => $imagePath,
+                'is_primary' => true,
+               // 'type' => 'main',
+                'order' => 1
             ]);
-
-            // حفظ الألوان
-            if ($request->colors) {
-                $product->colors()->sync($request->colors);
-            }
-
-            // حفظ الصور
-            if ($request->hasFile('images')) {
-                foreach ($request->file('images') as $index => $file) {
-                    $path = $file->store('products', 'public');
-                    $product->images()->create([
-                        'path' => $path,
-                        'is_primary' => $index === 0,
-                    ]);
-                }
-            }
-
-            // حفظ التسعير حسب المقاس والكمية
-            if ($request->filled('sizes.new')) {
-                foreach ($request->sizes['new'] as $tier) {
-                    ProductSizeTier::create([
-                        'product_id'     => $product->id,
-                        'size_id'        => $tier['size_id'],
-                        'quantity'       => $tier['quantity'],
-                        'price_per_unit' => $tier['price_per_unit'],
-                    ]);
-                }
-            }
-
-            DB::commit();
-            return redirect()->route('Admin.product.show', $product)
-                ->with('success', 'تم إضافة المنتج بنجاح');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Product Store Error: ' . $e->getMessage());
-            return back()->with('error', 'حدث خطأ أثناء حفظ المنتج');
         }
+
+        // Handle discount
+        if ($request->boolean('has_discount') && $request->filled('discount_value')) {
+            $product->discount()->create([
+                'discount_value' => $request->input('discount_value'),
+                'discount_type' => $request->input('discount_type', 'percentage'),
+            ]);
+        }
+
+        // Handle colors with prices
+        if ($request->filled('colors')) {
+            $colors = [];
+            foreach ($request->input('colors') as $colorId) {
+                $additionalPrice = $request->input("color_prices.{$colorId}", 0);
+                $colors[$colorId] = ['additional_price' => $additionalPrice];
+            }
+            $product->colors()->sync($colors);
+        }
+
+        // Handle materials
+        if ($request->filled('materials')) {
+            $materialsData = [];
+            foreach ($request->input('materials') as $materialData) {
+                if (!empty($materialData['material_id'])) {
+                    $materialsData[$materialData['material_id']] = [
+                        'quantity' => $materialData['quantity'] ?? 0,
+                        'unit' => $materialData['unit'] ?? 'piece',
+                        'additional_price' => $materialData['additional_price'] ?? 0
+                    ];
+                }
+            }
+            $product->materials()->sync($materialsData);
+        }
+
+        // Handle printing methods with prices
+        if ($request->filled('printing_methods')) {
+            $printingMethods = [];
+            foreach ($request->input('printing_methods') as $methodId) {
+                $additionalPrice = $request->input("printing_method_prices.{$methodId}", 0);
+                $printingMethods[$methodId] = ['additional_price' => $additionalPrice];
+            }
+            $product->printingMethods()->sync($printingMethods);
+        }
+
+        // Handle print locations with prices
+        if ($request->filled('print_locations')) {
+            $printLocations = [];
+            foreach ($request->input('print_locations') as $locationId) {
+                $additionalPrice = $request->input("print_location_prices.{$locationId}", 0);
+                $printLocations[$locationId] = ['additional_price' => $additionalPrice];
+            }
+            $product->printLocations()->sync($printLocations);
+        }
+
+        // Handle offers
+        if ($request->filled('offers')) {
+            $product->offers()->sync($request->input('offers'));
+        }
+
+        // Handle delivery time
+        if ($request->filled('from_days') || $request->filled('to_days')) {
+            $product->deliveryTime()->create([
+                'from_days' => $request->input('from_days'),
+                'to_days' => $request->input('to_days'),
+            ]);
+        }
+
+        // Handle warranty
+        if ($request->filled('warranty_months')) {
+            $product->warranty()->create([
+                'months' => $request->input('warranty_months')
+            ]);
+        }
+
+        // Handle additional images
+        if ($request->hasFile('additional_images')) {
+            $order = 2;
+            foreach ($request->file('additional_images') as $image) {
+                $path = $image->store('products/additional', 'public');
+                
+                $product->images()->create([
+                    'path' => $path,
+                    'is_primary' => false,
+                   // 'type' => 'additional',
+                    'order' => $order++
+                ]);
+            }
+        }
+
+        DB::commit();
+
+        return redirect()->route('admin.products.show', $product)
+            ->with('success', 'تم إضافة المنتج بنجاح');
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return redirect()->back()
+            ->withInput()
+            ->with('error', 'حدث خطأ أثناء إضافة المنتج: ' . $e->getMessage());
     }
+}
+
+/**
+ * Quick add functionality
+ */
+public function quickAdd(Request $request, $type)
+{
+    try {
+        switch ($type) {
+            case 'color':
+                $request->validate([
+                    'name' => 'required|string|max:255',
+                    'hex_code' => 'required|string|max:7'
+                ]);
+                
+                $color = Color::create([
+                    'name' => $request->name,
+                    'hex_code' => $request->hex_code
+                ]);
+                
+                return response()->json([
+                    'success' => true,
+                    'message' => 'تم إضافة اللون بنجاح',
+                    'data' => $color
+                ]);
+                
+            case 'material':
+                $request->validate([
+                    'name' => 'required|string|max:255',
+                    'description' => 'nullable|string'
+                ]);
+                
+                $material = Material::create([
+                    'name' => $request->name,
+                    'description' => $request->description
+                ]);
+                
+                return response()->json([
+                    'success' => true,
+                    'message' => 'تم إضافة المادة بنجاح',
+                    'data' => $material
+                ]);
+                
+            case 'printing_method':
+                $request->validate([
+                    'name' => 'required|string|max:255',
+                    'description' => 'nullable|string',
+                    'base_price' => 'required|numeric|min:0'
+                ]);
+                
+                $printingMethod = PrintingMethod::create([
+                    'name' => $request->name,
+                    'description' => $request->description,
+                    'base_price' => $request->base_price
+                ]);
+                
+                return response()->json([
+                    'success' => true,
+                    'message' => 'تم إضافة طريقة الطباعة بنجاح',
+                    'data' => $printingMethod
+                ]);
+                
+            case 'print_location':
+                $request->validate([
+                    'name' => 'required|string|max:255',
+                    'type' => 'required|in:front,back,side,sleeve',
+                    'additional_price' => 'required|numeric|min:0'
+                ]);
+                
+                $printLocation = PrintLocation::create([
+                    'name' => $request->name,
+                    'type' => $request->type,
+                    'additional_price' => $request->additional_price
+                ]);
+                
+                return response()->json([
+                    'success' => true,
+                    'message' => 'تم إضافة مكان الطباعة بنجاح',
+                    'data' => $printLocation
+                ]);
+                
+            case 'offer':
+                $request->validate([
+                    'name' => 'required|string|max:255'
+                ]);
+                
+                $offer = Offer::create([
+                    'name' => $request->name
+                ]);
+                
+                return response()->json([
+                    'success' => true,
+                    'message' => 'تم إضافة العرض بنجاح',
+                    'data' => $offer
+                ]);
+                
+            case 'category':
+                $request->validate([
+                    'name' => 'required|string|max:255',
+                    'parent_id' => 'nullable|exists:categories,id'
+                ]);
+                
+                $category = Category::create([
+                    'name' => $request->name,
+                    'parent_id' => $request->parent_id,
+                    'status_id' => 1
+                ]);
+                
+                return response()->json([
+                    'success' => true,
+                    'message' => 'تم إضافة القسم بنجاح',
+                    'data' => $category
+                ]);
+                
+            default:
+                return response()->json([
+                    'success' => false,
+                    'message' => 'النوع غير معروف'
+                ], 400);
+        }
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'حدث خطأ: ' . $e->getMessage()
+        ], 500);
+    }
+}
 
     public function show($id)
     {

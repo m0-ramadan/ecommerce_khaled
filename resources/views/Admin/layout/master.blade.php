@@ -59,11 +59,11 @@
     </div>
     <!-- / Layout wrapper -->
     <form id="form_action_delete" method="POST" class="d-none">
-        <input type="hidden" name="_token" value="0CmaMRSLCe8tBDQHmwjmk1pSKNwNgMufNwSt1m6R" autocomplete="off">
+        @csrf
         <input type="hidden" name="_method" value="DELETE">
     </form>
     <form id="form_action_post" method="POST" class="d-none">
-        <input type="hidden" name="_token" value="0CmaMRSLCe8tBDQHmwjmk1pSKNwNgMufNwSt1m6R" autocomplete="off">
+        @csrf
     </form>
     <!-- Core JS -->
     @include('Admin.layout.js')

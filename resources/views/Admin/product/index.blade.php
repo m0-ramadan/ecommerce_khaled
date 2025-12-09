@@ -771,7 +771,7 @@
                         <div class="col">
                             <div class="product-card" data-product-id="{{ $product->id }}">
                                 <div class="product-image">
-                                    <img src="{{ $product->image ? get_user_image($product->image) : 'https://via.placeholder.com/300x200?text=No+Image' }}"
+                                    <img src="{{ $product->primaryImage ? get_user_image($product->primaryImage->path) : 'https://via.placeholder.com/300x200?text=No+Image' }}"
                                         alt="{{ $product->name }}">
 
                                     <div class="product-badges">
@@ -949,7 +949,7 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <img src="{{ $product->image ? get_user_image($product->image) : 'https://via.placeholder.com/60x60?text=No+Image' }}"
+                                            <img src="{{ $product->primaryImage ? get_user_image($product->primaryImage->path) : 'https://via.placeholder.com/60x60?text=No+Image' }}"
                                                 alt="{{ $product->name }}" class="product-table-image">
                                         </td>
                                         <td>
@@ -1169,7 +1169,6 @@
     </div>
 
 @endsection
-
 @section('js')
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
@@ -1224,7 +1223,11 @@
                         className: 'btn btn-outline-info'
                     },
                     'colvis'
-                ]
+                ],
+                // Disable automatic search to use our custom search
+                searching: false,
+                info: false,
+                paging: false
             });
 
             // Global search
@@ -1243,6 +1246,9 @@
 
                 // Table view search
                 if ($('#tableView').is(':visible')) {
+                    // Clear previous search
+                    $('#productsTable').DataTable().search('').draw();
+                    // Apply new search
                     $('#productsTable').DataTable().search(searchTerm).draw();
                 }
             });
@@ -1279,10 +1285,28 @@
                     }
                 });
             });
+
+            // Initialize view toggle buttons
+            $('.view-toggle-btn').on('click', function() {
+                const viewType = $(this).text().includes('large') ? 'grid' : 'table';
+                toggleView(viewType);
+            });
+
+            // Initialize quick filter buttons
+            $('.quick-actions .btn').on('click', function() {
+                const action = $(this).attr('onclick');
+                if (action && action.includes('applyFilter')) {
+                    // Extract parameters from onclick attribute
+                    const match = action.match(/applyFilter\('([^']+)',\s*'([^']+)'\)/);
+                    if (match) {
+                        applyFilter(match[1], match[2]);
+                    }
+                }
+            });
         });
 
-        // View Toggle
-        function toggleView(viewType) {
+        // View Toggle Function
+        window.toggleView = function(viewType) {
             $('.view-toggle-btn').removeClass('active');
             $('.view-container').hide();
 
@@ -1295,8 +1319,8 @@
             }
         }
 
-        // Quick Filters
-        function applyFilter(filter, value) {
+        // Quick Filters Function
+        window.applyFilter = function(filter, value) {
             let url = new URL(window.location.href);
 
             if (value === 'low') {
@@ -1309,21 +1333,21 @@
             window.location.href = url.toString();
         }
 
-        function clearFilters() {
+        window.clearFilters = function() {
             window.location.href = '{{ route('admin.products.index') }}';
         }
 
-        // Advanced Filters
-        function toggleAdvancedFilters() {
+        // Advanced Filters Functions
+        window.toggleAdvancedFilters = function() {
             $('#advancedFilters').toggleClass('show');
         }
 
-        function clearAdvancedFilters() {
+        window.clearAdvancedFilters = function() {
             $('#filterForm')[0].reset();
             $('.select2').val(null).trigger('change');
         }
 
-        function applyAdvancedFilters() {
+        window.applyAdvancedFilters = function() {
             const formData = new FormData($('#filterForm')[0]);
             const params = new URLSearchParams();
 
@@ -1336,12 +1360,12 @@
             window.location.href = '{{ route('admin.products.index') }}?' + params.toString();
         }
 
-        // Bulk Actions
-        function showBulkActions() {
+        // Bulk Actions Functions
+        window.showBulkActions = function() {
             $('#bulkActions').addClass('show');
         }
 
-        function hideBulkActions() {
+        window.hideBulkActions = function() {
             $('#bulkActions').removeClass('show');
             $('.product-checkbox').prop('checked', false);
             updateSelectedCount();
@@ -1359,7 +1383,7 @@
             }
         }
 
-        $('#bulkActionSelect').on('change', function() {
+        $(document).on('change', '#bulkActionSelect', function() {
             const action = $(this).val();
             $('#bulkActionOptions').hide().find('> div').hide();
 
@@ -1372,7 +1396,7 @@
             }
         });
 
-        function applyBulkAction() {
+        window.applyBulkAction = function() {
             const action = $('#bulkActionSelect').val();
             const selectedProducts = [];
 
@@ -1497,7 +1521,7 @@
             });
         }
 
-        // Product Operations
+        // Product Operations Functions
         function deleteProduct(productId) {
             $.ajax({
                 url: `/admin/products/${productId}`,
@@ -1534,7 +1558,7 @@
             });
         }
 
-        function duplicateProduct(productId) {
+        window.duplicateProduct = function(productId) {
             Swal.fire({
                 title: 'نسخ المنتج',
                 input: 'text',
@@ -1582,12 +1606,12 @@
             });
         }
 
-        // Export
-        function exportProducts() {
+        // Export Functions
+        window.exportProducts = function() {
             $('#exportModal').modal('show');
         }
 
-        function performExport() {
+        window.performExport = function() {
             const type = $('#exportType').val();
             const columns = $('#exportColumns').val();
             const filters = new URLSearchParams(window.location.search);
@@ -1601,115 +1625,6 @@
             $('#exportModal').modal('hide');
         }
 
-        // Print
-        function printProducts() {
-            const printWindow = window.open('', '_blank');
-            const title = 'قائمة المنتجات';
-            const date = new Date().toLocaleDateString('ar-EG');
-
-            let content = `
-            <!DOCTYPE html>
-            <html dir="rtl" lang="ar">
-            <head>
-                <title>${title}</title>
-                <style>
-                    body { font-family: 'Cairo', sans-serif; margin: 20px; }
-                    .print-header { text-align: center; margin-bottom: 30px; }
-                    .print-header h1 { color: #2c3e50; margin-bottom: 10px; }
-                    .print-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-                    .print-table th, .print-table td { border: 1px solid #ddd; padding: 8px; text-align: right; }
-                    .print-table th { background-color: #f8f9fa; }
-                    .print-summary { margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 5px; }
-                    @media print {
-                        body { margin: 0; }
-                        .no-print { display: none; }
-                    }
-                </style>
-            </head>
-            <body>
-                <div class="print-header">
-                    <h1>${title}</h1>
-                    <p>تاريخ الطباعة: ${date}</p>
-                    <p>إجمالي المنتجات: {{ $totalProducts }}</p>
-                </div>
-        `;
-
-            if ($('#gridView').is(':visible')) {
-                content += '<div class="row">';
-                $('#productsGrid .product-card').each(function() {
-                    const name = $(this).find('.product-title').text();
-                    const price = $(this).find('.current-price').text();
-                    const stock = $(this).find('.product-stock').text().replace('قطعة', '').trim();
-                    const category = $(this).find('.product-category').text();
-
-                    content += `
-                    <div style="border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; border-radius: 5px;">
-                        <strong>${name}</strong><br>
-                        <small>${category} | ${price} | ${stock} قطعة</small>
-                    </div>
-                `;
-                });
-                content += '</div>';
-            } else {
-                content += `
-                <table class="print-table">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>اسم المنتج</th>
-                            <th>التصنيف</th>
-                            <th>السعر</th>
-                            <th>المخزون</th>
-                            <th>الحالة</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
-
-                let counter = 1;
-                $('#productsTable tbody tr').each(function() {
-                    const name = $(this).find('.product-table-name').text();
-                    const category = $(this).find('.badge').text();
-                    const price = $(this).find('.text-success').text();
-                    const stock = $(this).find('.stock-indicator').next().text().trim();
-                    const status = $(this).find('.status-badge').text();
-
-                    content += `
-                    <tr>
-                        <td>${counter}</td>
-                        <td>${name}</td>
-                        <td>${category}</td>
-                        <td>${price}</td>
-                        <td>${stock}</td>
-                        <td>${status}</td>
-                    </tr>
-                `;
-                    counter++;
-                });
-
-                content += `
-                    </tbody>
-                </table>
-            `;
-            }
-
-            content += `
-                <div class="no-print" style="text-align: center; margin-top: 30px;">
-                    <button onclick="window.print()" style="padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer;">
-                        طباعة الصفحة
-                    </button>
-                    <button onclick="window.close()" style="padding: 10px 20px; background: #e74c3c; color: white; border: none; border-radius: 5px; cursor: pointer; margin-right: 10px;">
-                        إغلاق
-                    </button>
-                </div>
-            </body>
-            </html>
-        `;
-
-            printWindow.document.write(content);
-            printWindow.document.close();
-        }
+   
     </script>
-
-
 @endsection
