@@ -69,27 +69,27 @@ class CategoryController extends Controller
      *
      * @return \Illuminate\View\View
      */
-public function create(Request $request)
-{
-    $parentCategories = Category::whereNull('parent_id')
-        ->orderBy('order')
-        ->withCount('children')
-        ->get();
-    
-    // Get recent categories for sidebar
-    $recentCategories = Category::latest()
-        ->take(5)
-        ->get();
-    
-    // Check if coming from parent category
-    $parentId = $request->get('parent_id');
-    if ($parentId) {
-        $parentCategory = Category::find($parentId);
-        return view('Admin.category.create', compact('parentCategories', 'recentCategories', 'parentId', 'parentCategory'));
+    public function create(Request $request)
+    {
+        $parentCategories = Category::whereNull('parent_id')
+            ->orderBy('order')
+            ->withCount('children')
+            ->get();
+
+        // Get recent categories for sidebar
+        $recentCategories = Category::latest()
+            ->take(5)
+            ->get();
+
+        // Check if coming from parent category
+        $parentId = $request->get('parent_id');
+        if ($parentId) {
+            $parentCategory = Category::find($parentId);
+            return view('Admin.category.create', compact('parentCategories', 'recentCategories', 'parentId', 'parentCategory'));
+        }
+
+        return view('Admin.category.create', compact('parentCategories', 'recentCategories'));
     }
-    
-    return view('Admin.category.create', compact('parentCategories', 'recentCategories'));
-}
 
     /**
      * Store a newly created category.
@@ -97,78 +97,77 @@ public function create(Request $request)
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
      */
-/**
- * Store a newly created category.
- */
-public function store(Request $request)
-{
-    $validated = $this->validateRequest($request);
+    /**
+     * Store a newly created category.
+     */
+    public function store(Request $request)
+    {
+        $validated = $this->validateRequest($request);
 
-    try {
-        DB::beginTransaction();
+        try {
+            DB::beginTransaction();
 
-        $category = new Category();
-        $this->fillCategoryData($category, $validated, $request);
-        
-        // Generate slug if not provided
-        if (empty($category->slug)) {
-            $category->slug = $this->generateUniqueSlug($validated['name']);
+            $category = new Category();
+            $this->fillCategoryData($category, $validated, $request);
+
+            // Generate slug if not provided
+            if (empty($category->slug)) {
+                $category->slug = $this->generateUniqueSlug($validated['name']);
+            }
+
+            $category->save();
+
+            DB::commit();
+
+            $message = 'تم إضافة القسم بنجاح';
+
+            if ($request->wantsJson() || $request->is('api/*')) {
+                return response()->json([
+                    'success' => true,
+                    'message' => $message,
+                    'data' => $category->load(['parent', 'children'])
+                ], 201);
+            }
+
+            // Check if user wants to add another
+            if ($request->has('add_another')) {
+                return redirect()->route('admin.categories.create')
+                    ->with('success', $message)
+                    ->with('add_another', true);
+            }
+
+            return redirect()->route('admin.categories.index')
+                ->with('success', $message);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error creating category: ' . $e->getMessage());
+
+            return $this->handleError($e, 'Failed to create category');
         }
-        
-        $category->save();
-
-        DB::commit();
-
-        $message = 'تم إضافة القسم بنجاح';
-        
-        if ($request->wantsJson() || $request->is('api/*')) {
-            return response()->json([
-                'success' => true,
-                'message' => $message,
-                'data' => $category->load(['parent', 'children'])
-            ], 201);
-        }
-
-        // Check if user wants to add another
-        if ($request->has('add_another')) {
-            return redirect()->route('admin.categories.create')
-                ->with('success', $message)
-                ->with('add_another', true);
-        }
-
-        return redirect()->route('admin.categories.index')
-            ->with('success', $message);
-
-    } catch (\Exception $e) {
-        DB::rollBack();
-        Log::error('Error creating category: ' . $e->getMessage());
-        
-        return $this->handleError($e, 'Failed to create category');
     }
-}
 
-/**
- * Display the specified category.
- *
- * @param  \App\Models\Category  $category
- * @return \Illuminate\View\View
- */
-public function show(Category $category)
-{
-    // Load all necessary relationships with counts
-    $category->load([
-        'parent',
-        'children' => function($query) {
-            $query->orderBy('order')
-                  ->withCount('products');
-        }
-    ]);
-    
-    // Load counts
-    $category->loadCount(['products', 'children']);
-    
-    return view('Admin.category.show', compact('category'));
-}
+    /**
+     * Display the specified category.
+     *
+     * @param  \App\Models\Category  $category
+     * @return \Illuminate\View\View
+     */
+    public function show(Category $category)
+    {
+        // Load all necessary relationships with counts
+        $category->load([
+            'parent',
+            'children' => function ($query) {
+                $query->orderBy('order')
+                    ->withCount('products');
+            }
+        ]);
+
+        // Load counts
+        $category->loadCount(['products', 'children']);
+
+        return view('Admin.category.show', compact('category'));
+    }
 
     /**
      * Show the form for editing the specified category.
@@ -177,7 +176,7 @@ public function show(Category $category)
      * @return \Illuminate\View\View
      */
     public function edit($id)
-    {     
+    {
         $category = Category::findOrFail($id);
         $parentCategories = Category::whereNull('parent_id')
             ->where('id', '!=', $category->id)
@@ -243,47 +242,38 @@ public function show(Category $category)
      * @param  \App\Models\Category  $category
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
      */
-    public function destroy(Request $request, Category $category)
+    public function destroy(Category $category)
     {
         try {
-            DB::beginTransaction();
+            // Check if category has products
+            if ($category->products()->exists()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'لا يمكن حذف القسم لأنه يحتوي على منتجات.'
+                ], 400);
+            }
 
             // Check if category has children
             if ($category->children()->exists()) {
-                throw new \Exception('Cannot delete category with subcategories.');
+                return response()->json([
+                    'success' => false,
+                    'message' => 'لا يمكن حذف القسم لأنه يحتوي على أقسام فرعية.'
+                ], 400);
             }
-
-            // Check if category has products
-            if ($category->products()->exists()) {
-                throw new \Exception('Cannot delete category with associated products.');
-            }
-
-            // Delete images if they exist
-            $this->deleteCategoryImages($category);
 
             $category->delete();
 
-            DB::commit();
-
-            $message = 'Category deleted successfully';
-
-            if ($request->wantsJson() || $request->is('api/*')) {
-                return response()->json([
-                    'success' => true,
-                    'message' => $message
-                ]);
-            }
-
-            return redirect()->route('admin.categories.index')
-                ->with('success', $message);
+            return response()->json([
+                'success' => true,
+                'message' => 'تم حذف القسم بنجاح.'
+            ]);
         } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Error deleting category: ' . $e->getMessage());
-
-            return $this->handleError($e, 'Failed to delete category');
+            return response()->json([
+                'success' => false,
+                'message' => 'حدث خطأ أثناء الحذف: ' . $e->getMessage()
+            ], 500);
         }
     }
-
     /**
      * Update category order.
      *
@@ -333,13 +323,15 @@ public function show(Category $category)
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getTree(Request $request)
+
+    public function getTree()
     {
         try {
-            $categories = Category::with(['children' => function ($query) {
-                $query->orderBy('order');
-            }])
-                ->whereNull('parent_id')
+            // Load categories with their children recursively
+            $categories = Category::whereNull('parent_id')
+                ->with(['children' => function ($query) {
+                    $query->orderBy('order');
+                }])
                 ->orderBy('order')
                 ->get();
 
@@ -348,15 +340,12 @@ public function show(Category $category)
                 'data' => $categories
             ]);
         } catch (\Exception $e) {
-            Log::error('Error fetching category tree: ' . $e->getMessage());
-
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to fetch category tree'
+                'message' => 'فشل في تحميل البيانات: ' . $e->getMessage()
             ], 500);
         }
     }
-
     /**
      * Validate the request data.
      *

@@ -19,8 +19,6 @@ if (!function_exists('get_user_image')) {
         }
 
         // الرابط نسبي في قاعدة البيانات
-        return asset('website/profile/' . $image);
+        return asset('storage/' . $image);
     }
 }
-
-

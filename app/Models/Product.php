@@ -240,9 +240,18 @@ class Product extends Model
 
         return $product;
     }
+    public function printingMethods()
+    {
+        return $this->belongsToMany(PrintingMethod::class, 'product_print_methods');
+    }
+
 
     public function sizeTiers()
     {
         return $this->hasMany(ProductSizeTier::class);
+    }
+    public function printLocations()
+    {
+        return $this->belongsToMany(PrintLocation::class);
     }
 }

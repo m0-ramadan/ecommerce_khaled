@@ -5,9 +5,13 @@ namespace App\Http\Controllers\Admin;
 use App\Models\Size;
 use App\Models\Color;
 use App\Models\Image;
+use App\Models\Offer;
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\Material;
 use Illuminate\Http\Request;
+use App\Models\PrintLocation;
+use App\Models\PrintingMethod;
 use App\Exports\ProductsExport;
 use App\Models\ProductSizeTier;
 use Illuminate\Support\Facades\DB;
@@ -18,34 +22,454 @@ use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
+    /**
+     * Display a listing of products.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\View\View
+     */
     public function index(Request $request)
     {
-        $query = Product::with(['category', 'colors']);
+        // Get statistics
+        $totalProducts = Product::count();
+        $activeProducts = Product::where('status_id', 1)->count();
+        $inactiveProducts = Product::where('status_id', 2)->count();
+        $lowStockProducts = Product::where('stock', '<', 10)->where('stock', '>', 0)->count();
 
-        // تطبيق الفلاتر
-        $query = $query->filtered($request)->searched($request->search);
+        // Query products with filters
+        $query = Product::with(['category', 'discount', 'colors', 'materials'])
+            ->withCount('reviews')
+            ->sorted($request)
+            ->searched($request->get('search'))
+            ->filtered($request);
 
-        $products = $query->latest()->paginate(20);
+        // Apply additional filters
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
 
-        return view('Admin.product.index', [
-            'products'        => $products,
-            'categories'      => Category::all(),
-            'colors'          => Color::all(),
-            'totalProducts'   => Product::count(),
-            'activeProducts'  => Product::where('status_id', 1)->count(),
-            'inactiveProducts' => Product::where('status_id', 0)->count(),
+        if ($request->filled('status_id')) {
+            $query->where('status_id', $request->status_id);
+        }
+
+        if ($request->filled('price_from') && $request->filled('price_to')) {
+            $query->whereBetween('price', [$request->price_from, $request->price_to]);
+        } elseif ($request->filled('price_from')) {
+            $query->where('price', '>=', $request->price_from);
+        } elseif ($request->filled('price_to')) {
+            $query->where('price', '<=', $request->price_to);
+        }
+
+        if ($request->filled('stock_from') && $request->filled('stock_to')) {
+            $query->whereBetween('stock', [$request->stock_from, $request->stock_to]);
+        } elseif ($request->filled('stock_from')) {
+            $query->where('stock', '>=', $request->stock_from);
+        } elseif ($request->filled('stock_to')) {
+            $query->where('stock', '<=', $request->stock_to);
+        }
+
+        if ($request->filled('color_id')) {
+            $query->whereHas('colors', function ($q) use ($request) {
+                $q->whereIn('colors.id', (array)$request->color_id);
+            });
+        }
+
+        if ($request->filled('material_id')) {
+            $query->whereHas('materials', function ($q) use ($request) {
+                $q->whereIn('materials.id', (array)$request->material_id);
+            });
+        }
+
+        if ($request->filled('printing_method_id')) {
+            $query->whereHas('printingMethods', function ($q) use ($request) {
+                $q->whereIn('printing_methods.id', (array)$request->printing_method_id);
+            });
+        }
+
+        if ($request->filled('offer_id')) {
+            $query->whereHas('offers', function ($q) use ($request) {
+                $q->whereIn('offers.id', (array)$request->offer_id);
+            });
+        }
+
+        // Get paginated results
+        $products = $query->paginate($request->get('per_page', 20))->withQueryString();
+
+        // Get filter options
+        $categories = Category::where('status_id', 1)->get();
+        $colors = Color::all();
+        $materials = Material::all();
+        $printingMethods = PrintingMethod::all();
+        $offers = Offer::all();
+
+        return view('Admin.product.index', compact(
+            'products',
+            'totalProducts',
+            'activeProducts',
+            'inactiveProducts',
+            'lowStockProducts',
+            'categories',
+            'colors',
+            'materials',
+            'printingMethods',
+            'offers'
+        ));
+    }
+    /**
+     * Handle bulk actions on products.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function bulkAction(Request $request)
+    {
+        $request->validate([
+            'action' => 'required|string',
+            'product_ids' => 'required|array',
+            'product_ids.*' => 'exists:products,id'
         ]);
+
+        try {
+            DB::beginTransaction();
+
+            $productIds = $request->product_ids;
+            $message = '';
+
+            switch ($request->action) {
+                case 'activate':
+                    Product::whereIn('id', $productIds)->update(['status_id' => 1]);
+                    $message = 'تم تفعيل المنتجات المختارة';
+                    break;
+
+                case 'deactivate':
+                    Product::whereIn('id', $productIds)->update(['status_id' => 2]);
+                    $message = 'تم تعطيل المنتجات المختارة';
+                    break;
+
+                case 'move_to_category':
+                    $request->validate(['category_id' => 'required|exists:categories,id']);
+                    Product::whereIn('id', $productIds)->update(['category_id' => $request->category_id]);
+                    $message = 'تم نقل المنتجات إلى التصنيف المحدد';
+                    break;
+
+                case 'add_to_offer':
+                    $request->validate(['offer_id' => 'required|exists:offers,id']);
+                    $products = Product::whereIn('id', $productIds)->get();
+                    foreach ($products as $product) {
+                        $product->offers()->syncWithoutDetaching([$request->offer_id]);
+                    }
+                    $message = 'تم إضافة المنتجات إلى العرض';
+                    break;
+
+                case 'remove_from_offer':
+                    $request->validate(['offer_id' => 'required|exists:offers,id']);
+                    $products = Product::whereIn('id', $productIds)->get();
+                    foreach ($products as $product) {
+                        $product->offers()->detach($request->offer_id);
+                    }
+                    $message = 'تم إزالة المنتجات من العرض';
+                    break;
+
+                case 'delete':
+                    Product::whereIn('id', $productIds)->delete();
+                    $message = 'تم حذف المنتجات المختارة';
+                    break;
+
+                default:
+                    throw new \Exception('إجراء غير معروف');
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => $message
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Bulk action error: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+    /**
+     * Export products.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return mixed
+     */
+    public function export(Request $request)
+    {
+        $request->validate([
+            'type' => 'required|in:excel,csv,pdf',
+            'columns' => 'nullable|array'
+        ]);
+
+        $query = Product::with(['category', 'colors', 'materials'])
+            ->sorted($request)
+            ->filtered($request);
+
+        $products = $query->get();
+
+        $columns = $request->columns ?? ['id', 'name', 'category', 'price', 'stock', 'status', 'created_at'];
+
+        if ($request->type === 'excel') {
+            return Excel::download(new ProductsExport($products, $columns), 'products_' . date('Y-m-d') . '.xlsx');
+        } elseif ($request->type === 'csv') {
+            return Excel::download(new ProductsExport($products, $columns), 'products_' . date('Y-m-d') . '.csv');
+        } else {
+            // PDF export logic
+            $pdf = PDF::loadView('admin.products.export-pdf', compact('products', 'columns'));
+            return $pdf->download('products_' . date('Y-m-d') . '.pdf');
+        }
     }
 
+    /**
+     * Duplicate a product.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\Product  $product
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function duplicate(Request $request, Product $product)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255'
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            // Duplicate the product
+            $newProduct = $product->replicate();
+            $newProduct->name = $request->name;
+            $newProduct->save();
+
+            // Duplicate images
+            if ($product->image) {
+                $newImagePath = $this->duplicateImage($product->image, 'products');
+                $newProduct->update(['image' => $newImagePath]);
+            }
+
+            // Duplicate relationships
+            $product->colors()->each(function ($color) use ($newProduct) {
+                $newProduct->colors()->attach($color->id);
+            });
+
+            $product->materials()->each(function ($material) use ($newProduct) {
+                $newProduct->materials()->attach($material->id, [
+                    'quantity' => $material->pivot->quantity,
+                    'unit' => $material->pivot->unit
+                ]);
+            });
+
+            // Add more relationship duplications as needed
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم نسخ المنتج بنجاح',
+                'data' => $newProduct
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error duplicating product: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل في نسخ المنتج'
+            ], 500);
+        }
+    }
+
+    /**
+     * Show the form for creating a new product.
+     *
+     * @return \Illuminate\View\View
+     */
     public function create()
     {
-        return view('Admin.product.create', [
-            'categories' => Category::all(),
-            'colors'     => Color::all(),
-            'sizes'      => Size::all(),
-        ]);
-    }
+        // Load all necessary data
+        $categories = Category::where('status_id', 1)->get();
+        $colors = Color::all();
+        $materials = Material::all();
+        $printingMethods = PrintingMethod::all();
+        $printLocations = PrintLocation::all();
+        $offers = Offer::all();
 
+        return view('Admin.product.create', compact(
+            'categories',
+            'colors',
+            'materials',
+            'printingMethods',
+            'printLocations',
+            'offers'
+        ));
+    }
+    /**
+     * Handle quick addition of colors, materials, etc.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function quickAdd(Request $request)
+    {
+        try {
+            $type = $request->type;
+            $data = [];
+
+            switch ($type) {
+                case 'color':
+                    $validated = $request->validate([
+                        'name' => 'required|string|max:255',
+                        'hex_code' => 'required|string|max:7',
+                        'additional_price' => 'nullable|numeric|min:0',
+                        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                    ]);
+
+                    $color = Color::create([
+                        'name' => $validated['name'],
+                        'hex_code' => $validated['hex_code'],
+                    ]);
+
+                    if ($request->hasFile('image')) {
+                        $imagePath = $request->file('image')->store('colors', 'public');
+                        $color->update(['image' => $imagePath]);
+                    }
+
+                    $data = [
+                        'id' => $color->id,
+                        'name' => $color->name,
+                        'hex_code' => $color->hex_code,
+                        'additional_price' => $validated['additional_price'] ?? 0,
+                    ];
+                    break;
+
+                case 'material':
+                    $validated = $request->validate([
+                        'name' => 'required|string|max:255',
+                        'description' => 'nullable|string',
+                        'additional_price' => 'nullable|numeric|min:0',
+                    ]);
+
+                    $material = Material::create([
+                        'name' => $validated['name'],
+                        'description' => $validated['description'] ?? null,
+                    ]);
+
+                    $data = [
+                        'id' => $material->id,
+                        'name' => $material->name,
+                        'description' => $material->description,
+                        'additional_price' => $validated['additional_price'] ?? 0,
+                    ];
+                    break;
+
+                case 'printing_method':
+                    $validated = $request->validate([
+                        'name' => 'required|string|max:255',
+                        'description' => 'nullable|string',
+                        'base_price' => 'required|numeric|min:0',
+                    ]);
+
+                    $printingMethod = PrintingMethod::create([
+                        'name' => $validated['name'],
+                        'description' => $validated['description'] ?? null,
+                        'base_price' => $validated['base_price'],
+                    ]);
+
+                    $data = [
+                        'id' => $printingMethod->id,
+                        'name' => $printingMethod->name,
+                        'base_price' => $printingMethod->base_price,
+                    ];
+                    break;
+
+                case 'print_location':
+                    $validated = $request->validate([
+                        'name' => 'required|string|max:255',
+                        'type' => 'required|string|max:255',
+                        'additional_price' => 'required|numeric|min:0',
+                    ]);
+
+                    $printLocation = PrintLocation::create([
+                        'name' => $validated['name'],
+                        'type' => $validated['type'],
+                        'additional_price' => $validated['additional_price'],
+                    ]);
+
+                    $data = [
+                        'id' => $printLocation->id,
+                        'name' => $printLocation->name,
+                        'type' => $printLocation->type,
+                        'additional_price' => $printLocation->additional_price,
+                    ];
+                    break;
+
+                case 'offer':
+                    $validated = $request->validate([
+                        'name' => 'required|string|max:255',
+                        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                    ]);
+
+                    $offer = Offer::create([
+                        'name' => $validated['name'],
+                    ]);
+
+                    if ($request->hasFile('image')) {
+                        $imagePath = $request->file('image')->store('offers', 'public');
+                        $offer->update(['image' => $imagePath]);
+                    }
+
+                    $data = [
+                        'id' => $offer->id,
+                        'name' => $offer->name,
+                    ];
+                    break;
+
+                case 'category':
+                    $validated = $request->validate([
+                        'name' => 'required|string|max:255',
+                        'description' => 'nullable|string',
+                        'parent_id' => 'nullable|exists:categories,id',
+                    ]);
+
+                    $category = Category::create([
+                        'name' => $validated['name'],
+                        'description' => $validated['description'] ?? null,
+                        'parent_id' => $validated['parent_id'] ?? null,
+                        'status_id' => 1,
+                        'order' => 0,
+                    ]);
+
+                    $data = [
+                        'id' => $category->id,
+                        'name' => $category->name,
+                    ];
+                    break;
+
+                default:
+                    throw new \Exception('نوع غير معروف');
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تمت الإضافة بنجاح',
+                'data' => $data
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Quick add error: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -133,16 +557,48 @@ class ProductController extends Controller
         return view('Admin.product.show', compact('product'));
     }
 
+
+    /**
+     * Display the edit form for product
+     */
     public function edit($id)
     {
-        $product = Product::with(['category', 'colors', 'images', 'sizeTiers.size', 'reviews'])->find($id);
-
-        return view('Admin.product.edit', [
-            'product'    => $product,
-            'categories' => Category::all(),
-            'colors'     => Color::all(),
-            'sizes'      => Size::all(),
+        $product = Product::find($id);
+        // Load all related data
+        $product->load([
+            'category',
+            'colors',
+            'materials',
+            'deliveryTime',
+            'warranty',
+            'features',
+            'options',
+            'printingMethods',
+            'printLocations',
+            'offers',
+            'pricingTiers',
+            'sizeTiers',
+            'images',
+            'discount'
         ]);
+
+        // Get all necessary data for selects
+        $categories = Category::with('children')->whereNull('parent_id')->get();
+        $colors = Color::all();
+        $materials = Material::all();
+        $printingMethods = PrintingMethod::all();
+        $printLocations = PrintLocation::all();
+        $offers = Offer::all();
+
+        return view('Admin.product.edit', compact(
+            'product',
+            'categories',
+            'colors',
+            'materials',
+            'printingMethods',
+            'printLocations',
+            'offers'
+        ));
     }
 
     public function update(Request $request, Product $product)
@@ -268,8 +724,8 @@ class ProductController extends Controller
     }
 
     // تصدير Excel
-    public function export()
-    {
-        return Excel::download(new ProductsExport, 'products_' . now()->format('Y-m-d') . '.xlsx');
-    }
+    // public function export()
+    // {
+    //     return Excel::download(new ProductsExport, 'products_' . now()->format('Y-m-d') . '.xlsx');
+    // }
 }

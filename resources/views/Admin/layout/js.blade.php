@@ -658,53 +658,53 @@
             // the URL of the current page
 
 
-            if (next_url) {
-                var url = new URL(next_url);
-                var page = url.searchParams.get("page");
+            // if (next_url) {
+            //     var url = new URL(next_url);
+            //     var page = url.searchParams.get("page");
 
 
 
-                $.ajax({
-                    url: "https://seda.codeella.com/admin/notifications?page=" + page,
-                    success: function(res) {
-                        console.log(res)
-                        $.each(res.data.data, function(key, val) {
+            //     $.ajax({
+            //         url: "https://seda.codeella.com/admin/notifications?page=" + page,
+            //         success: function(res) {
+            //             console.log(res)
+            //             $.each(res.data.data, function(key, val) {
 
-                            // console.log(val);
-                            $("#list_notifications").append(`
-                                    <li style="cursor :unset"  class="list-group item list-group-item-action dropdown-notifications-item">
-                                        <div style="cursor :unset" class="d-flex">
+            //                 // console.log(val);
+            //                 $("#list_notifications").append(`
+            //                         <li style="cursor :unset"  class="list-group item list-group-item-action dropdown-notifications-item">
+            //                             <div style="cursor :unset" class="d-flex">
 
-                                            <div class="flex-grow-1">
-                                                    <h6 class="mb-1">${val.title}</h6>
-                                                <p class="mb-0">${val.message}</p>
-                                                <small class="text-muted text-nowrap">${val.created_at}</small>
-                                            </div>
-                                        </div>
-                                    </li>
-                                `);
-                        })
-
-
-                        if (!res.data.links.next) {
-                            $("#view-all-notifications").remove();
-
-                        } else {
-
-                            document.querySelector('.notification-body').scrollTo(0,
-                                document.querySelector(
-                                    '.notification-body').scrollHeight);
-                            $("#view-all-notifications").attr("href", res.data.links.next);
-
-                        }
+            //                                 <div class="flex-grow-1">
+            //                                         <h6 class="mb-1">${val.title}</h6>
+            //                                     <p class="mb-0">${val.message}</p>
+            //                                     <small class="text-muted text-nowrap">${val.created_at}</small>
+            //                                 </div>
+            //                             </div>
+            //                         </li>
+            //                     `);
+            //             })
 
 
-                    }
-                })
+            //             if (!res.data.links.next) {
+            //                 $("#view-all-notifications").remove();
+
+            //             } else {
+
+            //                 document.querySelector('.notification-body').scrollTo(0,
+            //                     document.querySelector(
+            //                         '.notification-body').scrollHeight);
+            //                 $("#view-all-notifications").attr("href", res.data.links.next);
+
+            //             }
+
+
+            //         }
+            //     })
 
 
 
-            }
+            // }
 
 
 
@@ -714,69 +714,69 @@
 
 
 
-        channel.bind('channel-notify', function(data) {
+        // channel.bind('channel-notify', function(data) {
 
 
-            toastr.options = {
-                "closeButton": false,
-                "debug": false,
-                "newestOnTop": false,
-                "progressBar": false,
-                "positionClass": "toast-top-right",
-                "preventDuplicates": false,
-                "onclick": null,
-                "showDuration": "300",
-                "hideDuration": "1000",
-                "timeOut": "5000",
-                "extendedTimeOut": "1000",
-                "showEasing": "swing",
-                "hideEasing": "linear",
-                "showMethod": "fadeIn",
-                "hideMethod": "fadeOut"
-            }
+        //     toastr.options = {
+        //         "closeButton": false,
+        //         "debug": false,
+        //         "newestOnTop": false,
+        //         "progressBar": false,
+        //         "positionClass": "toast-top-right",
+        //         "preventDuplicates": false,
+        //         "onclick": null,
+        //         "showDuration": "300",
+        //         "hideDuration": "1000",
+        //         "timeOut": "5000",
+        //         "extendedTimeOut": "1000",
+        //         "showEasing": "swing",
+        //         "hideEasing": "linear",
+        //         "showMethod": "fadeIn",
+        //         "hideMethod": "fadeOut"
+        //     }
 
-            // Original ISO format date string
-            let isoDateString = data.data.created_at;
+        //     // Original ISO format date string
+        //     let isoDateString = data.data.created_at;
 
-            // Create a new Date object from the ISO string
-            let date = new Date(isoDateString);
+        //     // Create a new Date object from the ISO string
+        //     let date = new Date(isoDateString);
 
-            // Get the components
-            let hours = date.getHours();
-            let minutes = ('0' + date.getMinutes()).slice(-2);
-            let seconds = ('0' + date.getSeconds()).slice(-2);
+        //     // Get the components
+        //     let hours = date.getHours();
+        //     let minutes = ('0' + date.getMinutes()).slice(-2);
+        //     let seconds = ('0' + date.getSeconds()).slice(-2);
 
-            // Convert to 12-hour format (no AM/PM)
-            hours = hours % 12;
-            hours = hours ? hours : 12; // The hour '0' should be '12'
+        //     // Convert to 12-hour format (no AM/PM)
+        //     hours = hours % 12;
+        //     hours = hours ? hours : 12; // The hour '0' should be '12'
 
-            // Format the date to 'YYYY-MM-DD HH:MM:SS'
-            let formattedDate = date.getFullYear() + '-' +
-                ('0' + (date.getMonth() + 1)).slice(-2) + '-' +
-                ('0' + date.getDate()).slice(-2) + ' ' +
-                ('0' + hours).slice(-2) + ':' +
-                minutes + ':' +
-                seconds;
+        //     // Format the date to 'YYYY-MM-DD HH:MM:SS'
+        //     let formattedDate = date.getFullYear() + '-' +
+        //         ('0' + (date.getMonth() + 1)).slice(-2) + '-' +
+        //         ('0' + date.getDate()).slice(-2) + ' ' +
+        //         ('0' + hours).slice(-2) + ':' +
+        //         minutes + ':' +
+        //         seconds;
 
-            $("#list_notifications").prepend(`
-                    <li style="cursor :unset"  class="list-group item list-group-item-action dropdown-notifications-item">
-                    <div style="cursor :unset" class="d-flex">
-                    <div class="flex-shrink-0 me-3">
+        //     $("#list_notifications").prepend(`
+        //             <li style="cursor :unset"  class="list-group item list-group-item-action dropdown-notifications-item">
+        //             <div style="cursor :unset" class="d-flex">
+        //             <div class="flex-shrink-0 me-3">
 
-                    </div>
-                    <div class="flex-grow-1">
-                    <h6 class="mb-1">${data.data.title}</h6>
-                    <p class="mb-0">${data.data.message}</p>
-                    <small class="text-muted text-nowrap">${formattedDate}</small>
-                    </div>
-                    </div>
-                    </li>
-                    `);
-            toastr["info"](data.data.message)
-            console.log(data.data)
-            var audio = new Audio("https://seda.codeella.com/sound_notify.mp3");
-            audio.play();
-        });
+        //             </div>
+        //             <div class="flex-grow-1">
+        //             <h6 class="mb-1">${data.data.title}</h6>
+        //             <p class="mb-0">${data.data.message}</p>
+        //             <small class="text-muted text-nowrap">${formattedDate}</small>
+        //             </div>
+        //             </div>
+        //             </li>
+        //             `);
+        //     toastr["info"](data.data.message)
+        //     console.log(data.data)
+        //     var audio = new Audio("https://seda.codeella.com/sound_notify.mp3");
+        //     audio.play();
+        // });
 
 
 
