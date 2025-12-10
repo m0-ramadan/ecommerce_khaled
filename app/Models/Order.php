@@ -62,9 +62,9 @@ class Order extends Model
     }
 
     public function orderItems()  // ← اسم جديد
-{
-    return $this->hasMany(OrderItem::class);
-}
+    {
+        return $this->hasMany(OrderItem::class);
+    }
 
     // رقم الطلب بشكل جميل (مثال: ORD-2025-000123)
     public function getFormattedOrderNumberAttribute()

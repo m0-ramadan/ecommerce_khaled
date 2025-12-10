@@ -17,7 +17,8 @@ class User extends Authenticatable
         'google_id',
         'facebook_id',
         'apple_id',
-        'phone','image'
+        'phone',
+        'image'
     ];
 
     protected $hidden = [
@@ -39,18 +40,26 @@ class User extends Authenticatable
         return $this->morphMany(\App\Models\Notification::class, 'notifiable');
     }
     public function favourites()
-{
-    return $this->hasMany(\App\Models\Favourite::class);
-}
+    {
+        return $this->hasMany(\App\Models\Favourite::class);
+    }
 
-public function favouriteProducts()
-{
-    return $this->belongsToMany(\App\Models\Product::class, 'favourites');
-}
+    public function favouriteProducts()
+    {
+        return $this->belongsToMany(\App\Models\Product::class, 'favourites');
+    }
 
-public function favorites()
-{
-    return $this->hasMany(Favorite::class);
-}
+    public function favorites()
+    {
+        return $this->hasMany(Favorite::class);
+    }
 
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+    public function cart()
+    {
+        return $this->hasOne(Cart::class);
+    }
 }

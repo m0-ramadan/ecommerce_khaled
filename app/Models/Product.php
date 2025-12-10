@@ -20,7 +20,16 @@ class Product extends Model
         'includes_shipping',
         'stock',
         'status_id',
-        'image','external_id','sku','weight','url','subtitle','type','meta_title','meta_description','meta_keywords'
+        'image',
+        'external_id',
+        'sku',
+        'weight',
+        'url',
+        'subtitle',
+        'type',
+        'meta_title',
+        'meta_description',
+        'meta_keywords'
     ];
 
     protected $casts = [
@@ -222,7 +231,7 @@ class Product extends Model
 
     public function primaryImage()
     {
-        return $this->hasOne(Image::class,'imageable_id')->where('type', 'main');
+        return $this->hasOne(Image::class, 'imageable_id')->where('type', 'main');
     }
 
 

@@ -2,33 +2,25 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\FaqController;
-use App\Http\Controllers\Admin\CodeController;
-use App\Http\Controllers\Admin\NoteController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\RolesController;
-use App\Http\Controllers\Admin\ClientController;
-use App\Http\Controllers\Admin\LockerController;
 use App\Http\Controllers\Admin\RegionController;
 use App\Http\Controllers\Admin\SliderController;
 use App\Http\Controllers\Admin\ContactController;
 use App\Http\Controllers\Admin\CountryController;
 use App\Http\Controllers\Admin\ManagerController;
-use App\Http\Controllers\Admin\PackageController;
-use App\Http\Controllers\Admin\PaymentController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\SettingController;
-use App\Http\Controllers\Admin\VehicleController;
 use App\Http\Controllers\Admin\VisitorController;
 use App\Http\Controllers\Admin\CategoryController;
-use App\Http\Controllers\Admin\CurrencyController;
 use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\Admin\ContactUsController;
-use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\SubscribeController;
 use App\Http\Controllers\Admin\PermissionsController;
-use App\Http\Controllers\AdminNotificationController;
+use App\Http\Controllers\Admin\PaymentMethodController;
 use App\Http\Controllers\Admin\LogisticServiceController;
 
 /*
@@ -77,7 +69,6 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
         'permissions' => PermissionsController::class,
         'roles' => RolesController::class,
         'countries' => CountryController::class,
-        'payments' => PaymentController::class,
         'contactus' => ContactUsController::class,
         'faqs' => FaqController::class,
         'sliders' => SliderController::class,
@@ -104,18 +95,12 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
 
     // categories (without tree route)
     Route::prefix('categories')->as('categories.')->group(function () {
-        // list + create + store
         Route::get('/', [CategoryController::class, 'index'])->name('index');
         Route::get('/create', [CategoryController::class, 'create'])->name('create');
         Route::post('/', [CategoryController::class, 'store'])->name('store');
-
-        // edit must be before show
         Route::get('/{category}/edit', [CategoryController::class, 'edit'])->name('edit');
-
-        // update + delete
         Route::put('/{category}', [CategoryController::class, 'update'])->name('update');
         Route::delete('/{category}', [CategoryController::class, 'destroy'])->name('destroy');
-
         Route::get('/{category}', [CategoryController::class, 'show'])->name('show');
         Route::post('/update-order', [CategoryController::class, 'updateOrder'])->name('updateOrder');
         Route::get('/export', [CategoryController::class, 'export'])->name('export');
@@ -153,6 +138,25 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
     Route::prefix('products')->as('products.')->group(function () {
         Route::get('/export', [ProductController::class, 'export'])->name('export');
     });
+
+    // Payment Method
+    Route::resource('payment-methods', PaymentMethodController::class);
+    Route::patch('payment-methods/{paymentMethod}/toggle-status', [PaymentMethodController::class, 'toggleStatus'])->name('payment-methods.toggle-status');
+
+    // Users
+    Route::resource('users', UserController::class);
+    Route::post('users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
+    Route::get('users/{user}/orders', [UserController::class, 'orders'])->name('users.orders');
+    Route::get('users/{user}/reviews', [UserController::class, 'reviews'])->name('users.reviews');
+    Route::get('users/{user}/favourites', [UserController::class, 'favourites'])->name('users.favourites');
+    Route::get('users/{user}/activities', [UserController::class, 'activities'])->name('users.activities');
+
+    // Orders
+    Route::resource('orders', OrderController::class);
+    Route::post('orders/{order}/update-status', [OrderController::class, 'updateStatus'])->name('orders.update-status');
+    Route::get('orders/{order}/print', [OrderController::class, 'print'])->name('orders.print');
+    Route::get('orders/export', [OrderController::class, 'export'])->name('orders.export');
+    Route::get('order/statistics', [OrderController::class, 'statistics'])->name('orders.statistics');
 });
 
 // Visitor stats route (outside admin group)

@@ -17,7 +17,7 @@ class ProductController extends Controller
     use ApiResponseTrait;
 
 
-public function index(Request $request)
+    public function index(Request $request)
     {
         try {
             $query = Product::with([
@@ -32,7 +32,6 @@ public function index(Request $request)
                 'offers',
                 'materials'
             ]);
-
             $products = $query
                 ->filtered($request)
                 ->searched($request->get('search'))

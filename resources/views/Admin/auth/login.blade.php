@@ -9,7 +9,7 @@
     <div class="authentication-wrapper authentication-cover authentication-bg" dir="rtl">
         <div class="authentication-inner row">
             <!-- الجانب الأيسر (الصورة التوضيحية) - يظهر فقط على الشاشات الكبيرة -->
-            <div class="d-none d-lg-flex col-lg-7 align-items-center p-0">
+            <div class="d-none d-lg-flex col-lg-7 align-items-center p-0" style="max-height: 950px;">
                 <div class="auth-cover-bg auth-cover-bg-color d-flex justify-content-center align-items-center w-100 h-100">
                     <img src="https://seda.codeella.com/assets/img/illustrations/auth-login-illustration-light.png"
                         alt="غلاف تسجيل الدخول" class="img-fluid auth-illustration">

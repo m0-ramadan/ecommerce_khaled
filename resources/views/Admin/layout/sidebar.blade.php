@@ -22,7 +22,7 @@
                </a>
            </li>
 
-           <li class="menu-item ">
+           {{-- <li class="menu-item ">
                <a href="javascript:void(0);" class="menu-link menu-toggle">
                    <i class="menu-icon tf-icons ti ti-world"></i>
                    <div>المناطق</div>
@@ -49,7 +49,7 @@
                    </li>
 
                </ul>
-           </li>
+           </li> --}}
            <li class="menu-item ">
                <a href="javascript:void(0);" class="menu-link menu-toggle">
                    <i class="menu-icon tf-icons ti ti-user-bolt"></i>
@@ -65,7 +65,7 @@
                    </li>
 
                    <li class="menu-item ">
-                       <a href="https://seda.codeella.com/admin/users/clients" class="menu-link">
+                       <a href="{{ route('admin.users.index') }}" class="menu-link">
                            <div>العملاء</div>
                        </a>
                    </li>
@@ -74,7 +74,7 @@
 
 
            <li class="menu-item ">
-               <a href="https://seda.codeella.com/admin/payment-methods" class="menu-link">
+               <a href="{{ route('admin.payment-methods.index') }}" class="menu-link">
                    <i class="menua-icon ti ti-credit-card"></i>
                    <div>طرق الدفع</div>
                </a>
@@ -87,39 +87,21 @@
                </a>
            </li>
 
-<li class="menu-item">
-    <a href="{{ route('admin.categories.index') }}" class="menu-link">
-        <i class="menua-icon ti ti-category"></i>
-        <div>الأقسام</div>
-    </a>
-</li>
+           <li class="menu-item">
+               <a href="{{ route('admin.categories.index') }}" class="menu-link">
+                   <i class="menua-icon ti ti-category"></i>
+                   <div>الأقسام</div>
+               </a>
+           </li>
 
-           <li class="menu-item ">
-               <a href="javascript:void(0);" class="menu-link menu-toggle">
+           <li class="menu-item">
+               <a href="{{ route('admin.orders.index') }}" class="menu-link">
                    <i class="menu-icon ti ti-package"></i>
 
                    <div>الطلبات</div>
-                   <div class="badge bg-primary rounded-pill ms-auto">5</div>
                </a>
-
-               <ul class="menu-sub">
-
-                   <li class="menu-item ">
-                       <a href="#" class="menu-link">
-                           <i class="menu-icon ti ti-shopping-cart"></i>
-                           <div>الجميع</div>
-                       </a>
-                   </li>
-
-
-                   <li class="menu-item ">
-                       <a href="#" class="menu-link">
-                           <i class="menu-icon ti ti-shopping-cart"></i>
-                           <div>الملغية</div>
-                       </a>
-                   </li>
-               </ul>
            </li>
+
 
 
 
