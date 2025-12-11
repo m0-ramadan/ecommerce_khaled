@@ -20,11 +20,11 @@ class CategoryController extends Controller
             $query = Category::where('status_id', 1);
 
             switch ($request->get('type')) {
-                case 'parent':
-                    $query->whereNull('parent_id');
-                    $resource = CategoryResource::class;
-                    break;
-                case 'child':
+                // case :
+                //     $query->whereNull('parent_id');
+                //     $resource = CategoryResource::class;
+                //     break;
+                case 'child'|| 'parent':
                     $query->whereNotNull('parent_id');
                     $resource = CategoryWithProductResource::class;
                     break;

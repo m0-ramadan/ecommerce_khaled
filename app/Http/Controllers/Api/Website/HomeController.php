@@ -31,10 +31,7 @@ class HomeController extends Controller
                 ->get();
 
             // 🟢 جلب الأقسام الفرعية
-            $sub_categories = Category::where('status_id', 1)
-                ->whereNotNull('parent_id')
-                ->take(7)
-                ->get();
+            $sub_categories = Category::where('status_id', 1)->whereHas('products')->orderBy('order','asc')->get();
 
             // 🟢 جلب المنتجات
             $products = Product::where('status_id', 1)

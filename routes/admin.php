@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\RolesController;
+use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\RegionController;
 use App\Http\Controllers\Admin\SliderController;
 use App\Http\Controllers\Admin\ContactController;
@@ -19,6 +20,7 @@ use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\Admin\ContactUsController;
 use App\Http\Controllers\Admin\SubscribeController;
+use App\Http\Controllers\Admin\BannerItemController;
 use App\Http\Controllers\Admin\PermissionsController;
 use App\Http\Controllers\Admin\PaymentMethodController;
 use App\Http\Controllers\Admin\LogisticServiceController;
@@ -37,7 +39,7 @@ Route::get('admin/categories/tree', [CategoryController::class, 'getTree'])->nam
 
 // Authentication Routes
 Route::prefix('admin')->name('admin.')->middleware('guest:admin')->group(function () {
-    Route::get('login', [AdminAuthController::class, 'loginPage'])->name('login');
+    Route::get('login', [AdminAuthController::class, 'loginPage'])->name('login.page');
     Route::post('login/post', [AdminAuthController::class, 'login'])->name('login');
 
     // Password Reset Routes
@@ -144,19 +146,46 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
     Route::patch('payment-methods/{paymentMethod}/toggle-status', [PaymentMethodController::class, 'toggleStatus'])->name('payment-methods.toggle-status');
 
     // Users
-    Route::resource('users', UserController::class);
-    Route::post('users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
-    Route::get('users/{user}/orders', [UserController::class, 'orders'])->name('users.orders');
-    Route::get('users/{user}/reviews', [UserController::class, 'reviews'])->name('users.reviews');
-    Route::get('users/{user}/favourites', [UserController::class, 'favourites'])->name('users.favourites');
-    Route::get('users/{user}/activities', [UserController::class, 'activities'])->name('users.activities');
+    Route::prefix('users')->as('users.')->group(function () {
+        Route::resource('/', UserController::class);
+        Route::post('/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('toggle-status');
+        Route::get('/{user}/orders', [UserController::class, 'orders'])->name('orders');
+        Route::get('/{user}/reviews', [UserController::class, 'reviews'])->name('reviews');
+        Route::get('/{user}/favourites', [UserController::class, 'favourites'])->name('favourites');
+        Route::get('/{user}/activities', [UserController::class, 'activities'])->name('activities');
+    });
+
+
+    // Banner Routes
+    Route::prefix('banners')->name('banners.')->group(function () {
+        Route::get('/', [BannerController::class, 'index'])->name('index');
+        Route::get('/create', [BannerController::class, 'create'])->name('create');
+        Route::post('/', [BannerController::class, 'store'])->name('store');
+        Route::get('/{banner}', [BannerController::class, 'show'])->name('show');
+        Route::get('/{banner}/edit', [BannerController::class, 'edit'])->name('edit');
+        Route::put('/{banner}', [BannerController::class, 'update'])->name('update');
+        Route::delete('/{banner}', [BannerController::class, 'destroy'])->name('destroy');
+        Route::post('/{banner}/toggle-status', [BannerController::class, 'toggleStatus'])->name('toggle-status');
+
+        // Banner Items Routes
+        Route::post('/items', [BannerItemController::class, 'store'])->name('items.store');
+        Route::put('/items/{bannerItem}', [BannerItemController::class, 'update'])->name('items.update');
+        Route::delete('/items/{bannerItem}', [BannerItemController::class, 'destroy'])->name('items.destroy');
+        Route::post('/items/{bannerItem}/toggle-status', [BannerItemController::class, 'toggleStatus'])->name('items.toggle-status');
+        Route::post('/items/reorder', [BannerItemController::class, 'reorder'])->name('items.reorder');
+    });
 
     // Orders
-    Route::resource('orders', OrderController::class);
-    Route::post('orders/{order}/update-status', [OrderController::class, 'updateStatus'])->name('orders.update-status');
-    Route::get('orders/{order}/print', [OrderController::class, 'print'])->name('orders.print');
-    Route::get('orders/export', [OrderController::class, 'export'])->name('orders.export');
+    Route::prefix('orders')->as('orders.')->group(function () {
+        Route::resource('/', OrderController::class);
+        Route::post('/{order}/update-status', [OrderController::class, 'updateStatus'])->name('update-status');
+        Route::get('/{order}/print', [OrderController::class, 'print'])->name('print');
+        Route::get('/export', [OrderController::class, 'export'])->name('export');
+    });
     Route::get('order/statistics', [OrderController::class, 'statistics'])->name('orders.statistics');
+
+
+
 });
 
 // Visitor stats route (outside admin group)

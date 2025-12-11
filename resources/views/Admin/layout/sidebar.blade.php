@@ -95,13 +95,19 @@
            </li>
 
            <li class="menu-item">
+               <a href="{{ route('admin.banners.index') }}" class="menu-link">
+                   <i class="menua-icon ti ti-photo"></i>
+                   <div>البانرات</div>
+               </a>
+           </li>
+
+           <li class="menu-item">
                <a href="{{ route('admin.orders.index') }}" class="menu-link">
                    <i class="menu-icon ti ti-package"></i>
 
                    <div>الطلبات</div>
                </a>
            </li>
-
 
 
 

@@ -22,7 +22,7 @@ class ProductResource extends JsonResource
             'includes_tax'      => $this->includes_tax,
             'includes_shipping' => $this->includes_shipping,
             'stock'             => $this->stock,
-            'image'             => $this->image ? get_user_image($this->image) : "https://eg-rv.homzmart.net/catalog/product/J/O/JOUFURH08142090-1-Navyblue.jpg",
+            'image'             => $this->primaryImage ? get_user_image($this->primaryImage->path) : env('DEFAULT_PRODUCT_IMAGE'),
             'average_rating'    => round($this->average_rating, 1),
             'is_favorite' => auth()->check()
                 ? Favorite::where('user_id', auth()->id())
