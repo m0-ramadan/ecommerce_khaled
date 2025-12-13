@@ -16,15 +16,15 @@ class CategoryController extends Controller
     public function index(Request $request)
     {
         try {
-        
+
             $query = Category::where('status_id', 1);
 
             switch ($request->get('type')) {
-                // case :
-                //     $query->whereNull('parent_id');
-                //     $resource = CategoryResource::class;
-                //     break;
-                case 'child'|| 'parent':
+                case 'parent':
+                    $query->whereNull('parent_id');
+                    $resource = CategoryResource::class;
+                    break;
+                case 'child':
                     $query->whereNotNull('parent_id');
                     $resource = CategoryWithProductResource::class;
                     break;

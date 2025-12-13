@@ -22,10 +22,11 @@ class AddToCartRequest extends FormRequest
             'print_locations'      => 'nullable|array',
             'print_locations.*'    => 'exists:print_locations,id',
             'embroider_locations'  => 'nullable|array',
-            'embroider_locations.*'=> 'nullable|exists:print_locations,id',
+            'embroider_locations.*' => 'nullable|exists:print_locations,id',
             'selected_options'     => 'nullable|array',
             'selected_options.*.option_name'  => 'nullable|required_with:selected_options|string',
             'selected_options.*.option_value' => 'nullable|required_with:selected_options|string',
+            'selected_options.*.option_additional_price' => 'nullable',
             'design_service_id'    => 'nullable|exists:design_services,id',
             'is_sample'            => 'sometimes|boolean',
         ];

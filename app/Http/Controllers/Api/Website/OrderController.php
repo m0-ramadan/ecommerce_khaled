@@ -17,6 +17,8 @@ use App\Http\Resources\Website\OrderResource;
 use App\Http\Requests\Website\ApplyCouponRequest;
 use App\Http\Requests\Website\CreateOrderRequest;
 use App\Http\Resources\Website\OrderDetailsResource;
+use App\Http\Resources\Website\PaymentMethodResource;
+use App\Models\PaymentMethod;
 
 class OrderController extends Controller
 {
@@ -33,7 +35,7 @@ class OrderController extends Controller
             return $this->errorResponse('يجب تسجيل الدخول لعرض الطلبات', 401);
         }
 
-        $orders = Order::with(['address', 'items.product','items'])
+        $orders = Order::with(['address', 'items.product', 'items'])
             ->where('user_id', $user->id)
             ->latest()
             ->paginate(15);
@@ -80,7 +82,7 @@ class OrderController extends Controller
 
                 $discountAmount = $coupon->calculateDiscount($cart->total);
             }
-//dd($cart);
+            //dd($cart);
             // إنشاء الطلب
             $order = Order::create([
                 'user_id'           => $user?->id,
@@ -122,13 +124,13 @@ class OrderController extends Controller
                     'image_design'          => $item->image_design,
                 ]);
             }
-        
+
             // تفريغ السلة بعد الطلب
-           //  $cart->items()->delete();
-           //  $cart->update(['subtotal' => 0, 'total' => 0]);
+            //  $cart->items()->delete();
+            //  $cart->update(['subtotal' => 0, 'total' => 0]);
 
             if ($request->payment_method === 'credit_card') {
-               
+
                 $payment = $this->initiatePaymobPayment($order);
 
                 if (!$payment['success']) {
@@ -266,53 +268,63 @@ class OrderController extends Controller
     }
 
     public function webhook(Request $request)
-{
-    $hmacSecret = config('services.paymob.hmac_secret');
+    {
+        $hmacSecret = config('services.paymob.hmac_secret');
 
-    $receivedHmac = $request->header('X-Paymob-Hmac-Signature')
-                 ?? $request->input('hmac');
+        $receivedHmac = $request->header('X-Paymob-Hmac-Signature')
+            ?? $request->input('hmac');
 
-    if (!$receivedHmac || empty($hmacSecret)) {
-        return response('Unauthorized', 401);
-    }
-
-    $obj = $request->input('obj');
-    $concatenated = collect($obj)->flatten()->implode('');
-    $calculatedHmac = hash_hmac('sha512', $concatenated, $hmacSecret);
-
-    if (!hash_equals($calculatedHmac, $receivedHmac)) {
-        \Illuminate\Support\Facades\Log::warning('PayMob Webhook HMAC Invalid', ['ip' => $request->ip()]);
-        return response('Invalid HMAC', 400);
-    }
-
-    if ($request->input('type') === 'TRANSACTION' && $obj['success'] && $obj['is_capture']) {
-        $orderNumber = $obj['merchant_reference'] ?? null;
-
-        if (!$orderNumber) return response('No reference', 400);
-
-        $order = Order::where('order_number', $orderNumber)->first();
-
-        if ($order && $order->status === 'pending') {
-            $order->update([
-                'status'         => 'paid',
-                'payment_method' => 'paymob',
-                'transaction_id' => $obj['id'],
-                'paid_at'        => now(),
-            ]);
-
-            // تفريغ السلة دلوقتي (آمن لأن الدفع تم)
-            $cart = Cart::where('user_id', $order->user_id)->orWhere('session_id', session()->getId())->first();
-            if ($cart) {
-                $cart->items()->delete();
-                $cart->update(['subtotal' => 0, 'total' => 0]);
-            }
-
-            \Illuminate\Support\Facades\Log::info("Order Paid via PayMob: {$orderNumber}");
+        if (!$receivedHmac || empty($hmacSecret)) {
+            return response('Unauthorized', 401);
         }
+
+        $obj = $request->input('obj');
+        $concatenated = collect($obj)->flatten()->implode('');
+        $calculatedHmac = hash_hmac('sha512', $concatenated, $hmacSecret);
+
+        if (!hash_equals($calculatedHmac, $receivedHmac)) {
+            \Illuminate\Support\Facades\Log::warning('PayMob Webhook HMAC Invalid', ['ip' => $request->ip()]);
+            return response('Invalid HMAC', 400);
+        }
+
+        if ($request->input('type') === 'TRANSACTION' && $obj['success'] && $obj['is_capture']) {
+            $orderNumber = $obj['merchant_reference'] ?? null;
+
+            if (!$orderNumber) return response('No reference', 400);
+
+            $order = Order::where('order_number', $orderNumber)->first();
+
+            if ($order && $order->status === 'pending') {
+                $order->update([
+                    'status'         => 'paid',
+                    'payment_method' => 'paymob',
+                    'transaction_id' => $obj['id'],
+                    'paid_at'        => now(),
+                ]);
+
+                // تفريغ السلة دلوقتي (آمن لأن الدفع تم)
+                $cart = Cart::where('user_id', $order->user_id)->orWhere('session_id', session()->getId())->first();
+                if ($cart) {
+                    $cart->items()->delete();
+                    $cart->update(['subtotal' => 0, 'total' => 0]);
+                }
+
+                \Illuminate\Support\Facades\Log::info("Order Paid via PayMob: {$orderNumber}");
+            }
+        }
+
+        return response('OK', 200);
     }
 
-    return response('OK', 200);
-}
+    public function paymentMethods(Request $request)
+    {
+
+        return $this->successResponse(
+            PaymentMethodResource::collection(PaymentMethod::where('is_active', 1)->where('is_payment', $request->is_payment)->get()),
+            'تم جلب تفاصيل الطلب بنجاح'
+
+        );
+    }
     // ==================== Helpers ====================
 
     private function getCurrentCart(): Cart

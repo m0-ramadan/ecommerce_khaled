@@ -53,7 +53,6 @@ Route::prefix('v1')->group(function () {
             Route::get('/{orderID}', [OrderController::class, 'show'])->name('show');
             Route::post('/', [OrderController::class, 'store'])->name('store');
             Route::post('cancel/{codeOrder}', [OrderController::class, 'cancelled'])->name('cancel');
-
         });
 
         Route::post('coupon/apply', [OrderController::class, 'applyCoupon']);
@@ -92,11 +91,12 @@ Route::prefix('v1')->group(function () {
     });
 
     Route::get('/banners', [BannerController::class, 'index']);
+    Route::get('/payment-methods', [OrderController::class, 'paymentMethods']);
+
 
     Route::get('/customization-options', [CustomizationOptionsController::class, 'index'])->name('customization_options');
 
-            Route::get('trace/{codeOrder}', [OrderController::class, 'traceOrder'])->name('trace');
-   
-   
+    Route::get('trace/{codeOrder}', [OrderController::class, 'traceOrder'])->name('trace');
+
     Route::post('/paymob/webhook', [OrderController::class, 'webhook'])->withoutMiddleware(['throttle:60,1']);
 });
