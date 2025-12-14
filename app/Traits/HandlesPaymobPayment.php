@@ -71,7 +71,7 @@ trait HandlesPaymobPayment
      */
     private function createPaymobPaymentLink($token, $order)
     {
-        $amountInCents = max(100, (int) round(($order->total ?? 0) * 100));
+        $amountInCents = max(100, (int) round(($order->total_amount ?? 0) * 100));
 
         $response = Http::withToken($token)
             ->asForm()
@@ -88,11 +88,12 @@ trait HandlesPaymobPayment
                 'is_live'          => config('services.paymob.mode') === 'live',
 
                 // URLs مهمة جدًا
-                'redirect_url'     => url("/payment/success/{$order->order_number}"),
-               // 'cancel_url'       => url("/payment/cancel/{$order->order_number}"),
+                //   'redirect_url'     => url("/payment/success/{$order->order_number}"),
+                'redirect_url' => url("/payment-status?status=success&orderId={$order->order_number}"),
+                'cancel_url'   => url("/payment-status?status=failed&orderId={$order->order_number}"),
 
                 // Webhook بيجي من الداشبورد، بس ممكن تبعته كمان
-                'callback_url'     => url('/api/paymob/webhook'),
+                'callback_url' => url('/api/v1/paymob/webhook'),
             ]);
         if ($response->failed()) {
             return [

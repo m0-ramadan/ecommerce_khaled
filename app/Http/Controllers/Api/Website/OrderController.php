@@ -226,8 +226,7 @@ class OrderController extends Controller
             return $this->errorResponse('يجب تسجيل الدخول لعرض تفاصيل الطلب', 401);
         }
 
-        $order = Order::with(['address', 'items.product', 'items.size', 'items.color'])
-            ->where('id', $orderID)
+        $order = Order::where('id', $orderID)
             ->where('user_id', $user->id)
             ->firstOrFail();
 
@@ -325,6 +324,33 @@ class OrderController extends Controller
 
         );
     }
+
+    public function paymentStatus(Request $request)
+    {
+        $status = $request->query('status'); // success | failed
+        $orderId = $request->query('orderId');
+
+        if (!$status || !$orderId) {
+            return $this->errorResponse('بيانات غير مكتملة', 400);
+        }
+
+        $order = Order::where('order_number', $orderId)
+            ->orWhere('id', $orderId)
+            ->first();
+
+        if (!$order) {
+            return $this->errorResponse('الطلب غير موجود', 404);
+        }
+
+        return $this->successResponse([
+            'order_id'     => $order->id,
+            'order_number' => $order->order_number,
+            'status'       => $status,
+            'order_status' => $order->status, // paid / pending / cancelled
+            'total'        => $order->total_amount,
+        ], 'تم جلب حالة الدفع');
+    }
+
     // ==================== Helpers ====================
 
     private function getCurrentCart(): Cart

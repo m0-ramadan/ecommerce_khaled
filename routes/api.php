@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\Website\CartController;
 use App\Http\Controllers\Api\Website\HomeController;
 use App\Http\Controllers\Api\Website\OrderController;
 use App\Http\Controllers\Api\Website\BannerController;
+use App\Http\Controllers\Api\Website\ReviewController;
 use App\Http\Controllers\Api\Website\ProductController;
 use App\Http\Controllers\Api\Website\CategoryController;
 use App\Http\Controllers\Api\Website\FavoriteController;
@@ -53,7 +54,9 @@ Route::prefix('v1')->group(function () {
             Route::get('/{orderID}', [OrderController::class, 'show'])->name('show');
             Route::post('/', [OrderController::class, 'store'])->name('store');
             Route::post('cancel/{codeOrder}', [OrderController::class, 'cancelled'])->name('cancel');
+            Route::get('/payment-status', [OrderController::class, 'paymentStatus']);
         });
+
 
         Route::post('coupon/apply', [OrderController::class, 'applyCoupon']);
     });
@@ -77,6 +80,19 @@ Route::prefix('v1')->group(function () {
 
     Route::post('contact-us', [ContactUsController::class, 'store']);
 
+    // تقييمات المنتجات
+    Route::prefix('reviews')->group(function () {
+        Route::get('/', [ReviewController::class, 'index']); // جميع التقييمات مع فلترة
+        Route::get('/my-reviews', [ReviewController::class, 'myReviews'])->middleware('auth:sanctum');
+        Route::get('/product/{productId}', [ReviewController::class, 'productReviews']);
+        Route::get('/{id}', [ReviewController::class, 'show']);
+
+        Route::middleware('auth:sanctum')->group(function () {
+            Route::post('/', [ReviewController::class, 'store']);
+            Route::put('/{id}', [ReviewController::class, 'update']);
+            Route::delete('/{id}', [ReviewController::class, 'destroy']);
+        });
+    });
 
     Route::prefix('categories')->group(function () {
         Route::get('/', [CategoryController::class, 'index']);

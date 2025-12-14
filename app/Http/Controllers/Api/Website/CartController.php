@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Api\Website;
 
 use App\Models\Cart;
@@ -71,6 +72,18 @@ class CartController extends Controller
                 ->where('hash_key', $hashKey)
                 ->first();
 
+            $printingMethodId = null;
+
+            if ($request->filled('printing_method_id')) {
+                $valid = Product::find($request->product_id)->printingMethods()
+                    ->where('printing_method_id', $request->printing_method_id)
+                    ->exists();
+
+                if ($valid) {
+                    $printingMethodId = $request->printing_method_id;
+                }
+            }
+
             if ($cartItem) {
                 // لو العنصر موجود — نزود الكمية بالكمية الواردة
                 $cartItem->increment('quantity', $request->quantity);
@@ -84,7 +97,7 @@ class CartController extends Controller
                     'product_id' => $request->product_id,
                     'size_id' => $request->size_id,
                     'color_id' => $request->color_id,
-                    'printing_method_id' => $request->printing_method_id,
+                    'printing_method_id' => $printingMethodId,
                     'print_locations' => $printLocationsJson,
                     'embroider_locations' => $embroiderLocationsJson,
                     'selected_options' => $selectedOptionsJson,
@@ -114,9 +127,18 @@ class CartController extends Controller
         return DB::transaction(function () use ($cartItem, $request) {
             // نحضر البيانات الجديدة مع الاحتفاظ بالقيم القديمة إن لم تُقدم
             $data = $request->only([
-                'quantity', 'size_id', 'color_id', 'printing_method_id',
-                'print_locations', 'embroider_locations', 'selected_options',
-                'design_service_id', 'is_sample', 'note', 'quantity_id', 'image_design'
+                'quantity',
+                'size_id',
+                'color_id',
+                'printing_method_id',
+                'print_locations',
+                'embroider_locations',
+                'selected_options',
+                'design_service_id',
+                'is_sample',
+                'note',
+                'quantity_id',
+                'image_design'
             ]);
 
             // نحسب السعر بناء على التخصيص الجديد — نمرر المنتج الحالي كـ param اختياري
@@ -131,13 +153,23 @@ class CartController extends Controller
             $printLocationsJson = isset($data['print_locations']) ? json_encode($data['print_locations'], JSON_UNESCAPED_UNICODE) : $cartItem->print_locations;
             $embroiderLocationsJson = isset($data['embroider_locations']) ? json_encode($data['embroider_locations'], JSON_UNESCAPED_UNICODE) : $cartItem->embroider_locations;
             $selectedOptionsJson = isset($data['selected_options']) ? json_encode($data['selected_options'], JSON_UNESCAPED_UNICODE) : $cartItem->selected_options;
+            $printingMethodId = null;
 
+            if ($request->filled('printing_method_id')) {
+                $valid = Product::find($request->product_id)->printingMethods()
+                    ->where('printing_method_id', $request->printing_method_id)
+                    ->exists();
+
+                if ($valid) {
+                    $printingMethodId = $request->printing_method_id;
+                }
+            }
             // إعادة توليد hash_key لأن التخصيصات قد تتغير
             $hashAttributes = [
                 'product_id' => $cartItem->product_id,
                 'size_id' => $data['size_id'] ?? $cartItem->size_id,
                 'color_id' => $data['color_id'] ?? $cartItem->color_id,
-                'printing_method_id' => $data['printing_method_id'] ?? $cartItem->printing_method_id,
+                'printing_method_id' => $printingMethodId ?? $cartItem->printing_method_id,
                 'print_locations' => isset($data['print_locations']) ? $data['print_locations'] : json_decode($cartItem->print_locations, true) ?? [],
                 'embroider_locations' => isset($data['embroider_locations']) ? $data['embroider_locations'] : json_decode($cartItem->embroider_locations, true) ?? [],
                 'selected_options' => isset($data['selected_options']) ? $data['selected_options'] : json_decode($cartItem->selected_options, true) ?? [],
@@ -233,8 +265,16 @@ class CartController extends Controller
             $price += $color?->additional_price ?? 0;
         }
         if ($request->filled('size_id')) {
-            $size = $product->sizes()->where('id', $request->size_id)->first();
-            $price += $size?->additional_price ?? 0;
+            $size = $product->sizes()
+                ->where('id', $request->size_id)
+                ->first();
+
+            $tier = $size?->productTiers()
+                ->where('quantity', '<=', $quantity)
+                ->orderByDesc('quantity')
+                ->first();
+
+            $price += ($tier?->price_per_unit ?? 0) * $quantity;
         }
 
         // مواقع الطباعة

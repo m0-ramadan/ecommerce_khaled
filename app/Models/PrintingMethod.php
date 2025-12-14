@@ -14,4 +14,11 @@ class PrintingMethod extends Model
         'base_price',
     ];
     public $table = 'printing_methods';
+    public function products()
+    {
+        return $this->belongsToMany(
+            Product::class,
+            'printing_method_product'
+        );
+    }
 }
