@@ -284,6 +284,10 @@ class CartController extends Controller
             $price += PrintLocation::whereIn('id', $ids)->sum('additional_price');
         }
 
+        if ($product->price) {
+            $price += $product->getFinalPriceAttribute();
+        }
+
         // مواقع التطريز
         if ($request->filled('embroider_locations')) {
             $ids = $request->embroider_locations;
@@ -309,6 +313,83 @@ class CartController extends Controller
             'line_total' => (float) $lineTotal,
         ];
     }
+//     private function calculateItemPrice(Request $request, Product $product = null): array
+// {
+//     $product = $product ?? Product::findOrFail($request->product_id);
+//     $quantity = max((int) $request->quantity, 1);
+
+//     // ================= Base unit price =================
+//     $tier = $product->pricingTiers()
+//         ->where('quantity', '<=', $quantity)
+//         ->orderByDesc('quantity')
+//         ->first();
+
+//     $unitPrice = $tier?->price_per_unit
+//         ?? $product->base_price
+//         ?? 0;
+
+//     // ================= Color =================
+//     if ($request->filled('color_id')) {
+//         $color = $product->colors()
+//             ->where('colors.id', $request->color_id)
+//             ->first();
+
+//         $unitPrice += $color?->additional_price ?? 0;
+//     }
+
+//     // ================= Size (override tier) =================
+//     if ($request->filled('size_id')) {
+//         $size = $product->sizes()
+//             ->where('id', $request->size_id)
+//             ->first();
+
+//         $sizeTier = $size?->productTiers()
+//             ->where('quantity', '<=', $quantity)
+//             ->orderByDesc('quantity')
+//             ->first();
+
+//         if ($sizeTier) {
+//             $unitPrice = $sizeTier->price_per_unit;
+//         }
+//     }
+
+//     // ================= Print Locations =================
+//     if ($request->filled('print_locations')) {
+//         $unitPrice += PrintLocation::whereIn(
+//             'id',
+//             (array) $request->print_locations
+//         )->sum('additional_price');
+//     }
+
+//     // ================= Embroidery Locations =================
+//     if ($request->filled('embroider_locations')) {
+//         $unitPrice += EmbroiderLocation::whereIn(
+//             'id',
+//             (array) $request->embroider_locations
+//         )->sum('additional_price');
+//     }
+
+//     // ================= Printing Method =================
+//     if ($request->filled('printing_method_id')) {
+//         $method = PrintingMethod::find($request->printing_method_id);
+//         $unitPrice += $method?->base_price ?? 0;
+//     }
+
+//     // ================= Design Service =================
+//     if ($request->filled('design_service_id')) {
+//         $service = DesignService::find($request->design_service_id);
+//         $unitPrice += $service?->price ?? 0;
+//     }
+
+//     // ================= Totals =================
+//     $lineTotal = $unitPrice * $quantity;
+
+//     return [
+//         'price_per_unit' => round((float) $unitPrice, 2),
+//         'line_total'     => round((float) $lineTotal, 2),
+//     ];
+// }
+
 
     private function recalculateCart(Cart $cart)
     {

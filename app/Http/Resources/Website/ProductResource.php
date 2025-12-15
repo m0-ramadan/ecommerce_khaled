@@ -11,6 +11,11 @@ class ProductResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
+        $lowestPrice = $this->sizes
+            ->flatMap(function ($size) {
+                return $size->productTiers;
+            })->min('price_per_unit');
+
         return [
             // ================== Basic Info ==================
             'id'                => $this->id,
@@ -25,10 +30,12 @@ class ProductResource extends JsonResource
             'stock'             => (int) $this->stock,
             'status_id'         => (int) $this->status_id,
             'is_active'         => $this->status_id == 1,
+            'lowest_price' =>  $lowestPrice??rand(5,15),
+
 
             // ================== Image ==================
-            'image' => $this->image
-                ? get_user_image($this->image)
+            'image' => $this->primaryImage
+                ? get_user_image($this->primaryImage->path)
                 : env('DEFAULT_PRODUCT_IMAGE'),
 
             // ================== Rating ==================
@@ -89,6 +96,7 @@ class ProductResource extends JsonResource
                     'name' => $size->name,
                     'tiers' => $size->productTiers->map(function ($tier) {
                         return [
+                            'id'             => $tier->id,
                             'quantity'       => $tier->quantity,
                             'price_per_unit' => $tier->price_per_unit,
                             'total_price'    => $tier->quantity * $tier->price_per_unit,

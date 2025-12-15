@@ -315,15 +315,27 @@ class OrderController extends Controller
         return response('OK', 200);
     }
 
-    public function paymentMethods(Request $request)
-    {
+public function paymentMethods(Request $request)
+{
 
-        return $this->successResponse(
-            PaymentMethodResource::collection(PaymentMethod::where('is_active', 1)->where('is_payment', $request->is_payment)->get()),
-            'تم جلب تفاصيل الطلب بنجاح'
 
-        );
-    }
+    $isPayment = filter_var(
+        $request->input('is_payment'),
+        FILTER_VALIDATE_BOOLEAN,
+        FILTER_NULL_ON_FAILURE
+    );
+
+    $paymentMethods = PaymentMethod::query()
+        ->where('is_active', true)
+        ->where('is_payment', $isPayment)
+        ->get();
+
+    return $this->successResponse(
+        PaymentMethodResource::collection($paymentMethods),
+        'تم جلب طرق الدفع بنجاح'
+    );
+}
+
 
     public function paymentStatus(Request $request)
     {

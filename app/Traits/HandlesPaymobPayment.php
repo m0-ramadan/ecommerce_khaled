@@ -89,7 +89,7 @@ trait HandlesPaymobPayment
 
                 // URLs مهمة جدًا
                 //   'redirect_url'     => url("/payment/success/{$order->order_number}"),
-                'redirect_url' => url("/payment-status?status=success&orderId={$order->order_number}"),
+                'redirect_url' => "https://ecommerce-xo.vercel.app/payment-status?status=success&orderId={$order->order_number}",
                 'cancel_url'   => url("/payment-status?status=failed&orderId={$order->order_number}"),
 
                 // Webhook بيجي من الداشبورد، بس ممكن تبعته كمان
