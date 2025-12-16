@@ -48,7 +48,7 @@ class BannerItemController extends Controller
             'tag_text' => 'nullable|string|max:50',
             'tag_color' => 'nullable|string|max:7',
             'tag_bg_color' => 'nullable|string|max:7',
-            'is_active' => 'required|boolean',
+            'is_active' => 'nullable',
             'promo_codes' => 'nullable|array',
             'promo_codes.*' => 'exists:promo_codes,id',
         ]);
@@ -68,13 +68,13 @@ class BannerItemController extends Controller
             'image_alt' => $validated['image_alt'],
             'link_url' => $validated['link_url'],
             'link_target' => $validated['link_target'] ?? '_self',
-            'is_link_active' => $validated['is_link_active'],
+            'is_link_active' => $validated['is_link_active']??true,
             'product_id' => $validated['product_id'],
             'category_id' => $validated['category_id'],
             'tag_text' => $validated['tag_text'],
             'tag_color' => $validated['tag_color'],
             'tag_bg_color' => $validated['tag_bg_color'],
-            'is_active' => $validated['is_active'],
+            'is_active' => $validated['is_active']??true,
         ]);
 
         // Attach promo codes
@@ -107,7 +107,7 @@ class BannerItemController extends Controller
             'tag_text' => 'nullable|string|max:50',
             'tag_color' => 'nullable|string|max:7',
             'tag_bg_color' => 'nullable|string|max:7',
-            'is_active' => 'required|boolean',
+            'is_active' => 'nullable',
             'promo_codes' => 'nullable|array',
             'promo_codes.*' => 'exists:promo_codes,id',
         ]);

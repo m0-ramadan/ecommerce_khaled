@@ -1005,12 +1005,12 @@
                             </select>
                         </div>
                         
-                        <div class="col-md-6 mb-3">
+                        {{-- <div class="col-md-6 mb-3">
                             <div class="form-check form-switch mt-4">
                                 <input class="form-check-input" type="checkbox" id="is_link_active" name="is_link_active" checked>
                                 <label class="form-check-label" for="is_link_active">تفعيل الرابط</label>
                             </div>
-                        </div>
+                        </div> --}}
                     </div>
 
                     <div class="row">
@@ -1549,8 +1549,8 @@ function editItem(itemId) {
         const linkTarget = document.getElementById('link_target');
         if (linkTarget) linkTarget.value = response.link_target || '_self';
         
-        const isLinkActive = document.getElementById('is_link_active');
-        if (isLinkActive) isLinkActive.checked = response.is_link_active !== false;
+        // const isLinkActive = document.getElementById('is_link_active');
+        // if (isLinkActive) isLinkActive.checked = response.is_link_active !== false;
         
         // تعيين Select2
         setTimeout(() => {

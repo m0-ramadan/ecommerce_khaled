@@ -14,7 +14,7 @@ class BannerItem extends Model
         'mobile_image_url',
         'link_url',
         'link_target',
-        // 'is_link_active',
+         'is_link_active',
         'product_id',
         'category_id',
         'tag_text',
@@ -24,7 +24,7 @@ class BannerItem extends Model
     ];
 
     protected $casts = [
-        'is_active' => 'boolean',
+      //  'is_active' => 'boolean',
        
     ];
 
