@@ -15,6 +15,23 @@ class BannerItemController extends Controller
     /**
      * Store a newly created resource in storage.
      */
+        public function show(BannerItem $bannerItem)
+    {
+        try {
+            // Load relationships
+            $bannerItem->load('promoCodes');
+            
+            return response()->json([
+                'success' => true,
+                'item' => $bannerItem
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'حدث خطأ في جلب بيانات العنصر: ' . $e->getMessage()
+            ], 500);
+        }
+    }
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -25,7 +42,7 @@ class BannerItemController extends Controller
             'image_alt' => 'nullable|string|max:255',
             'link_url' => 'nullable|url',
             'link_target' => 'nullable|in:_blank,_self',
-            'is_link_active' => 'required|boolean',
+            'is_link_active' => 'nullable',
             'product_id' => 'nullable|exists:products,id',
             'category_id' => 'nullable|exists:categories,id',
             'tag_text' => 'nullable|string|max:50',
@@ -84,7 +101,7 @@ class BannerItemController extends Controller
             'image_alt' => 'nullable|string|max:255',
             'link_url' => 'nullable|url',
             'link_target' => 'nullable|in:_blank,_self',
-            'is_link_active' => 'required|boolean',
+            'is_link_active' => 'nullable',
             'product_id' => 'nullable|exists:products,id',
             'category_id' => 'nullable|exists:categories,id',
             'tag_text' => 'nullable|string|max:50',

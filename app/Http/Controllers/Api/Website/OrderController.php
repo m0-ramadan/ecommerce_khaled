@@ -97,7 +97,7 @@ class OrderController extends Controller
                 'discount_amount'   => $discountAmount,
                 'tax_amount'        => 0,
                 'total_amount'      => $cart->total - $discountAmount,
-                'payment_method'    => $request->payment_method ?? 'cash_on_delivery',
+                'payment_method'    => $request->payment_method ,
                 'status'            => 'pending',
                 'notes'             => $request->notes,
                 'coupon_id'         => $coupon?->id
@@ -129,7 +129,7 @@ class OrderController extends Controller
             //  $cart->items()->delete();
             //  $cart->update(['subtotal' => 0, 'total' => 0]);
 
-            if ($request->payment_method === 'credit_card') {
+            if ($request->payment_method === 8) {
 
                 $payment = $this->initiatePaymobPayment($order);
 

@@ -10,246 +10,545 @@ use App\Models\Product;
 use App\Models\PromoCode;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
+use App\Services\BannerService;
 
 class BannerController extends Controller
 {
+    protected $bannerService;
+
+    public function __construct(BannerService $bannerService)
+    {
+        $this->bannerService = $bannerService;
+    }
+
     /**
-     * Display a listing of the resource.
+     * Display a listing of banners with filters
+     *
+     * @param Request $request
+     * @return \Illuminate\View\View
      */
     public function index(Request $request)
     {
-        $query = Banner::with(['type', 'items', 'gridLayout', 'sliderSetting']);
+        try {
+            $banners = $this->bannerService->getFilteredBanners($request);
+            $bannerTypes = BannerType::all();
 
-        // Filter by type
-        if ($request->has('type') && $request->type != 'all') {
-            $query->whereHas('type', function ($q) use ($request) {
-                $q->where('name', $request->type);
-            });
+            return view('Admin.banners.index', compact('banners', 'bannerTypes'));
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'حدث خطأ في جلب البنرات: ' . $e->getMessage());
         }
-
-        // Filter by status
-        if ($request->has('status') && $request->status != 'all') {
-            $query->where('is_active', $request->status == 'active');
-        }
-
-        $banners = $query->orderBy('section_order')->paginate(10);
-        $bannerTypes = BannerType::all();
-
-        return view('Admin.banners.index', compact('banners', 'bannerTypes'));
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Show the form for creating a new banner
+     *
+     * @return \Illuminate\View\View
      */
     public function create()
     {
-        $bannerTypes = BannerType::all();
-        $categories = Category::where('status_id', 1)->get();
-        $products = Product::where('status', 'active')->limit(100)->get();
-        $promoCodes = PromoCode::where('is_active', true)
-            ->where('end_date', '>=', now())
-            ->get();
-
-        return view('Admin.banners.create', compact('bannerTypes', 'categories', 'products', 'promoCodes'));
+        try {
+            $data = $this->prepareCreateData();
+            
+            return view('Admin.banners.create', $data);
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'حدث خطأ في تحضير النموذج: ' . $e->getMessage());
+        }
     }
-
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created banner in storage
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'banner_type_id' => 'required|exists:banner_types,id',
-            'section_order' => 'required|integer',
-            'is_active' => 'required|boolean',
-            'start_date' => 'nullable|date',
-            'end_date' => 'nullable|date|after_or_equal:start_date',
-        ]);
+        DB::beginTransaction();
 
-        $banner = Banner::create($validated);
+        try {
+            $validatedData = $this->validateBannerRequest($request);
+            
+            $banner = Banner::create($validatedData);
+            
+            $this->handleBannerSettings($banner, $request);
+            
+            DB::commit();
 
-        // Create grid layout if banner type is grid
-        if ($request->banner_type_id == 2) { // Assuming 2 is grid type
-            $this->createGridLayout($banner->id, $request);
+            return redirect()
+                ->route('admin.banners.edit', $banner)
+                ->with('success', 'تم إنشاء البانر بنجاح. يمكنك الآن إضافة العناصر.');
+                
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            DB::rollBack();
+            return redirect()->back()->withErrors($e->errors())->withInput();
+            
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'حدث خطأ أثناء إنشاء البانر: ' . $e->getMessage())->withInput();
         }
-
-        // Create slider setting if banner type is slider
-        if ($request->banner_type_id == 1) { // Assuming 1 is slider type
-            $this->createSliderSetting($banner->id, $request);
-        }
-
-        return redirect()->route('admin.banners.index')
-            ->with('success', 'Banner created successfully.');
     }
 
     /**
-     * Display the specified resource.
+     * Display the specified banner
+     *
+     * @param Banner $banner
+     * @return \Illuminate\View\View
      */
     public function show(Banner $banner)
     {
-        $banner->load(['type', 'items', 'gridLayout', 'sliderSetting']);
-        return view('Admin.banners.show', compact('banner'));
+        try {
+            $banner->load(['type', 'items', 'gridLayout', 'sliderSetting']);
+            
+            return view('Admin.banners.show', compact('banner'));
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'حدث خطأ في عرض البانر: ' . $e->getMessage());
+        }
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Show the form for editing the specified banner
+     *
+     * @param Banner $banner
+     * @return \Illuminate\View\View
      */
     public function edit(Banner $banner)
     {
-        $banner->load(['items', 'gridLayout', 'sliderSetting']);
-        $bannerTypes = BannerType::all();
-        $categories = Category::where('status_id', 1)->get();
-        $products = Product::where('status', 'active')->limit(100)->get();
-        $promoCodes = PromoCode::where('is_active', true)
-            ->where('end_date', '>=', now())
-            ->get();
-
-        return view('Admin.banners.edit', compact('banner', 'bannerTypes', 'categories', 'products', 'promoCodes'));
+        try {
+            $banner->load(['items', 'gridLayout', 'sliderSetting']);
+            $data = $this->prepareEditData($banner);
+            
+            return view('Admin.banners.edit', array_merge($data, compact('banner')));
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'حدث خطأ في تحضير نموذج التعديل: ' . $e->getMessage());
+        }
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the specified banner in storage
+     *
+     * @param Request $request
+     * @param Banner $banner
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function update(Request $request, Banner $banner)
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'banner_type_id' => 'required|exists:banner_types,id',
-            'section_order' => 'required|integer',
-            'is_active' => 'required|boolean',
-            'start_date' => 'nullable|date',
-            'end_date' => 'nullable|date|after_or_equal:start_date',
-        ]);
+        DB::beginTransaction();
 
-        $banner->update($validated);
+        try {
+            $validatedData = $this->validateBannerRequest($request);
+            
+            $banner->update($validatedData);
+            
+            $this->handleBannerSettings($banner, $request);
+            
+            DB::commit();
 
-        // Update grid layout
-        if ($request->banner_type_id == 2) {
-            $this->updateGridLayout($banner->id, $request);
+            return redirect()
+                ->route('admin.banners.index')
+                ->with('success', 'تم تحديث البانر بنجاح.');
+                
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            DB::rollBack();
+            return redirect()->back()->withErrors($e->errors())->withInput();
+            
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'حدث خطأ أثناء تحديث البانر: ' . $e->getMessage())->withInput();
         }
-
-        // Update slider setting
-        if ($request->banner_type_id == 1) {
-            $this->updateSliderSetting($banner->id, $request);
-        }
-
-        return redirect()->route('admin.banners.index')
-            ->with('success', 'Banner updated successfully.');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified banner from storage
+     *
+     * @param Banner $banner
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy(Banner $banner)
     {
-        // Delete associated items first
-        foreach ($banner->items as $item) {
-            $this->deleteItemImages($item);
+        DB::beginTransaction();
+
+        try {
+            $this->deleteBannerAssets($banner);
+            $banner->delete();
+            
+            DB::commit();
+
+            return redirect()
+                ->route('admin.banners.index')
+                ->with('success', 'تم حذف البانر بنجاح.');
+                
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'حدث خطأ أثناء حذف البانر: ' . $e->getMessage());
         }
-
-        $banner->delete();
-
-        return redirect()->route('admin.banners.index')
-            ->with('success', 'Banner deleted successfully.');
     }
 
     /**
-     * Toggle banner status
+     * Toggle banner active status
+     *
+     * @param Banner $banner
+     * @return \Illuminate\Http\JsonResponse
      */
     public function toggleStatus(Banner $banner)
     {
-        $banner->update(['is_active' => !$banner->is_active]);
+        try {
+            $banner->update(['is_active' => !$banner->is_active]);
 
-        return response()->json([
-            'success' => true,
-            'is_active' => $banner->is_active
-        ]);
-    }
-
-    /**
-     * Create grid layout
-     */
-    private function createGridLayout($bannerId, $request)
-    {
-        \App\Models\BannerGridLayout::create([
-            'banner_id' => $bannerId,
-            'grid_type' => $request->grid_type ?? 'responsive',
-            'desktop_columns' => $request->desktop_columns ?? 3,
-            'tablet_columns' => $request->tablet_columns ?? 2,
-            'mobile_columns' => $request->mobile_columns ?? 1,
-            'row_gap' => $request->row_gap ?? 20,
-            'column_gap' => $request->column_gap ?? 20,
-        ]);
-    }
-
-    /**
-     * Update grid layout
-     */
-    private function updateGridLayout($bannerId, $request)
-    {
-        $gridLayout = \App\Models\BannerGridLayout::where('banner_id', $bannerId)->first();
-        
-        if ($gridLayout) {
-            $gridLayout->update([
-                'grid_type' => $request->grid_type ?? 'responsive',
-                'desktop_columns' => $request->desktop_columns ?? 3,
-                'tablet_columns' => $request->tablet_columns ?? 2,
-                'mobile_columns' => $request->mobile_columns ?? 1,
-                'row_gap' => $request->row_gap ?? 20,
-                'column_gap' => $request->column_gap ?? 20,
+            return response()->json([
+                'success' => true,
+                'is_active' => $banner->is_active,
+                'message' => 'تم تغيير حالة البانر بنجاح.'
             ]);
-        } else {
-            $this->createGridLayout($bannerId, $request);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'حدث خطأ أثناء تغيير الحالة.'
+            ], 500);
         }
     }
 
     /**
-     * Create slider setting
+     * Update banners order
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
      */
-    private function createSliderSetting($bannerId, $request)
+    public function updateOrder(Request $request)
     {
-        \App\Models\SliderSetting::create([
-            'banner_id' => $bannerId,
-            'autoplay' => $request->autoplay ?? true,
-            'autoplay_speed' => $request->autoplay_speed ?? 3000,
-            'arrows' => $request->arrows ?? true,
-            'dots' => $request->dots ?? true,
-            'infinite' => $request->infinite ?? true,
-        ]);
-    }
-
-    /**
-     * Update slider setting
-     */
-    private function updateSliderSetting($bannerId, $request)
-    {
-        $sliderSetting = \App\Models\SliderSetting::where('banner_id', $bannerId)->first();
-        
-        if ($sliderSetting) {
-            $sliderSetting->update([
-                'autoplay' => $request->autoplay ?? true,
-                'autoplay_speed' => $request->autoplay_speed ?? 3000,
-                'arrows' => $request->arrows ?? true,
-                'dots' => $request->dots ?? true,
-                'infinite' => $request->infinite ?? true,
+        try {
+            $this->validate($request, [
+                'banners' => 'required|array',
+                'banners.*.id' => 'required|exists:banners,id',
+                'banners.*.order' => 'required|integer'
             ]);
-        } else {
-            $this->createSliderSetting($bannerId, $request);
+
+            foreach ($request->banners as $item) {
+                Banner::where('id', $item['id'])->update(['section_order' => $item['order']]);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم تحديث الترتيب بنجاح.'
+            ]);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'حدث خطأ أثناء تحديث الترتيب.'
+            ], 500);
         }
     }
 
     /**
-     * Delete item images
+     * Prepare data for create form
+     *
+     * @return array
+     */
+    private function prepareCreateData()
+    {
+        return [
+            'bannerTypes' => BannerType::all(),
+            'categories' => Category::where('status_id',1)->get(),
+            'products' => Product::where('status_id',1)->limit(100)->get(),
+            'promoCodes' => PromoCode::activeAndValid()->get(),
+        ];
+    }
+
+    /**
+     * Prepare data for edit form
+     *
+     * @param Banner $banner
+     * @return array
+     */
+    private function prepareEditData(Banner $banner)
+    {
+        return [
+            'bannerTypes' => BannerType::all(),
+            'categories' => Category::where('status_id',1)->get(),
+            'products' => Product::where('status_id',1)->limit(100)->get(),
+            'promoCodes' => PromoCode::activeAndValid()->get(),
+        ];
+    }
+
+    /**
+     * Validate banner request data
+     *
+     * @param Request $request
+     * @return array
+     */
+    private function validateBannerRequest(Request $request)
+    {
+        return $request->validate([
+            'title' => 'required|string|max:255',
+            'banner_type_id' => 'required|exists:banner_types,id',
+            'section_order' => 'required|integer|min:1',
+            'is_active' => 'required|boolean',
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
+            'category_id' => 'nullable|exists:categories,id',
+        ]);
+    }
+
+    /**
+     * Handle banner type-specific settings
+     *
+     * @param Banner $banner
+     * @param Request $request
+     * @return void
+     */
+    private function handleBannerSettings(Banner $banner, Request $request)
+    {
+        switch ($banner->banner_type_id) {
+            case 1: // Slider
+                $this->handleSliderSettings($banner, $request);
+                break;
+            case 2: // Grid
+                $this->handleGridLayout($banner, $request);
+                break;
+        }
+    }
+
+    /**
+     * Handle slider settings
+     *
+     * @param Banner $banner
+     * @param Request $request
+     * @return void
+     */
+    private function handleSliderSettings(Banner $banner, Request $request)
+    {
+        $settings = $request->only([
+            // 'autoplay',
+             'autoplay_speed', 
+            'arrows', 'dots', 'infinite'
+        ]);
+
+        if ($this->hasSliderSettings($settings)) {
+            $sliderSetting = $banner->sliderSetting()->firstOrNew();
+            $sliderSetting->fill($settings);
+            $sliderSetting->save();
+        }
+    }
+
+    /**
+     * Handle grid layout
+     *
+     * @param Banner $banner
+     * @param Request $request
+     * @return void
+     */
+    private function handleGridLayout(Banner $banner, Request $request)
+    {
+        $layoutData = $request->only([
+            'grid_type', 'desktop_columns', 'tablet_columns',
+            'mobile_columns', 'row_gap', 'column_gap'
+        ]);
+
+        if ($this->hasGridSettings($layoutData)) {
+            $gridLayout = $banner->gridLayout()->firstOrNew();
+            $gridLayout->fill($layoutData);
+            $gridLayout->save();
+        }
+    }
+
+    /**
+     * Check if slider settings exist
+     *
+     * @param array $settings
+     * @return bool
+     */
+    private function hasSliderSettings(array $settings)
+    {
+        return !empty(array_filter($settings, function ($value) {
+            return !is_null($value);
+        }));
+    }
+
+    /**
+     * Check if grid settings exist
+     *
+     * @param array $settings
+     * @return bool
+     */
+    private function hasGridSettings(array $settings)
+    {
+        return !empty(array_filter($settings, function ($value) {
+            return !is_null($value);
+        }));
+    }
+
+    /**
+     * Delete all banner related assets
+     *
+     * @param Banner $banner
+     * @return void
+     */
+    private function deleteBannerAssets(Banner $banner)
+    {
+        $banner->load('items');
+        
+        foreach ($banner->items as $item) {
+            $this->deleteItemImages($item);
+        }
+    }
+
+    /**
+     * Delete item images from storage
+     *
+     * @param mixed $item
+     * @return void
      */
     private function deleteItemImages($item)
     {
-        if ($item->image_url && Storage::exists($item->image_url)) {
-            Storage::delete($item->image_url);
+        $images = [
+            $item->image_url,
+            $item->mobile_image_url,
+        ];
+
+        foreach ($images as $image) {
+            if ($image && Storage::exists($image)) {
+                Storage::delete($image);
+            }
         }
-        
-        if ($item->mobile_image_url && Storage::exists($item->mobile_image_url)) {
-            Storage::delete($item->mobile_image_url);
+    }
+
+    /**
+     * Export banners to CSV
+     *
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     */
+    public function export(Request $request)
+    {
+        try {
+            $banners = $this->bannerService->getFilteredBanners($request, false);
+            
+            $fileName = 'banners-' . now()->format('Y-m-d-H-i-s') . '.csv';
+
+            $headers = [
+                'Content-Type' => 'text/csv',
+                'Content-Disposition' => "attachment; filename=\"$fileName\"",
+                'Pragma' => 'no-cache',
+                'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+                'Expires' => '0'
+            ];
+
+            $callback = function () use ($banners) {
+                $file = fopen('php://output', 'w');
+                fputcsv($file, [
+                    'ID', 'العنوان', 'النوع', 'الترتيب', 
+                    'الحالة', 'تاريخ البدء', 'تاريخ الانتهاء'
+                ]);
+
+                foreach ($banners as $banner) {
+                    fputcsv($file, [
+                        $banner->id,
+                        $banner->title,
+                        $banner->type->name,
+                        $banner->section_order,
+                        $banner->is_active ? 'نشط' : 'غير نشط',
+                        $banner->start_date ? $banner->start_date->format('Y-m-d') : '',
+                        $banner->end_date ? $banner->end_date->format('Y-m-d') : '',
+                    ]);
+                }
+
+                fclose($file);
+            };
+
+            return response()->stream($callback, 200, $headers);
+            
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'حدث خطأ أثناء التصدير: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Get banner statistics
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function statistics()
+    {
+        try {
+            $totalBanners = Banner::count();
+            $activeBanners = Banner::where('is_active', true)->count();
+            $expiredBanners = Banner::where('end_date', '<', now())->count();
+            $upcomingBanners = Banner::where('start_date', '>', now())->count();
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'total' => $totalBanners,
+                    'active' => $activeBanners,
+                    'expired' => $expiredBanners,
+                    'upcoming' => $upcomingBanners,
+                ]
+            ]);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'حدث خطأ في جلب الإحصائيات.'
+            ], 500);
+        }
+    }
+
+    /**
+     * Bulk actions on banners
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function bulkActions(Request $request)
+    {
+        try {
+            $this->validate($request, [
+                'action' => 'required|in:activate,deactivate,delete',
+                'ids' => 'required|array',
+                'ids.*' => 'exists:banners,id'
+            ]);
+
+            $banners = Banner::whereIn('id', $request->ids);
+
+            switch ($request->action) {
+                case 'activate':
+                    $banners->update(['is_active' => true]);
+                    $message = 'تم تفعيل البنرات المحددة.';
+                    break;
+                    
+                case 'deactivate':
+                    $banners->update(['is_active' => false]);
+                    $message = 'تم إلغاء تفعيل البنرات المحددة.';
+                    break;
+                    
+                case 'delete':
+                    $banners->each(function ($banner) {
+                        $this->deleteBannerAssets($banner);
+                    });
+                    $banners->delete();
+                    $message = 'تم حذف البنرات المحددة.';
+                    break;
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'count' => $banners->count()
+            ]);
+            
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'بيانات غير صالحة.',
+                'errors' => $e->errors()
+            ], 422);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'حدث خطأ أثناء المعالجة.'
+            ], 500);
         }
     }
 }

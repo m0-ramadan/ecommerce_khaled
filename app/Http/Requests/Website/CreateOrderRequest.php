@@ -66,7 +66,7 @@ class CreateOrderRequest extends FormRequest
             'customer_email'    => 'nullable|email',
 
             // وسائل الدفع المتاحة
-            'payment_method'    => 'required|in:cash_on_delivery,credit_card,tabby,tamara,applePay,stcPay',
+            'payment_method'    => 'required|exists:payment_methods,id',
 
             'notes'             => 'nullable|string|max:1000',
 

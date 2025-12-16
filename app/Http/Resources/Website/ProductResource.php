@@ -36,7 +36,7 @@ class ProductResource extends JsonResource
             // ================== Image ==================
             'image' => $this->primaryImage
                 ? get_user_image($this->primaryImage->path)
-                : env('DEFAULT_PRODUCT_IMAGE'),
+                : url(env('DEFAULT_PRODUCT_IMAGE')),
 
             // ================== Rating ==================
             'average_rating' => round($this->average_rating, 1),

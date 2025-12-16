@@ -73,7 +73,6 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
         'countries' => CountryController::class,
         'contactus' => ContactUsController::class,
         'faqs' => FaqController::class,
-        'sliders' => SliderController::class,
         'logistic-services' => LogisticServiceController::class,
         'employees' => EmployeeController::class,
         'managers' => ManagerController::class,
@@ -156,24 +155,25 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
     });
 
 
-    // Banner Routes
-    Route::prefix('banners')->name('banners.')->group(function () {
-        Route::get('/', [BannerController::class, 'index'])->name('index');
-        Route::get('/create', [BannerController::class, 'create'])->name('create');
-        Route::post('/', [BannerController::class, 'store'])->name('store');
-        Route::get('/{banner}', [BannerController::class, 'show'])->name('show');
-        Route::get('/{banner}/edit', [BannerController::class, 'edit'])->name('edit');
-        Route::put('/{banner}', [BannerController::class, 'update'])->name('update');
-        Route::delete('/{banner}', [BannerController::class, 'destroy'])->name('destroy');
-        Route::post('/{banner}/toggle-status', [BannerController::class, 'toggleStatus'])->name('toggle-status');
+// Banner Routes
+Route::prefix('banners')->name('banners.')->group(function () {
+    Route::get('/', [BannerController::class, 'index'])->name('index');
+    Route::get('/create', [BannerController::class, 'create'])->name('create');
+    Route::post('/', [BannerController::class, 'store'])->name('store');
+    Route::get('/{banner}', [BannerController::class, 'show'])->name('show');
+    Route::get('/{banner}/edit', [BannerController::class, 'edit'])->name('edit');
+    Route::put('/{banner}', [BannerController::class, 'update'])->name('update');
+    Route::delete('/{banner}', [BannerController::class, 'destroy'])->name('destroy');
+    Route::post('/{banner}/toggle-status', [BannerController::class, 'toggleStatus'])->name('toggle-status');
 
-        // Banner Items Routes
-        Route::post('/items', [BannerItemController::class, 'store'])->name('items.store');
-        Route::put('/items/{bannerItem}', [BannerItemController::class, 'update'])->name('items.update');
-        Route::delete('/items/{bannerItem}', [BannerItemController::class, 'destroy'])->name('items.destroy');
-        Route::post('/items/{bannerItem}/toggle-status', [BannerItemController::class, 'toggleStatus'])->name('items.toggle-status');
-        Route::post('/items/reorder', [BannerItemController::class, 'reorder'])->name('items.reorder');
-    });
+    // Banner Items Routes - إضافة route للعرض
+    Route::get('/items/{bannerItem}', [BannerItemController::class, 'show'])->name('items.show'); // أضف هذا السطر
+    Route::post('/items', [BannerItemController::class, 'store'])->name('items.store');
+    Route::put('/items/{bannerItem}', [BannerItemController::class, 'update'])->name('items.update');
+    Route::delete('/items/{bannerItem}', [BannerItemController::class, 'destroy'])->name('items.destroy');
+    Route::post('/items/{bannerItem}/toggle-status', [BannerItemController::class, 'toggleStatus'])->name('items.toggle-status');
+    Route::post('/items/reorder', [BannerItemController::class, 'reorder'])->name('items.reorder');
+});
 
     // Orders
     Route::prefix('orders')->as('orders.')->group(function () {

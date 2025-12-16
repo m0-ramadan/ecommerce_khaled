@@ -31,19 +31,19 @@
                <ul class="menu-sub">
 
                    <li class="menu-item ">
-                       <a href="https://seda.codeella.com/admin/zones/countries" class="menu-link">
+                       <a href="#/admin/zones/countries" class="menu-link">
                            <div>الدول</div>
                        </a>
                    </li>
 
                    <li class="menu-item ">
-                       <a href="https://seda.codeella.com/admin/zones/governorates" class="menu-link">
+                       <a href="#/admin/zones/governorates" class="menu-link">
                            <div>المحافظات</div>
                        </a>
                    </li>
 
                    <li class="menu-item ">
-                       <a href="https://seda.codeella.com/admin/zones" class="menu-link">
+                       <a href="#/admin/zones" class="menu-link">
                            <div>المناطق</div>
                        </a>
                    </li>
@@ -59,7 +59,7 @@
                <ul class="menu-sub">
 
                    <li class="menu-item ">
-                       <a href="https://seda.codeella.com/admin/admins" class="menu-link">
+                       <a href="#/admin/admins" class="menu-link">
                            <div>مديرين الموقع</div>
                        </a>
                    </li>
@@ -112,14 +112,14 @@
 
 
            <li class="menu-item ">
-               <a href="https://seda.codeella.com/admin/problems" class="menu-link">
+               <a href="#/admin/problems" class="menu-link">
                    <i class="menu-icon ti ti-category-2"></i>
                    <div>المشكلات</div>
                </a>
            </li>
 
            <li class="menu-item ">
-               <a href="https://seda.codeella.com/admin/coupons" class="menu-link">
+               <a href="#/admin/coupons" class="menu-link">
                    <i class="menu-icon ti ti-discount"></i>
                    <div>الكوبونات</div>
                </a>
@@ -127,14 +127,14 @@
 
 
            <li class="menu-item ">
-               <a href="https://seda.codeella.com/admin/contact-us" class="menu-link">
+               <a href="#/admin/contact-us" class="menu-link">
                    <i class="menu-icon ti ti-messages"></i>
                    <div>تواصل معنا</div>
                </a>
            </li>
 
            <li class="menu-item ">
-               <a href="https://seda.codeella.com/admin/order-reports" class="menu-link">
+               <a href="#/admin/order-reports" class="menu-link">
                    <i class="menu-icon ti ti-message-report"></i>
                    <div>الشكاوي</div>
                </a>
@@ -150,7 +150,7 @@
                <ul class="menu-sub">
 
                    <li class="menu-item ">
-                       <a href="https://seda.codeella.com/admin/about/policy-customer" class="menu-link">
+                       <a href="#/admin/about/policy-customer" class="menu-link">
                            <i class="menu-icon ti ti-file-text"></i>
                            <div> سياسة الخصوصية للعميل
                            </div>
@@ -158,7 +158,7 @@
                    </li>
 
                    <li class="menu-item ">
-                       <a href="https://seda.codeella.com/admin/about/terms-customer" class="menu-link">
+                       <a href="#/admin/about/terms-customer" class="menu-link">
                            <i class="menu-icon ti ti-info-circle"></i>
                            <div> من نحن للعميل
                            </div>
@@ -166,7 +166,7 @@
                    </li>
 
                    <li class="menu-item ">
-                       <a href="https://seda.codeella.com/admin/about/aboutus-customer" class="menu-link">
+                       <a href="#/admin/about/aboutus-customer" class="menu-link">
                            <i class="menu-icon ti ti-file-description"></i>
                            <div> الشروط والأحكام للعميل
                            </div>
@@ -184,7 +184,7 @@
                <ul class="menu-sub">
 
                    <li class="menu-item ">
-                       <a href="https://seda.codeella.com/admin/logs/errors" class="menu-link">
+                       <a href="#/admin/logs/errors" class="menu-link">
                            <div>الاخطاء البرمجية</div>
                        </a>
                    </li>
@@ -201,55 +201,55 @@
 
                <ul class="menu-sub">
                    <li class="menu-item">
-                       <a href="https://seda.codeella.com/admin/settings/languages" class="menu-link">
+                       <a href="#/admin/settings/languages" class="menu-link">
                            <div>اللغات</div>
                        </a>
                    </li>
 
                    <li class="menu-item">
-                       <a href="https://seda.codeella.com/admin/settings/api" class="menu-link">
+                       <a href="#/admin/settings/api" class="menu-link">
                            <div>واجهة الـ API</div>
                        </a>
                    </li>
 
                    <li class="menu-item">
-                       <a href="https://seda.codeella.com/admin/settings/pages/Orders" class="menu-link">
+                       <a href="#/admin/settings/pages/Orders" class="menu-link">
                            <div>الطلبات</div>
                        </a>
                    </li>
 
                    <li class="menu-item">
-                       <a href="https://seda.codeella.com/admin/settings/pages/SMTP" class="menu-link">
+                       <a href="#/admin/settings/pages/SMTP" class="menu-link">
                            <div>إعدادات البريد (SMTP)</div>
                        </a>
                    </li>
 
                    <li class="menu-item">
-                       <a href="https://seda.codeella.com/admin/settings/pages/General" class="menu-link">
+                       <a href="#/admin/settings/pages/General" class="menu-link">
                            <div>الإعدادات العامة</div>
                        </a>
                    </li>
 
                    <li class="menu-item">
-                       <a href="https://seda.codeella.com/admin/settings/pages/Payment" class="menu-link">
+                       <a href="#/admin/settings/pages/Payment" class="menu-link">
                            <div>وسائل الدفع</div>
                        </a>
                    </li>
 
                    <li class="menu-item">
-                       <a href="https://seda.codeella.com/admin/settings/pages/Communication" class="menu-link">
+                       <a href="#/admin/settings/pages/Communication" class="menu-link">
                            <div>إعدادات التواصل</div>
                        </a>
                    </li>
 
                    <li class="menu-item">
-                       <a href="https://seda.codeella.com/admin/settings/pages/Realtime" class="menu-link">
+                       <a href="#/admin/settings/pages/Realtime" class="menu-link">
                            <div>التحديث اللحظي (Realtime)</div>
                        </a>
                    </li>
 
                    <li class="menu-item">
-                       <a href="https://seda.codeella.com/admin/settings/pages/Files" class="menu-link">
+                       <a href="#/admin/settings/pages/Files" class="menu-link">
                            <div>إدارة الملفات</div>
                        </a>
                    </li>
