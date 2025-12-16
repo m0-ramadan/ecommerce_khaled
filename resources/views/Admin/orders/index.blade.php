@@ -5,19 +5,36 @@
 @section('css')
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --primary-color: #696cff;
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --info-color: #17a2b8;
+            --light-bg: #f8f9fa;
+            --border-color: #e9ecef;
+            --text-muted: #6c757d;
+            --dark-bg: #1e1e2d;
+            --dark-card: #2b3b4c;
+        }
+
         body {
             font-family: "Cairo", sans-serif !important;
+            background: var(--dark-bg);
+            color: #fff;
         }
 
         .order-card {
-            /* background: white; */
+            background: var(--dark-card);
             border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
             padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .order-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--primary-gradient);
             color: white;
             padding: 25px 30px;
             border-radius: 15px 15px 0 0;
@@ -31,47 +48,55 @@
         }
 
         .status-pending {
-            background: #fff3cd;
-            color: #856404;
+            background: rgba(133, 100, 4, 0.2);
+            color: #ffc107;
+            border: 1px solid rgba(255, 193, 7, 0.3);
         }
 
         .status-processing {
-            background: #cce5ff;
-            color: #004085;
+            background: rgba(0, 64, 133, 0.2);
+            color: #0dcaf0;
+            border: 1px solid rgba(13, 202, 240, 0.3);
         }
 
         .status-shipped {
-            background: #d1ecf1;
-            color: #0c5460;
+            background: rgba(12, 84, 96, 0.2);
+            color: #0dcaf0;
+            border: 1px solid rgba(13, 202, 240, 0.3);
         }
 
         .status-delivered {
-            background: #d4edda;
-            color: #155724;
+            background: linear-gradient(135deg, rgba(21, 87, 36, 0.2) 0%, rgba(32, 201, 151, 0.2) 100%);
+            color: #20c997;
+            border: 1px solid rgba(32, 201, 151, 0.3);
         }
 
         .status-cancelled {
-            background: #f8d7da;
-            color: #721c24;
+            background: linear-gradient(135deg, rgba(220, 53, 69, 0.2) 0%, rgba(253, 126, 20, 0.2) 100%);
+            color: #fd7e14;
+            border: 1px solid rgba(253, 126, 20, 0.3);
         }
 
         .status-refunded {
-            background: #e2e3e5;
-            color: #383d41;
+            background: rgba(56, 61, 65, 0.2);
+            color: #adb5bd;
+            border: 1px solid rgba(173, 181, 189, 0.3);
         }
 
         .stats-card {
-            background: white;
+            background: var(--dark-card);
             border-radius: 12px;
             padding: 20px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            border-top: 4px solid #696cff;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            border-top: 4px solid var(--primary-color);
             transition: transform 0.3s ease;
             margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .stats-card:hover {
             transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
         }
 
         .stats-icon {
@@ -86,41 +111,46 @@
         }
 
         .icon-total {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--primary-gradient);
             color: white;
         }
 
         .icon-revenue {
-            background: #e7f5ff;
+            background: rgba(12, 99, 228, 0.2);
             color: #0c63e4;
+            border: 1px solid rgba(12, 99, 228, 0.3);
         }
 
         .icon-pending {
-            background: #fff3cd;
-            color: #856404;
+            background: rgba(133, 100, 4, 0.2);
+            color: #ffc107;
+            border: 1px solid rgba(255, 193, 7, 0.3);
         }
 
         .icon-delivered {
-            background: #d4edda;
-            color: #155724;
+            background: linear-gradient(135deg, rgba(21, 87, 36, 0.2) 0%, rgba(32, 201, 151, 0.2) 100%);
+            color: #20c997;
+            border: 1px solid rgba(32, 201, 151, 0.3);
         }
 
         .stats-number {
             font-size: 24px;
             font-weight: 700;
             margin-bottom: 5px;
+            color: #fff;
         }
 
         .stats-label {
-            color: #6c757d;
+            color: rgba(255, 255, 255, 0.7);
             font-size: 14px;
         }
 
         .filter-card {
-            background: #f8f9fa;
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 12px;
             padding: 20px;
             margin-bottom: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .filter-row {
@@ -137,6 +167,16 @@
         .search-box input {
             padding-right: 40px;
             border-radius: 25px;
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .search-box input:focus {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--primary-color);
+            color: #fff;
+            box-shadow: 0 0 0 0.25rem rgba(105, 108, 255, 0.25);
         }
 
         .search-box .search-icon {
@@ -144,21 +184,24 @@
             left: 15px;
             top: 50%;
             transform: translateY(-50%);
-            color: #6c757d;
+            color: rgba(255, 255, 255, 0.5);
         }
 
         .order-item {
-            background: #f8f9fa;
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 10px;
             padding: 20px;
             margin-bottom: 15px;
             transition: all 0.3s ease;
             border-right: 4px solid transparent;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .order-item:hover {
             transform: translateX(-5px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            background: rgba(105, 108, 255, 0.1);
+            border-color: var(--primary-color);
         }
 
         .order-item.pending {
@@ -174,7 +217,7 @@
         }
 
         .order-item.delivered {
-            border-color: #198754;
+            border-color: #20c997;
         }
 
         .order-item.cancelled {
@@ -187,18 +230,18 @@
             align-items: center;
             margin-bottom: 15px;
             padding-bottom: 15px;
-            border-bottom: 1px solid #dee2e6;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .order-title {
             font-weight: 600;
-            color: #2c3e50;
+            color: rgba(255, 255, 255, 0.9);
             font-size: 16px;
         }
 
         .order-date {
             font-size: 12px;
-            color: #6c757d;
+            color: rgba(255, 255, 255, 0.7);
         }
 
         .order-details {
@@ -216,12 +259,12 @@
 
         .detail-label {
             font-weight: 600;
-            color: #495057;
+            color: rgba(255, 255, 255, 0.8);
             min-width: 80px;
         }
 
         .detail-value {
-            color: #2c3e50;
+            color: rgba(255, 255, 255, 0.9);
         }
 
         .order-actions {
@@ -237,12 +280,12 @@
 
         .empty-state-icon {
             font-size: 60px;
-            color: #dee2e6;
+            color: rgba(255, 255, 255, 0.1);
             margin-bottom: 20px;
         }
 
         .empty-state-text {
-            color: #6c757d;
+            color: rgba(255, 255, 255, 0.7);
             margin-bottom: 20px;
         }
 
@@ -256,22 +299,23 @@
         .status-filter-btn {
             padding: 8px 20px;
             border-radius: 25px;
-            background: #f8f9fa;
-            color: #6c757d;
-            border: 1px solid #dee2e6;
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             cursor: pointer;
             transition: all 0.3s ease;
             font-size: 14px;
         }
 
         .status-filter-btn:hover {
-            background: #e9ecef;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
         }
 
         .status-filter-btn.active {
-            background: #696cff;
+            background: var(--primary-gradient);
             color: white;
-            border-color: #696cff;
+            border-color: var(--primary-color);
         }
 
         .sort-dropdown {
@@ -280,9 +324,9 @@
         }
 
         .sort-btn {
-            background: white;
-            border: 1px solid #dee2e6;
-            color: #495057;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.8);
             padding: 8px 15px;
             border-radius: 25px;
             cursor: pointer;
@@ -291,16 +335,22 @@
             gap: 8px;
         }
 
+        .sort-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
         .sort-dropdown-content {
             display: none;
             position: absolute;
-            background: white;
+            background: var(--dark-card);
             min-width: 200px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
             border-radius: 10px;
             z-index: 1;
             padding: 10px 0;
             margin-top: 5px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .sort-dropdown:hover .sort-dropdown-content {
@@ -311,15 +361,48 @@
             padding: 10px 20px;
             cursor: pointer;
             transition: background 0.3s;
-            color: #495057;
+            color: rgba(255, 255, 255, 0.8);
         }
 
         .sort-item:hover {
-            background: #f8f9fa;
+            background: rgba(105, 108, 255, 0.1);
+            color: #fff;
         }
 
         .sort-item.active {
-            background: #696cff;
+            background: var(--primary-gradient);
+            color: white;
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4a9a 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(105, 108, 255, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-outline-primary {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--primary-color);
             color: white;
         }
 
@@ -518,7 +601,7 @@
                                 <a href="{{ route('admin.orders.statistics') }}" class="btn btn-light">
                                     <i class="fas fa-chart-bar me-2"></i>الإحصائيات
                                 </a>
-                                <a href="{{ route('admin.orders.create') }}" class="btn btn-light">
+                                <a href="#" class="btn btn-light">
                                     <i class="fas fa-plus me-2"></i>إضافة طلب جديد
                                 </a>
                             </div>
@@ -603,7 +686,8 @@
                                     </div>
 
                                     <div class="order-actions" bis_skin_checked="1">
-                                        <a href="{{ route('admin.orders.show', $order) }}" class="btn btn-sm btn-info">
+                                        <a href="{{ route('admin.orders.show', $order->id) }}"
+                                            class="btn btn-sm btn-info">
                                             <i class="fas fa-eye me-1"></i>عرض التفاصيل
                                         </a>
                                         <a href="{{ route('admin.orders.edit', $order) }}"
@@ -623,10 +707,48 @@
                             @endforeach
 
                             @if ($orders->hasPages())
-                                <div class="mt-4" bis_skin_checked="1">
-                                    <div class="d-flex justify-content-center" bis_skin_checked="1">
-                                        {{ $orders->withQueryString()->links() }}
-                                    </div>
+                                <div class="m-3">
+                                    <nav>
+                                        <ul class="pagination">
+                                            {{-- Previous Page Link --}}
+                                            @if ($orders->onFirstPage())
+                                                <li class="page-item disabled" aria-disabled="true">
+                                                    <span class="page-link waves-effect" aria-hidden="true">‹</span>
+                                                </li>
+                                            @else
+                                                <li class="page-item">
+                                                    <a class="page-link waves-effect"
+                                                        href="{{ $orders->previousPageUrl() }}" rel="prev">‹</a>
+                                                </li>
+                                            @endif
+
+                                            {{-- Pagination Elements --}}
+                                            @foreach ($orders->links()->elements[0] as $page => $url)
+                                                @if ($page == $orders->currentPage())
+                                                    <li class="page-item active" aria-current="page">
+                                                        <span class="page-link waves-effect">{{ $page }}</span>
+                                                    </li>
+                                                @else
+                                                    <li class="page-item">
+                                                        <a class="page-link waves-effect"
+                                                            href="{{ $url }}">{{ $page }}</a>
+                                                    </li>
+                                                @endif
+                                            @endforeach
+
+                                            {{-- Next Page Link --}}
+                                            @if ($orders->hasMorePages())
+                                                <li class="page-item">
+                                                    <a class="page-link waves-effect" href="{{ $orders->nextPageUrl() }}"
+                                                        rel="next">›</a>
+                                                </li>
+                                            @else
+                                                <li class="page-item disabled" aria-disabled="true">
+                                                    <span class="page-link waves-effect" aria-hidden="true">›</span>
+                                                </li>
+                                            @endif
+                                        </ul>
+                                    </nav>
                                 </div>
                             @endif
                         @endif

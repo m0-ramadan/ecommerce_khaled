@@ -81,7 +81,7 @@ class OrderController extends Controller
 
     public function create()
     {
-        $users = User::where('is_active', true)->latest()->get();
+        $users = User::latest()->get();
         $products = Product::where('stock', '>', 0)->where('status_id', 1)->latest()->get();
 
         return view('Admin.orders.create', compact('users', 'products'));
@@ -150,8 +150,9 @@ class OrderController extends Controller
         }
     }
 
-    public function show(Order $order)
+    public function show($order)
     {
+        $order = Order::find($order);
         $order->load(['user', 'items.product', 'items.color', 'items.size', 'items.printingMethod']);
 
         return view('Admin.orders.show', compact('order'));
@@ -160,7 +161,7 @@ class OrderController extends Controller
     public function edit(Order $order)
     {
         $order->load(['user', 'items.product']);
-        $users = User::where('is_active', true)->latest()->get();
+        $users = User::latest()->get();
         $products = Product::where('stock', '>', 0)->where('status_id', 1)->latest()->get();
 
         return view('Admin.orders.edit', compact('order', 'users', 'products'));

@@ -155,37 +155,42 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
     });
 
 
-// Banner Routes
-Route::prefix('banners')->name('banners.')->group(function () {
-    Route::get('/', [BannerController::class, 'index'])->name('index');
-    Route::get('/create', [BannerController::class, 'create'])->name('create');
-    Route::post('/', [BannerController::class, 'store'])->name('store');
-    Route::get('/{banner}', [BannerController::class, 'show'])->name('show');
-    Route::get('/{banner}/edit', [BannerController::class, 'edit'])->name('edit');
-    Route::put('/{banner}', [BannerController::class, 'update'])->name('update');
-    Route::delete('/{banner}', [BannerController::class, 'destroy'])->name('destroy');
-    Route::post('/{banner}/toggle-status', [BannerController::class, 'toggleStatus'])->name('toggle-status');
+    // Banner Routes
+    Route::prefix('banners')->name('banners.')->group(function () {
+        Route::get('/', [BannerController::class, 'index'])->name('index');
+        Route::get('/create', [BannerController::class, 'create'])->name('create');
+        Route::post('/', [BannerController::class, 'store'])->name('store');
+        Route::get('/{banner}', [BannerController::class, 'show'])->name('show');
+        Route::get('/{banner}/edit', [BannerController::class, 'edit'])->name('edit');
+        Route::put('/{banner}', [BannerController::class, 'update'])->name('update');
+        Route::delete('/{banner}', [BannerController::class, 'destroy'])->name('destroy');
+        Route::post('/{banner}/toggle-status', [BannerController::class, 'toggleStatus'])->name('toggle-status');
 
-    // Banner Items Routes - إضافة route للعرض
-    Route::get('/items/{bannerItem}', [BannerItemController::class, 'show'])->name('items.show'); // أضف هذا السطر
-    Route::post('/items', [BannerItemController::class, 'store'])->name('items.store');
-    Route::put('/items/{bannerItem}', [BannerItemController::class, 'update'])->name('items.update');
-    Route::delete('/items/{bannerItem}', [BannerItemController::class, 'destroy'])->name('items.destroy');
-    Route::post('/items/{bannerItem}/toggle-status', [BannerItemController::class, 'toggleStatus'])->name('items.toggle-status');
-    Route::post('/items/reorder', [BannerItemController::class, 'reorder'])->name('items.reorder');
-});
+        // Banner Items Routes - إضافة route للعرض
+        Route::get('/items/{bannerItem}', [BannerItemController::class, 'show'])->name('items.show'); // أضف هذا السطر
+        Route::post('/items', [BannerItemController::class, 'store'])->name('items.store');
+        Route::put('/items/{bannerItem}', [BannerItemController::class, 'update'])->name('items.update');
+        Route::delete('/items/{bannerItem}', [BannerItemController::class, 'destroy'])->name('items.destroy');
+        Route::post('/items/{bannerItem}/toggle-status', [BannerItemController::class, 'toggleStatus'])->name('items.toggle-status');
+        Route::post('/items/reorder', [BannerItemController::class, 'reorder'])->name('items.reorder');
+    });
 
     // Orders
     Route::prefix('orders')->as('orders.')->group(function () {
-        Route::resource('/', OrderController::class);
+        // Route::resource('/', OrderController::class);
+        Route::get('/', [OrderController::class, 'index'])->name('index');
+        Route::get('/create', [OrderController::class, 'create'])->name('create');
+        Route::post('/', [OrderController::class, 'store'])->name('store');
+        Route::get('/{id}', [OrderController::class, 'show'])->name('show');
+        Route::get('/{order}/edit', [OrderController::class, 'edit'])->name('edit');
+        Route::put('/{order}', [OrderController::class, 'update'])->name('update');
+        Route::delete('/{order}', [OrderController::class, 'destroy'])->name('destroy');
+
         Route::post('/{order}/update-status', [OrderController::class, 'updateStatus'])->name('update-status');
         Route::get('/{order}/print', [OrderController::class, 'print'])->name('print');
         Route::get('/export', [OrderController::class, 'export'])->name('export');
     });
     Route::get('order/statistics', [OrderController::class, 'statistics'])->name('orders.statistics');
-
-
-
 });
 
 // Visitor stats route (outside admin group)

@@ -19,14 +19,22 @@
             --light-bg: #f8f9fa;
             --border-color: #e9ecef;
             --text-muted: #6c757d;
+            --dark-bg: #1e1e2d;
+            --dark-card: #2b3b4c;
+        }
+
+        body {
+            background: var(--dark-bg);
+            color: #fff;
         }
 
         .form-card {
-            background: white;
+            background: var(--dark-card);
             border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
             padding: 30px;
             margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .form-header {
@@ -34,19 +42,20 @@
             color: white;
             padding: 20px;
             border-radius: 15px 15px 0 0;
-            margin-bottom: 30px;
+            margin: -30px -30px 30px -30px;
         }
 
         .form-header h4 {
             margin-bottom: 5px;
+            color: white;
         }
 
         .form-section {
             margin-bottom: 30px;
             padding: 20px;
-            border: 1px solid var(--border-color);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 10px;
-            background: var(--light-bg);
+            background: rgba(255, 255, 255, 0.05);
         }
 
         .section-title {
@@ -61,25 +70,26 @@
 
         /* بطاقات الأنواع */
         .type-card {
-            border: 2px solid var(--border-color);
+            border: 2px solid rgba(255, 255, 255, 0.1);
             border-radius: 10px;
             padding: 20px;
             cursor: pointer;
             transition: all 0.3s ease;
             text-align: center;
-            background: white;
+            background: rgba(255, 255, 255, 0.05);
             height: 100%;
         }
 
         .type-card:hover {
             border-color: var(--primary-color);
             transform: translateY(-5px);
+            background: rgba(105, 108, 255, 0.1);
         }
 
         .type-card.active {
             border-color: var(--primary-color);
-            background: rgba(105, 108, 255, 0.1);
-            box-shadow: 0 5px 15px rgba(105, 108, 255, 0.2);
+            background: rgba(105, 108, 255, 0.2);
+            box-shadow: 0 5px 15px rgba(105, 108, 255, 0.3);
         }
 
         .type-icon {
@@ -99,30 +109,30 @@
             flex: 1;
             text-align: center;
             padding: 15px;
-            border: 2px solid var(--border-color);
+            border: 2px solid rgba(255, 255, 255, 0.1);
             border-radius: 10px;
             cursor: pointer;
             transition: all 0.3s ease;
-            background: white;
+            background: rgba(255, 255, 255, 0.05);
         }
 
         .category-option:hover {
             border-color: var(--primary-color);
-            background: var(--light-bg);
+            background: rgba(105, 108, 255, 0.1);
         }
 
         .category-option.active {
             border-color: var(--primary-color);
-            background: rgba(105, 108, 255, 0.1);
+            background: rgba(105, 108, 255, 0.2);
         }
 
         /* لوحات الإعدادات */
         .settings-panel {
-            background: var(--light-bg);
+            background: rgba(255, 255, 255, 0.05);
             padding: 20px;
             border-radius: 10px;
             margin-top: 20px;
-            border: 2px dashed var(--border-color);
+            border: 2px dashed rgba(255, 255, 255, 0.1);
             display: none;
         }
 
@@ -133,19 +143,19 @@
 
         /* رفع الصور */
         .image-upload-box {
-            border: 2px dashed var(--border-color);
+            border: 2px dashed rgba(255, 255, 255, 0.2);
             border-radius: 10px;
             padding: 30px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
-            background: var(--light-bg);
+            background: rgba(255, 255, 255, 0.05);
             position: relative;
         }
 
         .image-upload-box:hover {
             border-color: var(--primary-color);
-            background: rgba(105, 108, 255, 0.05);
+            background: rgba(105, 108, 255, 0.1);
         }
 
         .image-upload-box input {
@@ -159,6 +169,7 @@
             border-radius: 10px;
             margin-top: 15px;
             display: none;
+            border: 2px solid rgba(255, 255, 255, 0.1);
         }
 
         /* الباجات */
@@ -171,13 +182,13 @@
         }
 
         .badge-active {
-            background: #d4edda;
-            color: #155724;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
         }
 
         .badge-inactive {
-            background: #f8d7da;
-            color: #721c24;
+            background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);
+            color: white;
         }
 
         /* مفتاح التبديل */
@@ -201,7 +212,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: #ccc;
+            background-color: #666;
             transition: .4s;
             border-radius: 34px;
         }
@@ -232,15 +243,15 @@
             align-items: center;
             margin-bottom: 20px;
             padding: 15px;
-            background: white;
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 10px;
-            border: 1px solid var(--border-color);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .step-number {
             width: 40px;
             height: 40px;
-            background: var(--primary-color);
+            background: var(--primary-gradient);
             color: white;
             border-radius: 50%;
             display: flex;
@@ -262,23 +273,24 @@
         }
 
         .alert-info {
-            background: #e7f5ff;
-            border: 1px solid #0c63e4;
+            background: rgba(12, 99, 228, 0.2);
+            border: 1px solid rgba(12, 99, 228, 0.5);
             color: #0c63e4;
         }
 
         .alert-warning {
-            background: #fff3cd;
-            border: 1px solid #856404;
+            background: rgba(133, 100, 4, 0.2);
+            border: 1px solid rgba(133, 100, 4, 0.5);
             color: #856404;
         }
 
         /* المعاينة */
         .preview-container {
-            background: var(--light-bg);
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 10px;
             padding: 20px;
             margin-top: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .preview-wrapper {
@@ -286,6 +298,7 @@
             overflow: hidden;
             border-radius: 10px;
             margin-bottom: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .preview-overlay {
@@ -293,7 +306,7 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.8);
             color: white;
             padding: 10px;
             font-size: 12px;
@@ -311,6 +324,34 @@
         .required-field::after {
             content: " *";
             color: var(--danger-color);
+        }
+
+        /* تحسينات للنموذج */
+        .form-control {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .form-control:focus {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--primary-color);
+            color: #fff;
+            box-shadow: 0 0 0 0.25rem rgba(105, 108, 255, 0.25);
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .input-group-text {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .form-label {
+            color: rgba(255, 255, 255, 0.9);
         }
 
         /* الرسوم المتحركة */
@@ -717,7 +758,8 @@
                                 <i class="fas fa-exclamation-triangle fa-2x"></i>
                                 <div>
                                     <h6 class="mb-1">ملاحظة مهمة</h6>
-                                    <p class="mb-0">• يمكنك إضافة عناصر البانر (الصور والروابط) بعد إنشاء البانر مباشرة</p>
+                                    <p class="mb-0">• يمكنك إضافة عناصر البانر (الصور والروابط) بعد إنشاء البانر مباشرة
+                                    </p>
                                     <p class="mb-0">• ستظهر صفحة خاصة لإدارة العناصر مباشرة بعد الحفظ</p>
                                 </div>
                             </div>

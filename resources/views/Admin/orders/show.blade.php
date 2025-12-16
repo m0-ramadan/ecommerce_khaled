@@ -5,23 +5,41 @@
 @section('css')
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --primary-color: #696cff;
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --info-color: #17a2b8;
+            --light-bg: #f8f9fa;
+            --border-color: #e9ecef;
+            --text-muted: #6c757d;
+            --dark-bg: #1e1e2d;
+            --dark-card: #2b3b4c;
+        }
+
         body {
             font-family: "Cairo", sans-serif !important;
+            background: var(--dark-bg);
+            color: #fff;
         }
 
         .order-detail-card {
-            background: white;
+            background: var(--dark-card);
             border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
             padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .order-detail-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--primary-gradient);
             color: white;
             padding: 25px 30px;
             border-radius: 15px 15px 0 0;
             position: relative;
+            margin: -30px -30px 30px -30px;
         }
 
         .badge-status {
@@ -32,73 +50,94 @@
         }
 
         .status-pending {
-            background: #fff3cd;
-            color: #856404;
+            background: rgba(133, 100, 4, 0.2);
+            color: #ffc107;
+            border: 1px solid rgba(255, 193, 7, 0.3);
         }
 
         .status-processing {
-            background: #cce5ff;
-            color: #004085;
+            background: rgba(0, 64, 133, 0.2);
+            color: #0dcaf0;
+            border: 1px solid rgba(13, 202, 240, 0.3);
         }
 
         .status-shipped {
-            background: #d1ecf1;
-            color: #0c5460;
+            background: rgba(12, 84, 96, 0.2);
+            color: #0dcaf0;
+            border: 1px solid rgba(13, 202, 240, 0.3);
         }
 
         .status-delivered {
-            background: #d4edda;
-            color: #155724;
+            background: linear-gradient(135deg, rgba(21, 87, 36, 0.2) 0%, rgba(32, 201, 151, 0.2) 100%);
+            color: #20c997;
+            border: 1px solid rgba(32, 201, 151, 0.3);
         }
 
         .status-cancelled {
-            background: #f8d7da;
-            color: #721c24;
+            background: linear-gradient(135deg, rgba(220, 53, 69, 0.2) 0%, rgba(253, 126, 20, 0.2) 100%);
+            color: #fd7e14;
+            border: 1px solid rgba(253, 126, 20, 0.3);
         }
 
         .status-refunded {
-            background: #e2e3e5;
-            color: #383d41;
+            background: rgba(56, 61, 65, 0.2);
+            color: #adb5bd;
+            border: 1px solid rgba(173, 181, 189, 0.3);
         }
 
         .info-section {
-            background: #f8f9fa;
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 12px;
             padding: 20px;
             margin-bottom: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .info-section h6 {
-            color: #696cff;
+            color: var(--primary-color);
             margin-bottom: 20px;
             padding-bottom: 10px;
-            border-bottom: 2px solid #dee2e6;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
         }
 
         .info-row {
             display: flex;
             align-items: center;
             margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+        }
+
+        .info-row:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
         }
 
         .info-label {
             min-width: 150px;
             font-weight: 600;
-            color: #495057;
+            color: rgba(255, 255, 255, 0.8);
         }
 
         .info-value {
-            color: #2c3e50;
+            color: rgba(255, 255, 255, 0.9);
             font-weight: 500;
             flex-grow: 1;
         }
 
         .product-item {
-            background: white;
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 10px;
             padding: 15px;
             margin-bottom: 15px;
-            border: 1px solid #dee2e6;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .product-item:hover {
+            background: rgba(105, 108, 255, 0.1);
+            border-color: var(--primary-color);
         }
 
         .product-header {
@@ -107,18 +146,18 @@
             align-items: center;
             margin-bottom: 10px;
             padding-bottom: 10px;
-            border-bottom: 1px solid #f0f0f0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .product-name {
             font-weight: 600;
-            color: #2c3e50;
+            color: rgba(255, 255, 255, 0.9);
             font-size: 16px;
         }
 
         .product-price {
             font-weight: 700;
-            color: #198754;
+            color: #20c997;
         }
 
         .product-details {
@@ -136,19 +175,19 @@
 
         .detail-label {
             font-weight: 600;
-            color: #495057;
+            color: rgba(255, 255, 255, 0.7);
             min-width: 80px;
         }
 
         .detail-value {
-            color: #2c3e50;
+            color: rgba(255, 255, 255, 0.9);
         }
 
         .summary-card {
-            background: #f8f9fa;
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 12px;
             padding: 20px;
-            border: 2px solid #dee2e6;
+            border: 2px solid rgba(255, 255, 255, 0.1);
         }
 
         .summary-row {
@@ -157,7 +196,7 @@
             align-items: center;
             margin-bottom: 10px;
             padding-bottom: 10px;
-            border-bottom: 1px dashed #dee2e6;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
         }
 
         .summary-row:last-child {
@@ -168,17 +207,18 @@
 
         .summary-label {
             font-weight: 600;
-            color: #495057;
+            color: rgba(255, 255, 255, 0.8);
         }
 
         .summary-value {
             font-weight: 600;
-            color: #2c3e50;
+            color: rgba(255, 255, 255, 0.9);
         }
 
         .total-row {
             font-size: 18px;
-            color: #198754;
+            color: #20c997;
+            font-weight: 700;
         }
 
         .timeline {
@@ -193,7 +233,7 @@
             top: 0;
             bottom: 0;
             width: 3px;
-            background: #696cff;
+            background: var(--primary-color);
         }
 
         .timeline-item {
@@ -209,24 +249,25 @@
             width: 13px;
             height: 13px;
             border-radius: 50%;
-            background: white;
-            border: 3px solid #696cff;
+            background: var(--dark-card);
+            border: 3px solid var(--primary-color);
         }
 
         .timeline-content {
-            background: #f8f9fa;
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 10px;
             padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .timeline-date {
             font-size: 12px;
-            color: #6c757d;
+            color: rgba(255, 255, 255, 0.7);
             margin-bottom: 5px;
         }
 
         .timeline-text {
-            color: #2c3e50;
+            color: rgba(255, 255, 255, 0.9);
             font-weight: 500;
         }
 
@@ -254,6 +295,7 @@
         .btn-action:hover {
             background: rgba(255, 255, 255, 0.3);
             transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(105, 108, 255, 0.4);
         }
 
         .status-buttons {
@@ -267,8 +309,8 @@
             padding: 8px 20px;
             border-radius: 25px;
             border: 2px solid transparent;
-            background: #f8f9fa;
-            color: #495057;
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.8);
             font-weight: 500;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -276,13 +318,47 @@
 
         .status-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
         }
 
         .status-btn.active {
-            background: #696cff;
+            background: var(--primary-gradient);
             color: white;
-            border-color: #696cff;
+            border-color: var(--primary-color);
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4a9a 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(105, 108, 255, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-outline-primary {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--primary-color);
+            color: white;
         }
 
         @media (max-width: 768px) {
@@ -306,6 +382,16 @@
 
             .product-details {
                 grid-template-columns: 1fr;
+            }
+
+            .product-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .product-price {
+                align-self: flex-start;
             }
         }
     </style>

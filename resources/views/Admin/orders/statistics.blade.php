@@ -6,23 +6,41 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.css">
     <style>
+        :root {
+            --primary-color: #696cff;
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --info-color: #17a2b8;
+            --light-bg: #f8f9fa;
+            --border-color: #e9ecef;
+            --text-muted: #6c757d;
+            --dark-bg: #1e1e2d;
+            --dark-card: #2b3b4c;
+        }
+
         body {
             font-family: "Cairo", sans-serif !important;
+            background: var(--dark-bg);
+            color: #fff;
         }
 
         .stats-card {
-            background: white;
+            background: var(--dark-card);
             border-radius: 12px;
             padding: 20px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            border-top: 4px solid #696cff;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            border-top: 4px solid var(--primary-color);
             transition: transform 0.3s ease;
             margin-bottom: 20px;
             height: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .stats-card:hover {
             transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
         }
 
         .stats-icon {
@@ -37,53 +55,61 @@
         }
 
         .icon-total {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--primary-gradient);
             color: white;
         }
 
         .icon-revenue {
-            background: #e7f5ff;
+            background: rgba(12, 99, 228, 0.2);
             color: #0c63e4;
+            border: 1px solid rgba(12, 99, 228, 0.3);
         }
 
         .icon-average {
-            background: #d4edda;
-            color: #155724;
+            background: rgba(21, 87, 36, 0.2);
+            color: #20c997;
+            border: 1px solid rgba(32, 201, 151, 0.3);
         }
 
         .icon-pending {
-            background: #fff3cd;
-            color: #856404;
+            background: rgba(133, 100, 4, 0.2);
+            color: #ffc107;
+            border: 1px solid rgba(255, 193, 7, 0.3);
         }
 
         .icon-delivered {
-            background: #d1ecf1;
-            color: #0c5460;
+            background: rgba(12, 84, 96, 0.2);
+            color: #0dcaf0;
+            border: 1px solid rgba(13, 202, 240, 0.3);
         }
 
         .icon-cancelled {
-            background: #f8d7da;
-            color: #721c24;
+            background: linear-gradient(135deg, rgba(220, 53, 69, 0.2) 0%, rgba(253, 126, 20, 0.2) 100%);
+            color: #fd7e14;
+            border: 1px solid rgba(253, 126, 20, 0.3);
         }
 
         .icon-today {
-            background: #e9ecef;
-            color: #495057;
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .icon-week {
-            background: #f8f9fa;
-            color: #6c757d;
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .stats-number {
             font-size: 28px;
             font-weight: 700;
             margin-bottom: 5px;
+            color: #fff;
         }
 
         .stats-label {
-            color: #6c757d;
+            color: rgba(255, 255, 255, 0.7);
             font-size: 14px;
             margin-bottom: 10px;
         }
@@ -97,20 +123,21 @@
         }
 
         .change-up {
-            color: #198754;
+            color: #20c997;
         }
 
         .change-down {
-            color: #dc3545;
+            color: #fd7e14;
         }
 
         .chart-card {
-            background: white;
+            background: var(--dark-card);
             border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
             padding: 25px;
             margin-bottom: 25px;
             height: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .chart-header {
@@ -121,7 +148,7 @@
         }
 
         .chart-header h6 {
-            color: #696cff;
+            color: var(--primary-color);
             margin-bottom: 0;
         }
 
@@ -133,22 +160,23 @@
         .chart-control {
             padding: 6px 15px;
             border-radius: 20px;
-            background: #f8f9fa;
-            color: #6c757d;
-            border: 1px solid #dee2e6;
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             cursor: pointer;
             transition: all 0.3s ease;
             font-size: 13px;
         }
 
         .chart-control:hover {
-            background: #e9ecef;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
         }
 
         .chart-control.active {
-            background: #696cff;
+            background: var(--primary-gradient);
             color: white;
-            border-color: #696cff;
+            border-color: var(--primary-color);
         }
 
         .chart-container {
@@ -158,15 +186,16 @@
         }
 
         .table-card {
-            background: white;
+            background: var(--dark-card);
             border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
             padding: 25px;
             margin-bottom: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .table-header {
-            border-bottom: 2px solid #f8f9fa;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
             padding-bottom: 15px;
             margin-bottom: 20px;
         }
@@ -177,7 +206,7 @@
             gap: 15px;
             margin-bottom: 15px;
             padding-bottom: 15px;
-            border-bottom: 1px solid #f0f0f0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .product-item:last-child {
@@ -190,7 +219,6 @@
             width: 30px;
             height: 30px;
             border-radius: 50%;
-            background: #696cff;
             color: white;
             display: flex;
             align-items: center;
@@ -200,15 +228,19 @@
         }
 
         .rank-1 {
-            background: #ffd700;
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
         }
 
         .rank-2 {
-            background: #c0c0c0;
+            background: linear-gradient(135deg, #c0c0c0 0%, #e0e0e0 100%);
         }
 
         .rank-3 {
-            background: #cd7f32;
+            background: linear-gradient(135deg, #cd7f32 0%, #e89c4e 100%);
+        }
+
+        .rank-default {
+            background: var(--primary-gradient);
         }
 
         .product-info {
@@ -217,37 +249,38 @@
 
         .product-name {
             font-weight: 600;
-            color: #2c3e50;
+            color: rgba(255, 255, 255, 0.9);
             margin-bottom: 5px;
         }
 
         .product-sales {
-            color: #6c757d;
+            color: rgba(255, 255, 255, 0.7);
             font-size: 13px;
         }
 
         .sales-count {
             font-weight: 700;
-            color: #198754;
+            color: #20c997;
         }
 
         .empty-chart {
             text-align: center;
             padding: 50px 20px;
-            color: #6c757d;
+            color: rgba(255, 255, 255, 0.7);
         }
 
         .empty-chart i {
             font-size: 60px;
             margin-bottom: 20px;
-            color: #dee2e6;
+            color: rgba(255, 255, 255, 0.1);
         }
 
         .date-filter {
-            background: #f8f9fa;
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 12px;
             padding: 20px;
             margin-bottom: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .filter-row {
@@ -255,6 +288,45 @@
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px;
             margin-bottom: 15px;
+        }
+
+        .form-control {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .form-control:focus {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--primary-color);
+            color: #fff;
+            box-shadow: 0 0 0 0.25rem rgba(105, 108, 255, 0.25);
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4a9a 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(105, 108, 255, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
         }
 
         @media (max-width: 768px) {
