@@ -25,60 +25,44 @@ class HomeController extends Controller
     {
         try {
 
-            // 🟢 جلب الأقسام الرئيسية
-            $categories = Category::where('status_id', 1)->take(5)
-                ->whereNull('parent_id')
-                ->get();
+            // 🟢 limit جاي من الفرونت أو default = 5
+            $subCategoriesLimit = $request->input('categories_limit', 5);
 
             // 🟢 جلب الأقسام الفرعية
-            $sub_categories = Category::take(5)->where('status_id', 1)->whereHas('products')->orderBy('order', 'asc')->get();
-
-            // 🟢 جلب المنتجات
-            $products = Product::where('status_id', 1)
-                ->take(10)
+            $sub_categories = Category::where('status_id', 1)
+                ->whereHas('products', function ($q) {
+                    $q->where('status_id', 1);
+                })
+                ->orderBy('order', 'asc')
+                ->limit($subCategoriesLimit)
                 ->get();
 
             // ============================
-            // 🎯 جلب السلايدر فقط (main_slider)
+            // 🎯 جلب السلايدر
             // ============================
-
-            $query = Banner::with([
+            $banners = Banner::with([
                 'type',
                 'items',
                 'sliderSetting',
                 'gridLayout'
-            ])->where('is_active', true);
+            ])
+                ->where('is_active', true)
+                ->whereHas('type', fn($q) => $q->where('name', 'main_slider'))
+                ->where(function ($q) {
+                    $q->whereNull('start_date')->orWhere('start_date', '<=', now());
+                })
+                ->where(function ($q) {
+                    $q->whereNull('end_date')->orWhere('end_date', '>=', now());
+                })
+                ->orderBy('section_order')
+                ->first();
 
-
-            $query->whereHas('type', function ($q) {
-                $q->where('name', 'main_slider');
-            });
-
-            $today = now();
-
-            $query->where(function ($q) use ($today) {
-                $q->whereNull('start_date')->orWhere('start_date', '<=', $today);
-            })->where(function ($q) use ($today) {
-                $q->whereNull('end_date')->orWhere('end_date', '>=', $today);
-            });
-
-            $banners = $query->orderBy('section_order')->first();
-
-            // ============================
-            // 📦 البيانات النهائية
-            // ============================
-
-            $data = [
-                'categories'     => CategoryResource::collection($categories),
+            return $this->success([
                 'sub_categories' => CategoryWithProductResource::collection($sub_categories),
-                //  'products'       => ProductResource::collection($products),
                 'sliders'        => new BannerResource($banners),
-            ];
-
-            return $this->success($data, 'تم جلب بيانات الصفحة الرئيسية بنجاح');
+            ], 'تم جلب بيانات الصفحة الرئيسية بنجاح');
         } catch (\Exception $e) {
-
-            return $this->error('حدث خطأ أثناء تحميل بيانات الصفحة الرئيسية', 500, [
+            return $this->error('حدث خطأ أثناء تحميل البيانات', 500, [
                 'exception' => $e->getMessage(),
             ]);
         }
