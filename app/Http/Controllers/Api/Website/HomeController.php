@@ -26,12 +26,12 @@ class HomeController extends Controller
         try {
 
             // 🟢 جلب الأقسام الرئيسية
-            $categories = Category::where('status_id', 1)
+            $categories = Category::where('status_id', 1)->take(5)
                 ->whereNull('parent_id')
                 ->get();
 
             // 🟢 جلب الأقسام الفرعية
-            $sub_categories = Category::where('status_id', 1)->whereHas('products')->orderBy('order','asc')->get();
+            $sub_categories = Category::take(5)->where('status_id', 1)->whereHas('products')->orderBy('order', 'asc')->get();
 
             // 🟢 جلب المنتجات
             $products = Product::where('status_id', 1)
@@ -48,6 +48,7 @@ class HomeController extends Controller
                 'sliderSetting',
                 'gridLayout'
             ])->where('is_active', true);
+
 
             $query->whereHas('type', function ($q) {
                 $q->where('name', 'main_slider');
