@@ -2,26 +2,25 @@
 
 return [
 
-    //     /*
-    //     |--------------------------------------------------------------------------
-    //     | Cross-Origin Resource Sharing (CORS) Configuration
-    //     |--------------------------------------------------------------------------
-    //     |
-    //     | Here you may configure your settings for cross-origin resource sharing
-    //     | or "CORS". This determines what cross-origin operations may execute
-    //     | in web browsers. You are free to adjust these settings as needed.
-    //     |
-    //     | To learn more: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
-    //     |
-    //     */
-
-    'paths' => ['api/*', 'sanctum/csrf-cookie'],
+    'paths' => [
+        'api/*',
+        'sanctum/csrf-cookie'
+    ],
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['http://localhost:3000', 'https://ecommerce-xo.vercel.app/', 'http://72.62.25.136:3000', 'https://talaaljazeera.com', 'https://talaaljazeera.com/', 'http://talaaljazeera.com/', 'talaaljazeera.com'],
+    'allowed_origins' => [
+        'http://localhost:3000',
+        'http://72.62.25.136:3000',
+        'https://talaaljazeera.com',
+        'https://www.talaaljazeera.com',
+        'https://ecommerce-xo.vercel.app'
+    ],
 
-    'allowed_origins_patterns' => [],
+    // علشان Vercel preview
+    'allowed_origins_patterns' => [
+        '#^https://.*\.vercel\.app$#'
+    ],
 
     'allowed_headers' => ['*'],
 
@@ -29,6 +28,6 @@ return [
 
     'max_age' => 0,
 
-    'supports_credentials' => false,
+    'supports_credentials' => true,
 
 ];
