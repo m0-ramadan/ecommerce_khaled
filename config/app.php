@@ -126,6 +126,11 @@ return [
 
     'cipher' => 'AES-256-CBC',
 
+    'default_product_image' => env('DEFAULT_PRODUCT_IMAGE', "storage/products/default.png"),
+
+    'default_user_image' => env('DEFAULT_USER_IMAGE', "https://static.vecteezy.com/system/resources/previews/011/209/565/non_2x/user-profile-avatar-free-vector.jpg"),
+
+
     /*
     |--------------------------------------------------------------------------
     | Maintenance Mode Driver
@@ -163,7 +168,7 @@ return [
         /*
          * Application Service Providers...
          */
-        
+
         App\Providers\AppServiceProvider::class,
         App\Providers\AuthServiceProvider::class,
         // App\Providers\BroadcastServiceProvider::class,

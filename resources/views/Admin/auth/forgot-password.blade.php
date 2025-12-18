@@ -11,7 +11,7 @@
         <!-- الجانب الأيسر (الصورة التوضيحية) - يظهر فقط على الشاشات الكبيرة -->
         <div class="d-none d-lg-flex col-lg-7 align-items-center p-0">
             <div class="auth-cover-bg auth-cover-bg-color d-flex justify-content-center align-items-center w-100 h-100">
-                <img src="https://seda.codeella.com/assets/img/illustrations/auth-login-illustration-light.png"
+                <img src="{{ asset('dashboard/assets/img/illustrations/forgot-password-illustration-light.png') }}"
                      alt="غلاف استعادة كلمة المرور"
                      class="img-fluid auth-illustration">
 
@@ -30,7 +30,7 @@
                 <div class="app-brand mb-5 text-center">
                     <a href="{{ url('/') }}" class="app-brand-link">
                         <img height="90" width="270"
-                             src="https://seda.codeella.com/assets/img/logo_.png"
+                             src="{{ asset('dashboard/assets/img/logo_.png') }}"
                              alt="شعار {{ env('APP_NAME') }}">
                     </a>
                 </div>

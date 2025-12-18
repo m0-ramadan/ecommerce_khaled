@@ -3,7 +3,7 @@
 @section('title', 'الرئيسية')
 
 @section('css')
-    <link rel="stylesheet" href="https://seda.codeella.com/assets/vendor/css/pages/app-logistics-dashboard.css" />
+    <link rel="stylesheet" href="{{ asset('dashboard/assets/vendor/css/pages/app-logistics-dashboard.css') }}" />
 
 
     <style>

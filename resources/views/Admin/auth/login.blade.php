@@ -11,7 +11,7 @@
             <!-- الجانب الأيسر (الصورة التوضيحية) - يظهر فقط على الشاشات الكبيرة -->
             <div class="d-none d-lg-flex col-lg-7 align-items-center p-0" style="max-height: 950px;">
                 <div class="auth-cover-bg auth-cover-bg-color d-flex justify-content-center align-items-center w-100 h-100">
-                    <img src="https://seda.codeella.com/assets/img/illustrations/auth-login-illustration-light.png"
+                    <img src="{{ asset('dashboard/assets/img/illustrations/auth-login-illustration-light.png') }}"
                         alt="غلاف تسجيل الدخول" class="img-fluid auth-illustration">
 
                     <img src="{{ asset('dashboard/assets/img/illustrations/bg-shape-image-light.png') }}" alt="خلفية النظام"

@@ -103,7 +103,7 @@
                      </li>
 
                      <li class="dropdown-menu-footer border-top">
-                         <a href="https://seda.codeella.com/home?page=2"
+                         <a href="#"
                              class="dropdown-item d-flex justify-content-center text-primary p-2 h-px-40 mb-1 align-items-center"
                              id="view-all-notifications">
                              عرض المزيد من الاشعارات

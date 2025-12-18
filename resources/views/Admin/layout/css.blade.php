@@ -1,6 +1,6 @@
 
 <!-- Favicon -->
-<link rel="icon" type="image/x-icon" href="https://seda.codeella.com/assets/img/favicon/favicon.ico" />
+<link rel="icon" type="image/x-icon" href="#assets/img/favicon/favicon.ico" />
 
 <!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -48,14 +48,14 @@
 
 
 <!-- Helpers -->
-<script src="https://seda.codeella.com/assets/vendor/js/helpers.js"></script>
+<script src="{{ asset('dashboard/assets/vendor/js/helpers.js') }}"></script>
 <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
 <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
 
-<script src="https://seda.codeella.com/assets/vendor/js/template-customizer.js"></script>
+<script src="{{ asset('dashboard/assets/vendor/js/template-customizer.js') }}"></script>
 
 
-<script src="https://seda.codeella.com/assets/js/config.js"></script>
+<script src="{{ asset('dashboard/assets/js/config.js') }}"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link

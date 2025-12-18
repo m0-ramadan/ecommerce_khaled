@@ -16,6 +16,7 @@ class ProductResource extends JsonResource
                 return $size->productTiers;
             })->min('price_per_unit');
 
+
         return [
             // ================== Basic Info ==================
             'id'                => $this->id,
@@ -32,11 +33,10 @@ class ProductResource extends JsonResource
             'is_active'         => $this->status_id == 1,
             'lowest_price' =>  $lowestPrice??rand(5,15),
 
-
             // ================== Image ==================
             'image' => $this->primaryImage
                 ? get_user_image($this->primaryImage->path)
-                : url(env('DEFAULT_PRODUCT_IMAGE')),
+                : url(config('app.default_product_image')),
 
             // ================== Rating ==================
             'average_rating' => round($this->average_rating, 1),
