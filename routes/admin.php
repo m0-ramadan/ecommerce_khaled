@@ -115,7 +115,7 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
         Route::post('/', [ProductController::class, 'store'])->name('store');
         Route::get('/{id}/edit', [ProductController::class, 'edit'])->name('edit');
 
-        Route::delete('/{product}', [ProductController::class, 'destroy'])->name('destroy');
+        Route::delete('/{id}', [ProductController::class, 'destroy'])->name('destroy');
         Route::get('/show/{id}', [ProductController::class, 'show'])->name('show');
         Route::post('quick-add', [ProductController::class, 'quickAdd'])->name('quick-add');
         Route::post('bulk-action', [ProductController::class, 'bulkAction'])->name('bulk-action');
