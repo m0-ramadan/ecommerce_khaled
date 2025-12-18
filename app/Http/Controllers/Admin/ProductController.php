@@ -335,7 +335,7 @@ class ProductController extends Controller
                 'category_id' => $validated['category_id'],
                 'description' => $validated['description'],
                 'price' => $validated['price'],
-                'stock' => $validated['stock']??0,
+                'stock' => $validated['stock'] ?? 0,
                 'status_id' => $validated['status_id'],
                 'has_discount' => $request->boolean('has_discount'),
                 'includes_tax' => $request->boolean('includes_tax'),
@@ -450,7 +450,7 @@ class ProductController extends Controller
 
             DB::commit();
 
-            return redirect()->route('admin.products.show', $product)
+            return redirect()->route('admin.products.show', $product->id)
                 ->with('success', 'تم إضافة المنتج بنجاح');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -732,7 +732,7 @@ class ProductController extends Controller
             }
 
             DB::commit();
-            return redirect()->route('admin.products.show', $product)
+            return redirect()->route('admin.products.show', $product->id)
                 ->with('success', 'تم تحديث المنتج بنجاح');
         } catch (\Exception $e) {
             DB::rollBack();

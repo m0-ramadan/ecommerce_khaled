@@ -1003,7 +1003,7 @@
                                         </td>
                                         <td>
                                             <div class="d-flex gap-2" bis_skin_checked="1">
-                                                <a href="{{ route('admin.products.show', $product) }}"
+                                                <a href="{{ route('admin.products.show', $produc->id) }}"
                                                     class="btn btn-sm btn-outline-info" title="عرض">
                                                     <i class="fas fa-eye"></i>
                                                 </a>
@@ -1624,7 +1624,5 @@
             window.open(url, '_blank');
             $('#exportModal').modal('hide');
         }
-
-   
     </script>
 @endsection

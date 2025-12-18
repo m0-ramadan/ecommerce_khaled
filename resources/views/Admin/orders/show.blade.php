@@ -561,7 +561,7 @@
 
                                             @if ($item->product)
                                                 <div class="mt-2" bis_skin_checked="1">
-                                                    <a href="{{ route('admin.products.show', $item->product) }}"
+                                                    <a href="{{ route('admin.products.show', $item->product->id) }}"
                                                         class="btn btn-sm btn-outline-primary">
                                                         <i class="fas fa-eye me-1"></i>عرض المنتج
                                                     </a>

@@ -362,7 +362,7 @@
 
                                 @if ($review->product)
                                     <div class="review-actions" bis_skin_checked="1">
-                                        <a href="{{ route('admin.products.show', $review->product) }}"
+                                        <a href="{{ route('admin.products.show', $review->product->id) }}"
                                             class="btn btn-sm btn-outline-primary">
                                             <i class="fas fa-eye me-1"></i>عرض المنتج
                                         </a>

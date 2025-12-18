@@ -575,7 +575,7 @@
                                                             @if ($item->product)
                                                                 <p class="mb-1">
                                                                     <i class="fas fa-shopping-bag text-muted me-2"></i>
-                                                                    <a href="{{ route('admin.products.show', $item->product) }}"
+                                                                    <a href="{{ route('admin.products.show', $item->product->id) }}"
                                                                         class="text-decoration-none">
                                                                         المنتج: {{ $item->product->title }}
                                                                     </a>

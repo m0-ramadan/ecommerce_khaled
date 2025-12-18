@@ -355,7 +355,7 @@
                                             </div>
 
                                             <div class="product-actions" bis_skin_checked="1">
-                                                <a href="{{ route('admin.products.show', $product) }}"
+                                                <a href="{{ route('admin.products.show', $product->id) }}"
                                                     class="btn btn-sm btn-outline-primary flex-grow-1">
                                                     <i class="fas fa-eye me-1"></i>عرض
                                                 </a>
