@@ -116,7 +116,7 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
         Route::get('/{id}/edit', [ProductController::class, 'edit'])->name('edit');
 
         Route::delete('/{product}', [ProductController::class, 'destroy'])->name('destroy');
-        Route::get('/{id}', [ProductController::class, 'show'])->name('show');
+        Route::get('/show/{id}', [ProductController::class, 'show'])->name('show');
         Route::post('quick-add', [ProductController::class, 'quickAdd'])->name('quick-add');
         Route::post('bulk-action', [ProductController::class, 'bulkAction'])->name('bulk-action');
         Route::get('export', [ProductController::class, 'export'])->name('export');
@@ -124,6 +124,7 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
     });
     Route::post('products/update/{id}', [ProductController::class, 'update'])->name('products.update');
 
+    
     // Contacts
     Route::prefix('contacts')->as('contact.')->group(function () {
         Route::get('/', [ContactController::class, 'index'])->name('index');
