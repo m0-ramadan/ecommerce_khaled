@@ -27,7 +27,8 @@ class HomeController extends Controller
 
             // 🟢 limit جاي من الفرونت أو default = 5
             $subCategoriesLimit = $request->input('categories_limit', 5);
-
+            
+            $categories = Category::where('status_id', 1)->whereNull('parent_id')->get();
             // 🟢 جلب الأقسام الفرعية
             $sub_categories = Category::where('status_id', 1)
                 ->whereHas('products', function ($q) {
@@ -60,6 +61,7 @@ class HomeController extends Controller
             return $this->success([
                 'sub_categories' => CategoryWithProductResource::collection($sub_categories),
                 'sliders'        => new BannerResource($banners),
+                'categories' => CategoryResource::collection($categories),
             ], 'تم جلب بيانات الصفحة الرئيسية بنجاح');
         } catch (\Exception $e) {
             return $this->error('حدث خطأ أثناء تحميل البيانات', 500, [
