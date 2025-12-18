@@ -771,9 +771,7 @@
                         <div class="col">
                             <div class="product-card" data-product-id="{{ $product->id }}">
                                 <div class="product-image">
-                                    <img src="{{$product->primaryImage
-                ? get_user_image($product->primaryImage->path)
-                : url(config('app.default_product_image')) }}"
+                                    <img src="{{ $product->primaryImage ? get_user_image($product->primaryImage->path) : 'https://via.placeholder.com/300x200?text=No+Image' }}"
                                         alt="{{ $product->name }}">
 
                                     <div class="product-badges">
@@ -951,9 +949,7 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <img src="{{ $product->primaryImage
-                ? get_user_image($product->primaryImage->path)
-                : url(config('app.default_product_image'))  }}"
+                                            <img src="{{ $product->primaryImage ? get_user_image($product->primaryImage->path) : 'https://via.placeholder.com/60x60?text=No+Image' }}"
                                                 alt="{{ $product->name }}" class="product-table-image">
                                         </td>
                                         <td>
