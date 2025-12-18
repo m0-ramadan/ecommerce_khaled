@@ -335,7 +335,7 @@ class ProductController extends Controller
                 'category_id' => $validated['category_id'],
                 'description' => $validated['description'],
                 'price' => $validated['price'],
-                'stock' => $validated['stock'],
+                'stock' => $validated['stock']??0,
                 'status_id' => $validated['status_id'],
                 'has_discount' => $request->boolean('has_discount'),
                 'includes_tax' => $request->boolean('includes_tax'),
