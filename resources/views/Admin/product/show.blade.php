@@ -585,7 +585,7 @@
                     <div class="row" bis_skin_checked="1">
                         <div class="col-md-8" bis_skin_checked="1">
                             <div class="product-main-image" bis_skin_checked="1">
-                                <img src="{{ $product->primaryImage ? get_user_image($product->primaryImage->path): 'https://via.placeholder.com/600x400?text=No+Image' }}"
+                                <img src="{{ $product->primaryImage ? get_user_image($product->primaryImage->path) : 'https://via.placeholder.com/600x400?text=No+Image' }}"
                                     alt="{{ $product->name }}" id="mainProductImage">
                                 <div class="image-overlay-buttons" bis_skin_checked="1">
                                     <button class="btn btn-primary" onclick="zoomImage()">
@@ -1458,129 +1458,7 @@
             window.open(url, '_blank');
         }
 
-        // Print product details
-        function printProduct() {
-            const printWindow = window.open('', '_blank');
-            const title = 'تفاصيل المنتج - {{ $product->name }}';
-            const date = new Date().toLocaleString('ar-EG');
 
-            printWindow.document.write(`
-            <!DOCTYPE html>
-            <html dir="rtl" lang="ar">
-            <head>
-                <title>${title}</title>
-                <style>
-                    body { 
-                        font-family: 'Cairo', sans-serif; 
-                        margin: 20px; 
-                        color: #333;
-                    }
-                    .print-header {
-                        text-align: center;
-                        margin-bottom: 30px;
-                        border-bottom: 2px solid #333;
-                        padding-bottom: 20px;
-                    }
-                    .print-header h1 {
-                        color: #2c3e50;
-                        margin-bottom: 10px;
-                    }
-                    .print-section {
-                        margin-bottom: 20px;
-                        page-break-inside: avoid;
-                    }
-                    .print-section h3 {
-                        color: #3498db;
-                        border-bottom: 1px solid #ddd;
-                        padding-bottom: 10px;
-                        margin-bottom: 15px;
-                    }
-                    .print-info {
-                        display: grid;
-                        grid-template-columns: repeat(2, 1fr);
-                        gap: 10px;
-                    }
-                    .print-item {
-                        padding: 8px 0;
-                        border-bottom: 1px solid #eee;
-                    }
-                    .print-label {
-                        font-weight: bold;
-                        color: #7f8c8d;
-                    }
-                    .print-value {
-                        color: #2c3e50;
-                    }
-                    .print-image {
-                        max-width: 300px;
-                        border-radius: 10px;
-                        margin: 10px 0;
-                    }
-                    @media print {
-                        body { margin: 0; }
-                        .no-print { display: none; }
-                    }
-                </style>
-            </head>
-            <body>
-                <div class="print-header">
-                    <h1>${title}</h1>
-                    <p>تم الطباعة في: ${date}</p>
-                    <p>الرابط: {{ url('/products/' . $product->slug) }}</p>
-                </div>
-                
-                <div class="print-section">
-                    <h3>المعلومات الأساسية</h3>
-                    <div class="print-info">
-                        <div class="print-item">
-                            <span class="print-label">اسم المنتج:</span>
-                            <span class="print-value">{{ $product->name }}</span>
-                        </div>
-                        <div class="print-item">
-                            <span class="print-label">التصنيف:</span>
-                            <span class="print-value">{{ $product->category->name ?? 'غير مصنف' }}</span>
-                        </div>
-                        <div class="print-item">
-                            <span class="print-label">السعر:</span>
-                            <span class="print-value">{{ number_format($product->final_price, 2) }} ج.م</span>
-                        </div>
-                        <div class="print-item">
-                            <span class="print-label">المخزون:</span>
-                            <span class="print-value">{{ $product->stock }} قطعة</span>
-                        </div>
-                        <div class="print-item">
-                            <span class="print-label">الحالة:</span>
-                            <span class="print-value">{{ $product->status_id == 1 ? 'نشط' : ($product->status_id == 2 ? 'غير نشط' : 'مسودة') }}</span>
-                        </div>
-                        <div class="print-item">
-                            <span class="print-label">تاريخ الإنشاء:</span>
-                            <span class="print-value">{{ $product->created_at->format('Y/m/d h:i A') }}</span>
-                        </div>
-                    </div>
-                </div>
-                
-                @if ($product->description)
-                <div class="print-section">
-                    <h3>الوصف</h3>
-                    <div class="print-description">
-                        {{ strip_tags($product->description) }}
-                    </div>
-                </div>
-                @endif
-                
-                <div class="no-print" style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd;">
-                    <button onclick="window.print()" style="padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer;">
-                        طباعة الصفحة
-                    </button>
-                    <button onclick="window.close()" style="padding: 10px 20px; background: #e74c3c; color: white; border: none; border-radius: 5px; cursor: pointer; margin-right: 10px;">
-                        إغلاق
-                    </button>
-                </div>
-            </body>
-            </html>
-        `);
-            printWindow.document.close();
-        }
 
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {

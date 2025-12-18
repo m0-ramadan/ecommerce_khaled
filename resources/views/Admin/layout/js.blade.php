@@ -45,7 +45,7 @@
     </div>
 </div>
 
-<script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+{{-- <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script> --}}
 
 <script src="{{ asset('dashboard/assets/vendor/libs/toastr/toastr.js') }}"></script>
 <script src="{{ asset('dashboard/assets/js/app-logistics-dashboard.js') }}"></script>
@@ -639,13 +639,13 @@
 
 
 
-        Pusher.logToConsole = true;
+        // Pusher.logToConsole = true;
 
-        var pusher = new Pusher("0a0f927bacf0d6a676c5", {
-            cluster: 'eu'
-        });
+        // var pusher = new Pusher("0a0f927bacf0d6a676c5", {
+        //     cluster: 'eu'
+        // });
 
-        var channel = pusher.subscribe('channel-notify-1');
+        // var channel = pusher.subscribe('channel-notify-1');
 
 
         $("#view-all-notifications").click(function(e) {
