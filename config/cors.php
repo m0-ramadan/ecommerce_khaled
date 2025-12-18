@@ -2,25 +2,16 @@
 
 return [
 
-    'paths' => [
-        'api/*',
-        'sanctum/csrf-cookie'
-    ],
+    'paths' => ['api/*', 'sanctum/csrf-cookie'],
 
     'allowed_methods' => ['*'],
 
     'allowed_origins' => [
-        'http://localhost:3000',
-        'http://72.62.25.136:3000',
         'https://talaaljazeera.com',
         'https://www.talaaljazeera.com',
-        'https://ecommerce-xo.vercel.app'
     ],
 
-    // علشان Vercel preview
-    'allowed_origins_patterns' => [
-        '#^https://.*\.vercel\.app$#'
-    ],
+    'allowed_origins_patterns' => [],
 
     'allowed_headers' => ['*'],
 
@@ -28,6 +19,6 @@ return [
 
     'max_age' => 0,
 
-    'supports_credentials' => true,
+    'supports_credentials' => false,
 
 ];
