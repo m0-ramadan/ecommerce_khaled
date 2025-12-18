@@ -19,7 +19,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['http://localhost:3000','https://ecommerce-xo.vercel.app/'],
+    'allowed_origins' => ['http://localhost:3000','https://ecommerce-xo.vercel.app/','http://72.62.25.136:3000','talaaljazeera.com'],
 
     'allowed_origins_patterns' => [],
 
