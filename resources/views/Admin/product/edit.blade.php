@@ -728,7 +728,7 @@
                             </div>
                         </div>
 
-                        <form action="{{ route('admin.products.update', $product) }}" method="POST"
+                        <form action="{{ route('admin.products.update', $product->id) }}" method="POST"
                             enctype="multipart/form-data" id="editProductForm">
                             @csrf
                             @method('POST')
@@ -2398,7 +2398,7 @@
             // Submit form via AJAX
             const formData = new FormData(document.getElementById('editProductForm'));
 
-            fetch('{{ route('admin.products.update', $product) }}', {
+            fetch('{{ route('admin.products.update', $product->id) }}', {
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': '{{ csrf_token() }}',

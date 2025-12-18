@@ -114,7 +114,7 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
         Route::get('/create', [ProductController::class, 'create'])->name('create');
         Route::post('/', [ProductController::class, 'store'])->name('store');
         Route::get('/{id}/edit', [ProductController::class, 'edit'])->name('edit');
-        Route::post('/{product}', [ProductController::class, 'update'])->name('update');
+
         Route::delete('/{product}', [ProductController::class, 'destroy'])->name('destroy');
         Route::get('/{id}', [ProductController::class, 'show'])->name('show');
         Route::post('quick-add', [ProductController::class, 'quickAdd'])->name('quick-add');
@@ -122,6 +122,7 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
         Route::get('export', [ProductController::class, 'export'])->name('export');
         Route::post('{product}/duplicate', [ProductController::class, 'duplicate'])->name('duplicate');
     });
+    Route::post('products/update/{id}', [ProductController::class, 'update'])->name('products.update');
 
     // Contacts
     Route::prefix('contacts')->as('contact.')->group(function () {

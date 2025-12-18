@@ -442,7 +442,7 @@ class ProductController extends Controller
                         'alt' => 'ww',
 
                         'is_primary' => false,
-                         'type' => 'additional',
+                        'type' => 'additional',
                         'order' => $order++
                     ]);
                 }
@@ -637,24 +637,24 @@ class ProductController extends Controller
         ));
     }
 
-    public function update(Request $request, Product $product)
+    public function update(Request $request, $id)
     {
-        dd($request->all());
+        //dd($request->all());
 
         $validated = $request->validate([
             'name'              => 'required|string|max:255',
             'category_id'       => 'required|exists:categories,id',
             'description'       => 'nullable|string',
-            'num_faces'         => 'required|in:1,2',
+            'num_faces'         => 'nullable|in:1,2',
             'print_locations'   => 'nullable|array',
             'printing_methods'  => 'nullable|array',
             'protection_layer'  => 'nullable|in:none,glossy,matte',
             'design_service'    => 'nullable|in:0,free,paid',
             'design_service_price' => 'nullable|numeric|min:0',
-            'delivery_time'     => 'required|string',
+            'delivery_time'     => 'nullable|string',
             'shipping_fees'     => 'nullable|string',
             'tags'              => 'nullable|string',
-            'status'            => 'required|in:0,1',
+            'status'            => 'nullable|in:0,1',
             'images.*'          => 'image|mimes:jpg,jpeg,png,webp|max:5048',
             'colors'            => 'array',
             'colors.*'          => 'exists:colors,id',
@@ -668,6 +668,7 @@ class ProductController extends Controller
 
         DB::beginTransaction();
         try {
+            $product = Product::findOrFail($id);
             $product->update([
                 'name'              => $request->name,
                 'category_id'       => $request->category_id,
@@ -693,7 +694,25 @@ class ProductController extends Controller
                     $path = $file->store('products', 'public');
                     $product->images()->create([
                         'path' => $path,
+                        'alt' => 'ww',
+                        'type' => $index === 0 ? 'main' : 'additional',
                         'is_primary' => $index === 0 && !$product->images()->where('is_primary', true)->exists(),
+                    ]);
+                }
+            }
+
+
+            // تحديث خيارات المنتج
+            if ($request->filled('product_options')) {
+
+                // $product->options()->delete();
+
+                foreach ($request->product_options as $option) {
+                    $product->options()->create([
+                        'option_name'       => $option['option_name'] ?? null,
+                        'option_value'      => $option['option_value'] ?? null,
+                        'additional_price'  => $option['additional_price'] ?? 0,
+                        'is_required'       => $option['is_required'] ?? false,
                     ]);
                 }
             }
@@ -713,7 +732,7 @@ class ProductController extends Controller
             }
 
             DB::commit();
-            return redirect()->route('Admin.product.show', $product)
+            return redirect()->route('admin.products.show', $product)
                 ->with('success', 'تم تحديث المنتج بنجاح');
         } catch (\Exception $e) {
             DB::rollBack();
