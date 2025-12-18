@@ -17,7 +17,6 @@ if (!function_exists('get_user_image')) {
         if (str_starts_with($image, 'http://') || str_starts_with($image, 'https://')) {
             return $image;
         }
-
         // الرابط نسبي في قاعدة البيانات
         return asset('storage/' . $image);
     }
