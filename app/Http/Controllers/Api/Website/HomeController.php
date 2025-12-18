@@ -25,18 +25,15 @@ class HomeController extends Controller
     {
         try {
 
-            // 🟢 limit جاي من الفرونت أو default = 5
             $subCategoriesLimit = $request->input('categories_limit', 5);
-            
-            $categories = Category::where('status_id', 1)->whereNull('parent_id')->get();
-            // 🟢 جلب الأقسام الفرعية
+
             $sub_categories = Category::where('status_id', 1)
                 ->whereHas('products', function ($q) {
                     $q->where('status_id', 1);
                 })
                 ->orderBy('order', 'asc')
-                ->limit($subCategoriesLimit)
-                ->get();
+                ->paginate($subCategoriesLimit);
+
 
             // ============================
             // 🎯 جلب السلايدر
@@ -57,11 +54,19 @@ class HomeController extends Controller
                 })
                 ->orderBy('section_order')
                 ->first();
-
             return $this->success([
                 'sub_categories' => CategoryWithProductResource::collection($sub_categories),
-                'sliders'        => new BannerResource($banners),
-                'categories' => CategoryResource::collection($categories),
+
+                'sub_categories_pagination' => [
+                    'current_page' => $sub_categories->currentPage(),
+                    'last_page'    => $sub_categories->lastPage(),
+                    'per_page'     => $sub_categories->perPage(),
+                    'total'        => $sub_categories->total(),
+                    'next_page'    => $sub_categories->nextPageUrl(),
+                    'prev_page'    => $sub_categories->previousPageUrl(),
+                ],
+
+                'sliders'    => new BannerResource($banners)
             ], 'تم جلب بيانات الصفحة الرئيسية بنجاح');
         } catch (\Exception $e) {
             return $this->error('حدث خطأ أثناء تحميل البيانات', 500, [
