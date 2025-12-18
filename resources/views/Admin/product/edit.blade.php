@@ -731,7 +731,7 @@
                         <form action="{{ route('admin.products.update', $product) }}" method="POST"
                             enctype="multipart/form-data" id="editProductForm">
                             @csrf
-                            @method('PUT')
+                            @method('POST')
 
                             <!-- Step 1: Basic Information -->
                             <div class="step-card step-1" bis_skin_checked="1">
