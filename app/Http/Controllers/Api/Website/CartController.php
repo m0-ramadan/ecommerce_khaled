@@ -73,14 +73,14 @@ class CartController extends Controller
                 ->first();
 
             $printingMethodId = null;
-
             if ($request->filled('printing_method_id')) {
-                $valid = Product::find($request->product_id)->printingMethods()
-                    ->where('printing_method_id', $request->printing_method_id)
+                $valid = Product::whereKey($request->product_id)
+                    ->whereHas('printingMethods', function ($q) use ($request) {
+                        $q->where('printing_methods.id', $request->printing_method_id);
+                    })
                     ->exists();
-
                 if ($valid) {
-                    $printingMethodId = $request->printing_method_id;
+                    $printingMethodId = (int) $request->printing_method_id;
                 }
             }
 
