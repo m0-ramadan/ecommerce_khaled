@@ -260,6 +260,16 @@ class Product extends Model
         return $this->belongsToMany(PrintingMethod::class, 'product_print_methods');
     }
 
+    public function printingMethodsProduct()
+    {
+        return $this->belongsToMany(
+            PrintingMethod::class,
+            'printing_method_product',   // اسم جدول الـ pivot الصح
+            'product_id',
+            'printing_method_id'
+        );
+    }
+
 
     public function sizeTiers()
     {

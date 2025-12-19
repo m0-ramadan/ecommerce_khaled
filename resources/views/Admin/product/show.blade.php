@@ -1454,7 +1454,7 @@
 
         // Preview product in store
         function previewProduct() {
-            const url = '{{ url('/products/' . $product->slug) }}';
+            const url = 'https://talaaljazeera.com/product/{{ $product->id }}';
             window.open(url, '_blank');
         }
 

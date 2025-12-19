@@ -18,7 +18,7 @@ class AddToCartRequest extends FormRequest
             'quantity'             => 'required|integer|min:1',
             'size_id'              => 'nullable|exists:sizes,id',
             'color_id'             => 'nullable|exists:colors,id',
-            'printing_method_id'   => 'nullable|exists:printing_method_product,id',
+            'printing_method_id'   => 'nullable',
             'print_locations'      => 'nullable|array',
             'print_locations.*'    => 'exists:print_location_product,id',
             'embroider_locations'  => 'nullable|array',

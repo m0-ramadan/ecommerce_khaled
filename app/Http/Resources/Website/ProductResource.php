@@ -16,7 +16,6 @@ class ProductResource extends JsonResource
                 return $size->productTiers;
             })->min('price_per_unit');
 
-
         return [
             // ================== Basic Info ==================
             'id'                => $this->id,
@@ -31,7 +30,7 @@ class ProductResource extends JsonResource
             'stock'             => (int) $this->stock,
             'status_id'         => (int) $this->status_id,
             'is_active'         => $this->status_id == 1,
-            'lowest_price' =>  $lowestPrice??rand(5,15),
+            'lowest_price' =>  $lowestPrice ?? rand(5, 15),
 
             // ================== Image ==================
             'image' => $this->primaryImage
@@ -157,13 +156,12 @@ class ProductResource extends JsonResource
             }),
 
             // ================== Printing Methods ==================
-            'printing_methods' => $this->printingMethods->map(function ($method) {
+            'printing_methods' => $this->printingMethodsProduct->map(function ($method) {
                 return [
                     'id'          => $method->id,
                     'name'        => $method->name,
                     'description' => $method->description,
                     'base_price'  => $method->base_price,
-                    'pivot_price' => $method->pivot->additional_price ?? $method->base_price,
                 ];
             }),
 
