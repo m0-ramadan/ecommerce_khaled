@@ -168,11 +168,10 @@ class ProductResource extends JsonResource
             // ================== Print Locations ==================
             'print_locations' => $this->printLocations->map(function ($location) {
                 return [
-                    'id'               => $location->id,
-                    'name'             => $location->name,
-                    'type'             => $location->type,
-                    'additional_price' => $location->additional_price,
-                    'pivot_price'      => $location->pivot->additional_price ?? $location->additional_price,
+                    'id'   => $location->id,
+                    'name' => $location->name,
+                    'type' => $location->type,
+                    'additional_price' => $location->additional_price ?? 0 + ($location->pivot->additional_price ?? $location->additional_price ?? 0),
                 ];
             }),
 

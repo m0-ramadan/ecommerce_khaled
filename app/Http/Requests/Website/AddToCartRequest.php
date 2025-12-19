@@ -20,7 +20,7 @@ class AddToCartRequest extends FormRequest
             'color_id'             => 'nullable|exists:colors,id',
             'printing_method_id'   => 'nullable',
             'print_locations'      => 'nullable|array',
-            'print_locations.*'    => 'exists:print_location_product,id',
+            'print_locations.*'    => 'nullable',
             'embroider_locations'  => 'nullable|array',
             'embroider_locations.*' => 'nullable|exists:embroider_locations,id',
             'selected_options'     => 'nullable|array',

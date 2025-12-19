@@ -277,6 +277,11 @@ class Product extends Model
     }
     public function printLocations()
     {
-        return $this->belongsToMany(PrintLocation::class);
+        return $this->belongsToMany(
+            PrintLocation::class,
+            'print_location_product',
+            'product_id',
+            'print_location_id'
+        )->withPivot('additional_price');
     }
 }
