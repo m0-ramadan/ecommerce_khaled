@@ -156,7 +156,7 @@ class ProductResource extends JsonResource
             }),
 
             // ================== Printing Methods ==================
-            'printing_methods' => $this->printingMethodsProduct->map(function ($method) {
+            'printing_methods' => $this->printingMethods->map(function ($method) {
                 return [
                     'id'          => $method->id,
                     'name'        => $method->name,

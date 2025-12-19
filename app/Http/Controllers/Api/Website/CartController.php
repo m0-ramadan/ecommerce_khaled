@@ -244,152 +244,167 @@ class CartController extends Controller
      * @param Product|null $product
      * @return array ['price_per_unit' => float, 'line_total' => float]
      */
+    // private function calculateItemPrice(Request $request, Product $product = null): array
+    // {
+    //     // احصل على الـ product من ال-request إن لم يمرار
+    //     $product = $product ?? ($request->product ?? Product::find($request->product_id));
+
+    //     $quantity = (int) ($request->quantity ?? 1);
+
+    //     // بداية السعر: استعمل الـ tier إن وجد وإلا الـ base_price
+    //     $tier = $product->pricingTiers()
+    //         ->where('quantity', '<=', $quantity)
+    //         ->orderByDesc('quantity')
+    //         ->first();
+
+    //     $price = $tier?->price_per_unit ?? $product->base_price ?? 0;
+
+    //     // ============================
+    //     // ✅ selected options price
+    //     // ============================
+    //     if ($request->filled('selected_options')) {
+    //         foreach ($request->selected_options as $option) {
+    //             if (isset($option['option_additional_price'])) {
+    //                 $price += (float) $option['option_additional_price'];
+    //             }
+    //         }
+    //     }
+
+    //     // إضافة أسعار المقاس واللون لو متوفرة
+    //     if ($request->filled('color_id')) {
+    //         $color = $product->colors()->where('colors.id', $request->color_id)->first();
+    //         $price += $color?->additional_price ?? 0;
+    //     }
+    //     if ($request->filled('size_id')) {
+    //         $size = $product->sizes()
+    //             ->where('id', $request->size_id)
+    //             ->first();
+
+    //         $tier = $size?->productTiers()
+    //             ->where('quantity', '<=', $quantity)
+    //             ->orderByDesc('quantity')
+    //             ->first();
+
+    //         $price += ($tier?->price_per_unit ?? 0) * $quantity;
+    //     }
+
+    //     // مواقع الطباعة
+    //     if ($request->filled('print_locations')) {
+    //         // إذا كانت ids
+    //         $ids = $request->print_locations;
+    //         $price += PrintLocation::whereIn('id', $ids)->sum('additional_price');
+    //     }
+
+    //     if ($product->price) {
+    //         $price += $product->getFinalPriceAttribute();
+    //     }
+
+    //     // مواقع التطريز
+    //     if ($request->filled('embroider_locations')) {
+    //         $ids = $request->embroider_locations;
+    //         $price += EmbroiderLocation::whereIn('id', $ids)->sum('additional_price');
+    //     }
+
+    //     // طريقة الطباعة
+    //     if ($request->filled('printing_method_id')) {
+    //         $method = PrintingMethod::find($request->printing_method_id);
+    //         $price += $method?->base_price ?? 0;
+    //     }
+
+    //     // خدمة التصميم
+    //     if ($request->filled('design_service_id')) {
+    //         $service = DesignService::find($request->design_service_id);
+    //         $price += $service?->price ?? 0;
+    //     }
+
+    //     $lineTotal = $price * $quantity;
+
+    //     return [
+    //         'price_per_unit' => (float) $price,
+    //         'line_total' => (float) $lineTotal,
+    //     ];
+    // }
+
     private function calculateItemPrice(Request $request, Product $product = null): array
     {
-        // احصل على الـ product من ال-request إن لم يمرار
-        $product = $product ?? ($request->product ?? Product::find($request->product_id));
-
+        $product = $product ?? Product::findOrFail($request->product_id);
         $quantity = (int) ($request->quantity ?? 1);
 
-        // بداية السعر: استعمل الـ tier إن وجد وإلا الـ base_price
+        // ============================
+        // 🟢 base unit price
+        // ============================
         $tier = $product->pricingTiers()
             ->where('quantity', '<=', $quantity)
             ->orderByDesc('quantity')
             ->first();
 
-        $price = $tier?->price_per_unit ?? $product->base_price ?? 0;
+        $unitPrice = $tier?->price_per_unit ?? $product->base_price ?? 0;
 
-        // إضافة أسعار المقاس واللون لو متوفرة
-        if ($request->filled('color_id')) {
-            $color = $product->colors()->where('colors.id', $request->color_id)->first();
-            $price += $color?->additional_price ?? 0;
+        // ============================
+        // 🟢 per-unit additions
+        // ============================
+
+        // selected options
+        if ($request->filled('selected_options')) {
+            foreach ($request->selected_options as $option) {
+                $unitPrice += (float) ($option['option_additional_price'] ?? 0);
+            }
         }
-        if ($request->filled('size_id')) {
-            $size = $product->sizes()
-                ->where('id', $request->size_id)
-                ->first();
 
-            $tier = $size?->productTiers()
+        // color
+        if ($request->filled('color_id')) {
+            $color = $product->colors()->find($request->color_id);
+            $unitPrice += $color?->additional_price ?? 0;
+        }
+
+        // size (per unit)
+        if ($request->filled('size_id')) {
+            $size = $product->sizes()->find($request->size_id);
+
+            $sizeTier = $size?->productTiers()
                 ->where('quantity', '<=', $quantity)
                 ->orderByDesc('quantity')
                 ->first();
 
-            $price += ($tier?->price_per_unit ?? 0) * $quantity;
+            $unitPrice += $sizeTier?->price_per_unit ?? 0;
         }
 
-        // مواقع الطباعة
-        if ($request->filled('print_locations')) {
-            // إذا كانت ids
-            $ids = $request->print_locations;
-            $price += PrintLocation::whereIn('id', $ids)->sum('additional_price');
-        }
-
-        if ($product->price) {
-            $price += $product->getFinalPriceAttribute();
-        }
-
-        // مواقع التطريز
-        if ($request->filled('embroider_locations')) {
-            $ids = $request->embroider_locations;
-            $price += EmbroiderLocation::whereIn('id', $ids)->sum('additional_price');
-        }
-
-        // طريقة الطباعة
+        // printing method
         if ($request->filled('printing_method_id')) {
             $method = PrintingMethod::find($request->printing_method_id);
-            $price += $method?->base_price ?? 0;
+            $unitPrice += $method?->base_price ?? 0;
         }
 
-        // خدمة التصميم
+        // ============================
+        // 🟡 one-time additions
+        // ============================
+        $oneTimePrice = 0;
+
+        if ($request->filled('print_locations')) {
+            $oneTimePrice += PrintLocation::whereIn('id', $request->print_locations)
+                ->sum('additional_price');
+        }
+
+        if ($request->filled('embroider_locations')) {
+            $oneTimePrice += EmbroiderLocation::whereIn('id', $request->embroider_locations)
+                ->sum('additional_price');
+        }
+
         if ($request->filled('design_service_id')) {
             $service = DesignService::find($request->design_service_id);
-            $price += $service?->price ?? 0;
+            $oneTimePrice += $service?->price ?? 0;
         }
 
-        $lineTotal = $price * $quantity;
+        // ============================
+        // 🧮 totals
+        // ============================
+        $lineTotal = ($unitPrice * $quantity) + $oneTimePrice;
 
         return [
-            'price_per_unit' => (float) $price,
-            'line_total' => (float) $lineTotal,
+            'price_per_unit' => round($unitPrice, 2),
+            'line_total'     => round($lineTotal, 2),
         ];
     }
-//     private function calculateItemPrice(Request $request, Product $product = null): array
-// {
-//     $product = $product ?? Product::findOrFail($request->product_id);
-//     $quantity = max((int) $request->quantity, 1);
-
-//     // ================= Base unit price =================
-//     $tier = $product->pricingTiers()
-//         ->where('quantity', '<=', $quantity)
-//         ->orderByDesc('quantity')
-//         ->first();
-
-//     $unitPrice = $tier?->price_per_unit
-//         ?? $product->base_price
-//         ?? 0;
-
-//     // ================= Color =================
-//     if ($request->filled('color_id')) {
-//         $color = $product->colors()
-//             ->where('colors.id', $request->color_id)
-//             ->first();
-
-//         $unitPrice += $color?->additional_price ?? 0;
-//     }
-
-//     // ================= Size (override tier) =================
-//     if ($request->filled('size_id')) {
-//         $size = $product->sizes()
-//             ->where('id', $request->size_id)
-//             ->first();
-
-//         $sizeTier = $size?->productTiers()
-//             ->where('quantity', '<=', $quantity)
-//             ->orderByDesc('quantity')
-//             ->first();
-
-//         if ($sizeTier) {
-//             $unitPrice = $sizeTier->price_per_unit;
-//         }
-//     }
-
-//     // ================= Print Locations =================
-//     if ($request->filled('print_locations')) {
-//         $unitPrice += PrintLocation::whereIn(
-//             'id',
-//             (array) $request->print_locations
-//         )->sum('additional_price');
-//     }
-
-//     // ================= Embroidery Locations =================
-//     if ($request->filled('embroider_locations')) {
-//         $unitPrice += EmbroiderLocation::whereIn(
-//             'id',
-//             (array) $request->embroider_locations
-//         )->sum('additional_price');
-//     }
-
-//     // ================= Printing Method =================
-//     if ($request->filled('printing_method_id')) {
-//         $method = PrintingMethod::find($request->printing_method_id);
-//         $unitPrice += $method?->base_price ?? 0;
-//     }
-
-//     // ================= Design Service =================
-//     if ($request->filled('design_service_id')) {
-//         $service = DesignService::find($request->design_service_id);
-//         $unitPrice += $service?->price ?? 0;
-//     }
-
-//     // ================= Totals =================
-//     $lineTotal = $unitPrice * $quantity;
-
-//     return [
-//         'price_per_unit' => round((float) $unitPrice, 2),
-//         'line_total'     => round((float) $lineTotal, 2),
-//     ];
-// }
-
 
     private function recalculateCart(Cart $cart)
     {

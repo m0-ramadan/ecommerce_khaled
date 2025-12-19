@@ -255,12 +255,12 @@ class Product extends Model
 
         return $product;
     }
-    public function printingMethods()
-    {
-        return $this->belongsToMany(PrintingMethod::class, 'product_print_methods');
-    }
+    // public function printingMethods()
+    // {
+    //     return $this->belongsToMany(PrintingMethod::class, 'product_print_methods');
+    // }
 
-    public function printingMethodsProduct()
+    public function printingMethods()
     {
         return $this->belongsToMany(
             PrintingMethod::class,
