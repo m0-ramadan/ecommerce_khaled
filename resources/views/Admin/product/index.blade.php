@@ -505,18 +505,48 @@
         <div class="card mb-4" bis_skin_checked="1">
             <div class="card-body" bis_skin_checked="1">
                 <div class="row" bis_skin_checked="1">
-                    <div class="col-md-8" bis_skin_checked="1">
-                        <div class="d-flex flex-wrap align-items-center gap-3" bis_skin_checked="1">
-                            <!-- Search -->
-                            <div class="position-relative" style="min-width: 300px;" bis_skin_checked="1">
-                                <input type="text" class="form-control" id="globalSearch"
-                                    placeholder="بحث في المنتجات...">
-                                <i class="fas fa-search position-absolute"
-                                    style="left: 15px; top: 50%; transform: translateY(-50%); color: #adb5bd;"></i>
-                            </div>
+                    <div class="col-md-8">
+                        <div class="d-flex flex-wrap align-items-center gap-3">
+                            <!-- Search Form -->
+                            <form method="GET" action="{{ route('admin.products.index') }}" id="searchForm"
+                                class="d-flex">
+                                <div class="position-relative" style="min-width: 300px;">
+                                    <input type="text" class="form-control" name="search" id="globalSearch"
+                                        placeholder="بحث في المنتجات..." value="{{ request('search') }}">
+                                    <i class="fas fa-search position-absolute"
+                                        style="left: 15px; top: 50%; transform: translateY(-50%); color: #adb5bd;"></i>
+
+                                    @if (request('search'))
+                                        <button type="button" id="clearSearch" class="btn position-absolute"
+                                            style="right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none;">
+                                            <i class="fas fa-times text-muted"></i>
+                                        </button>
+                                    @endif
+                                </div>
+
+                                <!-- Hidden inputs to preserve other filters -->
+                                @if (request('category_id'))
+                                    <input type="hidden" name="category_id" value="{{ request('category_id') }}">
+                                @endif
+                                @if (request('status_id'))
+                                    <input type="hidden" name="status_id" value="{{ request('status_id') }}">
+                                @endif
+                                @if (request('price_from'))
+                                    <input type="hidden" name="price_from" value="{{ request('price_from') }}">
+                                @endif
+                                @if (request('price_to'))
+                                    <input type="hidden" name="price_to" value="{{ request('price_to') }}">
+                                @endif
+                                @if (request('stock_from'))
+                                    <input type="hidden" name="stock_from" value="{{ request('stock_from') }}">
+                                @endif
+                                @if (request('stock_to'))
+                                    <input type="hidden" name="stock_to" value="{{ request('stock_to') }}">
+                                @endif
+                            </form>
 
                             <!-- Quick Filters -->
-                            <div class="quick-actions" bis_skin_checked="1">
+                            <div class="quick-actions">
                                 <button type="button" class="btn btn-outline-primary btn-sm"
                                     onclick="applyFilter('status_id', '1')">
                                     <i class="fas fa-check-circle"></i> النشطة
@@ -771,7 +801,7 @@
                         <div class="col">
                             <div class="product-card" data-product-id="{{ $product->id }}">
                                 <div class="product-image">
-                                    <img src="{{ $product->primaryImage ? get_user_image($product->primaryImage->path) : 'https://via.placeholder.com/300x200?text=No+Image' }}"
+                                    <img src="{{ $product->primaryImage ? get_user_image($product->primaryImage->path) : asset(env('DEFAULT_PRODUCT_IMAGE')) }}"
                                         alt="{{ $product->name }}">
 
                                     <div class="product-badges">
@@ -1194,67 +1224,57 @@
                 allowClear: true
             });
 
-            // Initialize DataTable
+            // Initialize DataTable with basic features only
             $('#productsTable').DataTable({
                 language: {
                     url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json'
                 },
                 responsive: true,
-                colReorder: true,
-                dom: 'Bfrtip',
-                buttons: [{
-                        extend: 'copy',
-                        text: 'نسخ',
-                        className: 'btn btn-outline-secondary'
-                    },
-                    {
-                        extend: 'excel',
-                        text: 'Excel',
-                        className: 'btn btn-outline-success'
-                    },
-                    {
-                        extend: 'pdf',
-                        text: 'PDF',
-                        className: 'btn btn-outline-danger'
-                    },
-                    {
-                        extend: 'print',
-                        text: 'طباعة',
-                        className: 'btn btn-outline-info'
-                    },
-                    'colvis'
-                ],
-                // Disable automatic search to use our custom search
+                paging: false,
                 searching: false,
                 info: false,
-                paging: false
+                ordering: true,
+                dom: '<"row"<"col-sm-12"tr>>',
             });
 
-            // Global search
-            $('#globalSearch').on('keyup', function() {
-                const searchTerm = $(this).val().toLowerCase();
+            // Debounce function لمنع طلبات كثيرة
+            function debounce(func, wait) {
+                let timeout;
+                return function executedFunction(...args) {
+                    const later = () => {
+                        clearTimeout(timeout);
+                        func(...args);
+                    };
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                };
+            }
 
-                // Grid view search
-                $('#productsGrid .col').each(function() {
-                    const productText = $(this).text().toLowerCase();
-                    if (productText.includes(searchTerm)) {
-                        $(this).show();
-                    } else {
-                        $(this).hide();
-                    }
-                });
+            // البحث عن طريق الـ Form (يبحث في كل البيانات)
+            $('#globalSearch').on('keyup', debounce(function() {
+                const searchValue = $(this).val().trim();
 
-                // Table view search
-                if ($('#tableView').is(':visible')) {
-                    // Clear previous search
-                    $('#productsTable').DataTable().search('').draw();
-                    // Apply new search
-                    $('#productsTable').DataTable().search(searchTerm).draw();
+                // إذا كان البحث فارغاً، أزل معامل البحث من الـ URL
+                if (searchValue === '') {
+                    const url = new URL(window.location.href);
+                    url.searchParams.delete('search');
+                    url.searchParams.delete('page'); // أزل رقم الصفحة للعودة للصفحة الأولى
+                    window.location.href = url.toString();
+                    return;
                 }
+
+                // إرسال الفورم للبحث في كل البيانات
+                $('#searchForm').submit();
+            }, 500));
+
+            // Clear search when clicking clear button
+            $(document).on('click', '#clearSearch', function() {
+                $('#globalSearch').val('');
+                $('#searchForm').submit();
             });
 
             // Product checkbox selection
-            $('.product-checkbox').on('change', function() {
+            $(document).on('change', '.product-checkbox', function() {
                 updateSelectedCount();
             });
 
@@ -1266,7 +1286,7 @@
             });
 
             // Delete product
-            $('.delete-product').on('click', function() {
+            $(document).on('click', '.delete-product', function() {
                 const productId = $(this).data('id');
                 const productName = $(this).data('name');
 
@@ -1286,25 +1306,101 @@
                 });
             });
 
-            // Initialize view toggle buttons
+            // View toggle buttons
             $('.view-toggle-btn').on('click', function() {
-                const viewType = $(this).text().includes('large') ? 'grid' : 'table';
+                const viewType = $(this).has('.fa-th-large').length ? 'grid' : 'table';
                 toggleView(viewType);
             });
 
-            // Initialize quick filter buttons
+            // Quick filter buttons
             $('.quick-actions .btn').on('click', function() {
                 const action = $(this).attr('onclick');
                 if (action && action.includes('applyFilter')) {
-                    // Extract parameters from onclick attribute
                     const match = action.match(/applyFilter\('([^']+)',\s*'([^']+)'\)/);
                     if (match) {
                         applyFilter(match[1], match[2]);
                     }
                 }
             });
+
+            // Fill search input with current search value
+            @if (request('search'))
+                $('#globalSearch').val('{{ request('search') }}');
+            @endif
         });
 
+        // View Toggle Function
+        window.toggleView = function(viewType) {
+            $('.view-toggle-btn').removeClass('active').filter(function() {
+                return (viewType === 'grid' && $(this).has('.fa-th-large').length) ||
+                    (viewType === 'table' && $(this).has('.fa-list').length);
+            }).addClass('active');
+
+            $('.view-container').hide();
+            if (viewType === 'grid') {
+                $('#gridView').show();
+            } else {
+                $('#tableView').show();
+                $('#productsTable').DataTable().columns.adjust().responsive.recalc();
+            }
+        }
+
+        // Quick Filters Function
+        window.applyFilter = function(filter, value) {
+            const url = new URL(window.location.href);
+            url.searchParams.delete('page'); // العودة للصفحة الأولى
+
+            if (value === 'low') {
+                url.searchParams.set('stock_from', '1');
+                url.searchParams.set('stock_to', '10');
+                url.searchParams.delete('stock');
+            } else {
+                url.searchParams.set(filter, value);
+            }
+
+            window.location.href = url.toString();
+        }
+
+        window.clearFilters = function() {
+            // الحفاظ على البحث الحالي إذا كان موجوداً
+            const searchValue = $('#globalSearch').val();
+            let url = '{{ route('admin.products.index') }}';
+
+            if (searchValue) {
+                url += '?search=' + encodeURIComponent(searchValue);
+            }
+
+            window.location.href = url;
+        }
+
+        // Advanced Filters Functions
+        window.toggleAdvancedFilters = function() {
+            $('#advancedFilters').toggleClass('show');
+        }
+
+        window.clearAdvancedFilters = function() {
+            $('#filterForm')[0].reset();
+            $('.select2').val(null).trigger('change');
+        }
+
+        window.applyAdvancedFilters = function() {
+            const formData = new FormData($('#filterForm')[0]);
+            const params = new URLSearchParams();
+
+            // إضافة البحث الحالي إذا كان موجوداً
+            const searchValue = $('#globalSearch').val();
+            if (searchValue) {
+                params.append('search', searchValue);
+            }
+
+            for (let [key, value] of formData.entries()) {
+                if (value) {
+                    params.append(key, value);
+                }
+            }
+
+            window.location.href = '{{ route('admin.products.index') }}?' + params.toString();
+        }
         // View Toggle Function
         window.toggleView = function(viewType) {
             $('.view-toggle-btn').removeClass('active');
