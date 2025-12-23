@@ -657,6 +657,47 @@
             gap: 5px;
         }
     </style>
+    <style>
+        /* Text Ads Styles */
+        .text-ad-field {
+            background: var(--bs-light-bg-subtle);
+            border: 1px solid var(--bs-border-color);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .text-ad-field textarea {
+            border: none;
+            background: transparent;
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .text-ad-remove {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            width: 28px;
+            height: 28px;
+            background: #dc3545;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            cursor: pointer;
+            z-index: 1;
+            border: 2px solid white;
+        }
+
+        .text-ad-remove:hover {
+            background: #c82333;
+            transform: scale(1.1);
+        }
+    </style>
 @endsection
 
 @section('content')
@@ -862,7 +903,7 @@
 
                                 <!-- Basic Pricing -->
                                 <div class="row">
-                                    <div class="col-md-6 mb-3">
+                                    <div class="col-md-4 mb-2">
                                         <label for="price" class="form-label required">السعر الأساسي</label>
                                         <div class="price-input-group">
                                             <span class="input-group-text">ج.م</span>
@@ -870,7 +911,14 @@
                                                 step="0.01" value="{{ old('price') }}" required>
                                         </div>
                                     </div>
-
+                                    <div class="col-md-8 mb-4">
+                                        <label for="price_text" class="form-label required"> نص السعر </label>
+                                        <div class="price-input-group">
+                                            <span class="input-group-text">ج.م</span>
+                                            <input type="text" class="form-control" id="price_text" name="price_text"
+                                                value="{{ old('price_text') }}" required>
+                                        </div>
+                                    </div>
                                     <div class="col-md-6 mb-3">
                                         <div class="toggle-container">
                                             <label class="toggle-switch">
@@ -1114,7 +1162,55 @@
                                             name="warranty_months" value="{{ old('warranty_months') }}" min="0">
                                     </div>
                                 </div>
+                                <p class="mb-1"><strong>النصوص الإعلانية:</strong> <span id="summary_text_ads"></span>
+                                </p>
+                                <!-- Text Ads Section -->
+                                <div class="mb-4">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <div>
+                                            <label class="form-label mb-0 fw-bold">النصوص الإعلانية للمنتج</label>
+                                            <small class="text-muted d-block">أضف نصوصاً إعلانية تظهر مع المنتج لجذب
+                                                العملاء</small>
+                                        </div>
+                                        <button type="button" class="btn btn-outline-primary btn-sm"
+                                            onclick="addTextAdField()">
+                                            <i class="fas fa-plus me-1"></i> إضافة نص إعلاني
+                                        </button>
+                                    </div>
 
+                                    <div id="textAdsContainer" class="row g-3 mt-2">
+                                        <!-- Text ad fields will be added here -->
+                                        @if (old('text_ads'))
+                                            @foreach (old('text_ads') as $index => $ad)
+                                                <div class="col-md-12 mb-3">
+                                                    <div class="card">
+                                                        <div class="card-body">
+                                                            <div class="row align-items-center">
+                                                                <div class="col-md-10 mb-2">
+                                                                    <textarea class="form-control" name="text_ads[{{ $index }}][name]" placeholder="أدخل النص الإعلاني"
+                                                                        rows="3" required>{{ $ad['name'] ?? '' }}</textarea>
+                                                                </div>
+                                                                <div class="col-md-2 mb-2 text-center">
+                                                                    <button type="button"
+                                                                        class="btn btn-outline-danger btn-sm"
+                                                                        onclick="removeTextAdField(this)">
+                                                                        <i class="fas fa-trash"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        @endif
+                                    </div>
+
+                                    <div class="alert alert-info mt-2">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        <small>النصوص الإعلانية تظهر بشكل بارز مع المنتج لجذب انتباه العملاء وتعزيز
+                                            المبيعات</small>
+                                    </div>
+                                </div>
                                 <div class="d-flex justify-content-between mt-4">
                                     <button type="button" class="btn btn-outline-secondary prev-step" data-prev="2">
                                         <i class="fas fa-arrow-right me-1"></i> السابق
@@ -1259,6 +1355,8 @@
             </div>
         </div>
     </template>
+
+
 
     <template id="materialFieldTemplate">
         <div class="col-md-12 mb-3">
@@ -1720,6 +1818,45 @@
             });
         }
 
+        // Text Ads Management
+        let textAdCounter = {{ old('text_ads') ? count(old('text_ads')) : 0 }};
+
+        function addTextAdField() {
+            const container = $('#textAdsContainer');
+            const index = textAdCounter++;
+
+            const field = `
+        <div class="col-md-12 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-10 mb-2">
+                            <textarea 
+                                class="form-control" 
+                                name="text_ads[${index}][name]" 
+                                placeholder="أدخل النص الإعلاني هنا..." 
+                                rows="3"
+                                required></textarea>
+                            <small class="text-muted">يمكن إضافة أكثر من نص إعلاني لتظهر مع المنتج</small>
+                        </div>
+                        <div class="col-md-2 mb-2 text-center">
+                            <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeTextAdField(this)" title="حذف النص الإعلاني">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+            container.append(field);
+        }
+
+        function removeTextAdField(button) {
+            $(button).closest('.col-md-12').remove();
+            textAdCounter--;
+        }
         // Remove Selected Item
         function removeSelectedItem(button, type) {
             const item = $(button).closest('.selected-item');
@@ -2126,7 +2263,7 @@
                 container.append(`<input type="hidden" name="print_locations[]" value="${location.id}">`);
                 container.append(
                     `<input type="hidden" name="print_location_prices[${location.id}]" value="${location.price}">`
-                    );
+                );
             });
 
             // Collect offers
@@ -2162,6 +2299,15 @@
                 }
             });
             $('#summary_materials').text(materials.join(', ') || 'لا يوجد');
+
+            // Text Ads
+            const textAds = [];
+            $('#textAdsContainer textarea[name^="text_ads"], #textAdsContainer input[name^="text_ads"]').each(function() {
+                if ($(this).val().trim()) {
+                    textAds.push($(this).val());
+                }
+            });
+            $('#summary_text_ads').text(textAds.length > 0 ? textAds.length + ' نص إعلاني' : 'لا يوجد');
         }
 
         // Save as Draft

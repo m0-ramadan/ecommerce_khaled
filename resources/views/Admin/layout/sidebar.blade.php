@@ -119,7 +119,7 @@
            </li>
 
            <li class="menu-item ">
-               <a href="#/admin/coupons" class="menu-link">
+               <a href="{{ route('admin.coupons.index') }}" class="menu-link">
                    <i class="menu-icon ti ti-discount"></i>
                    <div>الكوبونات</div>
                </a>
@@ -200,23 +200,23 @@
                </a>
 
                <ul class="menu-sub">
-                   <li class="menu-item">
+                   {{-- <li class="menu-item">
                        <a href="#/admin/settings/languages" class="menu-link">
                            <div>اللغات</div>
                        </a>
-                   </li>
+                   </li> --}}
 
-                   <li class="menu-item">
+                   {{-- <li class="menu-item">
                        <a href="#/admin/settings/api" class="menu-link">
                            <div>واجهة الـ API</div>
                        </a>
-                   </li>
-
+                   </li> --}}
+{{-- 
                    <li class="menu-item">
                        <a href="#/admin/settings/pages/Orders" class="menu-link">
                            <div>الطلبات</div>
                        </a>
-                   </li>
+                   </li> --}}
 
                    <li class="menu-item">
                        <a href="#/admin/settings/pages/SMTP" class="menu-link">
@@ -230,23 +230,23 @@
                        </a>
                    </li>
 
-                   <li class="menu-item">
+                   {{-- <li class="menu-item">
                        <a href="#/admin/settings/pages/Payment" class="menu-link">
                            <div>وسائل الدفع</div>
                        </a>
-                   </li>
+                   </li> --}}
 
                    <li class="menu-item">
-                       <a href="#/admin/settings/pages/Communication" class="menu-link">
+                       <a href="{{ route('admin.social-media.index') }}" class="menu-link">
                            <div>إعدادات التواصل</div>
                        </a>
                    </li>
 
-                   <li class="menu-item">
+                   {{-- <li class="menu-item">
                        <a href="#/admin/settings/pages/Realtime" class="menu-link">
                            <div>التحديث اللحظي (Realtime)</div>
                        </a>
-                   </li>
+                   </li> --}}
 
                    <li class="menu-item">
                        <a href="#/admin/settings/pages/Files" class="menu-link">

@@ -29,7 +29,7 @@ class Product extends Model
         'type',
         'meta_title',
         'meta_description',
-        'meta_keywords'
+        'meta_keywords','price_text'
     ];
 
     protected $casts = [
@@ -52,6 +52,11 @@ class Product extends Model
     public function colors()
     {
         return $this->belongsToMany(Color::class);
+    }
+
+        public function adsText()
+    {
+        return $this->hasMany(ProductTextAd::class);
     }
 
     public function deliveryTime()

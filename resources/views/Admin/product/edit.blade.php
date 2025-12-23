@@ -915,7 +915,7 @@
 
                                 <!-- Pricing -->
                                 <div class="row" bis_skin_checked="1">
-                                    <div class="col-md-6 mb-3" bis_skin_checked="1">
+                                    <div class="col-md-4 mb-2" bis_skin_checked="1">
                                         <label for="price" class="form-label required">السعر الأساسي</label>
                                         <div class="price-input-group" bis_skin_checked="1">
                                             <span class="input-group-text">ج.م</span>
@@ -925,7 +925,13 @@
                                     </div>
 
                                 </div>
-
+                                    <div class="col-md-8 mb-4">
+                                        <label for="price_text" class="form-label required"> نص السعر </label>
+                                        <div class="price-input-group">
+                                            <span class="input-group-text">ج.م</span>
+                                            <input type="text" class="form-control" id="price_text" name="price_text" value="{{ old('price_text', $product->price_text) }}" required>
+                                        </div>
+                                    </div>
                                 <!-- Additional Pricing Options -->
                                 <div class="row" bis_skin_checked="1">
                                     <div class="col-md-4 mb-3" bis_skin_checked="1">

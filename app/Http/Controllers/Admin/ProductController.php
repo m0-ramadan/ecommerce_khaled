@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Requests\Admin\Product\StoreProductRequest;
 use PDF;
 use App\Models\Size;
 use App\Models\Color;
@@ -13,6 +12,7 @@ use App\Models\Category;
 use App\Models\Material;
 use Illuminate\Http\Request;
 use App\Models\PrintLocation;
+use App\Models\ProductTextAd;
 use App\Models\PrintingMethod;
 use App\Exports\ProductsExport;
 use App\Models\ProductSizeTier;
@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Requests\Admin\Product\StoreProductRequest;
 
 class ProductController extends Controller
 {
@@ -30,116 +31,116 @@ class ProductController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\View\View
      */
-public function index(Request $request)
-{
-    // Get statistics
-    $totalProducts = Product::count();
-    $activeProducts = Product::where('status_id', 1)->count();
-    $inactiveProducts = Product::where('status_id', 2)->count();
-    $lowStockProducts = Product::where('stock', '<', 10)->where('stock', '>', 0)->count();
+    public function index(Request $request)
+    {
+        // Get statistics
+        $totalProducts = Product::count();
+        $activeProducts = Product::where('status_id', 1)->count();
+        $inactiveProducts = Product::where('status_id', 2)->count();
+        $lowStockProducts = Product::where('stock', '<', 10)->where('stock', '>', 0)->count();
 
-    // Query products with filters
-    $query = Product::with(['category', 'discount', 'colors', 'materials', 'primaryImage'])
-        ->withCount('reviews')
-        ->sorted($request)
-        ->filtered($request);
+        // Query products with filters
+        $query = Product::with(['category', 'discount', 'colors', 'materials', 'primaryImage'])
+            ->withCount('reviews')
+            ->sorted($request)
+            ->filtered($request);
 
-    // تطبيق خاصية البحث GLOBAL إذا كان موجوداً
-    if ($request->filled('search')) {
-        $searchTerm = $request->get('search');
-        $query->where(function($q) use ($searchTerm) {
-            $q->where('name', 'LIKE', "%{$searchTerm}%")
-              ->orWhere('description', 'LIKE', "%{$searchTerm}%")
-              ->orWhere('sku', 'LIKE', "%{$searchTerm}%")
-              ->orWhereHas('category', function($q) use ($searchTerm) {
-                  $q->where('name', 'LIKE', "%{$searchTerm}%");
-              });
-        });
+        // تطبيق خاصية البحث GLOBAL إذا كان موجوداً
+        if ($request->filled('search')) {
+            $searchTerm = $request->get('search');
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('name', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('description', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('sku', 'LIKE', "%{$searchTerm}%")
+                    ->orWhereHas('category', function ($q) use ($searchTerm) {
+                        $q->where('name', 'LIKE', "%{$searchTerm}%");
+                    });
+            });
+        }
+
+        // Apply additional filters
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
+
+        if ($request->filled('status_id')) {
+            $query->where('status_id', $request->status_id);
+        }
+
+        if ($request->filled('price_from') && $request->filled('price_to')) {
+            $query->whereBetween('price', [$request->price_from, $request->price_to]);
+        } elseif ($request->filled('price_from')) {
+            $query->where('price', '>=', $request->price_from);
+        } elseif ($request->filled('price_to')) {
+            $query->where('price', '<=', $request->price_to);
+        }
+
+        if ($request->filled('stock_from') && $request->filled('stock_to')) {
+            $query->whereBetween('stock', [$request->stock_from, $request->stock_to]);
+        } elseif ($request->filled('stock_from')) {
+            $query->where('stock', '>=', $request->stock_from);
+        } elseif ($request->filled('stock_to')) {
+            $query->where('stock', '<=', $request->stock_to);
+        }
+
+        if ($request->filled('color_id')) {
+            $query->whereHas('colors', function ($q) use ($request) {
+                $q->whereIn('colors.id', (array)$request->color_id);
+            });
+        }
+
+        if ($request->filled('material_id')) {
+            $query->whereHas('materials', function ($q) use ($request) {
+                $q->whereIn('materials.id', (array)$request->material_id);
+            });
+        }
+
+        if ($request->filled('printing_method_id')) {
+            $query->whereHas('printingMethods', function ($q) use ($request) {
+                $q->whereIn('printing_methods.id', (array)$request->printing_method_id);
+            });
+        }
+
+        if ($request->filled('offer_id')) {
+            $query->whereHas('offers', function ($q) use ($request) {
+                $q->whereIn('offers.id', (array)$request->offer_id);
+            });
+        }
+
+        // الحصول على النتائج مع Pagination
+        $perPage = $request->get('per_page', 20);
+        $products = $query->paginate($perPage)->withQueryString();
+
+        // Calculate average rating for each product
+        foreach ($products as $product) {
+            $product->average_rating = $product->reviews()->avg('rating') ?? 0;
+            $product->final_price = $product->has_discount && $product->discount ?
+                ($product->discount->discount_type === 'percentage' ?
+                    $product->price - ($product->price * $product->discount->discount_value / 100) :
+                    $product->price - $product->discount->discount_value) :
+                $product->price;
+        }
+
+        // Get filter options
+        $categories = Category::where('status_id', 1)->get();
+        $colors = Color::all();
+        $materials = Material::all();
+        $printingMethods = PrintingMethod::all();
+        $offers = Offer::all();
+
+        return view('Admin.product.index', compact(
+            'products',
+            'totalProducts',
+            'activeProducts',
+            'inactiveProducts',
+            'lowStockProducts',
+            'categories',
+            'colors',
+            'materials',
+            'printingMethods',
+            'offers'
+        ));
     }
-
-    // Apply additional filters
-    if ($request->filled('category_id')) {
-        $query->where('category_id', $request->category_id);
-    }
-
-    if ($request->filled('status_id')) {
-        $query->where('status_id', $request->status_id);
-    }
-
-    if ($request->filled('price_from') && $request->filled('price_to')) {
-        $query->whereBetween('price', [$request->price_from, $request->price_to]);
-    } elseif ($request->filled('price_from')) {
-        $query->where('price', '>=', $request->price_from);
-    } elseif ($request->filled('price_to')) {
-        $query->where('price', '<=', $request->price_to);
-    }
-
-    if ($request->filled('stock_from') && $request->filled('stock_to')) {
-        $query->whereBetween('stock', [$request->stock_from, $request->stock_to]);
-    } elseif ($request->filled('stock_from')) {
-        $query->where('stock', '>=', $request->stock_from);
-    } elseif ($request->filled('stock_to')) {
-        $query->where('stock', '<=', $request->stock_to);
-    }
-
-    if ($request->filled('color_id')) {
-        $query->whereHas('colors', function ($q) use ($request) {
-            $q->whereIn('colors.id', (array)$request->color_id);
-        });
-    }
-
-    if ($request->filled('material_id')) {
-        $query->whereHas('materials', function ($q) use ($request) {
-            $q->whereIn('materials.id', (array)$request->material_id);
-        });
-    }
-
-    if ($request->filled('printing_method_id')) {
-        $query->whereHas('printingMethods', function ($q) use ($request) {
-            $q->whereIn('printing_methods.id', (array)$request->printing_method_id);
-        });
-    }
-
-    if ($request->filled('offer_id')) {
-        $query->whereHas('offers', function ($q) use ($request) {
-            $q->whereIn('offers.id', (array)$request->offer_id);
-        });
-    }
-
-    // الحصول على النتائج مع Pagination
-    $perPage = $request->get('per_page', 20);
-    $products = $query->paginate($perPage)->withQueryString();
-
-    // Calculate average rating for each product
-    foreach ($products as $product) {
-        $product->average_rating = $product->reviews()->avg('rating') ?? 0;
-        $product->final_price = $product->has_discount && $product->discount ? 
-            ($product->discount->discount_type === 'percentage' ? 
-                $product->price - ($product->price * $product->discount->discount_value / 100) : 
-                $product->price - $product->discount->discount_value) : 
-            $product->price;
-    }
-
-    // Get filter options
-    $categories = Category::where('status_id', 1)->get();
-    $colors = Color::all();
-    $materials = Material::all();
-    $printingMethods = PrintingMethod::all();
-    $offers = Offer::all();
-
-    return view('Admin.product.index', compact(
-        'products',
-        'totalProducts',
-        'activeProducts',
-        'inactiveProducts',
-        'lowStockProducts',
-        'categories',
-        'colors',
-        'materials',
-        'printingMethods',
-        'offers'
-    ));
-}
     /**
      * Handle bulk actions on products.
      *
@@ -355,6 +356,7 @@ public function index(Request $request)
             // Create product
             $product = Product::create([
                 'name' => $validated['name'],
+                'price_text' => $validated['price_text'],
                 'category_id' => $validated['category_id'],
                 'description' => $validated['description'],
                 'price' => $validated['price'],
@@ -453,7 +455,17 @@ public function index(Request $request)
                     'months' => $request->input('warranty_months')
                 ]);
             }
-
+            // Create text ads
+            if ($request->has('text_ads')) {
+                foreach ($request->text_ads as $ad) {
+                    if (!empty($ad['name'])) {
+                        ProductTextAd::create([
+                            'product_id' => $product->id,
+                            'name' => $ad['name']
+                        ]);
+                    }
+                }
+            }
             // Handle additional images
             if ($request->hasFile('additional_images')) {
                 $order = 2;
@@ -675,6 +687,7 @@ public function index(Request $request)
             'design_service'    => 'nullable|in:0,free,paid',
             'design_service_price' => 'nullable|numeric|min:0',
             'delivery_time'     => 'nullable|string',
+            'price_text'        => 'nullable|string',
             'shipping_fees'     => 'nullable|string',
             'tags'              => 'nullable|string',
             'status'            => 'nullable|in:0,1',
@@ -696,6 +709,7 @@ public function index(Request $request)
                 'name'              => $request->name,
                 'category_id'       => $request->category_id,
                 'description'       => $request->description,
+                'price_text'       => $request->price_text,
                 'num_faces'         => $request->num_faces,
                 'print_locations'   => $request->print_locations ? json_encode($request->print_locations) : null,
                 'printing_methods'  => $request->printing_methods ? json_encode($request->printing_methods) : null,

@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\RolesController;
 use App\Http\Controllers\Admin\BannerController;
+use App\Http\Controllers\Admin\CouponController;
 use App\Http\Controllers\Admin\RegionController;
 use App\Http\Controllers\Admin\SliderController;
 use App\Http\Controllers\Admin\ContactController;
@@ -22,6 +23,7 @@ use App\Http\Controllers\Admin\ContactUsController;
 use App\Http\Controllers\Admin\SubscribeController;
 use App\Http\Controllers\Admin\BannerItemController;
 use App\Http\Controllers\Admin\PermissionsController;
+use App\Http\Controllers\Admin\SocialMediaController;
 use App\Http\Controllers\Admin\PaymentMethodController;
 use App\Http\Controllers\Admin\LogisticServiceController;
 
@@ -79,6 +81,31 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
         'regions' => RegionController::class,
     ]);
 
+    // coupons
+    Route::prefix('coupons')->name('coupons.')->group(function () {
+        //  Route::resource('/', CouponController::class);
+        Route::get('/', [CouponController::class, 'index'])->name('index');
+        Route::get('/create', [CouponController::class, 'create'])->name('create');
+        Route::post('/', [CouponController::class, 'store'])->name('store');
+        Route::get('/{coupon}/edit', [CouponController::class, 'edit'])->name('edit');
+        Route::put('/{coupon}', [CouponController::class, 'update'])->name('update');
+        Route::delete('/{coupon}', [CouponController::class, 'destroy'])->name('destroy');
+        Route::get('/{coupon}', [CouponController::class, 'show'])->name('show');
+        Route::post('bulk-action', [CouponController::class, 'bulkAction'])->name('bulk-action');
+        Route::post('{coupon}/duplicate', [CouponController::class, 'duplicate'])->name('duplicate');
+        Route::post('generate-code', [CouponController::class, 'generateCode'])->name('generate-code');
+        Route::post('validate-code', [CouponController::class, 'validateCode'])->name('validate-code');
+        Route::get('export', [CouponController::class, 'export'])->name('export');
+    });
+
+    // social-media
+    Route::prefix('social-media')->name('social-media.')->group(function () {
+    Route::get('/', [SocialMediaController::class, 'index'])->name('index');
+    Route::get('/{id}/edit', [SocialMediaController::class, 'edit'])->name('edit');
+    Route::put('/{id}', [SocialMediaController::class, 'update'])->name('update');
+    Route::post('/bulk-update', [SocialMediaController::class, 'bulkUpdate'])->name('bulk-update');
+});
+
     // Users
     Route::prefix('users')->as('user.')->group(function () {
         Route::get('/', [UserController::class, 'index'])->name('index')->withoutMiddleware('admin:1')->middleware('admin:1,0');
@@ -124,7 +151,7 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
     });
     Route::post('products/update/{id}', [ProductController::class, 'update'])->name('products.update');
 
-    
+
     // Contacts
     Route::prefix('contacts')->as('contact.')->group(function () {
         Route::get('/', [ContactController::class, 'index'])->name('index');

@@ -23,6 +23,7 @@ class ProductResource extends JsonResource
             'slug'              => $this->slug ?? Str::slug($this->name),
             'description'       => $this->description,
             'price'             => $this->price,
+            'price_text'        => $this->price_text,
             'final_price'       => $this->final_price,
             'has_discount'      => (bool) $this->has_discount,
             'includes_tax'      => (bool) $this->includes_tax,
@@ -30,8 +31,10 @@ class ProductResource extends JsonResource
             'stock'             => (int) $this->stock,
             'status_id'         => (int) $this->status_id,
             'is_active'         => $this->status_id == 1,
-            'lowest_price' =>  $lowestPrice ?? rand(5, 15),
-
+            
+            'lowest_price'      =>  $lowestPrice ?? rand(5, 15),
+            // ================== Ads ==================
+            'text_ads'          => ProductTextAdResource::collection($this->adsText),
             // ================== Image ==================
             'image' => $this->primaryImage
                 ? get_user_image($this->primaryImage->path)
