@@ -3,9 +3,11 @@
 @section('title', 'تعديل إعداد التواصل')
 
 @section('css')
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
         .social-preview-card {
-            background: var(--bs-light-bg-subtle);
+            background: #26253d;
             border-radius: 12px;
             padding: 30px;
             text-align: center;
@@ -40,7 +42,7 @@
         }
 
         .form-section {
-            background: white;
+            background:#26253d;
             border-radius: 10px;
             padding: 25px;
             margin-bottom: 20px;
@@ -65,7 +67,7 @@
             border: 2px solid transparent;
             cursor: pointer;
             transition: all 0.3s ease;
-            background: var(--bs-light-bg-subtle);
+            background: #26253d;
         }
 
         .icon-option:hover {
@@ -90,7 +92,7 @@
         }
 
         .help-text {
-            background: var(--bs-info-bg-subtle);
+            background:#26253d;
             border-right: 4px solid #696cff;
             padding: 15px;
             border-radius: 5px;
@@ -110,7 +112,7 @@
         .preview-link {
             display: inline-block;
             padding: 8px 15px;
-            background: var(--bs-light-bg-subtle);
+            background: #26253d;
             border-radius: 5px;
             margin-top: 10px;
             text-decoration: none;
@@ -119,7 +121,7 @@
         }
 
         .preview-link:hover {
-            background: var(--bs-primary-bg-subtle);
+            background: #26253d;
             color: #696cff;
         }
     </style>

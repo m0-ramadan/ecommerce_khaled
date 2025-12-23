@@ -111,12 +111,12 @@
 
 
 
-           <li class="menu-item ">
+           {{-- <li class="menu-item ">
                <a href="#/admin/problems" class="menu-link">
                    <i class="menu-icon ti ti-category-2"></i>
                    <div>المشكلات</div>
                </a>
-           </li>
+           </li> --}}
 
            <li class="menu-item ">
                <a href="{{ route('admin.coupons.index') }}" class="menu-link">
@@ -133,12 +133,12 @@
                </a>
            </li>
 
-           <li class="menu-item ">
+           {{-- <li class="menu-item ">
                <a href="#/admin/order-reports" class="menu-link">
                    <i class="menu-icon ti ti-message-report"></i>
                    <div>الشكاوي</div>
                </a>
-           </li>
+           </li> --}}
 
 
            <li class="menu-item ">
@@ -184,7 +184,7 @@
                <ul class="menu-sub">
 
                    <li class="menu-item ">
-                       <a href="#/admin/logs/errors" class="menu-link">
+                       <a href="{{ route('admin.errors.index') }}" class="menu-link">
                            <div>الاخطاء البرمجية</div>
                        </a>
                    </li>

@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\FaqController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\ErrorController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\RolesController;
 use App\Http\Controllers\Admin\BannerController;
@@ -98,13 +99,23 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
         Route::get('export', [CouponController::class, 'export'])->name('export');
     });
 
+    // errors
+    Route::prefix('errors')->name('errors.')->group(function () {
+        Route::get('/', [ErrorController::class, 'index'])->name('index');
+        Route::get('/php-errors', [ErrorController::class, 'phpErrors'])->name('php-errors');
+        Route::get('/search', [ErrorController::class, 'search'])->name('search');
+        Route::get('/download/{filename}', [ErrorController::class, 'download'])->name('download');
+        Route::delete('/destroy', [ErrorController::class, 'destroy'])->name('destroy');
+        Route::post('/clear-all', [ErrorController::class, 'clearAll'])->name('clear-all');
+    });
+
     // social-media
     Route::prefix('social-media')->name('social-media.')->group(function () {
-    Route::get('/', [SocialMediaController::class, 'index'])->name('index');
-    Route::get('/{id}/edit', [SocialMediaController::class, 'edit'])->name('edit');
-    Route::put('/{id}', [SocialMediaController::class, 'update'])->name('update');
-    Route::post('/bulk-update', [SocialMediaController::class, 'bulkUpdate'])->name('bulk-update');
-});
+        Route::get('/', [SocialMediaController::class, 'index'])->name('index');
+        Route::get('/{id}/edit', [SocialMediaController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [SocialMediaController::class, 'update'])->name('update');
+        Route::post('/bulk-update', [SocialMediaController::class, 'bulkUpdate'])->name('bulk-update');
+    });
 
     // Users
     Route::prefix('users')->as('user.')->group(function () {
