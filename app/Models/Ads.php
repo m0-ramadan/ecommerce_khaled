@@ -10,6 +10,6 @@ class Ads extends Model
     use HasFactory;
     protected $fillable = [
         'description',
-        'type',
+        'type','icon'
     ];
 }

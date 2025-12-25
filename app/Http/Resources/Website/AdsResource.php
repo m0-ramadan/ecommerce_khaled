@@ -5,7 +5,7 @@ namespace App\Http\Resources\Website;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ProductTextAdResource extends JsonResource
+class AdsResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -14,11 +14,10 @@ class ProductTextAdResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        
         return [
-            'id' => $this->id,
-            'name' => $this->name,
-            'icon' => $this->icon,
+            'id'                => $this->id,
+            'description'       => $this->description,
+            'icon'              => $this->icon,
         ];
     }
 }

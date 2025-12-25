@@ -10,6 +10,7 @@ class ProductTextAd extends Model
     protected $fillable = [
         'product_id',
         'name',
+        'icon'
     ];
 public $timestamps = false;
     public function product()

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\Website\AdsController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Website\FaqController;
 use App\Http\Controllers\Api\Website\AuthController;
@@ -77,6 +78,8 @@ Route::prefix('v1')->group(function () {
     Route::get('static-pages/{slug}', [StaticPagesController::class, 'index']);
 
     Route::get('faqs', [FaqController::class, 'index']);
+
+    Route::get('ads', [AdsController::class, 'index']);
 
     Route::post('contact-us', [ContactUsController::class, 'store']);
 

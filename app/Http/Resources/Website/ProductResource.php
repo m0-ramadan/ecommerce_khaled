@@ -31,8 +31,9 @@ class ProductResource extends JsonResource
             'stock'             => (int) $this->stock,
             'status_id'         => (int) $this->status_id,
             'is_active'         => $this->status_id == 1,
-            
+
             'lowest_price'      =>  $lowestPrice ?? rand(5, 15),
+
             // ================== Ads ==================
             'text_ads'          => ProductTextAdResource::collection($this->adsText),
             // ================== Image ==================
@@ -149,14 +150,18 @@ class ProductResource extends JsonResource
 
             // ================== Options ==================
             'options' => $this->options->map(function ($option) {
+                $keywords = ['رفع', 'ملف', 'صورة'];
+                $hasFile = collect($keywords)->contains(fn($word) => str_contains($option->option_value, $word));
                 return [
                     'id'               => $option->id,
                     'option_name'      => $option->option_name,
                     'option_value'     => $option->option_value,
                     'additional_price' => $option->additional_price,
                     'is_required'      => (bool) $option->is_required,
+                    'file'             => $hasFile ? 1 : 0,
                 ];
             }),
+
 
             // ================== Printing Methods ==================
             'printing_methods' => $this->printingMethods->map(function ($method) {
