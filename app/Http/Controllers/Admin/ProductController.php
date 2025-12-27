@@ -710,7 +710,7 @@ public function update(StoreProductRequest $request, $id)
         // Handle main image update
         if ($request->hasFile('image')) {
             // Delete old main image if exists
-            $oldMainImage = $product->images()->where('is_primary', true)->first();
+            $oldMainImage = $product->images()->where('is_primary', 1)->first();
             if ($oldMainImage) {
                 Storage::disk('public')->delete($oldMainImage->path);
                 $oldMainImage->delete();
