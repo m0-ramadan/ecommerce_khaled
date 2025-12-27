@@ -1895,23 +1895,25 @@
             new bootstrap.Modal(document.getElementById('imageViewModal')).show();
         }
 
-// حذف الصورة الرئيسية
-function removeMainImage() {
-    if (confirm('هل تريد حذف الصورة الرئيسية؟')) {
-        // إخفاء الصورة المعروضة
-        document.querySelector('.preview-image').src = 'https://via.placeholder.com/100x100?text=No+Image';
-        
-        // تعيين قيمة لحقل الحذف
-        document.getElementById('remove_main_image').value = '1';
-        
-        // إخفاء العنصر
-        document.querySelector('.image-preview-grid').style.display = 'none';
-        
-        // إظهار رسالة
-        alert('سيتم حذف الصورة الرئيسية عند حفظ التعديلات');
-    }
-}
-
+        function removeMainImage() {
+            Swal.fire({
+                title: 'هل أنت متأكد؟',
+                text: 'سيتم إزالة الصورة الرئيسية',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'نعم، احذف',
+                cancelButtonText: 'إلغاء'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $('#remove_main_image').val('1');
+                    $('.image-preview-grid').first().empty();
+                    $('#main_image').val('');
+                    Swal.fire('تم الحذف!', 'تم إزالة الصورة الرئيسية', 'success');
+                }
+            });
+        }
 
         function removeNewMainImage() {
             $('#main_image').val('');
@@ -1919,25 +1921,25 @@ function removeMainImage() {
             $('#remove_main_image').val('0');
         }
 
-// حذف الصور الإضافية
-function removeAdditionalImage(imageId) {
-    if (confirm('هل تريد حذف هذه الصورة؟')) {
-        // إخفاء الصورة
-        const imageElement = document.querySelector(`.image-preview-item[data-id="${imageId}"]`);
-        if (imageElement) {
-            imageElement.style.display = 'none';
+        function removeAdditionalImage(imageId) {
+            Swal.fire({
+                title: 'هل أنت متأكد؟',
+                text: 'سيتم إزالة هذه الصورة',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'نعم، احذف',
+                cancelButtonText: 'إلغاء'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    removedImages.push(imageId);
+                    $('#removed_images').val(removedImages.join(','));
+                    $(`.image-preview-item[data-id="${imageId}"]`).remove();
+                    Swal.fire('تم الحذف!', 'تم إزالة الصورة', 'success');
+                }
+            });
         }
-        
-        // إضافة ID للصور المحذوفة
-        const removedInput = document.getElementById('removed_images');
-        const currentValue = removedInput.value;
-        if (currentValue) {
-            removedInput.value = currentValue + ',' + imageId;
-        } else {
-            removedInput.value = imageId;
-        }
-    }
-}
 
         function removeNewImage(index) {
             $(`.image-preview-item[data-new-index="${index}"]`).remove();
