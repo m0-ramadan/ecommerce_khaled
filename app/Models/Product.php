@@ -178,22 +178,26 @@ class Product extends Model
     // =================================================================
     // Scope: البحث
     // =================================================================
-    public function scopeSearched($query, ?string $search)
-    {
-        if (!$search) {
-            return $query;
-        }
+public function scopeSearched($query, ?string $search)
+{
+    return $query->when($search, function ($q) use ($search) {
+        $q->where('name', 'like', "%{$search}%");
 
-        return $query->where(function ($q) use ($search) {
-            $q->where('name', 'like', "%{$search}%")
-                // ->orWhere('description', 'like', "%{$search}%")
-                // ->orWhereHas('category', fn($c) => $c->where('name', 'like', "%{$search}%"))
-                // ->orWhereHas('features', fn($f) => $f
-                //     ->where('name', 'like', "%{$search}%")
-                //     ->orWhere('value', 'like', "%{$search}%"))
-                // ->orWhereHas('materials', fn($m) => $m->where('name', 'like', "%{$search}%"));
-        });
-    }
+        // أمثلة لو حابب توسّع البحث لاحقًا:
+        // ->orWhere('description', 'like', "%{$search}%")
+        // ->orWhereHas('category', fn ($c) =>
+        //     $c->where('name', 'like', "%{$search}%")
+        // )
+        // ->orWhereHas('features', fn ($f) =>
+        //     $f->where('name', 'like', "%{$search}%")
+        //       ->orWhere('value', 'like', "%{$search}%")
+        // )
+        // ->orWhereHas('materials', fn ($m) =>
+        //     $m->where('name', 'like', "%{$search}%")
+        // );
+    });
+}
+
 
     // =================================================================
     // Scope: الترتيب
