@@ -29,12 +29,12 @@ class StoreProductRequest extends FormRequest
             'category_id' => 'required|exists:categories,id',
             'description' => 'nullable|string',
             'price' => 'nullable|numeric|min:0',
-            'price_text' =>'nullable',
+            'price_text' => 'nullable',
             'stock' => 'required|min:0',
             'status_id' => 'required|in:1,2,3',
 
             // Main image
-            'image' => 'required|image|max:2048',
+            'image' => 'nullable|image|max:2048',
 
             // Discount
             'has_discount' => 'nullable',

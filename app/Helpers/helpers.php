@@ -23,6 +23,33 @@ if (!function_exists('get_user_image')) {
 }
 
 
+if (!function_exists('get_product_image')) {
+    /**
+     * إرجاع رابط الصورة الصحيح للمنتج
+     *
+     * @param string|null $image
+     * @return string
+     */
+    function get_product_image(?string $image): string
+    {
+        // صورة افتراضية للمنتج
+        if (!$image) {
+            return config(
+                'app.default_product_image',
+                'https://static.vecteezy.com/system/resources/previews/002/248/763/non_2x/box-package-icon-free-vector.jpg'
+            );
+        }
+
+        // لو الصورة رابط كامل
+        if (str_starts_with($image, 'http://') || str_starts_with($image, 'https://')) {
+            return $image;
+        }
+
+        // صورة مخزنة محليًا
+        return asset('storage/' . ltrim($image, '/'));
+    }
+}
+
 
 if (!function_exists('formatBytes')) {
     function formatBytes($bytes, $precision = 2)
@@ -32,7 +59,7 @@ if (!function_exists('formatBytes')) {
         $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
         $pow = min($pow, count($units) - 1);
         $bytes /= pow(1024, $pow);
-        
+
         return round($bytes, $precision) . ' ' . $units[$pow];
     }
 }
@@ -44,17 +71,17 @@ if (!function_exists('parsePHPLog')) {
         $lines = explode("\n", $content);
         $errors = [];
         $currentError = null;
-        
+
         foreach ($lines as $line) {
             $line = trim($line);
             if (empty($line)) continue;
-            
+
             // Check for new error entry (PHP format)
             if (preg_match('/^\[(.*?)\] (PHP )?(.*?): (.*)$/', $line, $matches)) {
                 if ($currentError) {
                     $errors[] = $currentError;
                 }
-                
+
                 $currentError = [
                     'timestamp' => $matches[1] ?? '',
                     'level' => $matches[3] ?? '',
@@ -69,7 +96,7 @@ if (!function_exists('parsePHPLog')) {
                 if ($currentError) {
                     $errors[] = $currentError;
                 }
-                
+
                 $currentError = [
                     'timestamp' => $matches[1] ?? '',
                     'level' => $matches[2] ?? '',
@@ -83,21 +110,19 @@ if (!function_exists('parsePHPLog')) {
             elseif ($currentError) {
                 if (str_contains($line, 'Stack trace:')) {
                     $currentError['stack'] = $line;
-                }
-                elseif (preg_match('/ in (.*?) on line (\d+)/', $line, $matches)) {
+                } elseif (preg_match('/ in (.*?) on line (\d+)/', $line, $matches)) {
                     $currentError['file'] = $matches[1] ?? '';
                     $currentError['line'] = $matches[2] ?? '';
-                }
-                elseif (str_starts_with($line, '#') && !empty($currentError['stack'])) {
+                } elseif (str_starts_with($line, '#') && !empty($currentError['stack'])) {
                     $currentError['stack'] .= "\n" . $line;
                 }
             }
         }
-        
+
         if ($currentError) {
             $errors[] = $currentError;
         }
-        
+
         return $errors;
     }
 }

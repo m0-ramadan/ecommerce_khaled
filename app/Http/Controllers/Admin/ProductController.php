@@ -672,231 +672,268 @@ class ProductController extends Controller
         ));
     }
 
-/**
- * Update the specified product.
- *
- * @param  \App\Http\Requests\Admin\Product\StoreProductRequest  $request
- * @param  int  $id
- * @return \Illuminate\Http\RedirectResponse
- */
-public function update(StoreProductRequest $request, $id)
-{
-    DB::beginTransaction();
+    /**
+     * Update the specified product.
+     *
+     * @param  \App\Http\Requests\Admin\Product\StoreProductRequest  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
 
-    try {
-        $product = Product::with([
-            'colors', 'materials', 'printingMethods', 
-            'printLocations', 'offers', 'deliveryTime', 
-            'warranty', 'discount', 'images', 'adsText'
-        ])->findOrFail($id);
+    public function update(StoreProductRequest $request, $id)
+    {
+        DB::beginTransaction();
 
-        // Validate main product data
-        $validated = $request->validated();
+        try {
 
-        // Handle main image update
-        $imagePath = $product->image;
-        
-        // If new main image uploaded
-        if ($request->hasFile('image')) {
-            // Delete old main image from storage
-            if ($product->image) {
-                Storage::disk('public')->delete($product->image);
-            }
+            $product = Product::with([
+                'colors',
+                'materials',
+                'printingMethods',
+                'printLocations',
+                'offers',
+                'deliveryTime',
+                'warranty',
+                'discount',
+                'images',
+                'adsText'
+            ])->findOrFail($id);
 
-            // Upload new main image
-            $imagePath = $request->file('image')->store('products', 'public');
-        }
-        
-        // If remove existing main image is requested
-        if ($request->filled('remove_existing_main_image') && $request->remove_existing_main_image == '1') {
-            if ($product->image) {
-                Storage::disk('public')->delete($product->image);
-            }
-            $imagePath = null;
-        }
+            $validated = $request->validated();
 
-        // Update product basic info
-        $product->update([
-            'name' => $validated['name'],
-            'price_text' => $validated['price_text'],
-            'category_id' => $validated['category_id'],
-            'description' => $validated['description'],
-            'price' => $validated['price'],
-            'stock' => $validated['stock'] ?? 0,
-            'status_id' => $validated['status_id'],
-            'has_discount' => $request->boolean('has_discount'),
-            'includes_tax' => $request->boolean('includes_tax'),
-            'includes_shipping' => $request->boolean('includes_shipping'),
-            'image' => $imagePath,
-        ]);
+            /* =====================================================
+         | MAIN IMAGE (products.image + product_images)
+         ===================================================== */
+            if ($request->hasFile('image')) {
 
-        // Handle discount update
-        if ($request->boolean('has_discount') && $request->filled('discount_value')) {
-            if ($product->discount) {
-                $product->discount()->update([
-                    'discount_value' => $request->input('discount_value'),
-                    'discount_type' => $request->input('discount_type', 'percentage'),
+                // حذف القديمة
+                $product->images()->where('type', 'main')->each(function ($img) {
+                    Storage::disk('public')->delete($img->path);
+                    $img->delete();
+                });
+
+                $path = $request->file('image')->store('products', 'public');
+
+                $product->update(['image' => $path]);
+
+                $product->images()->create([
+                    'path' => $path,
+                    'type' => 'main',
+                    'is_primary' => 1,
+                    'order' => 1,
+                    'is_active' => 1,
+                    'alt' => $product->name,
                 ]);
+            }
+
+
+            // حذف الصورة الأساسية يدويًا
+            if ($request->boolean('remove_existing_main_image')) {
+
+                if ($product->image && Storage::disk('public')->exists($product->image)) {
+                    Storage::disk('public')->delete($product->image);
+                }
+
+                $product->update(['image' => null]);
+                $product->images()->where('is_primary', true)->delete();
+            }
+
+            /* =====================================================
+         | BASIC PRODUCT DATA
+         ===================================================== */
+
+            $product->update([
+                'name' => $validated['name'],
+                'price_text' => $validated['price_text'] ?? null,
+                'category_id' => $validated['category_id'],
+                'description' => $validated['description'],
+                'price' => $validated['price'],
+                'stock' => $validated['stock'] ?? 0,
+                'status_id' => $validated['status_id'],
+                'has_discount' => $request->boolean('has_discount'),
+                'includes_tax' => $request->boolean('includes_tax'),
+                'includes_shipping' => $request->boolean('includes_shipping'),
+            ]);
+
+            /* =====================================================
+         | DISCOUNT
+         ===================================================== */
+
+            if ($request->boolean('has_discount') && $request->filled('discount_value')) {
+                $product->discount()->updateOrCreate(
+                    [],
+                    [
+                        'discount_value' => $request->discount_value,
+                        'discount_type' => $request->input('discount_type', 'percentage'),
+                    ]
+                );
             } else {
-                $product->discount()->create([
-                    'discount_value' => $request->input('discount_value'),
-                    'discount_type' => $request->input('discount_type', 'percentage'),
-                ]);
+                $product->discount()?->delete();
             }
-        } elseif ($product->discount) {
-            $product->discount()->delete();
-        }
 
-        // Handle colors with prices
-        if ($request->filled('colors')) {
-            $colors = [];
-            foreach ($request->input('colors') as $colorId) {
-                $additionalPrice = $request->input("color_prices.{$colorId}", 0);
-                $colors[$colorId] = ['additional_price' => $additionalPrice];
-            }
-            $product->colors()->sync($colors);
-        } else {
-            $product->colors()->detach();
-        }
+            /* =====================================================
+         | COLORS
+         ===================================================== */
 
-        // Handle materials update
-        if ($request->filled('materials')) {
-            $materialsData = [];
-            foreach ($request->input('materials') as $materialData) {
-                if (!empty($materialData['material_id'])) {
-                    $materialsData[$materialData['material_id']] = [
-                        'quantity' => $materialData['quantity'] ?? 0,
-                        'unit' => $materialData['unit'] ?? 'piece',
-                        'additional_price' => $materialData['additional_price'] ?? 0
+            if ($request->filled('colors')) {
+                $colors = [];
+                foreach ($request->colors as $colorId) {
+                    $colors[$colorId] = [
+                        'additional_price' => $request->input("color_prices.$colorId", 0)
                     ];
                 }
+                $product->colors()->sync($colors);
+            } else {
+                $product->colors()->detach();
             }
-            $product->materials()->sync($materialsData);
-        } else {
-            $product->materials()->detach();
-        }
 
-        // Handle printing methods with prices
-        if ($request->filled('printing_methods')) {
-            $printingMethods = [];
-            foreach ($request->input('printing_methods') as $methodId) {
-                $additionalPrice = $request->input("printing_method_prices.{$methodId}", 0);
-                $printingMethods[$methodId] = ['additional_price' => $additionalPrice];
+            /* =====================================================
+         | MATERIALS
+         ===================================================== */
+
+            if ($request->filled('materials')) {
+                $materials = [];
+                foreach ($request->materials as $item) {
+                    if (!empty($item['material_id'])) {
+                        $materials[$item['material_id']] = [
+                            'quantity' => $item['quantity'] ?? 0,
+                            'unit' => $item['unit'] ?? 'piece',
+                            'additional_price' => $item['additional_price'] ?? 0,
+                        ];
+                    }
+                }
+                $product->materials()->sync($materials);
+            } else {
+                $product->materials()->detach();
             }
-            $product->printingMethods()->sync($printingMethods);
-        } else {
-            $product->printingMethods()->detach();
-        }
 
-        // Handle print locations with prices
-        if ($request->filled('print_locations')) {
-            $printLocations = [];
-            foreach ($request->input('print_locations') as $locationId) {
-                $additionalPrice = $request->input("print_location_prices.{$locationId}", 0);
-                $printLocations[$locationId] = ['additional_price' => $additionalPrice];
+            /* =====================================================
+         | PRINTING METHODS
+         ===================================================== */
+
+            if ($request->filled('printing_methods')) {
+                $methods = [];
+                foreach ($request->printing_methods as $methodId) {
+                    $methods[$methodId] = [
+                        'additional_price' => $request->input("printing_method_prices.$methodId", 0)
+                    ];
+                }
+                $product->printingMethods()->sync($methods);
+            } else {
+                $product->printingMethods()->detach();
             }
-            $product->printLocations()->sync($printLocations);
-        } else {
-            $product->printLocations()->detach();
-        }
 
-        // Handle offers
-        if ($request->filled('offers')) {
-            $product->offers()->sync($request->input('offers'));
-        } else {
-            $product->offers()->detach();
-        }
+            /* =====================================================
+         | PRINT LOCATIONS
+         ===================================================== */
 
-        // Handle delivery time update
-        if ($request->filled('from_days') || $request->filled('to_days')) {
-            if ($product->deliveryTime) {
-                $product->deliveryTime()->update([
-                    'from_days' => $request->input('from_days'),
-                    'to_days' => $request->input('to_days'),
+            if ($request->filled('print_locations')) {
+                $locations = [];
+                foreach ($request->print_locations as $locationId) {
+                    $locations[$locationId] = [
+                        'additional_price' => $request->input("print_location_prices.$locationId", 0)
+                    ];
+                }
+                $product->printLocations()->sync($locations);
+            } else {
+                $product->printLocations()->detach();
+            }
+
+            /* =====================================================
+         | OFFERS
+         ===================================================== */
+
+            $request->filled('offers')
+                ? $product->offers()->sync($request->offers)
+                : $product->offers()->detach();
+
+            /* =====================================================
+         | DELIVERY TIME
+         ===================================================== */
+
+            if ($request->filled('from_days') || $request->filled('to_days')) {
+                $product->deliveryTime()->updateOrCreate([], [
+                    'from_days' => $request->from_days,
+                    'to_days' => $request->to_days,
                 ]);
             } else {
-                $product->deliveryTime()->create([
-                    'from_days' => $request->input('from_days'),
-                    'to_days' => $request->input('to_days'),
-                ]);
+                $product->deliveryTime()?->delete();
             }
-        } elseif ($product->deliveryTime) {
-            $product->deliveryTime()->delete();
-        }
 
-        // Handle warranty update
-        if ($request->filled('warranty_months')) {
-            if ($product->warranty) {
-                $product->warranty()->update([
-                    'months' => $request->input('warranty_months')
+            /* =====================================================
+         | WARRANTY
+         ===================================================== */
+
+            if ($request->filled('warranty_months')) {
+                $product->warranty()->updateOrCreate([], [
+                    'months' => $request->warranty_months
                 ]);
             } else {
-                $product->warranty()->create([
-                    'months' => $request->input('warranty_months')
-                ]);
+                $product->warranty()?->delete();
             }
-        } elseif ($product->warranty) {
-            $product->warranty()->delete();
-        }
 
-        // Handle text ads
-        $product->adsText()->delete();
-        if ($request->filled('text_ads')) {
-            foreach ($request->text_ads as $ad) {
-                if (!empty($ad['name'])) {
-                    $product->adsText()->create([
-                        'name' => $ad['name']
+            /* =====================================================
+         | TEXT ADS
+         ===================================================== */
+
+            $product->adsText()->delete();
+            if ($request->filled('text_ads')) {
+                foreach ($request->text_ads as $ad) {
+                    if (!empty($ad['name'])) {
+                        $product->adsText()->create(['name' => $ad['name']]);
+                    }
+                }
+            }
+
+            /* =====================================================
+         | ADDITIONAL IMAGES
+         ===================================================== */
+
+            if ($request->hasFile('additional_images')) {
+                $order = $product->images()->where('type', 'additional')->max('order') ?? 0;
+
+                foreach ($request->file('additional_images') as $image) {
+                    $path = $image->store('products/additional', 'public');
+
+                    $product->images()->create([
+                        'path' => $path,
+                        'alt' => $product->name,
+                        'is_primary' => false,
+                        'type' => 'additional',
+                        'order' => ++$order,
                     ]);
                 }
             }
-        }
 
-        // Handle additional images
-        if ($request->hasFile('additional_images')) {
-            $order = $product->images()->where('type', 'additional')->max('order') ?? 1;
-            
-            foreach ($request->file('additional_images') as $image) {
-                $path = $image->store('products/additional', 'public');
-                
-                $product->images()->create([
-                    'path' => $path,
-                    'alt' => $validated['name'] ?? 'product_additional_image',
-                    'is_primary' => false,
-                    'type' => 'additional',
-                    'order' => ++$order
-                ]);
-            }
-        }
+            /* =====================================================
+         | REMOVE ADDITIONAL IMAGES
+         ===================================================== */
 
-        // Handle removal of existing additional images
-        if ($request->filled('removed_existing_images')) {
-            $removedIds = explode(',', $request->removed_existing_images);
-            foreach ($removedIds as $imageId) {
-                if ($imageId) {
+            if ($request->filled('removed_existing_images')) {
+                foreach (explode(',', $request->removed_existing_images) as $imageId) {
                     $image = Image::find($imageId);
-                    if ($image && $image->imageable_id == $product->id) {
+                    if ($image && $image->imageable_id === $product->id) {
                         Storage::disk('public')->delete($image->path);
                         $image->delete();
                     }
                 }
             }
+
+            DB::commit();
+
+            return redirect()
+                ->route('admin.products.show', $product->id)
+                ->with('success', 'تم تحديث المنتج بنجاح');
+        } catch (\Throwable $e) {
+
+            DB::rollBack();
+            Log::error('Update product error', ['error' => $e]);
+
+            return back()
+                ->withInput()
+                ->with('error', 'حدث خطأ أثناء تحديث المنتج');
         }
-
-        DB::commit();
-
-        return redirect()->route('admin.products.show', $product->id)
-            ->with('success', 'تم تحديث المنتج بنجاح');
-            
-    } catch (\Exception $e) {
-        DB::rollBack();
-        Log::error('Error updating product: ' . $e->getMessage());
-        
-        return redirect()->back()
-            ->withInput()
-            ->with('error', 'حدث خطأ أثناء تحديث المنتج: ' . $e->getMessage());
     }
-}
-
     public function destroy(Product $product)
     {
         $product->images()->delete();

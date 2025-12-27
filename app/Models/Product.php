@@ -29,7 +29,8 @@ class Product extends Model
         'type',
         'meta_title',
         'meta_description',
-        'meta_keywords','price_text'
+        'meta_keywords',
+        'price_text'
     ];
 
     protected $casts = [
@@ -54,7 +55,7 @@ class Product extends Model
         return $this->belongsToMany(Color::class);
     }
 
-        public function adsText()
+    public function adsText()
     {
         return $this->hasMany(ProductTextAd::class);
     }
@@ -89,11 +90,14 @@ class Product extends Model
         return $this->belongsToMany(Offer::class);
     }
 
+    // public function images()
+    // {
+    //     return $this->morphMany(Image::class, 'imageable')->where('type', 'additional');
+    // }
     public function images()
     {
-        return $this->morphMany(Image::class, 'imageable')->where('type', 'additional');
+        return $this->morphMany(Image::class, 'imageable');
     }
-
 
     public function getFinalPriceAttribute()
     {
@@ -178,25 +182,25 @@ class Product extends Model
     // =================================================================
     // Scope: البحث
     // =================================================================
-public function scopeSearched($query, ?string $search)
-{
-    return $query->when($search, function ($q) use ($search) {
-        $q->where('name', 'like', "%{$search}%");
+    public function scopeSearched($query, ?string $search)
+    {
+        return $query->when($search, function ($q) use ($search) {
+            $q->where('name', 'like', "%{$search}%");
 
-        // أمثلة لو حابب توسّع البحث لاحقًا:
-        // ->orWhere('description', 'like', "%{$search}%")
-        // ->orWhereHas('category', fn ($c) =>
-        //     $c->where('name', 'like', "%{$search}%")
-        // )
-        // ->orWhereHas('features', fn ($f) =>
-        //     $f->where('name', 'like', "%{$search}%")
-        //       ->orWhere('value', 'like', "%{$search}%")
-        // )
-        // ->orWhereHas('materials', fn ($m) =>
-        //     $m->where('name', 'like', "%{$search}%")
-        // );
-    });
-}
+            // أمثلة لو حابب توسّع البحث لاحقًا:
+            // ->orWhere('description', 'like', "%{$search}%")
+            // ->orWhereHas('category', fn ($c) =>
+            //     $c->where('name', 'like', "%{$search}%")
+            // )
+            // ->orWhereHas('features', fn ($f) =>
+            //     $f->where('name', 'like', "%{$search}%")
+            //       ->orWhere('value', 'like', "%{$search}%")
+            // )
+            // ->orWhereHas('materials', fn ($m) =>
+            //     $m->where('name', 'like', "%{$search}%")
+            // );
+        });
+    }
 
 
     // =================================================================
@@ -238,10 +242,16 @@ public function scopeSearched($query, ?string $search)
         return $this->hasMany(ProductOptions::class);
     }
 
+    // public function primaryImage()
+    // {
+    //     return $this->hasOne(Image::class, 'imageable_id')->where('type', 'main');
+    // }
     public function primaryImage()
     {
-        return $this->hasOne(Image::class, 'imageable_id')->where('type', 'main');
+        return $this->morphOne(Image::class, 'imageable')
+            ->where('type', 'main');
     }
+
 
 
     // public static function boot()
