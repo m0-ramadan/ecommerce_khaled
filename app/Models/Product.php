@@ -289,8 +289,7 @@ class Product extends Model
             'print_location_id'
         )->withPivot('additional_price');
     }
-}
-
+    
     public function images()
     {
         return $this->morphMany(Image::class, 'imageable'); // إزالة الشرط where
@@ -305,3 +304,4 @@ class Product extends Model
     {
         return $this->morphMany(Image::class, 'imageable')->where('is_primary', false);
     }
+}
