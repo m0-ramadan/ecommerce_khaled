@@ -825,45 +825,42 @@
                                     </div>
                                 </div>
 
-                                <!-- Current Main Image -->
-                                <div class="mb-4" bis_skin_checked="1">
-                                    <label class="form-label">الصورة الرئيسية الحالية</label>
-                                    @if ($product->primaryImage)
-                                        <div class="image-preview-grid" bis_skin_checked="1">
-                                            <div class="image-preview-item">
-                                                <span class="primary-badge">رئيسية</span>
-                                                <img src="{{ get_user_image($product->primaryImage?->path) }}"
-                                                    alt="الصورة الرئيسية">
-                                                <div class="image-actions">
-                                                    <button type="button" class="btn btn-info btn-sm"
-                                                        onclick="viewImage('{{ get_user_image($product->primaryImage?->path) }}') ">
-                                                        <i class="fas fa-eye"></i>
-                                                    </button>
-                                                    <button type="button" class="btn btn-danger btn-sm"
-                                                        onclick="removeMainImage()">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    @else
-                                        <div class="alert alert-warning" bis_skin_checked="1">
-                                            <i class="fas fa-exclamation-triangle me-2"></i>
-                                            لا توجد صورة رئيسية للمنتج
-                                        </div>
-                                    @endif
+<!-- في قسم الصورة الرئيسية -->
+<div class="mb-4" bis_skin_checked="1">
+    <label class="form-label">الصورة الرئيسية الحالية</label>
+    @if ($product->image)
+        <div class="image-preview-grid" bis_skin_checked="1">
+            <div class="image-preview-item">
+                <span class="primary-badge">رئيسية</span>
+                <img src="{{ get_user_image($product->image) }}" alt="الصورة الرئيسية">
+                <div class="image-actions">
+                    <button type="button" class="btn btn-info btn-sm"
+                        onclick="viewImage('{{ get_user_image($product->image) }}')">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button type="button" class="btn btn-danger btn-sm"
+                        onclick="removeMainImage()">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    @else
+        <div class="alert alert-warning" bis_skin_checked="1">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            لا توجد صورة رئيسية للمنتج
+        </div>
+    @endif
 
-                                    <label class="form-label mt-3">تغيير الصورة الرئيسية</label>
-                                    <div class="image-manager" onclick="document.getElementById('main_image').click()">
-                                        <i class="fas fa-cloud-upload-alt"></i>
-                                        <p class="mb-0">انقر لرفع صورة جديدة</p>
-                                        <small class="text-muted">الحجم الموصى به: 800×800 بكسل</small>
-                                    </div>
-                                    <input type="file" id="main_image" name="image" accept="image/*"
-                                        style="display: none;">
-                                    <input type="hidden" id="remove_main_image" name="remove_main_image"
-                                        value="0">
-                                </div>
+    <label class="form-label mt-3">تغيير الصورة الرئيسية</label>
+    <div class="image-manager" onclick="document.getElementById('image').click()">
+        <i class="fas fa-cloud-upload-alt"></i>
+        <p class="mb-0">انقر لرفع صورة جديدة</p>
+        <small class="text-muted">الحجم الموصى به: 800×800 بكسل</small>
+    </div>
+    <input type="file" id="image" name="image" accept="image/*" style="display: none;">
+    <input type="hidden" id="remove_main_image" name="remove_main_image" value="0">
+</div>
 
                                 <!-- Additional Images -->
                                 <div class="mb-4" bis_skin_checked="1">
@@ -1898,25 +1895,23 @@
             new bootstrap.Modal(document.getElementById('imageViewModal')).show();
         }
 
-        function removeMainImage() {
-            Swal.fire({
-                title: 'هل أنت متأكد؟',
-                text: 'سيتم إزالة الصورة الرئيسية',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'نعم، احذف',
-                cancelButtonText: 'إلغاء'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $('#remove_main_image').val('1');
-                    $('.image-preview-grid').first().empty();
-                    $('#main_image').val('');
-                    Swal.fire('تم الحذف!', 'تم إزالة الصورة الرئيسية', 'success');
-                }
-            });
-        }
+// حذف الصورة الرئيسية
+function removeMainImage() {
+    if (confirm('هل تريد حذف الصورة الرئيسية؟')) {
+        // إخفاء الصورة المعروضة
+        document.querySelector('.preview-image').src = 'https://via.placeholder.com/100x100?text=No+Image';
+        
+        // تعيين قيمة لحقل الحذف
+        document.getElementById('remove_main_image').value = '1';
+        
+        // إخفاء العنصر
+        document.querySelector('.image-preview-grid').style.display = 'none';
+        
+        // إظهار رسالة
+        alert('سيتم حذف الصورة الرئيسية عند حفظ التعديلات');
+    }
+}
+
 
         function removeNewMainImage() {
             $('#main_image').val('');
@@ -1924,25 +1919,25 @@
             $('#remove_main_image').val('0');
         }
 
-        function removeAdditionalImage(imageId) {
-            Swal.fire({
-                title: 'هل أنت متأكد؟',
-                text: 'سيتم إزالة هذه الصورة',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'نعم، احذف',
-                cancelButtonText: 'إلغاء'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    removedImages.push(imageId);
-                    $('#removed_images').val(removedImages.join(','));
-                    $(`.image-preview-item[data-id="${imageId}"]`).remove();
-                    Swal.fire('تم الحذف!', 'تم إزالة الصورة', 'success');
-                }
-            });
+// حذف الصور الإضافية
+function removeAdditionalImage(imageId) {
+    if (confirm('هل تريد حذف هذه الصورة؟')) {
+        // إخفاء الصورة
+        const imageElement = document.querySelector(`.image-preview-item[data-id="${imageId}"]`);
+        if (imageElement) {
+            imageElement.style.display = 'none';
         }
+        
+        // إضافة ID للصور المحذوفة
+        const removedInput = document.getElementById('removed_images');
+        const currentValue = removedInput.value;
+        if (currentValue) {
+            removedInput.value = currentValue + ',' + imageId;
+        } else {
+            removedInput.value = imageId;
+        }
+    }
+}
 
         function removeNewImage(index) {
             $(`.image-preview-item[data-new-index="${index}"]`).remove();
