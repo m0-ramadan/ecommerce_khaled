@@ -89,10 +89,10 @@ class Product extends Model
         return $this->belongsToMany(Offer::class);
     }
 
-    // public function images()
-    // {
-    //     return $this->morphMany(Image::class, 'imageable')->where('type', 'additional');
-    // }
+    public function images()
+    {
+        return $this->morphMany(Image::class, 'imageable')->where('type', 'additional');
+    }
 
 
     public function getFinalPriceAttribute()
@@ -185,7 +185,7 @@ class Product extends Model
         }
 
         return $query->where(function ($q) use ($search) {
-            $q->where('name', 'like', "%{$search}%");
+            $q->where('name', 'like', "%{$search}%")
                 // ->orWhere('description', 'like', "%{$search}%")
                 // ->orWhereHas('category', fn($c) => $c->where('name', 'like', "%{$search}%"))
                 // ->orWhereHas('features', fn($f) => $f
@@ -234,10 +234,10 @@ class Product extends Model
         return $this->hasMany(ProductOptions::class);
     }
 
-    // public function primaryImage()
-    // {
-    //     return $this->hasOne(Image::class, 'imageable_id')->where('type', 'main');
-    // }
+    public function primaryImage()
+    {
+        return $this->hasOne(Image::class, 'imageable_id')->where('type', 'main');
+    }
 
 
     // public static function boot()
@@ -288,20 +288,5 @@ class Product extends Model
             'product_id',
             'print_location_id'
         )->withPivot('additional_price');
-    }
-    
-    public function images()
-    {
-        return $this->morphMany(Image::class, 'imageable'); // إزالة الشرط where
-    }
-
-    public function primaryImage()
-    {
-        return $this->morphOne(Image::class, 'imageable')->where('is_primary', true);
-    }
-
-    public function additionalImages()
-    {
-        return $this->morphMany(Image::class, 'imageable')->where('is_primary', false);
     }
 }

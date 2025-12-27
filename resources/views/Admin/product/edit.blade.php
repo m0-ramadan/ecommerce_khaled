@@ -5,15 +5,14 @@
 @section('css')
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
     <style>
         body {
             font-family: "Cairo", sans-serif !important;
         }
 
         .step-card {
-            /* background: white; */
+            background: var(--bs-card-bg);
             border-radius: 10px;
             padding: 25px;
             margin-bottom: 20px;
@@ -26,7 +25,7 @@
             align-items: center;
             margin-bottom: 20px;
             padding-bottom: 15px;
-            border-bottom: 2px solid #f8f9fa;
+            border-bottom: 2px solid var(--bs-border-color);
         }
 
         .step-number {
@@ -46,22 +45,22 @@
         .step-title {
             font-size: 18px;
             font-weight: 600;
-            color: white;
+            color: var(--bs-heading-color);
             margin-bottom: 5px;
         }
 
         .step-description {
-            color: #7f8c8d;
+            color: var(--bs-secondary-color);
             font-size: 14px;
         }
 
         /* Image Management */
-        .image-manager {
-            border: 2px dashed #dee2e6;
+        .image-upload-container {
+            border: 2px dashed var(--bs-border-color);
             border-radius: 10px;
-            padding: 20px;
+            padding: 30px;
             text-align: center;
-            /* background: #f8f9fa; */
+            background: var(--bs-light-bg-subtle);
             min-height: 200px;
             display: flex;
             align-items: center;
@@ -71,12 +70,12 @@
             transition: all 0.3s ease;
         }
 
-        .image-manager:hover {
+        .image-upload-container:hover {
             border-color: #696cff;
             background: rgba(105, 108, 255, 0.05);
         }
 
-        .image-manager i {
+        .image-upload-container i {
             font-size: 48px;
             color: #696cff;
             margin-bottom: 15px;
@@ -143,13 +142,9 @@
         }
 
         /* Color Management */
-        .color-management {
-            margin-top: 20px;
-        }
-
         .color-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+            display: flex;
+            flex-wrap: wrap;
             gap: 10px;
             margin-bottom: 15px;
         }
@@ -158,7 +153,7 @@
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            border: 3px solid white;
+            border: 3px solid var(--bs-card-bg);
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
             cursor: pointer;
             position: relative;
@@ -185,79 +180,98 @@
             text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
         }
 
-        /* Material Management */
-        .material-item {
-            /* background: white; */
-            border: 1px solid #dee2e6;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 15px;
-            position: relative;
-        }
-
-        .material-header {
+        /* Selected Items */
+        .selected-items-container {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #dee2e6;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
         }
 
-        .material-remove {
-            color: #e74c3c;
-            background: none;
-            border: none;
-            font-size: 18px;
-            cursor: pointer;
-        }
-
-        /* Dynamic Fields */
-        .dynamic-field {
-            /* background: #f8f9fa; */
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 15px;
-            position: relative;
-        }
-
-        .dynamic-field-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #dee2e6;
-        }
-
-        .dynamic-field-title {
-            font-weight: 600;
-            color: #2c3e50;
-        }
-
-        .dynamic-field-remove {
-            color: #e74c3c;
-            cursor: pointer;
-            background: none;
-            border: none;
-            font-size: 18px;
-        }
-
-        .add-more-btn {
-            width: 100%;
+        .selected-item {
+            background: var(--bs-light-bg-subtle);
+            border: 1px solid var(--bs-border-color);
+            border-radius: 8px;
             padding: 10px;
-            border: 2px dashed #dee2e6;
-            border-radius: 10px;
-            /* background: #f8f9fa; */
-            color: #696cff;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            min-width: 150px;
         }
 
-        .add-more-btn:hover {
-            border-color: #696cff;
-            background: rgba(105, 108, 255, 0.05);
+        .selected-item-remove {
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            width: 20px;
+            height: 20px;
+            background: #dc3545;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            cursor: pointer;
+            z-index: 1;
+        }
+
+        .selected-item-content {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .selected-item-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--bs-primary-border-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #696cff;
+        }
+
+        .selected-item-title {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .selected-item-price {
+            font-size: 12px;
+            color: var(--bs-success);
+            background: var(--bs-success-bg-subtle);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .color-preview {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 1px solid var(--bs-border-color);
+        }
+
+        /* Price Input Group */
+        .price-input-group {
+            position: relative;
+        }
+
+        .price-input-group .form-control {
+            padding-left: 40px;
+        }
+
+        .price-input-group .input-group-text {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            background: none;
+            border: none;
+            z-index: 3;
         }
 
         /* Toggle Switch */
@@ -313,7 +327,7 @@
 
         .toggle-label {
             font-weight: 500;
-            color: #2c3e50;
+            color: var(--bs-body-color);
         }
 
         /* Wizard Steps */
@@ -331,7 +345,7 @@
             right: 0;
             left: 0;
             height: 2px;
-            /* background: #e0e0e0; */
+            background: var(--bs-border-color);
             z-index: 1;
         }
 
@@ -346,14 +360,14 @@
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            /* background: #e0e0e0; */
-            color: #7f8c8d;
+            background: var(--bs-border-color);
+            color: var(--bs-secondary-color);
             display: flex;
             align-items: center;
             justify-content: center;
             margin: 0 auto 10px;
             font-weight: bold;
-            border: 4px solid white;
+            border: 4px solid var(--bs-card-bg);
         }
 
         .wizard-step.active .wizard-step-circle {
@@ -368,7 +382,7 @@
 
         .wizard-step-label {
             font-size: 14px;
-            color: #7f8c8d;
+            color: var(--bs-secondary-color);
             font-weight: 500;
         }
 
@@ -384,7 +398,7 @@
 
         /* Alert Guide */
         .alert-guide {
-            background: #26253d;
+            background: var(--bs-info-bg-subtle);
             border-right: 4px solid #696cff;
             padding: 15px;
             border-radius: 5px;
@@ -406,62 +420,99 @@
             font-size: 14px;
         }
 
-        /* Price Input */
-        .price-input-group {
+        /* Dynamic Fields */
+        .dynamic-field {
+            background: var(--bs-light-bg-subtle);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
             position: relative;
         }
 
-        .price-input-group .form-control {
-            padding-left: 40px;
-        }
-
-        .price-input-group .input-group-text {
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            background: none;
-            border: none;
-            z-index: 3;
-        }
-
-        /* Tabs */
-        .form-tabs {
-            border-bottom: 2px solid #dee2e6;
-            margin-bottom: 25px;
-        }
-
-        .form-tabs .nav-link {
-            border: none;
-            color: #7f8c8d;
-            font-weight: 500;
-            padding: 10px 20px;
-            border-bottom: 3px solid transparent;
-        }
-
-        .form-tabs .nav-link.active {
-            color: #696cff;
-            border-bottom-color: #696cff;
-            background: none;
-        }
-
-        /* Preview Card */
-        .preview-card {
-            /* background: white; */
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-            border: 2px solid #e9ecef;
-        }
-
-        .preview-card h6 {
-            color: #e9ecef;
-            margin-bottom: 15px;
+        .dynamic-field-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
             padding-bottom: 10px;
-            border-bottom: 1px solid #e9ecef;
+            border-bottom: 1px solid var(--bs-border-color);
         }
 
+        .dynamic-field-title {
+            font-weight: 600;
+            color: var(--bs-heading-color);
+        }
+
+        .dynamic-field-remove {
+            color: #e74c3c;
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-size: 18px;
+        }
+
+        /* Material Item */
+        .material-item {
+            background: var(--bs-light-bg-subtle);
+            border: 1px solid var(--bs-border-color);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .material-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--bs-border-color);
+        }
+
+        .material-title {
+            font-weight: 600;
+            color: var(--bs-heading-color);
+        }
+
+        .material-remove {
+            color: #e74c3c;
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        /* Additional Price Input */
+        .additional-price-input {
+            background: var(--bs-info-bg-subtle);
+            border: 1px dashed var(--bs-info-border-subtle);
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        /* Price Editor Modal */
+        .price-editor .modal-dialog {
+            max-width: 400px;
+        }
+
+        .price-editor .modal-content {
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .price-editor .modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom: none;
+            padding: 20px 30px;
+        }
+
+        .price-editor .modal-body {
+            padding: 30px;
+        }
+
+        /* Preview Image */
         .preview-image {
             width: 100px;
             height: 100px;
@@ -470,71 +521,17 @@
             margin-bottom: 10px;
         }
 
-        .preview-price {
-            font-size: 20px;
-            font-weight: bold;
-            color: #2ecc71;
-        }
-
-        .preview-old-price {
-            font-size: 16px;
-            color: #95a5a6;
-            text-decoration: line-through;
-        }
-
-        /* Quick Add Modal */
-        .quick-add-modal .modal-content {
-            border-radius: 15px;
-            /* overflow: hidden; */
-        }
-
-        .quick-add-modal .modal-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-bottom: none;
-            padding: 20px 30px;
-        }
-
-        .quick-add-modal .modal-body {
-            padding: 30px;
-        }
-
-        .quick-add-modal .modal-footer {
-            border-top: 1px solid #dee2e6;
-            padding: 20px 30px;
-        }
-
-        /* Color Picker Input */
-        .color-picker-input {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .color-picker-input input[type="color"] {
-            width: 40px;
-            height: 40px;
-            padding: 0;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
         /* Stock Warning */
         .stock-warning {
-            /* background: #fff3cd; */
-            border: 1px solid #ffeaa7;
-            color: #856404;
+            background: var(--bs-warning-bg-subtle);
+            border: 1px solid var(--bs-warning-border-subtle);
+            color: var(--bs-warning-text);
             padding: 10px;
             border-radius: 5px;
             margin-top: 10px;
             display: flex;
             align-items: center;
             gap: 10px;
-        }
-
-        .stock-warning i {
-            color: #f39c12;
         }
 
         /* Responsive */
@@ -560,46 +557,177 @@
             }
         }
 
-        /* Tab Content */
-        .tab-content {
-            padding: 20px 0;
+        /* Image Preview Styles */
+        .image-preview {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            height: 150px;
         }
 
-        /* Image Sortable */
-        .sortable-image-list {
+        .image-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .image-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .image-preview:hover .image-overlay {
+            opacity: 1;
+        }
+
+        .main-image-preview {
+            max-width: 300px;
             position: relative;
         }
 
-        .sortable-image-list .image-preview-item {
+        .main-image-preview .image-overlay {
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* Drag and Drop */
+        .sortable-item {
             cursor: move;
         }
 
-        .sortable-image-list .image-preview-item.sortable-chosen {
+        .sortable-item.sortable-ghost {
+            opacity: 0.4;
+        }
+
+        .sortable-item.sortable-chosen {
             box-shadow: 0 0 20px rgba(105, 108, 255, 0.3);
         }
 
-        /* Color Price Input */
-        .color-price-input {
-            width: 100px;
-            padding: 5px 10px;
-            border: 1px solid #dee2e6;
-            border-radius: 5px;
-            font-size: 14px;
+        /* Color with price */
+        .color-with-price {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
         }
 
-        /* Material Additional Price */
-        .material-additional-price {
-            /* background: #e7f7ff; */
-            border: 1px dashed #3498db;
-            padding: 10px;
-            border-radius: 5px;
-            margin-top: 10px;
+        .color-price-input {
+            width: 120px;
+        }
+
+        /* Image Preview Grid */
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .grid-item {
+            position: relative;
+            height: 120px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .grid-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .grid-item-actions {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 5px;
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        /* Existing Images */
+        .existing-images-container {
+            margin-bottom: 20px;
+        }
+
+        .existing-image-item {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            height: 120px;
+        }
+
+        .existing-image-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .existing-image-actions {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            display: flex;
+            gap: 5px;
+        }
+    </style>
+    <style>
+        /* Text Ads Styles */
+        .text-ad-field {
+            background: var(--bs-light-bg-subtle);
+            border: 1px solid var(--bs-border-color);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .text-ad-field textarea {
+            border: none;
+            background: transparent;
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .text-ad-remove {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            width: 28px;
+            height: 28px;
+            background: #dc3545;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            cursor: pointer;
+            z-index: 1;
+            border: 2px solid white;
+        }
+
+        .text-ad-remove:hover {
+            background: #c82333;
+            transform: scale(1.1);
         }
     </style>
 @endsection
 
 @section('content')
-    <div class="container-xxl flex-grow-1 container-p-y" bis_skin_checked="1">
+    <div class="container-xxl flex-grow-1 container-p-y">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item">
@@ -615,15 +743,15 @@
             </ol>
         </nav>
 
-        <div class="row" bis_skin_checked="1">
-            <div class="col-12" bis_skin_checked="1">
-                <div class="card mb-4" bis_skin_checked="1">
-                    <div class="card-header d-flex justify-content-between align-items-center" bis_skin_checked="1">
-                        <div bis_skin_checked="1">
+        <div class="row">
+            <div class="col-12">
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <div>
                             <h5 class="mb-0">تعديل المنتج</h5>
                             <small class="text-muted">ID: #{{ $product->id }}</small>
                         </div>
-                        <div class="btn-group" bis_skin_checked="1">
+                        <div class="btn-group">
                             <a href="{{ route('admin.products.show', $product->id) }}" class="btn btn-outline-info btn-sm">
                                 <i class="fas fa-eye me-1"></i> عرض
                             </a>
@@ -633,9 +761,9 @@
                         </div>
                     </div>
 
-                    <div class="card-body" bis_skin_checked="1">
+                    <div class="card-body">
                         <!-- Quick Guide -->
-                        <div class="alert-guide" bis_skin_checked="1">
+                        <div class="alert-guide">
                             <h6><i class="fas fa-lightbulb me-2"></i>نصائح للتعديل:</h6>
                             <ul>
                                 <li>يمكنك تحديث أي معلومات عن المنتج</li>
@@ -669,25 +797,25 @@
                         @endif
 
                         <!-- Product Preview -->
-                        <div class="preview-card mb-4" bis_skin_checked="1">
-                            <div class="row align-items-center" bis_skin_checked="1">
-                                <div class="col-auto" bis_skin_checked="1">
-                                    <img src="{{ $product->primaryImage ? get_user_image($product->primaryImage->path) : 'https://via.placeholder.com/100x100?text=No+Image' }}"
+                        <div class="preview-card mb-4" style="background: var(--bs-light-bg-subtle); border-radius: 10px; padding: 20px; margin-bottom: 20px; border: 2px solid var(--bs-border-color);">
+                            <div class="row align-items-center">
+                                <div class="col-auto">
+                                    <img src="{{ $product->image ? get_user_image($product->image) : 'https://via.placeholder.com/100x100?text=No+Image' }}"
                                         alt="{{ $product->name }}" class="preview-image">
                                 </div>
-                                <div class="col" bis_skin_checked="1">
+                                <div class="col">
                                     <h6 class="mb-2">{{ $product->name }}</h6>
-                                    <div class="mb-2" bis_skin_checked="1">
-                                        <span class="preview-price">
+                                    <div class="mb-2">
+                                        <span style="font-size: 20px; font-weight: bold; color: #2ecc71;">
                                             {{ number_format($product->final_price, 2) }} ج.م
                                         </span>
                                         @if ($product->has_discount && $product->price > $product->final_price)
-                                            <span class="preview-old-price ms-2">
+                                            <span style="font-size: 16px; color: #95a5a6; text-decoration: line-through;" class="ms-2">
                                                 {{ number_format($product->price, 2) }} ج.م
                                             </span>
                                         @endif
                                     </div>
-                                    <div class="d-flex gap-3" bis_skin_checked="1">
+                                    <div class="d-flex gap-3">
                                         <small class="text-muted">
                                             <i class="fas fa-box me-1"></i> المخزون: {{ $product->stock }}
                                         </small>
@@ -709,7 +837,7 @@
                         </div>
 
                         <!-- Wizard Steps -->
-                        <div class="wizard-steps" bis_skin_checked="1">
+                        <div class="wizard-steps">
                             <div class="wizard-step active" id="step1">
                                 <div class="wizard-step-circle">1</div>
                                 <div class="wizard-step-label">المعلومات الأساسية</div>
@@ -720,11 +848,11 @@
                             </div>
                             <div class="wizard-step" id="step3">
                                 <div class="wizard-step-circle">3</div>
-                                <div class="wizard-step-label">المواصفات</div>
+                                <div class="wizard-step-label">الخيارات والإضافات</div>
                             </div>
                             <div class="wizard-step" id="step4">
                                 <div class="wizard-step-circle">4</div>
-                                <div class="wizard-step-label">خيارات إضافية</div>
+                                <div class="wizard-step-label">التأكيد والإرسال</div>
                             </div>
                         </div>
 
@@ -734,26 +862,26 @@
                             @method('POST')
 
                             <!-- Step 1: Basic Information -->
-                            <div class="step-card step-1" bis_skin_checked="1">
-                                <div class="step-header" bis_skin_checked="1">
-                                    <div class="step-number" bis_skin_checked="1">1</div>
-                                    <div bis_skin_checked="1">
+                            <div class="step-card step-1">
+                                <div class="step-header">
+                                    <div class="step-number">1</div>
+                                    <div>
                                         <h5 class="step-title">المعلومات الأساسية</h5>
                                         <p class="step-description">تحديث المعلومات الأساسية للمنتج</p>
                                     </div>
                                 </div>
 
-                                <div class="row" bis_skin_checked="1">
-                                    <div class="col-md-8 mb-3" bis_skin_checked="1">
+                                <div class="row">
+                                    <div class="col-md-8 mb-3">
                                         <label for="name" class="form-label required">اسم المنتج</label>
                                         <input type="text" class="form-control" id="name" name="name"
                                             value="{{ old('name', $product->name) }}" required>
                                         <small class="text-muted">اسم واضح ومعبر عن المنتج</small>
                                     </div>
 
-                                    <div class="col-md-4 mb-3" bis_skin_checked="1">
+                                    <div class="col-md-4 mb-3">
                                         <label for="category_id" class="form-label required">القسم</label>
-                                        <div class="input-group" bis_skin_checked="1">
+                                        <div class="input-group">
                                             <select class="form-control select2" id="category_id" name="category_id"
                                                 required>
                                                 <option value="">اختر القسم</option>
@@ -774,12 +902,12 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-12 mb-3" bis_skin_checked="1">
+                                    <div class="col-12 mb-3">
                                         <label for="description" class="form-label">الوصف</label>
                                         <textarea class="form-control summernote" id="description" name="description" rows="6">{{ old('description', $product->description) }}</textarea>
                                     </div>
 
-                                    <div class="col-md-6 mb-3" bis_skin_checked="1">
+                                    <div class="col-md-6 mb-3">
                                         <label for="status_id" class="form-label required">الحالة</label>
                                         <select class="form-select" id="status_id" name="status_id" required>
                                             <option value="1"
@@ -789,17 +917,17 @@
                                                 {{ old('status_id', $product->status_id) == 2 ? 'selected' : '' }}>غير نشط
                                             </option>
                                             <option value="3"
-                                                {{ old('status_id', $product->status_id) == 3 ? 'selected' : '' }}>قيد
-                                                المراجعة</option>
+                                                {{ old('status_id', $product->status_id) == 3 ? 'selected' : '' }}>مسودة
+                                            </option>
                                         </select>
                                     </div>
 
-                                    <div class="col-md-6 mb-3" bis_skin_checked="1">
+                                    <div class="col-md-6 mb-3">
                                         <label for="stock" class="form-label required">الكمية المتاحة</label>
                                         <input type="number" class="form-control" id="stock" name="stock"
                                             value="{{ old('stock', $product->stock) }}" min="0" required>
                                         @if ($product->stock < 10)
-                                            <div class="stock-warning" bis_skin_checked="1">
+                                            <div class="stock-warning">
                                                 <i class="fas fa-exclamation-triangle"></i>
                                                 <span>المخزون منخفض! نوصي بإضافة المزيد</span>
                                             </div>
@@ -807,7 +935,7 @@
                                     </div>
                                 </div>
 
-                                <div class="d-flex justify-content-between mt-4" bis_skin_checked="1">
+                                <div class="d-flex justify-content-between mt-4">
                                     <div></div>
                                     <button type="button" class="btn btn-primary next-step" data-next="2">
                                         التالي <i class="fas fa-arrow-left ms-1"></i>
@@ -816,123 +944,145 @@
                             </div>
 
                             <!-- Step 2: Images & Pricing -->
-                            <div class="step-card step-2" style="display: none;" bis_skin_checked="1">
-                                <div class="step-header" bis_skin_checked="1">
-                                    <div class="step-number" bis_skin_checked="1">2</div>
-                                    <div bis_skin_checked="1">
+                            <div class="step-card step-2" style="display: none;">
+                                <div class="step-header">
+                                    <div class="step-number">2</div>
+                                    <div>
                                         <h5 class="step-title">الصور والتسعير</h5>
                                         <p class="step-description">تحديث صور المنتج والتسعير</p>
                                     </div>
                                 </div>
 
-<!-- في قسم الصورة الرئيسية -->
-<div class="mb-4" bis_skin_checked="1">
-    <label class="form-label">الصورة الرئيسية الحالية</label>
-    @if ($product->image)
-        <div class="image-preview-grid" bis_skin_checked="1">
-            <div class="image-preview-item">
-                <span class="primary-badge">رئيسية</span>
-                <img src="{{ get_user_image($product->image) }}" alt="الصورة الرئيسية">
-                <div class="image-actions">
-                    <button type="button" class="btn btn-info btn-sm"
-                        onclick="viewImage('{{ get_user_image($product->image) }}')">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                    <button type="button" class="btn btn-danger btn-sm"
-                        onclick="removeMainImage()">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    @else
-        <div class="alert alert-warning" bis_skin_checked="1">
-            <i class="fas fa-exclamation-triangle me-2"></i>
-            لا توجد صورة رئيسية للمنتج
-        </div>
-    @endif
-
-    <label class="form-label mt-3">تغيير الصورة الرئيسية</label>
-    <div class="image-manager" onclick="document.getElementById('image').click()">
-        <i class="fas fa-cloud-upload-alt"></i>
-        <p class="mb-0">انقر لرفع صورة جديدة</p>
-        <small class="text-muted">الحجم الموصى به: 800×800 بكسل</small>
-    </div>
-    <input type="file" id="image" name="image" accept="image/*" style="display: none;">
-    <input type="hidden" id="remove_main_image" name="remove_main_image" value="0">
-</div>
-
-                                <!-- Additional Images -->
-                                <div class="mb-4" bis_skin_checked="1">
-                                    <label class="form-label">الصور الإضافية</label>
-
-                                    @if ($product->images && $product->images->count() > 0)
-                                        <div class="image-preview-grid sortable-image-list" id="existingImagesGrid">
-                                            @foreach ($product->images as $image)
-                                                <div class="image-preview-item" data-id="{{ $image->id }}">
-                                                    @if ($image->is_primary)
-                                                        <span class="primary-badge">رئيسية</span>
-                                                    @endif
-                                                    <img src="{{ get_user_image($image->path) }}" alt="صورة إضافية">
-                                                    <div class="image-actions">
-                                                        <button type="button" class="btn btn-info btn-sm"
-                                                            onclick="viewImage('{{ get_user_image($image->path) }}')">
-                                                            <i class="fas fa-eye"></i>
-                                                        </button>
-                                                        <button type="button" class="btn btn-danger btn-sm"
-                                                            onclick="removeAdditionalImage({{ $image->id }})">
-                                                            <i class="fas fa-trash"></i>
-                                                        </button>
-                                                        @if (!$image->is_primary)
-                                                            <button type="button" class="btn btn-primary btn-sm"
-                                                                onclick="setAsPrimary({{ $image->id }})">
-                                                                <i class="fas fa-star"></i>
-                                                            </button>
-                                                        @endif
-                                                    </div>
+                                <!-- Main Image -->
+                                <div class="mb-4">
+                                    <label class="form-label">الصورة الرئيسية الحالية</label>
+                                    
+                                    @if ($product->image)
+                                        <div class="main-image-preview mb-3">
+                                            <div class="image-preview">
+                                                <img src="{{ get_user_image($product->image) }}" alt="الصورة الرئيسية الحالية">
+                                                <div class="image-overlay">
+                                                    <button type="button" class="btn btn-info btn-sm"
+                                                        onclick="viewMainImage('{{ get_user_image($product->image) }}')">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-danger btn-sm"
+                                                        onclick="removeExistingMainImage()">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
                                                 </div>
-                                            @endforeach
+                                                <span class="primary-badge">رئيسية</span>
+                                            </div>
+                                        </div>
+                                    @else
+                                        <div class="alert alert-warning">
+                                            <i class="fas fa-exclamation-triangle me-2"></i>
+                                            لا توجد صورة رئيسية للمنتج
                                         </div>
                                     @endif
 
-                                    <div class="image-manager mt-3"
-                                        onclick="document.getElementById('additional_images').click()">
+                                    <label class="form-label mt-3">تغيير الصورة الرئيسية</label>
+                                    <div class="image-upload-container"
+                                        onclick="document.getElementById('new_main_image').click()">
+                                        <i class="fas fa-cloud-upload-alt"></i>
+                                        <p class="mb-0">انقر لرفع صورة جديدة</p>
+                                        <small class="text-muted">الحجم الموصى به: 800×800 بكسل</small>
+                                    </div>
+                                    <input type="file" id="new_main_image" name="image" accept="image/*"
+                                        style="display: none;" onchange="previewNewMainImage(this)">
+                                    
+                                    <div id="newMainImagePreview" class="main-image-preview mt-3" style="display: none;">
+                                        <div class="image-preview">
+                                            <img id="newMainImagePreviewImg" src="" alt="الصورة الرئيسية الجديدة">
+                                            <div class="image-overlay">
+                                                <button type="button" class="btn btn-info btn-sm"
+                                                    onclick="viewNewMainImage()">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-danger btn-sm"
+                                                    onclick="removeNewMainImage()">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                            <span class="primary-badge" style="background: #2ecc71;">جديدة</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <input type="hidden" id="remove_existing_main_image" name="remove_existing_main_image" value="0">
+                                </div>
+
+                                <!-- Additional Images -->
+                                <div class="mb-4">
+                                    <label class="form-label">الصور الإضافية الحالية</label>
+                                    
+                                    <div class="existing-images-container">
+                                        @if($product->images && $product->images->where('type', 'additional')->count() > 0)
+                                            <div class="preview-grid" id="existingAdditionalImages">
+                                                @foreach($product->images->where('type', 'additional') as $image)
+                                                    <div class="existing-image-item" data-id="{{ $image->id }}">
+                                                        <img src="{{ get_user_image($image->path) }}" alt="صورة إضافية">
+                                                        <div class="existing-image-actions">
+                                                            <button type="button" class="btn btn-info btn-sm"
+                                                                onclick="viewExistingImage('{{ get_user_image($image->path) }}')">
+                                                                <i class="fas fa-eye"></i>
+                                                            </button>
+                                                            <button type="button" class="btn btn-danger btn-sm"
+                                                                onclick="removeExistingImage({{ $image->id }})">
+                                                                <i class="fas fa-trash"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        @else
+                                            <div class="alert alert-info">
+                                                <i class="fas fa-info-circle me-2"></i>
+                                                لا توجد صور إضافية حالية
+                                            </div>
+                                        @endif
+                                    </div>
+
+                                    <label class="form-label mt-3">إضافة صور إضافية جديدة</label>
+                                    <div class="image-upload-container"
+                                        onclick="document.getElementById('new_additional_images').click()">
                                         <i class="fas fa-images"></i>
-                                        <p class="mb-0">انقر لإضافة صور إضافية</p>
+                                        <p class="mb-0">انقر لإضافة صور إضافية جديدة</p>
                                         <small class="text-muted">يمكنك رفع أكثر من صورة</small>
                                     </div>
-                                    <input type="file" id="additional_images" name="additional_images[]"
-                                        accept="image/*" multiple style="display: none;">
-                                    <div id="newImagesPreview" class="image-preview-grid mt-3"></div>
-                                    <input type="hidden" id="removed_images" name="removed_images" value="">
-                                    <input type="hidden" id="primary_image_id" name="primary_image_id"
-                                        value="{{ $product->images->where('is_primary', true)->first()->id ?? '' }}">
-                                    <input type="hidden" id="images_order" name="images_order" value="">
+                                    <input type="file" id="new_additional_images" name="additional_images[]"
+                                        accept="image/*" multiple style="display: none;"
+                                        onchange="previewNewAdditionalImages(this)">
+                                    
+                                    <div id="newAdditionalImagesPreview" class="preview-grid mt-3"></div>
+                                    
+                                    <input type="hidden" id="removed_existing_images" name="removed_existing_images" value="">
                                 </div>
 
                                 <!-- Pricing -->
-                                <div class="row" bis_skin_checked="1">
-                                    <div class="col-md-4 mb-2" bis_skin_checked="1">
+                                <div class="row">
+                                    <div class="col-md-4 mb-2">
                                         <label for="price" class="form-label required">السعر الأساسي</label>
-                                        <div class="price-input-group" bis_skin_checked="1">
+                                        <div class="price-input-group">
                                             <span class="input-group-text">ج.م</span>
                                             <input type="number" class="form-control" id="price" name="price"
                                                 step="0.01" value="{{ old('price', $product->price) }}" required>
                                         </div>
                                     </div>
 
-                                </div>
                                     <div class="col-md-8 mb-4">
-                                        <label for="price_text" class="form-label required"> نص السعر </label>
+                                        <label for="price_text" class="form-label required">نص السعر</label>
                                         <div class="price-input-group">
                                             <span class="input-group-text">ج.م</span>
-                                            <input type="text" class="form-control" id="price_text" name="price_text" value="{{ old('price_text', $product->price_text) }}" required>
+                                            <input type="text" class="form-control" id="price_text" name="price_text"
+                                                value="{{ old('price_text', $product->price_text) }}" required>
                                         </div>
                                     </div>
+                                </div>
+
                                 <!-- Additional Pricing Options -->
-                                <div class="row" bis_skin_checked="1">
-                                    <div class="col-md-4 mb-3" bis_skin_checked="1">
-                                        <div class="toggle-container mb-3" bis_skin_checked="1">
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <div class="toggle-container">
                                             <label class="toggle-switch">
                                                 <input type="checkbox" id="has_discount" name="has_discount"
                                                     {{ old('has_discount', $product->has_discount) ? 'checked' : '' }}>
@@ -943,8 +1093,8 @@
 
                                         <div id="discountSection"
                                             style="{{ old('has_discount', $product->has_discount) ? '' : 'display: none;' }}">
-                                            <div class="row" bis_skin_checked="1">
-                                                <div class="col-6" bis_skin_checked="1">
+                                            <div class="row mt-3">
+                                                <div class="col-6">
                                                     <label for="discount_type" class="form-label">نوع الخصم</label>
                                                     <select class="form-select" id="discount_type" name="discount_type">
                                                         <option value="percentage"
@@ -955,7 +1105,7 @@
                                                             قيمة ثابتة</option>
                                                     </select>
                                                 </div>
-                                                <div class="col-6" bis_skin_checked="1">
+                                                <div class="col-6">
                                                     <label for="discount_value" class="form-label">قيمة الخصم</label>
                                                     <input type="number" class="form-control" id="discount_value"
                                                         name="discount_value" step="0.01"
@@ -965,8 +1115,8 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-md-4 mb-3" bis_skin_checked="1">
-                                        <div class="toggle-container" bis_skin_checked="1">
+                                    <div class="col-md-4 mb-3">
+                                        <div class="toggle-container">
                                             <label class="toggle-switch">
                                                 <input type="checkbox" id="includes_tax" name="includes_tax"
                                                     {{ old('includes_tax', $product->includes_tax) ? 'checked' : '' }}>
@@ -976,8 +1126,8 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-md-4 mb-3" bis_skin_checked="1">
-                                        <div class="toggle-container" bis_skin_checked="1">
+                                    <div class="col-md-4 mb-3">
+                                        <div class="toggle-container">
                                             <label class="toggle-switch">
                                                 <input type="checkbox" id="includes_shipping" name="includes_shipping"
                                                     {{ old('includes_shipping', $product->includes_shipping) ? 'checked' : '' }}>
@@ -988,7 +1138,7 @@
                                     </div>
                                 </div>
 
-                                <div class="d-flex justify-content-between mt-4" bis_skin_checked="1">
+                                <div class="d-flex justify-content-between mt-4">
                                     <button type="button" class="btn btn-outline-secondary prev-step" data-prev="1">
                                         <i class="fas fa-arrow-right me-1"></i> السابق
                                     </button>
@@ -998,20 +1148,19 @@
                                 </div>
                             </div>
 
-                            <!-- Step 3: Specifications -->
-                            <div class="step-card step-3" style="display: none;" bis_skin_checked="1">
-                                <div class="step-header" bis_skin_checked="1">
-                                    <div class="step-number" bis_skin_checked="1">3</div>
-                                    <div bis_skin_checked="1">
-                                        <h5 class="step-title">المواصفات والخصائص</h5>
-                                        <p class="step-description">تحديث مواصفات المنتج وخياراته</p>
+                            <!-- Step 3: Options & Additions -->
+                            <div class="step-card step-3" style="display: none;">
+                                <div class="step-header">
+                                    <div class="step-number">3</div>
+                                    <div>
+                                        <h5 class="step-title">الخيارات والإضافات</h5>
+                                        <p class="step-description">تحديث الخيارات والإضافات المتاحة للمنتج</p>
                                     </div>
                                 </div>
 
-                                <!-- Colors -->
-                                <div class="mb-4" bis_skin_checked="1">
-                                    <div class="d-flex justify-content-between align-items-center mb-3"
-                                        bis_skin_checked="1">
+                                <!-- Colors with Prices -->
+                                <div class="mb-4">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
                                         <label class="form-label mb-0">الألوان المتاحة</label>
                                         <button type="button" class="btn btn-outline-primary btn-sm"
                                             onclick="openQuickAddModal('color')">
@@ -1020,34 +1169,43 @@
                                     </div>
 
                                     <!-- Selected Colors -->
-                                    <div class="mb-3" bis_skin_checked="1">
+                                    <div class="mb-3">
                                         <label class="form-label">الألوان المختارة:</label>
-                                        <div id="selectedColorsContainer" class="d-flex flex-wrap gap-2 mb-3">
+                                        <div id="selectedColorsContainer" class="selected-items-container">
                                             @foreach ($product->colors as $color)
-                                                <div class="color-swatch" data-id="{{ $color->id }}">
-                                                    <div class="color-preview"
-                                                        style="background-color: {{ $color->hex_code }};"></div>
-                                                    <span>{{ $color->name }}</span>
-                                                    <input type="hidden" name="colors[]" value="{{ $color->id }}">
-                                                    <button type="button" class="btn btn-sm btn-outline-danger ms-2"
-                                                        onclick="removeColor({{ $color->id }})">
-                                                        <i class="fas fa-times"></i>
-                                                    </button>
+                                                <div class="selected-item color-item" data-id="{{ $color->id }}">
+                                                    <div class="selected-item-remove" onclick="removeSelectedColor('{{ $color->id }}')">×</div>
+                                                    <div class="selected-item-content">
+                                                        <div class="color-preview" style="background-color: {{ $color->hex_code }};"></div>
+                                                        <div class="selected-item-title">{{ $color->name }}</div>
+                                                        <div class="selected-item-price">
+                                                            {{ $color->pivot->additional_price ?? 0 }} ج.م
+                                                        </div>
+                                                        <button type="button" class="btn btn-sm btn-outline-secondary"
+                                                            onclick="editColorPrice('{{ $color->id }}', '{{ $color->name }}', {{ $color->pivot->additional_price ?? 0 }})">
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
+                                                        <input type="hidden" name="colors[]" value="{{ $color->id }}">
+                                                        <input type="hidden" name="color_prices[{{ $color->id }}]" 
+                                                            value="{{ $color->pivot->additional_price ?? 0 }}">
+                                                    </div>
                                                 </div>
                                             @endforeach
                                         </div>
                                     </div>
 
                                     <!-- Available Colors -->
-                                    <div bis_skin_checked="1">
+                                    <div>
                                         <label class="form-label">اختر من الألوان المتاحة:</label>
                                         <div class="color-grid" id="availableColorsGrid">
                                             @foreach ($colors as $color)
                                                 @if (!$product->colors->contains($color->id))
                                                     <div class="color-item"
                                                         style="background-color: {{ $color->hex_code }};"
-                                                        data-id="{{ $color->id }}" data-name="{{ $color->name }}"
-                                                        data-hex="{{ $color->hex_code }}" onclick="addColor(this)">
+                                                        data-id="{{ $color->id }}" 
+                                                        data-name="{{ $color->name }}"
+                                                        data-hex="{{ $color->hex_code }}"
+                                                        onclick="addColorToProduct(this)">
                                                     </div>
                                                 @endif
                                             @endforeach
@@ -1055,10 +1213,9 @@
                                     </div>
                                 </div>
 
-                                <!-- Materials -->
-                                <div class="mb-4" bis_skin_checked="1">
-                                    <div class="d-flex justify-content-between align-items-center mb-3"
-                                        bis_skin_checked="1">
+                                <!-- Materials with Prices -->
+                                <div class="mb-4">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
                                         <label class="form-label mb-0">المواد المستخدمة</label>
                                         <button type="button" class="btn btn-outline-primary btn-sm"
                                             onclick="openQuickAddModal('material')">
@@ -1067,134 +1224,276 @@
                                     </div>
 
                                     <!-- Existing Materials -->
-                                    <div id="materialsContainer">
-                                        @foreach ($product->materials as $material)
-                                            <div class="material-item" data-id="{{ $material->id }}">
-                                                <div class="material-header">
-                                                    <div class="material-title" bis_skin_checked="1">
-                                                        <strong>{{ $material->name }}</strong>
-                                                    </div>
-                                                    <button type="button" class="material-remove"
-                                                        onclick="removeMaterial(this)">
-                                                        <i class="fas fa-times"></i>
-                                                    </button>
-                                                </div>
-                                                <div class="row" bis_skin_checked="1">
-                                                    <div class="col-md-4 mb-2" bis_skin_checked="1">
-                                                        <input type="hidden"
-                                                            name="materials[{{ $loop->index }}][material_id]"
-                                                            value="{{ $material->id }}">
-                                                        <input type="number" class="form-control"
-                                                            name="materials[{{ $loop->index }}][quantity]"
-                                                            value="{{ $material->pivot->quantity }}" placeholder="الكمية"
-                                                            min="0" step="0.01" required>
-                                                    </div>
-                                                    <div class="col-md-4 mb-2" bis_skin_checked="1">
-                                                        <select class="form-select"
-                                                            name="materials[{{ $loop->index }}][unit]" required>
-                                                            <option value="piece"
-                                                                {{ $material->pivot->unit == 'piece' ? 'selected' : '' }}>
-                                                                قطعة</option>
-                                                            <option value="meter"
-                                                                {{ $material->pivot->unit == 'meter' ? 'selected' : '' }}>
-                                                                متر</option>
-                                                            <option value="kg"
-                                                                {{ $material->pivot->unit == 'kg' ? 'selected' : '' }}>كجم
-                                                            </option>
-                                                            <option value="liter"
-                                                                {{ $material->pivot->unit == 'liter' ? 'selected' : '' }}>
-                                                                لتر</option>
-                                                            <option value="gram"
-                                                                {{ $material->pivot->unit == 'gram' ? 'selected' : '' }}>
-                                                                جرام</option>
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-md-4 mb-2" bis_skin_checked="1">
-                                                        <input type="number" class="form-control"
-                                                            name="materials[{{ $loop->index }}][additional_price]"
-                                                            value="{{ $material->pivot->additional_price ?? 0 }}"
-                                                            placeholder="سعر إضافي" step="0.01" min="0">
+                                    <div id="materialsContainer" class="row g-3 mt-3">
+                                        @foreach ($product->materials as $index => $material)
+                                            <div class="col-md-12 mb-3">
+                                                <div class="card">
+                                                    <div class="card-body">
+                                                        <div class="row align-items-center">
+                                                            <div class="col-md-4 mb-2">
+                                                                <select class="form-select material-select" 
+                                                                    name="materials[{{ $index }}][material_id]" required>
+                                                                    <option value="">اختر المادة</option>
+                                                                    @foreach ($materials as $mat)
+                                                                        <option value="{{ $mat->id }}"
+                                                                            {{ $material->id == $mat->id ? 'selected' : '' }}>
+                                                                            {{ $mat->name }}
+                                                                        </option>
+                                                                    @endforeach
+                                                                </select>
+                                                            </div>
+                                                            <div class="col-md-2 mb-2">
+                                                                <input type="number" class="form-control" 
+                                                                    name="materials[{{ $index }}][quantity]"
+                                                                    value="{{ $material->pivot->quantity }}" 
+                                                                    placeholder="الكمية" min="0" step="0.01" required>
+                                                            </div>
+                                                            <div class="col-md-2 mb-2">
+                                                                <select class="form-select" 
+                                                                    name="materials[{{ $index }}][unit]" required>
+                                                                    <option value="piece" {{ $material->pivot->unit == 'piece' ? 'selected' : '' }}>قطعة</option>
+                                                                    <option value="meter" {{ $material->pivot->unit == 'meter' ? 'selected' : '' }}>متر</option>
+                                                                    <option value="kg" {{ $material->pivot->unit == 'kg' ? 'selected' : '' }}>كجم</option>
+                                                                    <option value="liter" {{ $material->pivot->unit == 'liter' ? 'selected' : '' }}>لتر</option>
+                                                                    <option value="gram" {{ $material->pivot->unit == 'gram' ? 'selected' : '' }}>جرام</option>
+                                                                </select>
+                                                            </div>
+                                                            <div class="col-md-2 mb-2">
+                                                                <input type="number" class="form-control material-price-input"
+                                                                    name="materials[{{ $index }}][additional_price]"
+                                                                    value="{{ $material->pivot->additional_price ?? 0 }}"
+                                                                    placeholder="السعر الإضافي" step="0.01" min="0">
+                                                            </div>
+                                                            <div class="col-md-2 mb-2">
+                                                                <button type="button" class="btn btn-outline-danger btn-sm"
+                                                                    onclick="removeMaterialField(this)">
+                                                                    <i class="fas fa-times"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         @endforeach
                                     </div>
 
-                                    <!-- Add Material Button -->
                                     <button type="button" class="btn btn-outline-primary btn-sm mt-3"
                                         onclick="addMaterialField()">
                                         <i class="fas fa-plus me-1"></i> إضافة مادة أخرى
                                     </button>
                                 </div>
 
-                                <!-- Features -->
-                                <div class="mb-4" bis_skin_checked="1">
-                                    <div class="d-flex justify-content-between align-items-center mb-3"
-                                        bis_skin_checked="1">
-                                        <label class="form-label mb-0">المواصفات الإضافية</label>
+                                <!-- Printing Methods -->
+                                <div class="mb-4">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <label class="form-label mb-0">طرق الطباعة</label>
                                         <button type="button" class="btn btn-outline-primary btn-sm"
-                                            onclick="addFeatureField()">
-                                            <i class="fas fa-plus me-1"></i> إضافة مواصفة
+                                            onclick="openQuickAddModal('printing_method')">
+                                            <i class="fas fa-plus me-1"></i> إضافة طريقة طباعة جديدة
                                         </button>
                                     </div>
 
-                                    <div id="featuresContainer">
-                                        @foreach ($product->features as $index => $feature)
-                                            <div class="dynamic-field">
-                                                <div class="dynamic-field-header">
-                                                    <div class="dynamic-field-title">مواصفة {{ $index + 1 }}</div>
-                                                    <button type="button" class="dynamic-field-remove"
-                                                        onclick="removeField(this)">
-                                                        <i class="fas fa-times"></i>
+                                    <div class="mb-3">
+                                        <label class="form-label">اختر طرق الطباعة:</label>
+                                        <select class="form-select select2" id="printingMethodsSelect" multiple>
+                                            @foreach ($printingMethods as $method)
+                                                <option value="{{ $method->id }}"
+                                                    data-price="{{ $method->base_price }}"
+                                                    data-name="{{ $method->name }}"
+                                                    {{ $product->printingMethods->contains($method->id) ? 'selected' : '' }}>
+                                                    {{ $method->name }} - {{ $method->base_price }} ج.م
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+                                    <div id="selectedPrintingMethods" class="selected-items-container">
+                                        @foreach ($product->printingMethods as $method)
+                                            <div class="selected-item" data-id="{{ $method->id }}">
+                                                <div class="selected-item-remove" onclick="removeSelectedPrintingMethod('{{ $method->id }}')">×</div>
+                                                <div class="selected-item-content">
+                                                    <div class="selected-item-icon">
+                                                        <i class="fas fa-print"></i>
+                                                    </div>
+                                                    <div class="selected-item-title">{{ $method->name }}</div>
+                                                    <div class="selected-item-price">
+                                                        {{ $method->pivot->additional_price ?? $method->base_price }} ج.م
+                                                    </div>
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary"
+                                                        onclick="editPrintingMethodPrice('{{ $method->id }}', '{{ $method->name }}', {{ $method->pivot->additional_price ?? $method->base_price }})">
+                                                        <i class="fas fa-edit"></i>
                                                     </button>
-                                                </div>
-                                                <div class="row" bis_skin_checked="1">
-                                                    <div class="col-md-5 mb-2" bis_skin_checked="1">
-                                                        <input type="text" class="form-control"
-                                                            name="features[{{ $index }}][name]"
-                                                            value="{{ $feature->name }}" placeholder="اسم المواصفة"
-                                                            required>
-                                                    </div>
-                                                    <div class="col-md-7 mb-2" bis_skin_checked="1">
-                                                        <input type="text" class="form-control"
-                                                            name="features[{{ $index }}][value]"
-                                                            value="{{ $feature->value }}" placeholder="القيمة" required>
-                                                    </div>
+                                                    <input type="hidden" name="printing_methods[]" value="{{ $method->id }}">
+                                                    <input type="hidden" name="printing_method_prices[{{ $method->id }}]" 
+                                                        value="{{ $method->pivot->additional_price ?? $method->base_price }}">
                                                 </div>
                                             </div>
                                         @endforeach
                                     </div>
                                 </div>
 
-                                <!-- Delivery Time -->
-                                <div class="mb-4" bis_skin_checked="1">
-                                    <label class="form-label">وقت التوصيل</label>
-                                    <div class="row" bis_skin_checked="1">
-                                        <div class="col-md-6 mb-3" bis_skin_checked="1">
-                                            <label for="from_days" class="form-label">من (أيام)</label>
-                                            <input type="number" class="form-control" id="from_days" name="from_days"
-                                                value="{{ old('from_days', $product->deliveryTime->from_days ?? '') }}"
-                                                min="0">
-                                        </div>
-                                        <div class="col-md-6 mb-3" bis_skin_checked="1">
-                                            <label for="to_days" class="form-label">إلى (أيام)</label>
-                                            <input type="number" class="form-control" id="to_days" name="to_days"
-                                                value="{{ old('to_days', $product->deliveryTime->to_days ?? '') }}"
-                                                min="0">
-                                        </div>
+                                <!-- Print Locations -->
+                                <div class="mb-4">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <label class="form-label mb-0">أماكن الطباعة</label>
+                                        <button type="button" class="btn btn-outline-primary btn-sm"
+                                            onclick="openQuickAddModal('print_location')">
+                                            <i class="fas fa-plus me-1"></i> إضافة مكان طباعة جديد
+                                        </button>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">اختر أماكن الطباعة:</label>
+                                        <select class="form-select select2" id="printLocationsSelect" multiple>
+                                            @foreach ($printLocations as $location)
+                                                <option value="{{ $location->id }}" 
+                                                    data-type="{{ $location->type }}"
+                                                    data-price="{{ $location->additional_price }}"
+                                                    data-name="{{ $location->name }}"
+                                                    {{ $product->printLocations->contains($location->id) ? 'selected' : '' }}>
+                                                    {{ $location->name }} ({{ $location->type }}) -
+                                                    {{ $location->additional_price }} ج.م
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+                                    <div id="selectedPrintLocations" class="selected-items-container">
+                                        @foreach ($product->printLocations as $location)
+                                            <div class="selected-item" data-id="{{ $location->id }}">
+                                                <div class="selected-item-remove" onclick="removeSelectedPrintLocation('{{ $location->id }}')">×</div>
+                                                <div class="selected-item-content">
+                                                    <div class="selected-item-icon">
+                                                        <i class="fas fa-map-marker-alt"></i>
+                                                    </div>
+                                                    <div class="selected-item-title">{{ $location->name }}</div>
+                                                    <div class="selected-item-price">
+                                                        {{ $location->pivot->additional_price ?? $location->additional_price }} ج.م
+                                                    </div>
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary"
+                                                        onclick="editPrintLocationPrice('{{ $location->id }}', '{{ $location->name }}', {{ $location->pivot->additional_price ?? $location->additional_price }})">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <input type="hidden" name="print_locations[]" value="{{ $location->id }}">
+                                                    <input type="hidden" name="print_location_prices[{{ $location->id }}]" 
+                                                        value="{{ $location->pivot->additional_price ?? $location->additional_price }}">
+                                                </div>
+                                            </div>
+                                        @endforeach
                                     </div>
                                 </div>
 
-                                <!-- Warranty -->
-                                <div class="mb-4" bis_skin_checked="1">
-                                    <label for="warranty_months" class="form-label">الضمان (بالأشهر)</label>
-                                    <input type="number" class="form-control" id="warranty_months"
-                                        name="warranty_months"
-                                        value="{{ old('warranty_months', $product->warranty->months ?? '') }}"
-                                        min="0">
+                                <!-- Offers -->
+                                <div class="mb-4">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <label class="form-label mb-0">العروض</label>
+                                        <button type="button" class="btn btn-outline-primary btn-sm"
+                                            onclick="openQuickAddModal('offer')">
+                                            <i class="fas fa-plus me-1"></i> إضافة عرض جديد
+                                        </button>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">اختر العروض:</label>
+                                        <select class="form-select select2" id="offersSelect" multiple>
+                                            @foreach ($offers as $offer)
+                                                <option value="{{ $offer->id }}" 
+                                                    data-name="{{ $offer->name }}"
+                                                    {{ $product->offers->contains($offer->id) ? 'selected' : '' }}>
+                                                    {{ $offer->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+                                    <div id="selectedOffers" class="selected-items-container">
+                                        @foreach ($product->offers as $offer)
+                                            <div class="selected-item" data-id="{{ $offer->id }}">
+                                                <div class="selected-item-remove" onclick="removeSelectedOffer('{{ $offer->id }}')">×</div>
+                                                <div class="selected-item-content">
+                                                    <div class="selected-item-icon">
+                                                        <i class="fas fa-tag"></i>
+                                                    </div>
+                                                    <div class="selected-item-title">{{ $offer->name }}</div>
+                                                    <input type="hidden" name="offers[]" value="{{ $offer->id }}">
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
                                 </div>
 
-                                <div class="d-flex justify-content-between mt-4" bis_skin_checked="1">
+                                <!-- Delivery Time & Warranty -->
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <label class="form-label">وقت التوصيل</label>
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <label for="from_days" class="form-label">من (أيام)</label>
+                                                <input type="number" class="form-control" id="from_days"
+                                                    name="from_days" 
+                                                    value="{{ old('from_days', $product->deliveryTime->from_days ?? '') }}" 
+                                                    min="0">
+                                            </div>
+                                            <div class="col-6">
+                                                <label for="to_days" class="form-label">إلى (أيام)</label>
+                                                <input type="number" class="form-control" id="to_days" name="to_days"
+                                                    value="{{ old('to_days', $product->deliveryTime->to_days ?? '') }}" 
+                                                    min="0">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <label for="warranty_months" class="form-label">الضمان (بالأشهر)</label>
+                                        <input type="number" class="form-control" id="warranty_months"
+                                            name="warranty_months" 
+                                            value="{{ old('warranty_months', $product->warranty->months ?? '') }}" 
+                                            min="0">
+                                    </div>
+                                </div>
+
+                                <!-- Text Ads Section -->
+                                <div class="mb-4">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <div>
+                                            <label class="form-label mb-0 fw-bold">النصوص الإعلانية للمنتج</label>
+                                            <small class="text-muted d-block">أضف نصوصاً إعلانية تظهر مع المنتج لجذب العملاء</small>
+                                        </div>
+                                        <button type="button" class="btn btn-outline-primary btn-sm"
+                                            onclick="addTextAdField()">
+                                            <i class="fas fa-plus me-1"></i> إضافة نص إعلاني
+                                        </button>
+                                    </div>
+
+                                    <div id="textAdsContainer" class="row g-3 mt-2">
+                                        @foreach ($product->adsText as $index => $ad)
+                                            <div class="col-md-12 mb-3">
+                                                <div class="card">
+                                                    <div class="card-body">
+                                                        <div class="row align-items-center">
+                                                            <div class="col-md-10 mb-2">
+                                                                <textarea class="form-control" name="text_ads[{{ $index }}][name]" 
+                                                                    placeholder="أدخل النص الإعلاني" rows="3" required>{{ $ad->name }}</textarea>
+                                                            </div>
+                                                            <div class="col-md-2 mb-2 text-center">
+                                                                <button type="button" class="btn btn-outline-danger btn-sm"
+                                                                    onclick="removeTextAdField(this)">
+                                                                    <i class="fas fa-trash"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+
+                                    <div class="alert alert-info mt-2">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        <small>النصوص الإعلانية تظهر بشكل بارز مع المنتج لجذب انتباه العملاء وتعزيز المبيعات</small>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex justify-content-between mt-4">
                                     <button type="button" class="btn btn-outline-secondary prev-step" data-prev="2">
                                         <i class="fas fa-arrow-right me-1"></i> السابق
                                     </button>
@@ -1204,291 +1503,46 @@
                                 </div>
                             </div>
 
-                            <!-- Step 4: Additional Options -->
-                            <div class="step-card step-4" style="display: none;" bis_skin_checked="1">
-                                <div class="step-header" bis_skin_checked="1">
-                                    <div class="step-number" bis_skin_checked="1">4</div>
-                                    <div bis_skin_checked="1">
-                                        <h5 class="step-title">خيارات إضافية</h5>
-                                        <p class="step-description">تحديث الخيارات الخاصة بالمنتج</p>
+                            <!-- Step 4: Confirmation -->
+                            <div class="step-card step-4" style="display: none;">
+                                <div class="step-header">
+                                    <div class="step-number">4</div>
+                                    <div>
+                                        <h5 class="step-title">التأكيد والإرسال</h5>
+                                        <p class="step-description">راجع المعلومات ثم أرسل التعديلات</p>
                                     </div>
                                 </div>
 
-                                <!-- Product Options -->
-                                <div class="mb-4" bis_skin_checked="1">
-                                    <div class="d-flex justify-content-between align-items-center mb-3"
-                                        bis_skin_checked="1">
-                                        <label class="form-label mb-0">خيارات المنتج</label>
-                                        <button type="button" class="btn btn-outline-primary btn-sm"
-                                            onclick="addProductOptionField()">
-                                            <i class="fas fa-plus me-1"></i> إضافة خيار
-                                        </button>
-                                    </div>
-
-                                    <div id="productOptionsContainer">
-                                        @foreach ($product->options as $index => $option)
-                                            <div class="dynamic-field">
-                                                <div class="dynamic-field-header">
-                                                    <div class="dynamic-field-title">خيار {{ $index + 1 }}</div>
-                                                    <button type="button" class="dynamic-field-remove"
-                                                        onclick="removeField(this)">
-                                                        <i class="fas fa-times"></i>
-                                                    </button>
-                                                </div>
-                                                <div class="row" bis_skin_checked="1">
-                                                    <div class="col-md-4 mb-2" bis_skin_checked="1">
-                                                        <input type="text" class="form-control"
-                                                            name="product_options[{{ $index }}][option_name]"
-                                                            value="{{ $option->option_name }}" placeholder="اسم الخيار"
-                                                            required>
-                                                    </div>
-                                                    <div class="col-md-4 mb-2" bis_skin_checked="1">
-                                                        <input type="text" class="form-control"
-                                                            name="product_options[{{ $index }}][option_value]"
-                                                            value="{{ $option->option_value }}" placeholder="القيمة"
-                                                            required>
-                                                    </div>
-                                                    <div class="col-md-2 mb-2" bis_skin_checked="1">
-                                                        <input type="number" class="form-control"
-                                                            name="product_options[{{ $index }}][additional_price]"
-                                                            value="{{ $option->additional_price }}"
-                                                            placeholder="السعر الإضافي" step="0.01">
-                                                    </div>
-                                                    <div class="col-md-2 mb-2" bis_skin_checked="1">
-                                                        <div class="form-check" bis_skin_checked="1">
-                                                            <input class="form-check-input" type="checkbox"
-                                                                name="product_options[{{ $index }}][is_required]"
-                                                                value="1"
-                                                                {{ $option->is_required ? 'checked' : '' }}>
-                                                            <label class="form-check-label">مطلوب</label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                </div>
-
-                                <!-- Printing Methods -->
-                                <div class="mb-4" bis_skin_checked="1">
-                                    <div class="d-flex justify-content-between align-items-center mb-3"
-                                        bis_skin_checked="1">
-                                        <label class="form-label mb-0">طرق الطباعة</label>
-                                        <button type="button" class="btn btn-outline-primary btn-sm"
-                                            onclick="openQuickAddModal('printing_method')">
-                                            <i class="fas fa-plus me-1"></i> إضافة طريقة طباعة جديدة
-                                        </button>
-                                    </div>
-
-                                    <div class="mb-3" bis_skin_checked="1">
-                                        <label class="form-label">اختر طرق الطباعة:</label>
-                                        <select class="form-select select2" id="printingMethodsSelect"
-                                            name="printing_methods[]" multiple>
-                                            @foreach ($printingMethods as $method)
-                                                <option value="{{ $method->id }}"
-                                                    data-price="{{ $method->base_price }}"
-                                                    {{ $product->printingMethods->contains($method->id) ? 'selected' : '' }}>
-                                                    {{ $method->name }} - {{ $method->base_price }} ج.م
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <!-- Print Locations -->
-                                <div class="mb-4" bis_skin_checked="1">
-                                    <div class="d-flex justify-content-between align-items-center mb-3"
-                                        bis_skin_checked="1">
-                                        <label class="form-label mb-0">أماكن الطباعة</label>
-                                        <button type="button" class="btn btn-outline-primary btn-sm"
-                                            onclick="openQuickAddModal('print_location')">
-                                            <i class="fas fa-plus me-1"></i> إضافة مكان طباعة جديد
-                                        </button>
-                                    </div>
-
-                                    <div class="mb-3" bis_skin_checked="1">
-                                        <label class="form-label">اختر أماكن الطباعة:</label>
-                                        <select class="form-select select2" id="printLocationsSelect"
-                                            name="print_locations[]" multiple>
-                                            @foreach ($printLocations as $location)
-                                                <option value="{{ $location->id }}" data-type="{{ $location->type }}"
-                                                    data-price="{{ $location->additional_price }}"
-                                                    {{ $product->printLocations->contains($location->id) ? 'selected' : '' }}>
-                                                    {{ $location->name }} ({{ $location->type }}) -
-                                                    {{ $location->additional_price }} ج.م
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <!-- Offers -->
-                                <div class="mb-4" bis_skin_checked="1">
-                                    <div class="d-flex justify-content-between align-items-center mb-3"
-                                        bis_skin_checked="1">
-                                        <label class="form-label mb-0">العروض</label>
-                                        <button type="button" class="btn btn-outline-primary btn-sm"
-                                            onclick="openQuickAddModal('offer')">
-                                            <i class="fas fa-plus me-1"></i> إضافة عرض جديد
-                                        </button>
-                                    </div>
-
-                                    <div class="mb-3" bis_skin_checked="1">
-                                        <label class="form-label">اختر العروض:</label>
-                                        <select class="form-select select2" id="offersSelect" name="offers[]" multiple>
-                                            @foreach ($offers as $offer)
-                                                <option value="{{ $offer->id }}"
-                                                    {{ $product->offers->contains($offer->id) ? 'selected' : '' }}>
-                                                    {{ $offer->name }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <!-- Pricing Tiers -->
-                                <div class="mb-4" bis_skin_checked="1">
-                                    <div class="d-flex justify-content-between align-items-center mb-3"
-                                        bis_skin_checked="1">
-                                        <label class="form-label mb-0">التسعير حسب الكمية</label>
-                                        <button type="button" class="btn btn-outline-primary btn-sm"
-                                            onclick="addPricingTierField()">
-                                            <i class="fas fa-plus me-1"></i> إضافة شرائح تسعير
-                                        </button>
-                                    </div>
-
-                                    <div id="pricingTiersContainer">
-                                        @foreach ($product->pricingTiers as $index => $tier)
-                                            <div class="dynamic-field">
-                                                <div class="dynamic-field-header">
-                                                    <div class="dynamic-field-title">شريحة تسعير {{ $index + 1 }}</div>
-                                                    <button type="button" class="dynamic-field-remove"
-                                                        onclick="removeField(this)">
-                                                        <i class="fas fa-times"></i>
-                                                    </button>
-                                                </div>
-                                                <div class="row" bis_skin_checked="1">
-                                                    <div class="col-md-3 mb-2" bis_skin_checked="1">
-                                                        <input type="number" class="form-control"
-                                                            name="pricing_tiers[{{ $index }}][quantity]"
-                                                            value="{{ $tier->quantity }}" placeholder="الكمية"
-                                                            min="1" required>
-                                                    </div>
-                                                    <div class="col-md-3 mb-2" bis_skin_checked="1">
-                                                        <input type="number" class="form-control"
-                                                            name="pricing_tiers[{{ $index }}][price_per_unit]"
-                                                            value="{{ $tier->price_per_unit }}"
-                                                            placeholder="السعر للوحدة" step="0.01" required>
-                                                    </div>
-                                                    <div class="col-md-3 mb-2" bis_skin_checked="1">
-                                                        <input type="number" class="form-control"
-                                                            name="pricing_tiers[{{ $index }}][discount_percentage]"
-                                                            value="{{ $tier->discount_percentage }}" placeholder="خصم %"
-                                                            min="0" max="100" step="0.01">
-                                                    </div>
-                                                    <div class="col-md-3 mb-2" bis_skin_checked="1">
-                                                        <div class="form-check" bis_skin_checked="1">
-                                                            <input class="form-check-input" type="checkbox"
-                                                                name="pricing_tiers[{{ $index }}][is_sample]"
-                                                                value="1" {{ $tier->is_sample ? 'checked' : '' }}>
-                                                            <label class="form-check-label">عينة</label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                </div>
-
-                                <!-- Size Tiers -->
-                                <div class="mb-4" bis_skin_checked="1">
-                                    <div class="d-flex justify-content-between align-items-center mb-3"
-                                        bis_skin_checked="1">
-                                        <label class="form-label mb-0">أسعار حسب المقاس والكمية</label>
-                                        <button type="button" class="btn btn-outline-primary btn-sm"
-                                            onclick="addSizeTierField()">
-                                            <i class="fas fa-plus me-1"></i> إضافة سعر للمقاس
-                                        </button>
-                                    </div>
-
-                                    <div id="sizeTiersContainer">
-                                        @foreach ($product->sizeTiers as $index => $tier)
-                                            <div class="dynamic-field">
-                                                <div class="dynamic-field-header">
-                                                    <div class="dynamic-field-title">سعر حسب المقاس {{ $index + 1 }}
-                                                    </div>
-                                                    <button type="button" class="dynamic-field-remove"
-                                                        onclick="removeField(this)">
-                                                        <i class="fas fa-times"></i>
-                                                    </button>
-                                                </div>
-                                                <div class="row" bis_skin_checked="1">
-                                                    <div class="col-md-4 mb-2" bis_skin_checked="1">
-                                                        <input type="text" class="form-control"
-                                                            name="size_tiers[{{ $index }}][size_name]"
-                                                            value="{{ $tier->size->name ?? '' }}"
-                                                            placeholder="اسم المقاس" required>
-                                                    </div>
-                                                    <div class="col-md-3 mb-2" bis_skin_checked="1">
-                                                        <input type="number" class="form-control"
-                                                            name="size_tiers[{{ $index }}][quantity]"
-                                                            value="{{ $tier->quantity }}" placeholder="الكمية"
-                                                            min="1" required>
-                                                    </div>
-                                                    <div class="col-md-3 mb-2" bis_skin_checked="1">
-                                                        <input type="number" class="form-control"
-                                                            name="size_tiers[{{ $index }}][price_per_unit]"
-                                                            value="{{ $tier->price_per_unit }}"
-                                                            placeholder="السعر للوحدة" step="0.01" required>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                </div>
-
-                                <!-- SEO Information -->
-                                <div class="mb-4" bis_skin_checked="1">
-                                    <label class="form-label mb-3">إعدادات SEO</label>
-                                    <div class="row" bis_skin_checked="1">
-                                        <div class="col-md-6 mb-3" bis_skin_checked="1">
-                                            <label for="slug" class="form-label">الرابط (Slug)</label>
-                                            <div class="input-group" bis_skin_checked="1">
-                                                <input type="text" class="form-control" id="slug" name="slug"
-                                                    value="{{ old('slug', $product->slug) }}">
-                                                <button type="button" class="btn btn-outline-secondary"
-                                                    onclick="generateSlug()">
-                                                    <i class="fas fa-sync-alt"></i>
-                                                </button>
-                                            </div>
-                                            <small class="text-muted">رابط SEO الخاص بالمنتج</small>
+                                <!-- Summary -->
+                                <div class="alert alert-info mb-4">
+                                    <h6 class="alert-heading mb-2"><i class="fas fa-info-circle me-2"></i>ملخص التعديلات</h6>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <p class="mb-1"><strong>اسم المنتج:</strong> <span id="summary_name">{{ $product->name }}</span></p>
+                                            <p class="mb-1"><strong>السعر الأساسي:</strong> <span id="summary_price">{{ $product->price }}</span> ج.م</p>
+                                            <p class="mb-1"><strong>الكمية:</strong> <span id="summary_stock">{{ $product->stock }}</span></p>
                                         </div>
-
-                                        <div class="col-md-6 mb-3" bis_skin_checked="1">
-                                            <label for="meta_title" class="form-label">عنوان الصفحة (Meta Title)</label>
-                                            <input type="text" class="form-control" id="meta_title" name="meta_title"
-                                                value="{{ old('meta_title', $product->meta_title) }}">
-                                            <small class="text-muted">الطول الموصى به: 50-60 حرفاً</small>
-                                        </div>
-
-                                        <div class="col-md-12 mb-3" bis_skin_checked="1">
-                                            <label for="meta_description" class="form-label">وصف الصفحة (Meta
-                                                Description)</label>
-                                            <textarea class="form-control" id="meta_description" name="meta_description" rows="3">{{ old('meta_description', $product->meta_description) }}</textarea>
-                                            <small class="text-muted">الطول الموصى به: 150-160 حرفاً</small>
-                                        </div>
-
-                                        <div class="col-md-12 mb-3" bis_skin_checked="1">
-                                            <label for="meta_keywords" class="form-label">الكلمات المفتاحية</label>
-                                            <input type="text" class="form-control" id="meta_keywords"
-                                                name="meta_keywords"
-                                                value="{{ old('meta_keywords', $product->meta_keywords) }}">
-                                            <small class="text-muted">كلمات مفتاحية مفصولة بفواصل (,)</small>
+                                        <div class="col-md-6">
+                                            <p class="mb-1"><strong>الحالة:</strong> 
+                                                <span id="summary_status">
+                                                    @if($product->status_id == 1) نشط
+                                                    @elseif($product->status_id == 2) غير نشط
+                                                    @else مسودة
+                                                    @endif
+                                                </span>
+                                            </p>
+                                            <p class="mb-1"><strong>عدد الألوان:</strong> <span id="summary_colors">{{ $product->colors->count() }}</span></p>
+                                            <p class="mb-1"><strong>عدد المواد:</strong> <span id="summary_materials">{{ $product->materials->count() }}</span></p>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div class="d-flex justify-content-between mt-4" bis_skin_checked="1">
+                                <!-- Hidden Inputs Container -->
+                                <div id="hiddenInputsContainer">
+                                    <!-- سيتم إضافة المدخلات المخفية هنا -->
+                                </div>
+
+                                <div class="d-flex justify-content-between mt-4">
                                     <button type="button" class="btn btn-outline-secondary prev-step" data-prev="3">
                                         <i class="fas fa-arrow-right me-1"></i> السابق
                                     </button>
@@ -1507,7 +1561,7 @@
         </div>
     </div>
 
-    <!-- Quick Add Modals -->
+    <!-- Quick Add Modal -->
     <div class="modal fade quick-add-modal" id="quickAddModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -1517,9 +1571,7 @@
                 </div>
                 <div class="modal-body">
                     <form id="quickAddForm">
-                        <div id="quickAddFormContent">
-                            <!-- Form content will be dynamically loaded here -->
-                        </div>
+                        <div id="quickAddFormContent"></div>
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -1530,178 +1582,174 @@
         </div>
     </div>
 
+    <!-- Price Editor Modal -->
+    <div class="modal fade price-editor" id="priceEditorModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">تعديل السعر</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">اسم العنصر</label>
+                        <input type="text" class="form-control" id="priceEditorName" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">السعر الإضافي (ج.م)</label>
+                        <input type="number" class="form-control" id="priceEditorPrice" step="0.01" min="0">
+                    </div>
+                    <input type="hidden" id="priceEditorType">
+                    <input type="hidden" id="priceEditorId">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="button" class="btn btn-primary" onclick="savePriceEdit()">حفظ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Image View Modal -->
     <div class="modal fade" id="imageViewModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-body p-0">
-                    <img src="" alt="صورة المنتج" id="viewedImage" class="img-fluid w-100">
+                    <img id="viewedImage" src="" alt="صورة المنتج" class="img-fluid w-100">
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Templates -->
+    <template id="colorItemTemplate">
+        <div class="selected-item color-item" data-id="{id}">
+            <div class="selected-item-remove" onclick="removeSelectedColor('{id}')">×</div>
+            <div class="selected-item-content">
+                <div class="color-preview" style="background-color: {hex};"></div>
+                <div class="selected-item-title">{name}</div>
+                <div class="selected-item-price">{price} ج.م</div>
+                <button type="button" class="btn btn-sm btn-outline-secondary"
+                    onclick="editColorPrice('{id}', '{name}', {price})">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <input type="hidden" name="colors[]" value="{id}">
+                <input type="hidden" name="color_prices[{id}]" value="{price}">
+            </div>
+        </div>
+    </template>
+
     <template id="materialFieldTemplate">
-        <div class="material-item">
-            <div class="material-header">
-                <div class="material-title">
-                    <strong>مادة جديدة</strong>
-                </div>
-                <button type="button" class="material-remove" onclick="removeMaterial(this)">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="row">
-                <div class="col-md-4 mb-2">
-                    <select class="form-select material-select" name="materials[][material_id]" required>
-                        <option value="">اختر المادة</option>
-                        @foreach ($materials as $material)
-                            <option value="{{ $material->id }}">{{ $material->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="col-md-4 mb-2">
-                    <input type="number" class="form-control" name="materials[][quantity]" placeholder="الكمية"
-                        min="0" step="0.01" required>
-                </div>
-                <div class="col-md-4 mb-2">
-                    <select class="form-select" name="materials[][unit]" required>
-                        <option value="piece">قطعة</option>
-                        <option value="meter">متر</option>
-                        <option value="kg">كجم</option>
-                        <option value="liter">لتر</option>
-                        <option value="gram">جرام</option>
-                    </select>
-                </div>
-                <div class="col-md-12 mb-2">
-                    <div class="material-additional-price">
-                        <label class="form-label">سعر إضافي</label>
-                        <input type="number" class="form-control" name="materials[][additional_price]"
-                            placeholder="سعر إضافي" step="0.01" min="0">
+        <div class="col-md-12 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-4 mb-2">
+                            <select class="form-select material-select" name="materials[{index}][material_id]" required>
+                                <option value="">اختر المادة</option>
+                                @foreach ($materials as $material)
+                                    <option value="{{ $material->id }}">{{ $material->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-2 mb-2">
+                            <input type="number" class="form-control" name="materials[{index}][quantity]"
+                                placeholder="الكمية" min="0" step="0.01" required>
+                        </div>
+                        <div class="col-md-2 mb-2">
+                            <select class="form-select" name="materials[{index}][unit]" required>
+                                <option value="piece">قطعة</option>
+                                <option value="meter">متر</option>
+                                <option value="kg">كجم</option>
+                                <option value="liter">لتر</option>
+                                <option value="gram">جرام</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 mb-2">
+                            <input type="number" class="form-control material-price-input"
+                                name="materials[{index}][additional_price]" placeholder="السعر الإضافي" step="0.01"
+                                min="0">
+                        </div>
+                        <div class="col-md-2 mb-2">
+                            <button type="button" class="btn btn-outline-danger btn-sm"
+                                onclick="removeMaterialField(this)">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </template>
 
-    <template id="featureFieldTemplate">
-        <div class="dynamic-field">
-            <div class="dynamic-field-header">
-                <div class="dynamic-field-title">مواصفة جديدة</div>
-                <button type="button" class="dynamic-field-remove" onclick="removeField(this)">
-                    <i class="fas fa-times"></i>
+    <template id="printingMethodItemTemplate">
+        <div class="selected-item" data-id="{id}">
+            <div class="selected-item-remove" onclick="removeSelectedPrintingMethod('{id}')">×</div>
+            <div class="selected-item-content">
+                <div class="selected-item-icon">
+                    <i class="fas fa-print"></i>
+                </div>
+                <div class="selected-item-title">{name}</div>
+                <div class="selected-item-price">{price} ج.م</div>
+                <button type="button" class="btn btn-sm btn-outline-secondary"
+                    onclick="editPrintingMethodPrice('{id}', '{name}', {price})">
+                    <i class="fas fa-edit"></i>
                 </button>
-            </div>
-            <div class="row">
-                <div class="col-md-5 mb-2">
-                    <input type="text" class="form-control" name="features[][name]" placeholder="اسم المواصفة"
-                        required>
-                </div>
-                <div class="col-md-7 mb-2">
-                    <input type="text" class="form-control" name="features[][value]" placeholder="القيمة" required>
-                </div>
+                <input type="hidden" name="printing_methods[]" value="{id}">
+                <input type="hidden" name="printing_method_prices[{id}]" value="{price}">
             </div>
         </div>
     </template>
 
-    <template id="productOptionFieldTemplate">
-        <div class="dynamic-field">
-            <div class="dynamic-field-header">
-                <div class="dynamic-field-title">خيار جديد</div>
-                <button type="button" class="dynamic-field-remove" onclick="removeField(this)">
-                    <i class="fas fa-times"></i>
+    <template id="printLocationItemTemplate">
+        <div class="selected-item" data-id="{id}">
+            <div class="selected-item-remove" onclick="removeSelectedPrintLocation('{id}')">×</div>
+            <div class="selected-item-content">
+                <div class="selected-item-icon">
+                    <i class="fas fa-map-marker-alt"></i>
+                </div>
+                <div class="selected-item-title">{name}</div>
+                <div class="selected-item-price">{price} ج.م</div>
+                <button type="button" class="btn btn-sm btn-outline-secondary"
+                    onclick="editPrintLocationPrice('{id}', '{name}', {price})">
+                    <i class="fas fa-edit"></i>
                 </button>
+                <input type="hidden" name="print_locations[]" value="{id}">
+                <input type="hidden" name="print_location_prices[{id}]" value="{price}">
             </div>
-            <div class="row">
-                <div class="col-md-4 mb-2">
-                    <input type="text" class="form-control" name="product_options[][option_name]"
-                        placeholder="اسم الخيار" required>
+        </div>
+    </template>
+
+    <template id="offerItemTemplate">
+        <div class="selected-item" data-id="{id}">
+            <div class="selected-item-remove" onclick="removeSelectedOffer('{id}')">×</div>
+            <div class="selected-item-content">
+                <div class="selected-item-icon">
+                    <i class="fas fa-tag"></i>
                 </div>
-                <div class="col-md-4 mb-2">
-                    <input type="text" class="form-control" name="product_options[][option_value]"
-                        placeholder="القيمة" required>
-                </div>
-                <div class="col-md-2 mb-2">
-                    <input type="number" class="form-control" name="product_options[][additional_price]"
-                        placeholder="السعر الإضافي" step="0.01">
-                </div>
-                <div class="col-md-2 mb-2">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="product_options[][is_required]"
-                            value="1">
-                        <label class="form-check-label">مطلوب</label>
+                <div class="selected-item-title">{name}</div>
+                <input type="hidden" name="offers[]" value="{id}">
+            </div>
+        </div>
+    </template>
+
+    <template id="textAdFieldTemplate">
+        <div class="col-md-12 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-10 mb-2">
+                            <textarea class="form-control" name="text_ads[{index}][name]" 
+                                placeholder="أدخل النص الإعلاني هنا..." rows="3" required></textarea>
+                        </div>
+                        <div class="col-md-2 mb-2 text-center">
+                            <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeTextAdField(this)">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </template>
-
-    <template id="pricingTierFieldTemplate">
-        <div class="dynamic-field">
-            <div class="dynamic-field-header">
-                <div class="dynamic-field-title">شريحة تسعير جديدة</div>
-                <button type="button" class="dynamic-field-remove" onclick="removeField(this)">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="row">
-                <div class="col-md-3 mb-2">
-                    <input type="number" class="form-control" name="pricing_tiers[][quantity]" placeholder="الكمية"
-                        min="1" required>
-                </div>
-                <div class="col-md-3 mb-2">
-                    <input type="number" class="form-control" name="pricing_tiers[][price_per_unit]"
-                        placeholder="السعر للوحدة" step="0.01" required>
-                </div>
-                <div class="col-md-3 mb-2">
-                    <input type="number" class="form-control" name="pricing_tiers[][discount_percentage]"
-                        placeholder="خصم %" min="0" max="100" step="0.01">
-                </div>
-                <div class="col-md-3 mb-2">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="pricing_tiers[][is_sample]"
-                            value="1">
-                        <label class="form-check-label">عينة</label>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </template>
-
-    <template id="sizeTierFieldTemplate">
-        <div class="dynamic-field">
-            <div class="dynamic-field-header">
-                <div class="dynamic-field-title">سعر حسب المقاس جديد</div>
-                <button type="button" class="dynamic-field-remove" onclick="removeField(this)">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="row">
-                <div class="col-md-4 mb-2">
-                    <input type="text" class="form-control" name="size_tiers[][size_name]" placeholder="اسم المقاس"
-                        required>
-                </div>
-                <div class="col-md-3 mb-2">
-                    <input type="number" class="form-control" name="size_tiers[][quantity]" placeholder="الكمية"
-                        min="1" required>
-                </div>
-                <div class="col-md-3 mb-2">
-                    <input type="number" class="form-control" name="size_tiers[][price_per_unit]"
-                        placeholder="السعر للوحدة" step="0.01" required>
-                </div>
-            </div>
-        </div>
-    </template>
-
-    <template id="colorSwatchTemplate">
-        <div class="color-swatch" data-id="{id}">
-            <div class="color-preview" style="background-color: {hex};"></div>
-            <span>{name}</span>
-            <input type="hidden" name="colors[]" value="{id}">
-            <button type="button" class="btn btn-sm btn-outline-danger ms-2" onclick="removeColor({id})">
-                <i class="fas fa-times"></i>
-            </button>
         </div>
     </template>
 @endsection
@@ -1710,18 +1758,51 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script>
         // Global variables
+        let selectedColors = new Map();
+        let selectedPrintingMethods = new Map();
+        let selectedPrintLocations = new Map();
+        let selectedOffers = new Map();
         let materialCounter = {{ $product->materials->count() }};
-        let featureCounter = {{ $product->features->count() }};
-        let optionCounter = {{ $product->options->count() }};
-        let pricingTierCounter = {{ $product->pricingTiers->count() }};
-        let sizeTierCounter = {{ $product->sizeTiers->count() }};
-        let removedImages = [];
+        let textAdCounter = {{ $product->adsText->count() }};
         let currentQuickAddType = '';
+        let removedExistingImages = [];
+
+        // تهيئة البيانات الحالية
+        @foreach($product->colors as $color)
+            selectedColors.set('{{ $color->id }}', {
+                id: '{{ $color->id }}',
+                name: '{{ $color->name }}',
+                hex: '{{ $color->hex_code }}',
+                price: {{ $color->pivot->additional_price ?? 0 }}
+            });
+        @endforeach
+
+        @foreach($product->printingMethods as $method)
+            selectedPrintingMethods.set({{ $method->id }}, {
+                id: {{ $method->id }},
+                name: '{{ $method->name }}',
+                price: {{ $method->pivot->additional_price ?? $method->base_price }}
+            });
+        @endforeach
+
+        @foreach($product->printLocations as $location)
+            selectedPrintLocations.set({{ $location->id }}, {
+                id: {{ $location->id }},
+                name: '{{ $location->name }}',
+                price: {{ $location->pivot->additional_price ?? $location->additional_price }}
+            });
+        @endforeach
+
+        @foreach($product->offers as $offer)
+            selectedOffers.set({{ $offer->id }}, {
+                id: {{ $offer->id }},
+                name: '{{ $offer->name }}'
+            });
+        @endforeach
 
         $(document).ready(function() {
             // Initialize Summernote
@@ -1746,31 +1827,40 @@
                 allowClear: true
             });
 
-            // Initialize image sortable
-            if (document.getElementById('existingImagesGrid')) {
-                Sortable.create(document.getElementById('existingImagesGrid'), {
-                    animation: 150,
-                    ghostClass: 'sortable-ghost',
-                    chosenClass: 'sortable-chosen',
-                    onEnd: function() {
-                        updateImagesOrder();
-                    }
-                });
-            }
+            // Initialize material selects
+            $('.material-select').select2();
 
-            // Step Navigation
-            $('.next-step').click(function() {
-                const nextStep = $(this).data('next');
-                navigateToStep(nextStep);
+            // Wizard Navigation
+            $('.next-step').on('click', function() {
+                const currentStep = $(this).closest('.step-card');
+                const nextStepNum = $(this).data('next');
+                const nextStep = $('.step-' + nextStepNum);
+
+                if (!validateStep(currentStep)) {
+                    return;
+                }
+
+                if (nextStepNum == 4) {
+                    updateSummary();
+                }
+
+                currentStep.hide();
+                nextStep.show();
+                updateWizardSteps(nextStepNum);
             });
 
-            $('.prev-step').click(function() {
-                const prevStep = $(this).data('prev');
-                navigateToStep(prevStep);
+            $('.prev-step').on('click', function() {
+                const currentStep = $(this).closest('.step-card');
+                const prevStepNum = $(this).data('prev');
+                const prevStep = $('.step-' + prevStepNum);
+
+                currentStep.hide();
+                prevStep.show();
+                updateWizardSteps(prevStepNum);
             });
 
-            // Discount Toggle
-            $('#has_discount').change(function() {
+            // Discount toggle
+            $('#has_discount').on('change', function() {
                 if ($(this).is(':checked')) {
                     $('#discountSection').slideDown();
                 } else {
@@ -1778,136 +1868,99 @@
                 }
             });
 
-            // Image Upload Handlers
-            $('#main_image').change(function(e) {
-                previewImage(e.target.files[0], 'main');
+            // Initialize select2 change events
+            $('#printingMethodsSelect').on('change', function() {
+                updateSelectedPrintingMethods();
             });
 
-            $('#additional_images').change(function(e) {
-                previewMultipleImages(e.target.files);
+            $('#printLocationsSelect').on('change', function() {
+                updateSelectedPrintLocations();
             });
 
-            // Initialize tooltips
-            $('[data-bs-toggle="tooltip"]').tooltip();
+            $('#offersSelect').on('change', function() {
+                updateSelectedOffers();
+            });
 
-            // Auto-generate slug when name changes
-            $('#name').on('blur', function() {
-                if (!$('#slug').val()) {
-                    generateSlug();
+            // Form submission
+            $('#editProductForm').on('submit', function(e) {
+                collectFormData();
+
+                // Validate all steps
+                for (let i = 1; i <= 4; i++) {
+                    const step = $('.step-' + i);
+                    if (step.is(':visible') && !validateStep(step)) {
+                        e.preventDefault();
+                        return;
+                    }
+                }
+
+                // Show loading
+                Swal.fire({
+                    title: 'جاري حفظ التعديلات...',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+            });
+        });
+
+        function validateStep(step) {
+            let isValid = true;
+            step.find('input[required], select[required], textarea[required]').each(function() {
+                if (!$(this).val().trim()) {
+                    $(this).addClass('is-invalid');
+                    isValid = false;
+
+                    if (!$(this).next('.invalid-feedback').length) {
+                        $(this).after('<div class="invalid-feedback">هذا الحقل مطلوب</div>');
+                    }
+                } else {
+                    $(this).removeClass('is-invalid');
+                    $(this).next('.invalid-feedback').remove();
                 }
             });
 
-            // Initialize fancybox for image viewing
-            $('[data-fancybox]').fancybox();
-        });
+            if (!isValid) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'بيانات ناقصة',
+                    text: 'يرجى ملء جميع الحقول المطلوبة',
+                    confirmButtonText: 'حسناً'
+                });
+            }
 
-        // Step Navigation
-        function navigateToStep(step) {
-            // Hide all steps
-            $('.step-card').hide();
+            return isValid;
+        }
 
-            // Show target step
-            $(`.step-${step}`).show();
-
-            // Update wizard steps
+        function updateWizardSteps(activeStep) {
             $('.wizard-step').removeClass('active completed');
 
-            for (let i = 1; i <= step; i++) {
-                $(`#step${i}`).addClass(i === step ? 'active' : 'completed');
+            for (let i = 1; i <= 4; i++) {
+                const step = $('#step' + i);
+                if (i < activeStep) {
+                    step.addClass('completed');
+                } else if (i == activeStep) {
+                    step.addClass('active');
+                }
             }
-
-            // Scroll to top
-            $('html, body').animate({
-                scrollTop: 0
-            }, 300);
         }
 
-  // تعديل دالة previewImage
-function previewImage(file, type) {
-    if (!file.type.match('image.*')) {
-        Swal.fire({
-            icon: 'error',
-            title: 'خطأ',
-            text: 'الملف يجب أن يكون صورة'
-        });
-        return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        if (type === 'main') {
-            // تحديث الصورة في العرض المباشر
-            $('.preview-image').attr('src', e.target.result);
-            
-            // تحديث الصورة في المعاينة
-            const previewHtml = `
-            <div class="image-preview-item">
-                <span class="primary-badge">رئيسية جديدة</span>
-                <img src="${e.target.result}" alt="الصورة الرئيسية الجديدة">
-                <div class="image-actions">
-                    <button type="button" class="btn btn-info btn-sm" onclick="viewImage('${e.target.result}')">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                </div>
-            </div>
-            `;
-            
-            // تأكد من وجود عنصر للمعاينة
-            let previewGrid = $('.step-2 .image-preview-grid').first();
-            if (previewGrid.length === 0) {
-                // إنشاء عنصر جديد
-                const parent = $('.step-2 .mb-4').first();
-                const newGrid = $('<div class="image-preview-grid"></div>');
-                newGrid.html(previewHtml);
-                parent.append(newGrid);
-            } else {
-                previewGrid.html(previewHtml);
-            }
-            
-            $('#remove_main_image').val('0');
-        }
-    };
-    reader.readAsDataURL(file);
-}
-
-        function previewMultipleImages(files) {
-            const container = $('#newImagesPreview');
-            container.empty();
-
-            Array.from(files).forEach((file, index) => {
-                if (!file.type.match('image.*')) return;
-
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const previewHtml = `
-                    <div class="image-preview-item" data-new-index="${index}">
-                        <span class="primary-badge">جديد</span>
-                        <img src="${e.target.result}" alt="صورة جديدة">
-                        <div class="image-actions">
-                            <button type="button" class="btn btn-info btn-sm" onclick="viewImage('${e.target.result}')">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                            <button type="button" class="btn btn-danger btn-sm" onclick="removeNewImage(${index})">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </div>
-                `;
-                    container.append(previewHtml);
-                };
-                reader.readAsDataURL(file);
-            });
-        }
-
-        function viewImage(src) {
+        // Image Management Functions
+        function viewMainImage(src) {
             $('#viewedImage').attr('src', src);
             new bootstrap.Modal(document.getElementById('imageViewModal')).show();
         }
 
-        function removeMainImage() {
+        function viewExistingImage(src) {
+            $('#viewedImage').attr('src', src);
+            new bootstrap.Modal(document.getElementById('imageViewModal')).show();
+        }
+
+        function removeExistingMainImage() {
             Swal.fire({
                 title: 'هل أنت متأكد؟',
-                text: 'سيتم إزالة الصورة الرئيسية',
+                text: 'سيتم إزالة الصورة الرئيسية الحالية',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
@@ -1916,21 +1969,14 @@ function previewImage(file, type) {
                 cancelButtonText: 'إلغاء'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    $('#remove_main_image').val('1');
-                    $('.image-preview-grid').first().empty();
-                    $('#main_image').val('');
-                    Swal.fire('تم الحذف!', 'تم إزالة الصورة الرئيسية', 'success');
+                    $('#remove_existing_main_image').val('1');
+                    $('.main-image-preview').hide();
+                    Swal.fire('تم الحذف!', 'سيتم إزالة الصورة الرئيسية الحالية', 'success');
                 }
             });
         }
 
-        function removeNewMainImage() {
-            $('#main_image').val('');
-            $('.image-preview-grid').first().empty();
-            $('#remove_main_image').val('0');
-        }
-
-        function removeAdditionalImage(imageId) {
+        function removeExistingImage(imageId) {
             Swal.fire({
                 title: 'هل أنت متأكد؟',
                 text: 'سيتم إزالة هذه الصورة',
@@ -1942,470 +1988,690 @@ function previewImage(file, type) {
                 cancelButtonText: 'إلغاء'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    removedImages.push(imageId);
-                    $('#removed_images').val(removedImages.join(','));
-                    $(`.image-preview-item[data-id="${imageId}"]`).remove();
-                    Swal.fire('تم الحذف!', 'تم إزالة الصورة', 'success');
+                    removedExistingImages.push(imageId);
+                    $('#removed_existing_images').val(removedExistingImages.join(','));
+                    $(`.existing-image-item[data-id="${imageId}"]`).remove();
+                    Swal.fire('تم الحذف!', 'سيتم إزالة الصورة', 'success');
                 }
             });
         }
 
-        function removeNewImage(index) {
-            $(`.image-preview-item[data-new-index="${index}"]`).remove();
-
-            // Remove file from input
-            const files = Array.from($('#additional_images')[0].files);
-            files.splice(index, 1);
-
-            const dt = new DataTransfer();
-            files.forEach(file => dt.items.add(file));
-            $('#additional_images')[0].files = dt.files;
+        function previewNewMainImage(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    $('#newMainImagePreviewImg').attr('src', e.target.result);
+                    $('#newMainImagePreview').show();
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
         }
 
-        function setAsPrimary(imageId) {
-            $('#primary_image_id').val(imageId);
-
-            // Update UI
-            $('.primary-badge').text('رئيسية');
-            $(`.image-preview-item[data-id="${imageId}"] .primary-badge`).text('رئيسية');
-
-            Swal.fire({
-                icon: 'success',
-                title: 'تم التحديث',
-                text: 'تم تعيين الصورة كرئيسية',
-                timer: 1500,
-                showConfirmButton: false
-            });
+        function removeNewMainImage() {
+            $('#new_main_image').val('');
+            $('#newMainImagePreview').hide();
         }
 
-        function updateImagesOrder() {
-            const order = [];
-            $('#existingImagesGrid .image-preview-item').each(function() {
-                const id = $(this).data('id');
-                if (id) order.push(id);
-            });
-            $('#images_order').val(order.join(','));
+        function viewNewMainImage() {
+            const src = $('#newMainImagePreviewImg').attr('src');
+            $('#viewedImage').attr('src', src);
+            new bootstrap.Modal(document.getElementById('imageViewModal')).show();
+        }
+
+        function previewNewAdditionalImages(input) {
+            const previewContainer = $('#newAdditionalImagesPreview');
+            previewContainer.empty();
+
+            if (input.files) {
+                Array.from(input.files).forEach((file, index) => {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const preview = `
+                            <div class="grid-item">
+                                <img src="${e.target.result}" alt="صورة إضافية جديدة">
+                                <div class="grid-item-actions">
+                                    <button type="button" class="btn btn-info btn-sm" onclick="viewNewAdditionalImage('${e.target.result}')">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-danger btn-sm" onclick="removeNewAdditionalImage(this)">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                        previewContainer.append(preview);
+                    }
+                    reader.readAsDataURL(file);
+                });
+            }
+        }
+
+        function removeNewAdditionalImage(button) {
+            $(button).closest('.grid-item').remove();
+        }
+
+        function viewNewAdditionalImage(src) {
+            $('#viewedImage').attr('src', src);
+            new bootstrap.Modal(document.getElementById('imageViewModal')).show();
         }
 
         // Color Management Functions
-        function addColor(element) {
+        function addColorToProduct(element) {
             const colorId = $(element).data('id');
             const colorName = $(element).data('name');
             const colorHex = $(element).data('hex');
 
             // Check if color already selected
-            if ($(`#selectedColorsContainer .color-swatch[data-id="${colorId}"]`).length > 0) {
+            if (selectedColors.has(colorId)) {
                 return;
             }
 
-            // Create color swatch
-            const template = $('#colorSwatchTemplate').html();
-            const swatchHtml = template
-                .replace(/{id}/g, colorId)
-                .replace(/{name}/g, colorName)
-                .replace(/{hex}/g, colorHex);
+            // Ask for price
+            Swal.fire({
+                title: 'إضافة سعر للون',
+                input: 'number',
+                inputLabel: `السعر الإضافي للون ${colorName}`,
+                inputPlaceholder: '0.00',
+                inputValue: 0,
+                showCancelButton: true,
+                confirmButtonText: 'إضافة',
+                cancelButtonText: 'إلغاء',
+                inputValidator: (value) => {
+                    if (value === '' || parseFloat(value) < 0) {
+                        return 'يرجى إدخال سعر صحيح';
+                    }
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const additionalPrice = parseFloat(result.value) || 0;
 
-            $('#selectedColorsContainer').append(swatchHtml);
-            $(element).remove();
+                    selectedColors.set(colorId, {
+                        id: colorId,
+                        name: colorName,
+                        hex: colorHex,
+                        price: additionalPrice
+                    });
 
-            // Add color price input
-            const priceInputHtml = `
-            <div class="col-md-4 mb-3 color-price-${colorId}">
-                <label class="form-label">سعر إضافي للون: ${colorName}</label>
-                <input type="number" class="form-control color-price-input" 
-                       name="color_prices[${colorId}]" 
-                       placeholder="السعر الإضافي" step="0.01" min="0">
-            </div>
-        `;
-            $('#colorPricesContainer').append(priceInputHtml);
+                    $(element).addClass('selected');
+
+                    // Add to selected colors container
+                    const template = document.getElementById('colorItemTemplate').innerHTML;
+                    const html = template
+                        .replace(/{id}/g, colorId)
+                        .replace(/{name}/g, colorName)
+                        .replace(/{hex}/g, colorHex)
+                        .replace(/{price}/g, additionalPrice);
+
+                    $('#selectedColorsContainer').append(html);
+                }
+            });
         }
 
-        function removeColor(colorId) {
-            $(`.color-swatch[data-id="${colorId}"]`).remove();
-            $(`.color-price-${colorId}`).remove();
-
-            // Add color back to available colors
-            const colorName = $(`.color-swatch[data-id="${colorId}"] span`).text();
-            const colorHex = $(`.color-swatch[data-id="${colorId}"] .color-preview`).css('background-color');
-
-            const colorItem = `
-            <div class="color-item" 
-                 style="background-color: ${colorHex};"
-                 data-id="${colorId}"
-                 data-name="${colorName}"
-                 data-hex="${colorHex}"
-                 onclick="addColor(this)">
-            </div>
-        `;
-            $('#availableColorsGrid').append(colorItem);
+        function removeSelectedColor(colorId) {
+            selectedColors.delete(colorId);
+            $(`.selected-item[data-id="${colorId}"]`).remove();
+            $(`.color-item[data-id="${colorId}"]`).removeClass('selected');
         }
 
-        // Dynamic Fields Functions
+        function editColorPrice(colorId, colorName, currentPrice) {
+            $('#priceEditorId').val(colorId);
+            $('#priceEditorType').val('color');
+            $('#priceEditorName').val(colorName);
+            $('#priceEditorPrice').val(currentPrice);
+
+            const modal = new bootstrap.Modal(document.getElementById('priceEditorModal'));
+            modal.show();
+        }
+
+        // Material Management Functions
         function addMaterialField() {
-            const template = $('#materialFieldTemplate').html();
+            const template = document.getElementById('materialFieldTemplate').content.cloneNode(true);
             const newField = $(template);
+            const index = materialCounter++;
 
-            // Update indices
-            newField.find('[name]').each(function() {
-                const name = $(this).attr('name');
-                $(this).attr('name', name.replace('[]', `[${materialCounter}]`));
-            });
-
-            // Initialize select2 for material select
-            newField.find('.material-select').select2({
-                placeholder: 'اختر المادة'
-            });
+            newField.html(newField.html().replace(/{index}/g, index));
+            newField.find('.material-select').select2();
 
             $('#materialsContainer').append(newField);
-            materialCounter++;
         }
 
-        function addFeatureField() {
-            const template = $('#featureFieldTemplate').html();
-            const newField = $(template);
+        function removeMaterialField(button) {
+            $(button).closest('.col-md-12').remove();
+        }
 
-            // Update indices
-            newField.find('[name]').each(function() {
-                const name = $(this).attr('name');
-                $(this).attr('name', name.replace('[]', `[${featureCounter}]`));
+        // Printing Methods Management
+        function updateSelectedPrintingMethods() {
+            const selected = $('#printingMethodsSelect').select2('data');
+            const container = $('#selectedPrintingMethods');
+            
+            selected.forEach(item => {
+                const id = item.id;
+                if (!selectedPrintingMethods.has(id)) {
+                    const name = $(item.element).data('name') || item.text.split(' - ')[0];
+                    const price = $(item.element).data('price') || 0;
+
+                    selectedPrintingMethods.set(id, {
+                        id,
+                        name,
+                        price
+                    });
+
+                    const template = document.getElementById('printingMethodItemTemplate').innerHTML;
+                    const html = template
+                        .replace(/{id}/g, id)
+                        .replace(/{name}/g, name)
+                        .replace(/{price}/g, price);
+
+                    container.append(html);
+                }
             });
-
-            $('#featuresContainer').append(newField);
-            featureCounter++;
         }
 
-        function addProductOptionField() {
-            const template = $('#productOptionFieldTemplate').html();
-            const newField = $(template);
+        function removeSelectedPrintingMethod(methodId) {
+            selectedPrintingMethods.delete(parseInt(methodId));
+            $(`.selected-item[data-id="${methodId}"]`).remove();
+            $('#printingMethodsSelect').val($('#printingMethodsSelect').val().filter(v => v != methodId)).trigger('change');
+        }
 
-            // Update indices
-            newField.find('[name]').each(function() {
-                const name = $(this).attr('name');
-                $(this).attr('name', name.replace('[]', `[${optionCounter}]`));
+        function editPrintingMethodPrice(methodId, methodName, currentPrice) {
+            $('#priceEditorId').val(methodId);
+            $('#priceEditorType').val('printing_method');
+            $('#priceEditorName').val(methodName);
+            $('#priceEditorPrice').val(currentPrice);
+
+            const modal = new bootstrap.Modal(document.getElementById('priceEditorModal'));
+            modal.show();
+        }
+
+        // Print Locations Management
+        function updateSelectedPrintLocations() {
+            const selected = $('#printLocationsSelect').select2('data');
+            const container = $('#selectedPrintLocations');
+            
+            selected.forEach(item => {
+                const id = item.id;
+                if (!selectedPrintLocations.has(id)) {
+                    const name = $(item.element).data('name') || item.text.split(' - ')[0];
+                    const price = $(item.element).data('price') || 0;
+
+                    selectedPrintLocations.set(id, {
+                        id,
+                        name,
+                        price
+                    });
+
+                    const template = document.getElementById('printLocationItemTemplate').innerHTML;
+                    const html = template
+                        .replace(/{id}/g, id)
+                        .replace(/{name}/g, name)
+                        .replace(/{price}/g, price);
+
+                    container.append(html);
+                }
             });
-
-            $('#productOptionsContainer').append(newField);
-            optionCounter++;
         }
 
-        function addPricingTierField() {
-            const template = $('#pricingTierFieldTemplate').html();
-            const newField = $(template);
+        function removeSelectedPrintLocation(locationId) {
+            selectedPrintLocations.delete(parseInt(locationId));
+            $(`.selected-item[data-id="${locationId}"]`).remove();
+            $('#printLocationsSelect').val($('#printLocationsSelect').val().filter(v => v != locationId)).trigger('change');
+        }
 
-            // Update indices
-            newField.find('[name]').each(function() {
-                const name = $(this).attr('name');
-                $(this).attr('name', name.replace('[]', `[${pricingTierCounter}]`));
+        function editPrintLocationPrice(locationId, locationName, currentPrice) {
+            $('#priceEditorId').val(locationId);
+            $('#priceEditorType').val('print_location');
+            $('#priceEditorName').val(locationName);
+            $('#priceEditorPrice').val(currentPrice);
+
+            const modal = new bootstrap.Modal(document.getElementById('priceEditorModal'));
+            modal.show();
+        }
+
+        // Offers Management
+        function updateSelectedOffers() {
+            const selected = $('#offersSelect').select2('data');
+            const container = $('#selectedOffers');
+            
+            selected.forEach(item => {
+                const id = item.id;
+                if (!selectedOffers.has(id)) {
+                    const name = $(item.element).data('name') || item.text;
+
+                    selectedOffers.set(id, {
+                        id,
+                        name
+                    });
+
+                    const template = document.getElementById('offerItemTemplate').innerHTML;
+                    const html = template
+                        .replace(/{id}/g, id)
+                        .replace(/{name}/g, name);
+
+                    container.append(html);
+                }
             });
-
-            $('#pricingTiersContainer').append(newField);
-            pricingTierCounter++;
         }
 
-        function addSizeTierField() {
-            const template = $('#sizeTierFieldTemplate').html();
-            const newField = $(template);
-
-            // Update indices
-            newField.find('[name]').each(function() {
-                const name = $(this).attr('name');
-                $(this).attr('name', name.replace('[]', `[${sizeTierCounter}]`));
-            });
-
-            $('#sizeTiersContainer').append(newField);
-            sizeTierCounter++;
+        function removeSelectedOffer(offerId) {
+            selectedOffers.delete(parseInt(offerId));
+            $(`.selected-item[data-id="${offerId}"]`).remove();
+            $('#offersSelect').val($('#offersSelect').val().filter(v => v != offerId)).trigger('change');
         }
 
-        function removeMaterial(button) {
-            $(button).closest('.material-item').remove();
+        // Text Ads Management
+        function addTextAdField() {
+            const container = $('#textAdsContainer');
+            const index = textAdCounter++;
+
+            const field = `
+                <div class="col-md-12 mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-10 mb-2">
+                                    <textarea class="form-control" name="text_ads[${index}][name]" 
+                                        placeholder="أدخل النص الإعلاني هنا..." rows="3" required></textarea>
+                                </div>
+                                <div class="col-md-2 mb-2 text-center">
+                                    <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeTextAdField(this)">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            container.append(field);
         }
 
-        function removeField(button) {
-            $(button).closest('.dynamic-field').remove();
+        function removeTextAdField(button) {
+            $(button).closest('.col-md-12').remove();
+            textAdCounter--;
+        }
+
+        // Price Editor
+        function savePriceEdit() {
+            const id = $('#priceEditorId').val();
+            const type = $('#priceEditorType').val();
+            const newPrice = parseFloat($('#priceEditorPrice').val()) || 0;
+
+            switch (type) {
+                case 'color':
+                    if (selectedColors.has(id)) {
+                        const color = selectedColors.get(id);
+                        color.price = newPrice;
+                        selectedColors.set(id, color);
+
+                        // Update UI
+                        const item = $(`.selected-item[data-id="${id}"]`);
+                        item.find('.selected-item-price').text(newPrice + ' ج.م');
+                        item.find('input[name^="color_prices"]').val(newPrice);
+                    }
+                    break;
+                case 'printing_method':
+                    if (selectedPrintingMethods.has(parseInt(id))) {
+                        const method = selectedPrintingMethods.get(parseInt(id));
+                        method.price = newPrice;
+                        selectedPrintingMethods.set(parseInt(id), method);
+
+                        // Update UI
+                        const item = $(`.selected-item[data-id="${id}"]`);
+                        item.find('.selected-item-price').text(newPrice + ' ج.م');
+                        item.find('input[name^="printing_method_prices"]').val(newPrice);
+                    }
+                    break;
+                case 'print_location':
+                    if (selectedPrintLocations.has(parseInt(id))) {
+                        const location = selectedPrintLocations.get(parseInt(id));
+                        location.price = newPrice;
+                        selectedPrintLocations.set(parseInt(id), location);
+
+                        // Update UI
+                        const item = $(`.selected-item[data-id="${id}"]`);
+                        item.find('.selected-item-price').text(newPrice + ' ج.م');
+                        item.find('input[name^="print_location_prices"]').val(newPrice);
+                    }
+                    break;
+            }
+
+            $('#priceEditorModal').modal('hide');
         }
 
         // Quick Add Modal Functions
         function openQuickAddModal(type) {
             currentQuickAddType = type;
+            const modal = $('#quickAddModal');
+            const formContent = $('#quickAddFormContent');
+            formContent.empty();
 
             let title = '';
-            let formContent = '';
+            let formHtml = '';
 
             switch (type) {
-                case 'category':
-                    title = 'إضافة قسم جديد';
-                    formContent = `
-                    <div class="mb-3">
-                        <label class="form-label">اسم القسم</label>
-                        <input type="text" class="form-control" id="category_name" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">القسم الرئيسي</label>
-                        <select class="form-control" id="parent_category_id">
-                            <option value="">بدون قسم رئيسي</option>
-                            @foreach ($categories as $category)
-                                @if ($category->isParent())
-                                    <option value="{{ $category->id }}">{{ $category->name }}</option>
-                                @endif
-                            @endforeach
-                        </select>
-                    </div>
-                `;
-                    break;
-
                 case 'color':
                     title = 'إضافة لون جديد';
-                    formContent = `
-                    <div class="mb-3">
-                        <label class="form-label">اسم اللون</label>
-                        <input type="text" class="form-control" id="color_name" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">الكود اللوني</label>
-                        <div class="color-picker-input">
-                            <input type="color" id="color_hex" value="#696cff">
-                            <input type="text" class="form-control" id="color_hex_code" value="#696cff" readonly>
+                    formHtml = `
+                        <div class="mb-3">
+                            <label class="form-label">اسم اللون</label>
+                            <input type="text" class="form-control" id="quick_color_name" required>
                         </div>
-                    </div>
-                `;
+                        <div class="mb-3">
+                            <label class="form-label">الكود اللوني (Hex)</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="quick_color_hex" placeholder="#000000" required>
+                                <input type="color" class="form-control form-control-color" id="quick_color_picker">
+                            </div>
+                        </div>
+                    `;
                     break;
 
                 case 'material':
                     title = 'إضافة مادة جديدة';
-                    formContent = `
-                    <div class="mb-3">
-                        <label class="form-label">اسم المادة</label>
-                        <input type="text" class="form-control" id="material_name" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">الوصف</label>
-                        <textarea class="form-control" id="material_description" rows="3"></textarea>
-                    </div>
-                `;
+                    formHtml = `
+                        <div class="mb-3">
+                            <label class="form-label">اسم المادة</label>
+                            <input type="text" class="form-control" id="quick_material_name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">الوصف</label>
+                            <textarea class="form-control" id="quick_material_description" rows="3"></textarea>
+                        </div>
+                    `;
                     break;
 
                 case 'printing_method':
                     title = 'إضافة طريقة طباعة جديدة';
-                    formContent = `
-                    <div class="mb-3">
-                        <label class="form-label">الاسم</label>
-                        <input type="text" class="form-control" id="printing_method_name" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">الوصف</label>
-                        <textarea class="form-control" id="printing_method_description" rows="3"></textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">السعر الأساسي</label>
-                        <input type="number" class="form-control" id="printing_method_price" step="0.01" min="0" required>
-                    </div>
-                `;
+                    formHtml = `
+                        <div class="mb-3">
+                            <label class="form-label">اسم طريقة الطباعة</label>
+                            <input type="text" class="form-control" id="quick_printing_name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">الوصف</label>
+                            <textarea class="form-control" id="quick_printing_description" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">السعر الأساسي</label>
+                            <input type="number" class="form-control" id="quick_printing_price" step="0.01" min="0" required>
+                        </div>
+                    `;
                     break;
 
                 case 'print_location':
                     title = 'إضافة مكان طباعة جديد';
-                    formContent = `
-                    <div class="mb-3">
-                        <label class="form-label">الاسم</label>
-                        <input type="text" class="form-control" id="print_location_name" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">النوع</label>
-                        <select class="form-control" id="print_location_type">
-                            <option value="front">أمامي</option>
-                            <option value="back">خلفي</option>
-                            <option value="side">جانبي</option>
-                            <option value="sleeve">كم</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">السعر الإضافي</label>
-                        <input type="number" class="form-control" id="print_location_price" step="0.01" min="0" required>
-                    </div>
-                `;
+                    formHtml = `
+                        <div class="mb-3">
+                            <label class="form-label">اسم مكان الطباعة</label>
+                            <input type="text" class="form-control" id="quick_location_name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">النوع</label>
+                            <select class="form-select" id="quick_location_type">
+                                <option value="front">أمامي</option>
+                                <option value="back">خلفي</option>
+                                <option value="side">جانبي</option>
+                                <option value="sleeve">كم</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">السعر الإضافي</label>
+                            <input type="number" class="form-control" id="quick_location_price" step="0.01" min="0" required>
+                        </div>
+                    `;
                     break;
 
                 case 'offer':
                     title = 'إضافة عرض جديد';
-                    formContent = `
-                    <div class="mb-3">
-                        <label class="form-label">اسم العرض</label>
-                        <input type="text" class="form-control" id="offer_name" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">الصورة</label>
-                        <input type="file" class="form-control" id="offer_image" accept="image/*">
-                    </div>
-                `;
+                    formHtml = `
+                        <div class="mb-3">
+                            <label class="form-label">اسم العرض</label>
+                            <input type="text" class="form-control" id="quick_offer_name" required>
+                        </div>
+                    `;
+                    break;
+
+                case 'category':
+                    title = 'إضافة قسم جديد';
+                    formHtml = `
+                        <div class="mb-3">
+                            <label class="form-label">اسم القسم</label>
+                            <input type="text" class="form-control" id="quick_category_name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">القسم الرئيسي</label>
+                            <select class="form-select" id="quick_category_parent">
+                                <option value="">قسم رئيسي</option>
+                                @foreach ($categories as $category)
+                                    @if ($category->isParent())
+                                        <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                    @endif
+                                @endforeach
+                            </select>
+                        </div>
+                    `;
                     break;
             }
 
             $('#quickAddModalTitle').text(title);
-            $('#quickAddFormContent').html(formContent);
+            formContent.html(formHtml);
 
             // Initialize color picker
             if (type === 'color') {
-                $('#color_hex').change(function() {
-                    $('#color_hex_code').val($(this).val());
+                $('#quick_color_picker').on('change', function() {
+                    $('#quick_color_hex').val($(this).val());
                 });
             }
 
-            new bootstrap.Modal(document.getElementById('quickAddModal')).show();
+            modal.modal('show');
         }
 
-        async function saveQuickAdd() {
-            const formData = new FormData();
+        function saveQuickAdd() {
+            const modal = $('#quickAddModal');
+            const type = currentQuickAddType;
 
-            switch (currentQuickAddType) {
-                case 'category':
-                    formData.append('name', $('#category_name').val());
-                    formData.append('parent_id', $('#parent_category_id').val());
-                    break;
+            // Validate
+            let isValid = true;
+            modal.find('input[required], select[required]').each(function() {
+                if (!$(this).val().trim()) {
+                    $(this).addClass('is-invalid');
+                    isValid = false;
+                } else {
+                    $(this).removeClass('is-invalid');
+                }
+            });
 
+            if (!isValid) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'بيانات ناقصة',
+                    text: 'يرجى ملء جميع الحقول المطلوبة',
+                    confirmButtonText: 'حسناً'
+                });
+                return;
+            }
+
+            // Prepare data
+            const data = new FormData();
+            data.append('_token', '{{ csrf_token() }}');
+            data.append('type', type);
+
+            switch (type) {
                 case 'color':
-                    formData.append('name', $('#color_name').val());
-                    formData.append('hex_code', $('#color_hex_code').val());
+                    data.append('name', $('#quick_color_name').val());
+                    data.append('hex_code', $('#quick_color_hex').val());
                     break;
 
                 case 'material':
-                    formData.append('name', $('#material_name').val());
-                    formData.append('description', $('#material_description').val());
+                    data.append('name', $('#quick_material_name').val());
+                    data.append('description', $('#quick_material_description').val());
                     break;
 
                 case 'printing_method':
-                    formData.append('name', $('#printing_method_name').val());
-                    formData.append('description', $('#printing_method_description').val());
-                    formData.append('base_price', $('#printing_method_price').val());
+                    data.append('name', $('#quick_printing_name').val());
+                    data.append('description', $('#quick_printing_description').val());
+                    data.append('base_price', $('#quick_printing_price').val());
                     break;
 
                 case 'print_location':
-                    formData.append('name', $('#print_location_name').val());
-                    formData.append('type', $('#print_location_type').val());
-                    formData.append('additional_price', $('#print_location_price').val());
+                    data.append('name', $('#quick_location_name').val());
+                    data.append('type', $('#quick_location_type').val());
+                    data.append('additional_price', $('#quick_location_price').val());
                     break;
 
                 case 'offer':
-                    formData.append('name', $('#offer_name').val());
-                    if ($('#offer_image')[0].files[0]) {
-                        formData.append('image', $('#offer_image')[0].files[0]);
-                    }
+                    data.append('name', $('#quick_offer_name').val());
+                    break;
+
+                case 'category':
+                    data.append('name', $('#quick_category_name').val());
+                    data.append('parent_id', $('#quick_category_parent').val());
                     break;
             }
 
-            try {
-                const response = await fetch(`/admin/quick-add/${currentQuickAddType}`, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Accept': 'application/json'
-                    },
-                    body: formData
-                });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    // Close modal
-                    bootstrap.Modal.getInstance(document.getElementById('quickAddModal')).hide();
-
-                    // Show success message
+            // Send AJAX request
+            $.ajax({
+                url: '{{ route('admin.products.quick-add') }}',
+                type: 'POST',
+                data: data,
+                processData: false,
+                contentType: false,
+                beforeSend: function() {
                     Swal.fire({
-                        icon: 'success',
-                        title: 'تمت الإضافة',
-                        text: data.message || 'تم الإضافة بنجاح'
+                        title: 'جاري الإضافة...',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
                     });
+                },
+                success: function(response) {
+                    if (response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'تمت الإضافة!',
+                            text: response.message,
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
 
-                    // Update UI based on type
-                    updateUIAfterQuickAdd(data);
+                        // Update the appropriate select
+                        updateSelectAfterQuickAdd(type, response.data);
 
-                } else {
-                    throw new Error(data.message || 'حدث خطأ أثناء الإضافة');
+                        modal.modal('hide');
+                        modal.find('input, textarea, select').val('');
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'خطأ!',
+                            text: response.message
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'خطأ!',
+                        text: xhr.responseJSON?.message || 'حدث خطأ أثناء الإضافة'
+                    });
                 }
-
-            } catch (error) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'خطأ',
-                    text: error.message
-                });
-            }
+            });
         }
 
-        function updateUIAfterQuickAdd(data) {
-            switch (currentQuickAddType) {
-                case 'category':
-                    // Add new option to category select
-                    const option = new Option(data.item.name, data.item.id);
-                    $('#category_id').append(option).val(data.item.id).trigger('change');
-                    break;
-
+        function updateSelectAfterQuickAdd(type, data) {
+            switch (type) {
                 case 'color':
-                    // Add color to available colors grid
+                    // Add to colors grid
                     const colorItem = `
-                    <div class="color-item" 
-                         style="background-color: ${data.item.hex_code};"
-                         data-id="${data.item.id}"
-                         data-name="${data.item.name}"
-                         data-hex="${data.item.hex_code}"
-                         onclick="addColor(this)">
-                    </div>
-                `;
+                        <div class="color-item" 
+                             style="background-color: ${data.hex_code};"
+                             data-id="${data.id}"
+                             data-name="${data.name}"
+                             data-hex="${data.hex_code}"
+                             onclick="addColorToProduct(this)">
+                        </div>
+                    `;
                     $('#availableColorsGrid').append(colorItem);
                     break;
 
                 case 'material':
-                    // Add option to material select in all material fields
+                    // Add to materials select
+                    const materialOption = new Option(data.name, data.id, false, false);
+                    $('#materialsSelect').append(materialOption).trigger('change');
+                    
+                    // Update all material selects
                     $('.material-select').each(function() {
-                        const option = new Option(data.item.name, data.item.id);
-                        $(this).append(option);
+                        $(this).append(new Option(data.name, data.id, false, false));
                     });
                     break;
 
                 case 'printing_method':
-                    // Add option to printing methods select
-                    const printingOption = new Option(
-                        `${data.item.name} - ${data.item.base_price} ج.م`,
-                        data.item.id
-                    );
-                    $('#printingMethodsSelect').append(printingOption);
+                    // Add to printing methods select
+                    const printingOption = new Option(`${data.name} - ${data.base_price} ج.م`, data.id, false, false);
+                    $(printingOption).data('name', data.name);
+                    $(printingOption).data('price', data.base_price);
+                    $('#printingMethodsSelect').append(printingOption).trigger('change');
                     break;
 
                 case 'print_location':
-                    // Add option to print locations select
-                    const locationOption = new Option(
-                        `${data.item.name} (${data.item.type}) - ${data.item.additional_price} ج.م`,
-                        data.item.id
-                    );
-                    $('#printLocationsSelect').append(locationOption);
+                    // Add to print locations select
+                    const locationOption = new Option(`${data.name} (${data.type}) - ${data.additional_price} ج.م`, data.id,
+                        false, false);
+                    $(locationOption).data('name', data.name);
+                    $(locationOption).data('price', data.additional_price);
+                    $('#printLocationsSelect').append(locationOption).trigger('change');
                     break;
 
                 case 'offer':
-                    // Add option to offers select
-                    const offerOption = new Option(data.item.name, data.item.id);
-                    $('#offersSelect').append(offerOption);
+                    // Add to offers select
+                    const offerOption = new Option(data.name, data.id, false, false);
+                    $(offerOption).data('name', data.name);
+                    $('#offersSelect').append(offerOption).trigger('change');
+                    break;
+
+                case 'category':
+                    // Add to category select
+                    const categoryOption = new Option(data.name, data.id, false, false);
+                    $('#category_id').append(categoryOption).trigger('change');
                     break;
             }
         }
 
-        // Slug Generation
-        function generateSlug() {
-            const name = $('#name').val();
-            if (!name) return;
+        // Collect Form Data
+        function collectFormData() {
+            const container = $('#hiddenInputsContainer');
+            container.empty();
 
-            let slug = name
-                .toLowerCase()
-                .replace(/[^\u0600-\u06FF\w\s]/g, '')
-                .replace(/\s+/g, '-')
-                .replace(/--+/g, '-')
-                .trim();
-
-            // Add product ID to ensure uniqueness
-            slug += '-' + {{ $product->id }};
-
-            $('#slug').val(slug);
+            // Collect removed images
+            if (removedExistingImages.length > 0) {
+                container.append(`<input type="hidden" name="removed_existing_images" value="${removedExistingImages.join(',')}">`);
+            }
         }
 
-        // Form Submission
+        // Update Summary
+        function updateSummary() {
+            $('#summary_name').text($('#name').val());
+            $('#summary_price').text($('#price').val());
+            $('#summary_stock').text($('#stock').val());
+
+            // Status
+            const statusText = {
+                '1': 'نشط',
+                '2': 'غير نشط',
+                '3': 'مسودة'
+            }[$('#status_id').val()];
+            $('#summary_status').text(statusText);
+
+            // Colors
+            $('#summary_colors').text(selectedColors.size);
+
+            // Materials
+            const materialCount = $('#materialsContainer .material-select option:selected').length;
+            $('#summary_materials').text(materialCount);
+        }
+
+        // Save and Continue
         function saveAndContinue() {
             // Submit form via AJAX
             const formData = new FormData(document.getElementById('editProductForm'));
@@ -2443,38 +2709,5 @@ function previewImage(file, type) {
                     });
                 });
         }
-
-        // Form Validation
-        document.getElementById('editProductForm').addEventListener('submit', function(e) {
-            // Basic validation
-            const name = $('#name').val();
-            const price = $('#price').val();
-            const stock = $('#stock').val();
-
-            if (!name || !price || !stock) {
-                e.preventDefault();
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'بيانات ناقصة',
-                    text: 'يرجى ملء جميع الحقول المطلوبة',
-                    confirmButtonColor: '#3085d6'
-                });
-            }
-
-            // Validate discount
-            if ($('#has_discount').is(':checked')) {
-                const discountValue = $('#discount_value').val();
-                if (!discountValue || discountValue <= 0) {
-                    e.preventDefault();
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'قيمة خصم غير صالحة',
-                        text: 'يرجى إدخال قيمة خصم صحيحة',
-                        confirmButtonColor: '#3085d6'
-                    });
-                    return;
-                }
-            }
-        });
     </script>
 @endsection

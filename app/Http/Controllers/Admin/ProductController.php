@@ -687,15 +687,16 @@ public function update(StoreProductRequest $request, $id)
         $product = Product::with([
             'colors', 'materials', 'printingMethods', 
             'printLocations', 'offers', 'deliveryTime', 
-            'warranty', 'discount', 'images'
+            'warranty', 'discount', 'images', 'adsText'
         ])->findOrFail($id);
 
         // Validate main product data
         $validated = $request->validated();
 
         // Handle main image update
-        $imagePath = $product->image; // Keep old image by default
+        $imagePath = $product->image;
         
+        // If new main image uploaded
         if ($request->hasFile('image')) {
             // Delete old main image from storage
             if ($product->image) {
@@ -704,32 +705,17 @@ public function update(StoreProductRequest $request, $id)
 
             // Upload new main image
             $imagePath = $request->file('image')->store('products', 'public');
-            
-            // Update or create image record in images table
-            $product->images()->updateOrCreate(
-                ['is_primary' => true],
-                [
-                    'path' => $imagePath,
-                    'is_primary' => true,
-                    'alt' => $validated['name'] ?? 'product_image',
-                    'type' => 'main',
-                    'order' => 1
-                ]
-            );
         }
-
-        // Handle removal of main image
-        if ($request->filled('remove_main_image') && $request->remove_main_image == '1') {
+        
+        // If remove existing main image is requested
+        if ($request->filled('remove_existing_main_image') && $request->remove_existing_main_image == '1') {
             if ($product->image) {
                 Storage::disk('public')->delete($product->image);
             }
             $imagePath = null;
-            
-            // Delete primary image record
-            $product->images()->where('is_primary', true)->delete();
         }
 
-        // Update product basic info INCLUDING THE IMAGE FIELD
+        // Update product basic info
         $product->update([
             'name' => $validated['name'],
             'price_text' => $validated['price_text'],
@@ -741,7 +727,7 @@ public function update(StoreProductRequest $request, $id)
             'has_discount' => $request->boolean('has_discount'),
             'includes_tax' => $request->boolean('includes_tax'),
             'includes_shipping' => $request->boolean('includes_shipping'),
-            'image' => $imagePath, // THIS IS THE FIX - UPDATE THE IMAGE FIELD
+            'image' => $imagePath,
         ]);
 
         // Handle discount update
@@ -758,11 +744,10 @@ public function update(StoreProductRequest $request, $id)
                 ]);
             }
         } elseif ($product->discount) {
-            // Remove discount if unchecked
             $product->discount()->delete();
         }
 
-        // Handle colors with prices (sync will update existing and add new)
+        // Handle colors with prices
         if ($request->filled('colors')) {
             $colors = [];
             foreach ($request->input('colors') as $colorId) {
@@ -854,12 +839,21 @@ public function update(StoreProductRequest $request, $id)
             $product->warranty()->delete();
         }
 
+        // Handle text ads
+        $product->adsText()->delete();
+        if ($request->filled('text_ads')) {
+            foreach ($request->text_ads as $ad) {
+                if (!empty($ad['name'])) {
+                    $product->adsText()->create([
+                        'name' => $ad['name']
+                    ]);
+                }
+            }
+        }
+
         // Handle additional images
         if ($request->hasFile('additional_images')) {
-            // Get current max order for additional images
-            $maxOrder = $product->images()
-                ->where('type', 'additional')
-                ->max('order') ?? 1;
+            $order = $product->images()->where('type', 'additional')->max('order') ?? 1;
             
             foreach ($request->file('additional_images') as $image) {
                 $path = $image->store('products/additional', 'public');
@@ -869,14 +863,14 @@ public function update(StoreProductRequest $request, $id)
                     'alt' => $validated['name'] ?? 'product_additional_image',
                     'is_primary' => false,
                     'type' => 'additional',
-                    'order' => ++$maxOrder
+                    'order' => ++$order
                 ]);
             }
         }
 
-        // Handle removal of additional images
-        if ($request->filled('removed_images')) {
-            $removedIds = explode(',', $request->removed_images);
+        // Handle removal of existing additional images
+        if ($request->filled('removed_existing_images')) {
+            $removedIds = explode(',', $request->removed_existing_images);
             foreach ($removedIds as $imageId) {
                 if ($imageId) {
                     $image = Image::find($imageId);
@@ -885,58 +879,6 @@ public function update(StoreProductRequest $request, $id)
                         $image->delete();
                     }
                 }
-            }
-        }
-
-        // Handle setting primary image
-        if ($request->filled('primary_image_id')) {
-            // Get the selected image
-            $newPrimaryImage = Image::find($request->primary_image_id);
-            
-            if ($newPrimaryImage && $newPrimaryImage->imageable_id == $product->id) {
-                // Reset all images to not primary
-                $product->images()->update(['is_primary' => false]);
-                
-                // Set the selected image as primary
-                $newPrimaryImage->update([
-                    'is_primary' => true,
-                    'type' => 'main'
-                ]);
-                
-                // Update product's main image
-                $product->update(['image' => $newPrimaryImage->path]);
-            }
-        }
-
-        // Handle size tiers
-        if ($request->filled('sizes.edit')) {
-            foreach ($request->sizes['edit'] as $sizeTierId => $data) {
-                $sizeTier = ProductSizeTier::where('id', $sizeTierId)
-                    ->where('product_id', $product->id)
-                    ->first();
-                
-                if ($sizeTier) {
-                    $sizeTier->update($data);
-                }
-            }
-        }
-
-        if ($request->filled('sizes.new')) {
-            foreach ($request->sizes['new'] as $data) {
-                $product->sizeTiers()->create($data);
-            }
-        }
-
-        // Handle options update
-        $product->options()->delete();
-        if ($request->filled('product_options')) {
-            foreach ($request->product_options as $option) {
-                $product->options()->create([
-                    'option_name'       => $option['option_name'] ?? null,
-                    'option_value'      => $option['option_value'] ?? null,
-                    'additional_price'  => $option['additional_price'] ?? 0,
-                    'is_required'       => $option['is_required'] ?? false,
-                ]);
             }
         }
 
