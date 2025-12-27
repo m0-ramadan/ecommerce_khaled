@@ -178,6 +178,8 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
     // Additional Routes
     Route::prefix('products')->as('products.')->group(function () {
         Route::get('/export', [ProductController::class, 'export'])->name('export');
+        Route::post('/{product}/update-image', [ProductController::class, 'updateImage'])
+            ->name('update-image');
     });
 
     // Payment Method

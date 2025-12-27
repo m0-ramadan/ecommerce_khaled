@@ -909,8 +909,8 @@ class ProductController extends Controller
          | REMOVE ADDITIONAL IMAGES
          ===================================================== */
 
-            if ($request->filled('removed_existing_images')) {
-                foreach (explode(',', $request->removed_existing_images) as $imageId) {
+            if ($request->filled('removed_images')) {
+                foreach (explode(',', $request->removed_images) as $imageId) {
                     $image = Image::find($imageId);
                     if ($image && $image->imageable_id === $product->id) {
                         Storage::disk('public')->delete($image->path);
@@ -978,4 +978,69 @@ class ProductController extends Controller
     // {
     //     return Excel::download(new ProductsExport, 'products_' . now()->format('Y-m-d') . '.xlsx');
     // }
+    public function updateImage(Request $request, Product $product)
+    {
+        \Log::info('Update Image Request', [
+            'product_id' => $product->id,
+            'has_file' => $request->hasFile('image'),
+            'all_data' => $request->all()
+        ]);
+
+        try {
+            $request->validate([
+                'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            ]);
+
+            // حذف الصور القديمة أولاً
+            $oldImages = $product->images ?? collect();
+
+            if ($oldImages->isNotEmpty()) {
+                foreach ($oldImages as $oldImage) {
+                    if ($oldImage->path && Storage::disk('public')->exists($oldImage->path)) {
+                        Storage::disk('public')->delete($oldImage->path);
+                    }
+                    $oldImage->delete();
+                }
+            }
+
+            // حفظ الصورة الجديدة
+            $imagePath = $request->file('image')->store('products', 'public');
+
+            // إنشاء سجل جديد في جدول الصور
+            $image = new \App\Models\ProductImage();
+            $image->product_id = $product->id;
+            $image->path = $imagePath;
+            $image->is_primary = 1; // تعيين كصورة رئيسية
+            $image->save();
+
+            // تحديث المنتج للإشارة إلى الصورة الرئيسية
+            $product->primary_image_id = $image->id;
+            $product->save();
+
+            $imageUrl = asset('storage/' . $imagePath);
+
+            \Log::info('Image updated successfully', [
+                'image_path' => $imagePath,
+                'image_url' => $imageUrl,
+                'image_id' => $image->id
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'تم تحديث صورة المنتج بنجاح',
+                'image_url' => $imageUrl,
+                'image_id' => $image->id
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Failed to update product image', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل في تحديث الصورة: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }
