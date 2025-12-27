@@ -840,7 +840,7 @@ public function update(StoreProductRequest $request, $id)
         }
 
         // Handle text ads (delete old and create new)
-        $product->textAds()->delete();
+        $product->textAds()?->delete();
         if ($request->has('text_ads')) {
             foreach ($request->text_ads as $ad) {
                 if (!empty($ad['name'])) {
