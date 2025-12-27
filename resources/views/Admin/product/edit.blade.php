@@ -1822,44 +1822,53 @@
             }, 300);
         }
 
-        // Image Management Functions
-        function previewImage(file, type) {
-            if (!file.type.match('image.*')) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'خطأ',
-                    text: 'الملف يجب أن يكون صورة'
-                });
-                return;
+  // تعديل دالة previewImage
+function previewImage(file, type) {
+    if (!file.type.match('image.*')) {
+        Swal.fire({
+            icon: 'error',
+            title: 'خطأ',
+            text: 'الملف يجب أن يكون صورة'
+        });
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        if (type === 'main') {
+            // تحديث الصورة في العرض المباشر
+            $('.preview-image').attr('src', e.target.result);
+            
+            // تحديث الصورة في المعاينة
+            const previewHtml = `
+            <div class="image-preview-item">
+                <span class="primary-badge">رئيسية جديدة</span>
+                <img src="${e.target.result}" alt="الصورة الرئيسية الجديدة">
+                <div class="image-actions">
+                    <button type="button" class="btn btn-info btn-sm" onclick="viewImage('${e.target.result}')">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+            `;
+            
+            // تأكد من وجود عنصر للمعاينة
+            let previewGrid = $('.step-2 .image-preview-grid').first();
+            if (previewGrid.length === 0) {
+                // إنشاء عنصر جديد
+                const parent = $('.step-2 .mb-4').first();
+                const newGrid = $('<div class="image-preview-grid"></div>');
+                newGrid.html(previewHtml);
+                parent.append(newGrid);
+            } else {
+                previewGrid.html(previewHtml);
             }
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                if (type === 'main') {
-                    // Remove old main image preview
-                    $('.image-preview-grid').first().empty();
-
-                    // Add new main image preview
-                    const previewHtml = `
-                    <div class="image-preview-item">
-                        <span class="primary-badge">رئيسية جديدة</span>
-                        <img src="${e.target.result}" alt="الصورة الرئيسية الجديدة">
-                        <div class="image-actions">
-                            <button type="button" class="btn btn-info btn-sm" onclick="viewImage('${e.target.result}')">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                            <button type="button" class="btn btn-danger btn-sm" onclick="removeNewMainImage()">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </div>
-                `;
-                    $('.image-preview-grid').first().html(previewHtml);
-                    $('#remove_main_image').val('0');
-                }
-            };
-            reader.readAsDataURL(file);
+            
+            $('#remove_main_image').val('0');
         }
+    };
+    reader.readAsDataURL(file);
+}
 
         function previewMultipleImages(files) {
             const container = $('#newImagesPreview');
