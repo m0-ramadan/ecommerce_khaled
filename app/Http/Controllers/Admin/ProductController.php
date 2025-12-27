@@ -672,111 +672,252 @@ class ProductController extends Controller
         ));
     }
 
-    public function update(Request $request, $id)
-    {
-        //dd($request->all());
+/**
+ * Update the specified product.
+ *
+ * @param  \App\Http\Requests\Admin\Product\StoreProductRequest  $request
+ * @param  int  $id
+ * @return \Illuminate\Http\RedirectResponse
+ */
+public function update(StoreProductRequest $request, $id)
+{
+    DB::beginTransaction();
 
-        $validated = $request->validate([
-            'name'              => 'required|string|max:255',
-            'category_id'       => 'required|exists:categories,id',
-            'description'       => 'nullable|string',
-            'num_faces'         => 'nullable|in:1,2',
-            'print_locations'   => 'nullable|array',
-            'printing_methods'  => 'nullable|array',
-            'protection_layer'  => 'nullable|in:none,glossy,matte',
-            'design_service'    => 'nullable|in:0,free,paid',
-            'design_service_price' => 'nullable|numeric|min:0',
-            'delivery_time'     => 'nullable|string',
-            'price_text'        => 'nullable|string',
-            'shipping_fees'     => 'nullable|string',
-            'tags'              => 'nullable|string',
-            'status'            => 'nullable|in:0,1',
-            'images.*'          => 'image|mimes:jpg,jpeg,png,webp|max:5048',
-            'colors'            => 'array',
-            'colors.*'          => 'exists:colors,id',
-            'sizes.edit.*.size_id'       => 'required|exists:sizes,id',
-            'sizes.edit.*.quantity'      => 'required|integer|min:1',
-            'sizes.edit.*.price_per_unit' => 'required|numeric|min:0',
-            'sizes.new.*.size_id'        => 'required|exists:sizes,id',
-            'sizes.new.*.quantity'       => 'required|integer|min:1',
-            'sizes.new.*.price_per_unit' => 'required|numeric|min:0',
+    try {
+        $product = Product::with([
+            'colors', 'materials', 'printingMethods', 
+            'printLocations', 'offers', 'deliveryTime', 
+            'warranty', 'discount', 'images'
+        ])->findOrFail($id);
+
+        // Validate main product data
+        $validated = $request->validated();
+
+        // Update product basic info
+        $product->update([
+            'name' => $validated['name'],
+            'price_text' => $validated['price_text'],
+            'category_id' => $validated['category_id'],
+            'description' => $validated['description'],
+            'price' => $validated['price'],
+            'stock' => $validated['stock'] ?? 0,
+            'status_id' => $validated['status_id'],
+            'has_discount' => $request->boolean('has_discount'),
+            'includes_tax' => $request->boolean('includes_tax'),
+            'includes_shipping' => $request->boolean('includes_shipping'),
         ]);
 
-        DB::beginTransaction();
-        try {
-            $product = Product::findOrFail($id);
-            $product->update([
-                'name'              => $request->name,
-                'category_id'       => $request->category_id,
-                'description'       => $request->description,
-                'price_text'       => $request->price_text,
-                'num_faces'         => $request->num_faces,
-                'print_locations'   => $request->print_locations ? json_encode($request->print_locations) : null,
-                'printing_methods'  => $request->printing_methods ? json_encode($request->printing_methods) : null,
-                'protection_layer'  => $request->protection_layer,
-                'design_service'    => $request->design_service,
-                'design_service_price' => $request->design_service == 'paid' ? $request->design_service_price : null,
-                'delivery_time'     => $request->delivery_time,
-                'shipping_fees'     => $request->shipping_fees,
-                'tags'              => $request->tags,
-                'status'            => $request->status,
+        // Handle main image update
+        if ($request->hasFile('image')) {
+            // Delete old main image if exists
+            $oldMainImage = $product->images()->where('is_primary', true)->first();
+            if ($oldMainImage) {
+                Storage::disk('public')->delete($oldMainImage->path);
+                $oldMainImage->delete();
+            }
+
+            // Upload new main image
+            $imagePath = $request->file('image')->store('products', 'public');
+            
+            // Create new image record
+            $product->images()->create([
+                'path' => $imagePath,
+                'is_primary' => true,
+                'alt' => $validated['name'] ?? 'product_image',
+                'type' => 'main',
+                'order' => 1
             ]);
-
-            // تحديث الألوان
-            $product->colors()->sync($request->colors ?? []);
-
-            // إضافة صور جديدة
-            if ($request->hasFile('images')) {
-                foreach ($request->file('images') as $index => $file) {
-                    $path = $file->store('products', 'public');
-                    $product->images()->create([
-                        'path' => $path,
-                        'alt' => 'ww',
-                        'type' => $index === 0 ? 'main' : 'additional',
-                        'is_primary' => $index === 0 && !$product->images()->where('is_primary', true)->exists(),
-                    ]);
-                }
-            }
-
-
-            // تحديث خيارات المنتج
-            if ($request->filled('product_options')) {
-
-                // $product->options()->delete();
-
-                foreach ($request->product_options as $option) {
-                    $product->options()->create([
-                        'option_name'       => $option['option_name'] ?? null,
-                        'option_value'      => $option['option_value'] ?? null,
-                        'additional_price'  => $option['additional_price'] ?? 0,
-                        'is_required'       => $option['is_required'] ?? false,
-                    ]);
-                }
-            }
-
-            // تحديث التسعير القديم
-            if ($request->filled('sizes.edit')) {
-                foreach ($request->sizes['edit'] as $id => $data) {
-                    ProductSizeTier::findOrFail($id)->update($data);
-                }
-            }
-
-            // إضافة تسعير جديد
-            if ($request->filled('sizes.new')) {
-                foreach ($request->sizes['new'] as $data) {
-                    $product->sizeTiers()->create($data);
-                }
-            }
-
-            DB::commit();
-            return redirect()->route('admin.products.show', $product->id)
-                ->with('success', 'تم تحديث المنتج بنجاح');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Product Update Error: ' . $e->getMessage());
-            return back()->with('error', 'حدث خطأ أثناء التحديث');
         }
+
+        // Handle discount update
+        if ($request->boolean('has_discount') && $request->filled('discount_value')) {
+            if ($product->discount) {
+                $product->discount()->update([
+                    'discount_value' => $request->input('discount_value'),
+                    'discount_type' => $request->input('discount_type', 'percentage'),
+                ]);
+            } else {
+                $product->discount()->create([
+                    'discount_value' => $request->input('discount_value'),
+                    'discount_type' => $request->input('discount_type', 'percentage'),
+                ]);
+            }
+        } elseif ($product->discount) {
+            // Remove discount if unchecked
+            $product->discount()->delete();
+        }
+
+        // Handle colors with prices (sync will update existing and add new)
+        if ($request->filled('colors')) {
+            $colors = [];
+            foreach ($request->input('colors') as $colorId) {
+                $additionalPrice = $request->input("color_prices.{$colorId}", 0);
+                $colors[$colorId] = ['additional_price' => $additionalPrice];
+            }
+            $product->colors()->sync($colors);
+        } else {
+            $product->colors()->detach();
+        }
+
+        // Handle materials update
+        if ($request->filled('materials')) {
+            $materialsData = [];
+            foreach ($request->input('materials') as $materialData) {
+                if (!empty($materialData['material_id'])) {
+                    $materialsData[$materialData['material_id']] = [
+                        'quantity' => $materialData['quantity'] ?? 0,
+                        'unit' => $materialData['unit'] ?? 'piece',
+                        'additional_price' => $materialData['additional_price'] ?? 0
+                    ];
+                }
+            }
+            $product->materials()->sync($materialsData);
+        } else {
+            $product->materials()->detach();
+        }
+
+        // Handle printing methods with prices
+        if ($request->filled('printing_methods')) {
+            $printingMethods = [];
+            foreach ($request->input('printing_methods') as $methodId) {
+                $additionalPrice = $request->input("printing_method_prices.{$methodId}", 0);
+                $printingMethods[$methodId] = ['additional_price' => $additionalPrice];
+            }
+            $product->printingMethods()->sync($printingMethods);
+        } else {
+            $product->printingMethods()->detach();
+        }
+
+        // Handle print locations with prices
+        if ($request->filled('print_locations')) {
+            $printLocations = [];
+            foreach ($request->input('print_locations') as $locationId) {
+                $additionalPrice = $request->input("print_location_prices.{$locationId}", 0);
+                $printLocations[$locationId] = ['additional_price' => $additionalPrice];
+            }
+            $product->printLocations()->sync($printLocations);
+        } else {
+            $product->printLocations()->detach();
+        }
+
+        // Handle offers
+        if ($request->filled('offers')) {
+            $product->offers()->sync($request->input('offers'));
+        } else {
+            $product->offers()->detach();
+        }
+
+        // Handle delivery time update
+        if ($request->filled('from_days') || $request->filled('to_days')) {
+            if ($product->deliveryTime) {
+                $product->deliveryTime()->update([
+                    'from_days' => $request->input('from_days'),
+                    'to_days' => $request->input('to_days'),
+                ]);
+            } else {
+                $product->deliveryTime()->create([
+                    'from_days' => $request->input('from_days'),
+                    'to_days' => $request->input('to_days'),
+                ]);
+            }
+        } elseif ($product->deliveryTime) {
+            $product->deliveryTime()->delete();
+        }
+
+        // Handle warranty update
+        if ($request->filled('warranty_months')) {
+            if ($product->warranty) {
+                $product->warranty()->update([
+                    'months' => $request->input('warranty_months')
+                ]);
+            } else {
+                $product->warranty()->create([
+                    'months' => $request->input('warranty_months')
+                ]);
+            }
+        } elseif ($product->warranty) {
+            $product->warranty()->delete();
+        }
+
+        // Handle text ads (delete old and create new)
+        $product->textAds()->delete();
+        if ($request->has('text_ads')) {
+            foreach ($request->text_ads as $ad) {
+                if (!empty($ad['name'])) {
+                    ProductTextAd::create([
+                        'product_id' => $product->id,
+                        'name' => $ad['name']
+                    ]);
+                }
+            }
+        }
+
+        // Handle additional images
+        if ($request->hasFile('additional_images')) {
+            // Get current max order for additional images
+            $maxOrder = $product->images()
+                ->where('type', 'additional')
+                ->max('order') ?? 1;
+            
+            foreach ($request->file('additional_images') as $image) {
+                $path = $image->store('products/additional', 'public');
+                
+                $product->images()->create([
+                    'path' => $path,
+                    'alt' => $validated['name'] ?? 'product_additional_image',
+                    'is_primary' => false,
+                    'type' => 'additional',
+                    'order' => ++$maxOrder
+                ]);
+            }
+        }
+
+        // Handle size tiers (من الكود الأصلي)
+        if ($request->filled('sizes.edit')) {
+            foreach ($request->sizes['edit'] as $sizeTierId => $data) {
+                $sizeTier = ProductSizeTier::where('id', $sizeTierId)
+                    ->where('product_id', $product->id)
+                    ->first();
+                
+                if ($sizeTier) {
+                    $sizeTier->update($data);
+                }
+            }
+        }
+
+        if ($request->filled('sizes.new')) {
+            foreach ($request->sizes['new'] as $data) {
+                $product->sizeTiers()->create($data);
+            }
+        }
+
+        // Handle options update (من الكود الأصلي)
+        $product->options()->delete(); // Delete all and recreate
+        if ($request->filled('product_options')) {
+            foreach ($request->product_options as $option) {
+                $product->options()->create([
+                    'option_name'       => $option['option_name'] ?? null,
+                    'option_value'      => $option['option_value'] ?? null,
+                    'additional_price'  => $option['additional_price'] ?? 0,
+                    'is_required'       => $option['is_required'] ?? false,
+                ]);
+            }
+        }
+
+        DB::commit();
+
+        return redirect()->route('admin.products.show', $product->id)
+            ->with('success', 'تم تحديث المنتج بنجاح');
+            
+    } catch (\Exception $e) {
+        DB::rollBack();
+        Log::error('Error updating product: ' . $e->getMessage());
+        
+        return redirect()->back()
+            ->withInput()
+            ->with('error', 'حدث خطأ أثناء تحديث المنتج: ' . $e->getMessage());
     }
+}
 
     public function destroy(Product $product)
     {

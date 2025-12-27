@@ -185,13 +185,13 @@ class Product extends Model
         }
 
         return $query->where(function ($q) use ($search) {
-            $q->where('name', 'like', "%{$search}%")
-                ->orWhere('description', 'like', "%{$search}%")
-                ->orWhereHas('category', fn($c) => $c->where('name', 'like', "%{$search}%"))
-                ->orWhereHas('features', fn($f) => $f
-                    ->where('name', 'like', "%{$search}%")
-                    ->orWhere('value', 'like', "%{$search}%"))
-                ->orWhereHas('materials', fn($m) => $m->where('name', 'like', "%{$search}%"));
+            $q->where('name', 'like', "%{$search}%");
+                // ->orWhere('description', 'like', "%{$search}%")
+                // ->orWhereHas('category', fn($c) => $c->where('name', 'like', "%{$search}%"))
+                // ->orWhereHas('features', fn($f) => $f
+                //     ->where('name', 'like', "%{$search}%")
+                //     ->orWhere('value', 'like', "%{$search}%"))
+                // ->orWhereHas('materials', fn($m) => $m->where('name', 'like', "%{$search}%"));
         });
     }
 
