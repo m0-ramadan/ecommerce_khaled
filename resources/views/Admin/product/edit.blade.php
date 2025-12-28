@@ -1197,7 +1197,7 @@
                                                         <input type="number" class="form-control"
                                                             name="materials[{{ $loop->index }}][quantity]"
                                                             value="{{ $material->pivot->quantity }}" placeholder="الكمية"
-                                                            min="0" step="0.01" required>
+                                                            min="0" step="0.01">
                                                     </div>
                                                     <div class="col-md-4 mb-2" bis_skin_checked="1">
                                                         <select class="form-select"
