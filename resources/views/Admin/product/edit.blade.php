@@ -1673,10 +1673,10 @@
                 </div>
                 <div class="col-md-4 mb-2">
                     <input type="number" class="form-control" name="materials[][quantity]" placeholder="الكمية"
-                        min="0" step="0.01" required>
+                        min="0" step="0.01">
                 </div>
                 <div class="col-md-4 mb-2">
-                    <select class="form-select" name="materials[][unit]" required>
+                    <select class="form-select" name="materials[][unit]">
                         <option value="piece">قطعة</option>
                         <option value="meter">متر</option>
                         <option value="kg">كجم</option>
