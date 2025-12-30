@@ -51,6 +51,16 @@ class Order extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function paymentMethod()
+    {
+        return $this->belongsTo(PaymentMethod::class, 'payment_method');
+    }
+    public function getPaymentMethodLabelAttribute()
+    {
+        return $this->paymentMethod?->name;
+    }
+
+
     public function address()
     {
         return $this->belongsTo(UserAddress::class); // جدول addresses

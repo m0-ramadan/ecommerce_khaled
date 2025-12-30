@@ -108,7 +108,7 @@ class ProductController extends Controller
         }
 
         // الحصول على النتائج مع Pagination
-        $perPage = $request->get('per_page', 20);
+        $perPage = $request->get('per_page', 30);
         $products = $query->paginate($perPage)->withQueryString();
 
         // Calculate average rating for each product
