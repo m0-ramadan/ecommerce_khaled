@@ -293,7 +293,7 @@
                                             <div class="module-icon" bis_skin_checked="1">
                                                 <i class="fas fa-{{ module_icon($module) }}"></i>
                                             </div>
-                                            <span>{{ trans("modules.{$module}") ?? ucfirst(str_replace('_', ' ', $module)) }}</span>
+                                            <span>{{ module_display_name($module) }}</span>
                                         </div>
                                         <div class="module-stats" bis_skin_checked="1">
                                             <span class="stat-item">
@@ -309,15 +309,20 @@
 
                                     <div class="row" bis_skin_checked="1">
                                         @foreach ($permissions as $permission)
+                                            @php
+                                                // استخدم الـ helper functions الصحيحة
+                                                $permissionType = permission_type($permission->name);
+                                                $permissionTypeLabel = permission_type_label($permission->name);
+                                                $badgeClass = permission_badge_class($permission->name);
+                                            @endphp
                                             <div class="col-lg-6 mb-3" bis_skin_checked="1">
                                                 <div class="permission-item" bis_skin_checked="1">
                                                     <div class="permission-info" bis_skin_checked="1">
                                                         <div bis_skin_checked="1">
                                                             <div class="permission-name" bis_skin_checked="1">
                                                                 {{ $permission->display_name }}
-                                                                <span
-                                                                    class="permission-badge badge-{{ getPermissionType($permission->name) }}">
-                                                                    {{ getPermissionTypeLabel($permission->name) }}
+                                                                <span class="permission-badge {{ $badgeClass }}">
+                                                                    {{ $permissionTypeLabel }}
                                                                 </span>
                                                             </div>
                                                             <div class="permission-description" bis_skin_checked="1">
@@ -448,48 +453,5 @@
                 });
             @endif
         });
-
-        // دالة مساعدة للحصول على الأيقونة المناسبة لكل وحدة
-        function getModuleIcon(module) {
-            const icons = {
-                'users': 'users',
-                'roles': 'shield-alt',
-                'permissions': 'key',
-                'products': 'box',
-                'categories': 'folder',
-                'orders': 'shopping-cart',
-                'settings': 'cog',
-                'banners': 'image',
-                'coupons': 'tag',
-                'reports': 'chart-bar'
-            };
-            return icons[module] || 'cube';
-        }
-
-        function getPermissionType(permissionName) {
-            if (permissionName.includes('.create')) return 'create';
-            if (permissionName.includes('.read') || permissionName.includes('.view')) return 'read';
-            if (permissionName.includes('.update') || permissionName.includes('.edit')) return 'update';
-            if (permissionName.includes('.delete') || permissionName.includes('.destroy')) return 'delete';
-            if (permissionName.includes('.manage') || permissionName.includes('.all')) return 'manage';
-            return 'other';
-        }
-
-        function getPermissionTypeLabel(permissionName) {
-            const types = {
-                'create': 'إنشاء',
-                'read': 'قراءة',
-                'view': 'عرض',
-                'update': 'تعديل',
-                'edit': 'تعديل',
-                'delete': 'حذف',
-                'destroy': 'حذف',
-                'manage': 'إدارة',
-                'all': 'جميع'
-            };
-
-            const type = getPermissionType(permissionName);
-            return types[type] || 'أخرى';
-        }
     </script>
 @endsection

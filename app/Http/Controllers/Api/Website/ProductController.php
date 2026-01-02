@@ -31,7 +31,7 @@ class ProductController extends Controller
                 'sizes',
                 'offers',
                 'materials'
-            ]);
+            ])->where('status_id', 1);
             $products = $query
                 ->filtered($request)
                 ->searched($request->get('search'))

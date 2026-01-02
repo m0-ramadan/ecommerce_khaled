@@ -32,7 +32,7 @@ class Category extends Model
 
     public function products()
     {
-        return $this->hasMany(Product::class);
+        return $this->hasMany(Product::class)->where('status_id', 1);
     }
 
     public function isParent()

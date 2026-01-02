@@ -340,7 +340,7 @@ class RoleController extends Controller
      */
     public function assignIndex(Request $request)
     {
-        if (!auth()->guard('admin')->user()->can('assign_roles')) {
+        if (!auth()->guard('admin')->user()->can('roles.assign')) {
             abort(403, 'غير مصرح لك بتعيين الرتب');
         }
 
@@ -350,7 +350,7 @@ class RoleController extends Controller
 
         $roles = Role::orderBy('name')->get();
 
-        return view('admin.roles.assign', compact('admins', 'roles'));
+        return view('Admin.roles.assign', compact('admins', 'roles'));
     }
 
     /**

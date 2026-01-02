@@ -163,3 +163,39 @@ if (!function_exists('permission_badge_class')) {
         return \App\Helpers\PermissionHelper::getPermissionBadgeClass($permissionName);
     }
 }
+
+
+if (!function_exists('module_icon')) {
+    function module_icon(string $module): string
+    {
+        return \App\Helpers\PermissionHelper::getModuleIcon($module);
+    }
+}
+
+if (!function_exists('module_display_name')) {
+    function module_display_name(string $module): string
+    {
+        return \App\Helpers\PermissionHelper::getModuleDisplayName($module);
+    }
+}
+
+if (!function_exists('permission_type')) {
+    function permission_type(string $permissionName): string
+    {
+        return \App\Helpers\PermissionHelper::getPermissionType($permissionName);
+    }
+}
+
+if (!function_exists('permission_type_label')) {
+    function permission_type_label(string $permissionName): string
+    {
+        return \App\Helpers\PermissionHelper::getPermissionTypeLabel($permissionName);
+    }
+}
+
+if (!function_exists('permission_badge_class')) {
+    function permission_badge_class(string $permissionName): string
+    {
+        return \App\Helpers\PermissionHelper::getPermissionBadgeClass($permissionName);
+    }
+}

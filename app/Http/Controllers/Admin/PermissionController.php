@@ -52,14 +52,23 @@ class PermissionController extends Controller
      */
     public function create()
     {
-        if (!auth()->guard('admin')->user()->can('create_permissions')) {
+        if (!auth()->guard('admin')->user()->can('permissions.create')) {
             abort(403, 'غير مصرح لك بإنشاء صلاحيات');
         }
 
         $modules = $this->getAvailableModules();
         $permissionTypes = $this->getPermissionTypes();
 
-        return view('admin.permissions.create', compact('modules', 'permissionTypes'));
+        return view('Admin.permissions.form', [
+            'title' => 'إنشاء صلاحية جديدة',
+            'description' => 'أضف صلاحية جديدة إلى النظام',
+            'action' => route('admin.permissions.store'),
+            'modules' => $modules,
+            'permissionTypes' => $permissionTypes,
+            'permission' => null,
+            'module' => old('module', ''),
+            'actionVal' => old('action', '')
+        ]);
     }
 
     /**
@@ -67,7 +76,7 @@ class PermissionController extends Controller
      */
     public function store(Request $request)
     {
-        if (!auth()->guard('admin')->user()->can('create_permissions')) {
+        if (!auth()->guard('admin')->user()->can('permissions.create')) {
             abort(403, 'غير مصرح لك بإنشاء صلاحيات');
         }
 
@@ -92,7 +101,7 @@ class PermissionController extends Controller
             $name = Str::slug($request->module) . '.' . Str::slug($request->action);
 
             // التحقق من عدم تكرار الاسم
-            if (Permission::where('name', $name)->exists()) {
+            if (Permission::where('name', $name)->where('guard_name', 'admin')->exists()) {
                 return redirect()->back()
                     ->with('error', 'هذه الصلاحية موجودة بالفعل')
                     ->withInput();
@@ -121,20 +130,29 @@ class PermissionController extends Controller
      */
     public function edit($id)
     {
-        if (!auth()->guard('admin')->user()->can('edit_permissions')) {
+        if (!auth()->guard('admin')->user()->can('permissions.edit')) {
             abort(403, 'غير مصرح لك بتعديل الصلاحيات');
         }
 
         $permission = Permission::findOrFail($id);
-
         $modules = $this->getAvailableModules();
+        $permissionTypes = $this->getPermissionTypes();
 
         // استخراج الوحدة والإجراء من الاسم
         $nameParts = explode('.', $permission->name);
         $module = $nameParts[0] ?? '';
-        $action = $nameParts[1] ?? '';
+        $actionVal = $nameParts[1] ?? '';
 
-        return view('admin.permissions.edit', compact('permission', 'modules', 'module', 'action'));
+        return view('Admin.permissions.form', [
+            'title' => 'تعديل صلاحية',
+            'description' => 'تعديل بيانات الصلاحية',
+            'action' => route('admin.permissions.update', $permission),
+            'modules' => $modules,
+            'permissionTypes' => $permissionTypes,
+            'permission' => $permission,
+            'module' => old('module', $module),
+            'actionVal' => old('action', $actionVal)
+        ]);
     }
 
     /**
@@ -142,7 +160,7 @@ class PermissionController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if (!auth()->guard('admin')->user()->can('edit_permissions')) {
+        if (!auth()->guard('admin')->user()->can('permissions.edit')) {
             abort(403, 'غير مصرح لك بتعديل الصلاحيات');
         }
 
@@ -166,7 +184,7 @@ class PermissionController extends Controller
             $newName = Str::slug($request->module) . '.' . Str::slug($request->action);
 
             // التحقق من عدم تكرار الاسم (إذا تغير)
-            if ($newName !== $permission->name && Permission::where('name', $newName)->exists()) {
+            if ($newName !== $permission->name && Permission::where('name', $newName)->where('guard_name', 'admin')->exists()) {
                 return redirect()->back()
                     ->with('error', 'هذا الاسم مستخدم بالفعل لصلاحية أخرى')
                     ->withInput();
@@ -194,7 +212,7 @@ class PermissionController extends Controller
      */
     public function destroy($id)
     {
-        if (!auth()->guard('admin')->user()->can('delete_permissions')) {
+        if (!auth()->guard('admin')->user()->can('permissions.delete')) {
             abort(403, 'غير مصرح لك بحذف الصلاحيات');
         }
 
@@ -228,7 +246,7 @@ class PermissionController extends Controller
      */
     public function generateForModule(Request $request)
     {
-        if (!auth()->guard('admin')->user()->can('create_permissions')) {
+        if (!auth()->guard('admin')->user()->can('permissions.create')) {
             abort(403, 'غير مصرح لك بإنشاء صلاحيات');
         }
 
@@ -260,7 +278,7 @@ class PermissionController extends Controller
         foreach ($permissions as $permission) {
             $name = $module . '.' . $permission['action'];
 
-            if (!Permission::where('name', $name)->exists()) {
+            if (!Permission::where('name', $name)->where('guard_name', 'admin')->exists()) {
                 Permission::create([
                     'name' => $name,
                     'guard_name' => 'admin',
@@ -322,8 +340,9 @@ class PermissionController extends Controller
             'approve' => 'موافقة',
             'reject' => 'رفض',
             'assign' => 'تعيين',
-            'export' => 'تصدير',
-            'print' => 'طباعة'
+            'print' => 'طباعة',
+            'restore' => 'استعادة',
+            'force_delete' => 'حذف نهائي'
         ];
     }
 }

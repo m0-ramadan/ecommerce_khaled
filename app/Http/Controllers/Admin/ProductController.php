@@ -739,6 +739,25 @@ class ProductController extends Controller
             }
 
             /* =====================================================
+         | PRODUCT OPTIONS
+         ===================================================== */
+            $product->options()->delete(); // Delete existing options
+
+            if ($request->filled('product_options')) {
+                foreach ($request->product_options as $option) {
+                    if (!empty($option['option_name']) && !empty($option['option_value'])) {
+                        $product->options()->create([
+                            'option_name' => $option['option_name'],
+                            'option_value' => $option['option_value'],
+                            'additional_price' => $option['additional_price'] ?? 0,
+                            'is_required' => isset($option['is_required']) && $option['is_required'] == '1',
+                        ]);
+                    }
+                }
+            }
+
+
+            /* =====================================================
          | BASIC PRODUCT DATA
          ===================================================== */
 
