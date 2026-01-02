@@ -226,6 +226,25 @@ class CartController extends Controller
         return $this->success(null, 'تم تفريغ السلة');
     }
 
+    // رفع صورة للعنصر في السلة
+    public function uploadImage(Request $request)
+    {
+        $request->validate([
+            'image' => 'required|image|max:2048',
+            'cart_item_id' => 'required|exists:cart_items,id',
+        ]);
+
+        $cartItem = CartItem::findOrFail($request->input('cart_item_id'));
+        $this->authorizeCartItem($cartItem);
+
+        return DB::transaction(function () use ($request, $cartItem) {
+            $imagePath = $request->file('image')->store('cart_items', 'public');
+            $cartItem->update(['image_design' => $imagePath]);
+
+            return $this->success(new CartResource($cartItem->cart), 'تم رفع الصورة بنجاح');
+        });
+    }
+
     // --- Helpers ---
 
     private function authorizeCartItem(CartItem $cartItem)
