@@ -71,7 +71,31 @@
                    </li>
                </ul>
            </li>
+           <li class="menu-item ">
+               <a href="javascript:void(0);" class="menu-link menu-toggle">
+                   <i class="menu-icon tf-icons ti ti-shield-lock"></i>
+                   <div>الصلاحيات</div>
+               </a>
+               <ul class="menu-sub">
+                   <li class="menu-item ">
+                       <a href="{{ route('admin.roles.index') }}" class="menu-link">
+                           <div>الرتب</div>
+                       </a>
+                   </li>
 
+                   <li class="menu-item ">
+                       <a href="{{ route('admin.permissions.index') }}" class="menu-link">
+                           <div>الصلاحيات</div>
+                       </a>
+                   </li>
+
+                   <li class="menu-item ">
+                       <a href="{{ route('admin.roles.assign.index') }}" class="menu-link">
+                           <div>تخصيص الصلاحيات</div>
+                       </a>
+                   </li>
+               </ul>
+           </li>
 
            <li class="menu-item ">
                <a href="{{ route('admin.payment-methods.index') }}" class="menu-link">
@@ -150,25 +174,9 @@
                <ul class="menu-sub">
 
                    <li class="menu-item ">
-                       <a href="#/admin/about/policy-customer" class="menu-link">
-                           <i class="menu-icon ti ti-file-text"></i>
-                           <div> سياسة الخصوصية للعميل
-                           </div>
-                       </a>
-                   </li>
-
-                   <li class="menu-item ">
-                       <a href="#/admin/about/terms-customer" class="menu-link">
-                           <i class="menu-icon ti ti-info-circle"></i>
-                           <div> من نحن للعميل
-                           </div>
-                       </a>
-                   </li>
-
-                   <li class="menu-item ">
-                       <a href="#/admin/about/aboutus-customer" class="menu-link">
+                       <a href="{{ route('admin.static-pages.index') }}" class="menu-link">
                            <i class="menu-icon ti ti-file-description"></i>
-                           <div> الشروط والأحكام للعميل
+                           <div> الصفحات الثابته
                            </div>
                        </a>
                    </li>
@@ -211,7 +219,7 @@
                            <div>واجهة الـ API</div>
                        </a>
                    </li> --}}
-{{-- 
+                   {{-- 
                    <li class="menu-item">
                        <a href="#/admin/settings/pages/Orders" class="menu-link">
                            <div>الطلبات</div>

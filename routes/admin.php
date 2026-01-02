@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\FaqController;
+use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\ErrorController;
@@ -23,6 +24,8 @@ use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\Admin\ContactUsController;
 use App\Http\Controllers\Admin\SubscribeController;
 use App\Http\Controllers\Admin\BannerItemController;
+use App\Http\Controllers\Admin\PermissionController;
+use App\Http\Controllers\Admin\StaticPageController;
 use App\Http\Controllers\Admin\PermissionsController;
 use App\Http\Controllers\Admin\SocialMediaController;
 use App\Http\Controllers\Admin\PaymentMethodController;
@@ -232,6 +235,41 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
         Route::get('/{order}/print', [OrderController::class, 'print'])->name('print');
         Route::get('/export', [OrderController::class, 'export'])->name('export');
     });
+
+    // Routes for Roles and Permissions
+    Route::prefix('roles')->name('roles.')->group(function () {
+        Route::get('/', [RoleController::class, 'index'])->name('index');
+        Route::get('/create', [RoleController::class, 'create'])->name('create');
+        Route::post('/', [RoleController::class, 'store'])->name('store');
+        Route::get('/{role}', [RoleController::class, 'show'])->name('show');
+        Route::get('/{role}/edit', [RoleController::class, 'edit'])->name('edit');
+        Route::put('/{role}', [RoleController::class, 'update'])->name('update');
+        Route::delete('/{role}', [RoleController::class, 'destroy'])->name('destroy');
+        Route::get('/{role}/permissions', [RoleController::class, 'permissions'])->name('permissions');
+        Route::post('/{role}/permissions', [RoleController::class, 'syncPermissions'])->name('permissions.sync');
+    });
+
+    Route::prefix('permissions')->name('permissions.')->group(function () {
+        Route::get('/', [PermissionController::class, 'index'])->name('index');
+        Route::get('/create', [PermissionController::class, 'create'])->name('create');
+        Route::post('/', [PermissionController::class, 'store'])->name('store');
+        Route::post('/generate', [PermissionController::class, 'generateForModule'])->name('generate');
+        Route::get('/{permission}/edit', [PermissionController::class, 'edit'])->name('edit');
+        Route::put('/{permission}', [PermissionController::class, 'update'])->name('update');
+        Route::delete('/{permission}', [PermissionController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::prefix('assign-roles')->name('roles.')->group(function () {
+        Route::get('/', [RoleController::class, 'assignIndex'])->name('assign.index');
+        Route::post('/', [RoleController::class, 'assignRoles'])->name('assign.store');
+    });
+    Route::prefix('static-pages')->name('static-pages.')->group(function () {
+        Route::resource('/', StaticPageController::class);
+        Route::post('/bulk-action', [StaticPageController::class, 'bulkAction'])
+            ->name('bulk-action');
+    });
+
+
     Route::get('order/statistics', [OrderController::class, 'statistics'])->name('orders.statistics');
 });
 
