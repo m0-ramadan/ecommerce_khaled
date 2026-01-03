@@ -32,13 +32,13 @@ class ArticleCommentController extends Controller
     public function store(StoreArticleCommentRequest $request)
     {
         $article = Article::findOrFail($request->article_id);
-
+        $user = auth()->user();
         $comment = ArticleComment::create([
             'article_id' => $article->id,
-            'user_id' => auth()->id(),
+            'user_id' => $user?->id,
             'parent_id' => $request->parent_id,
-            'name' => $request->name,
-            'email' => $request->email,
+            'name' => $request->name ??  ($user ? $user->name : null),
+            'email' => $request->email ?? ($user ? $user->email : null),
             'content' => $request->content,
             'is_approved' => auth()->check() // إذا كان مسجل دخول يوافق تلقائياً
         ]);
