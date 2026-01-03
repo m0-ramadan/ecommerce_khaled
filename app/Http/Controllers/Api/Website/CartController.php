@@ -354,8 +354,8 @@ class CartController extends Controller
         // ============================
         // 🟢 base unit price
         // ============================
-        $tier = $product->pricingTiers()
-            ->where('quantity', '<=', $quantity)
+        $tier = $product->sizeTiers()
+            ->where('quantity', '<=', $quantity)->where('size_id', $request->size_id)
             ->orderByDesc('quantity')
             ->first();
         $unitPrice = $tier?->price_per_unit ?? $product->base_price ?? 0;
@@ -368,47 +368,45 @@ class CartController extends Controller
         if ($request->filled('selected_options')) {
             foreach ($request->selected_options as $optionData) {
 
-                // بيانات من الـ request
                 $optionName = trim($optionData['option_name'] ?? '');
-                $productId  = $product->id;
 
-                // جلب السعر من قاعدة البيانات (product_id + name)
-                $option = ProductOptions::where('product_id', $productId)
-                    ->where('option_name', $optionName)
+                // 🟡 خدمة التصميم → زي ما هي
+                if (mb_strpos($optionName, 'خدمة تصميم') !== false) {
+                    $oneTimePrice += (float) ($optionData['additional_price'] ?? 0);
+                    continue;
+                }
+
+                // 🟢 باقي الأوبشنز → بحث مرن بالاسم
+                $option = ProductOptions::where('product_id', $product->id)
+                    ->where('option_name', 'LIKE', '%' . $optionName . '%')
                     ->first();
 
                 if (!$option) {
-                    continue; // لو مش موجود
+                    continue;
                 }
 
-                // 🟡 خدمة تصميم → مرة واحدة فقط
-                if ($option->is_one_time) {
-                    $oneTimePrice += $option->additional_price;
-                }
-                // 🟢 أي خيار تاني → per unit
-                else {
-                    $unitPrice += $option->additional_price;
-                }
+                $unitPrice += $option->additional_price;
             }
         }
+
+
 
         // color
         if ($request->filled('color_id')) {
             $color = $product->colors()->find($request->color_id);
             $unitPrice += $color?->additional_price ?? 0;
         }
+        // // size (per unit)
+        // if ($request->filled('size_id')) {
+        //     $size = $product->sizes()->find($request->size_id);
 
-        // size (per unit)
-        if ($request->filled('size_id')) {
-            $size = $product->sizes()->find($request->size_id);
+        //     $sizeTier = $size?->productTiers()
+        //         ->where('quantity', '<=', $quantity)
+        //         ->orderByDesc('quantity')
+        //         ->first();
 
-            $sizeTier = $size?->productTiers()
-                ->where('quantity', '<=', $quantity)
-                ->orderByDesc('quantity')
-                ->first();
-
-            $unitPrice += $sizeTier?->price_per_unit ?? 0;
-        }
+        //     $unitPrice += $sizeTier?->price_per_unit ?? 0;
+        // }
 
         // printing method (per unit)
         if ($request->filled('printing_method_id')) {
