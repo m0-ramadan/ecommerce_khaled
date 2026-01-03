@@ -26,4 +26,9 @@ class Tag extends Model
             $tag->slug = \Illuminate\Support\Str::slug($tag->name);
         });
     }
+
+    public function articles()
+    {
+        return $this->belongsToMany(Article::class, 'article_tags');
+    }
 }

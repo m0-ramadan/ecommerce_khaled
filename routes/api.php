@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\Api\Website\AdsController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\Website\AdsController;
 use App\Http\Controllers\Api\Website\FaqController;
 use App\Http\Controllers\Api\Website\AuthController;
 use App\Http\Controllers\Api\Website\CartController;
@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\Website\HomeController;
 use App\Http\Controllers\Api\Website\OrderController;
 use App\Http\Controllers\Api\Website\BannerController;
 use App\Http\Controllers\Api\Website\ReviewController;
+use App\Http\Controllers\Api\Website\ArticleController;
 use App\Http\Controllers\Api\Website\ProductController;
 use App\Http\Controllers\Api\Website\CategoryController;
 use App\Http\Controllers\Api\Website\FavoriteController;
@@ -16,6 +17,8 @@ use App\Http\Controllers\Api\Website\ContactUsController;
 use App\Http\Controllers\Api\Website\SocialMediaController;
 use App\Http\Controllers\Api\Website\StaticPagesController;
 use App\Http\Controllers\Api\Website\UserAddressController;
+use App\Http\Controllers\Api\Website\ArticleCommentController;
+use App\Http\Controllers\Api\Website\ArticleCategoryController;
 use App\Http\Controllers\Api\Website\CustomizationOptionsController;
 
 
@@ -119,4 +122,24 @@ Route::prefix('v1')->group(function () {
     Route::get('trace/{codeOrder}', [OrderController::class, 'traceOrder'])->name('trace');
 
     Route::post('/paymob/webhook', [OrderController::class, 'webhook'])->withoutMiddleware(['throttle:60,1']);
+
+    // مقالات
+    Route::prefix('articles')->group(function () {
+        Route::get('/', [ArticleController::class, 'index']);
+        Route::get('/featured', [ArticleController::class, 'featured']);
+        Route::get('/popular', [ArticleController::class, 'popular']);
+        Route::get('/{slug}', [ArticleController::class, 'show']);
+        Route::get('/{slug}/related', [ArticleController::class, 'related']);
+
+        // التعليقات
+        Route::get('/{article}/comments', [ArticleCommentController::class, 'index']);
+        Route::post('/comments', [ArticleCommentController::class, 'store']);
+    });
+
+    // أقسام المقالات
+    Route::prefix('article-categories')->group(function () {
+        Route::get('/', [ArticleCategoryController::class, 'index']);
+        Route::get('/with-counts', [ArticleCategoryController::class, 'withCounts']);
+        Route::get('/{slug}', [ArticleCategoryController::class, 'show']);
+    });
 });
