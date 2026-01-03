@@ -97,7 +97,7 @@ class OrderController extends Controller
                 'discount_amount'   => $discountAmount,
                 'tax_amount'        => 0,
                 'total_amount'      => $cart->total - $discountAmount,
-                'payment_method'    => $request->payment_method ,
+                'payment_method'    => $request->payment_method,
                 'status'            => 'pending',
                 'notes'             => $request->notes,
                 'coupon_id'         => $coupon?->id
@@ -241,7 +241,7 @@ class OrderController extends Controller
      */
     public function applyCoupon(ApplyCouponRequest $request)
     {
-        $user = auth('sanctum')->user();
+        $user = auth()->user();
         $cart = $this->getCurrentCart();
 
         if ($cart->items()->count() === 0) {
@@ -315,26 +315,26 @@ class OrderController extends Controller
         return response('OK', 200);
     }
 
-public function paymentMethods(Request $request)
-{
+    public function paymentMethods(Request $request)
+    {
 
 
-    $isPayment = filter_var(
-        $request->input('is_payment'),
-        FILTER_VALIDATE_BOOLEAN,
-        FILTER_NULL_ON_FAILURE
-    );
+        $isPayment = filter_var(
+            $request->input('is_payment'),
+            FILTER_VALIDATE_BOOLEAN,
+            FILTER_NULL_ON_FAILURE
+        );
 
-    $paymentMethods = PaymentMethod::query()
-        ->where('is_active', true)
-        ->where('is_payment', $isPayment)
-        ->get();
+        $paymentMethods = PaymentMethod::query()
+            ->where('is_active', true)
+            ->where('is_payment', $isPayment)
+            ->get();
 
-    return $this->successResponse(
-        PaymentMethodResource::collection($paymentMethods),
-        'تم جلب طرق الدفع بنجاح'
-    );
-}
+        return $this->successResponse(
+            PaymentMethodResource::collection($paymentMethods),
+            'تم جلب طرق الدفع بنجاح'
+        );
+    }
 
 
     public function paymentStatus(Request $request)
