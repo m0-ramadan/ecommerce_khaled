@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Models\DesignService;
 use App\Models\PrintLocation;
 use App\Models\PrintingMethod;
+use App\Models\ProductOptions;
 use App\Traits\ApiResponseTrait;
 use App\Models\EmbroiderLocation;
 use Illuminate\Support\Facades\DB;
@@ -263,90 +264,91 @@ class CartController extends Controller
      * @param Product|null $product
      * @return array ['price_per_unit' => float, 'line_total' => float]
      */
+
+
     // private function calculateItemPrice(Request $request, Product $product = null): array
     // {
-    //     // احصل على الـ product من ال-request إن لم يمرار
-    //     $product = $product ?? ($request->product ?? Product::find($request->product_id));
-
+    //     $product = $product ?? Product::findOrFail($request->product_id);
     //     $quantity = (int) ($request->quantity ?? 1);
 
-    //     // بداية السعر: استعمل الـ tier إن وجد وإلا الـ base_price
+    //     // ============================
+    //     // 🟢 base unit price
+    //     // ============================
     //     $tier = $product->pricingTiers()
     //         ->where('quantity', '<=', $quantity)
     //         ->orderByDesc('quantity')
     //         ->first();
 
-    //     $price = $tier?->price_per_unit ?? $product->base_price ?? 0;
+    //     $unitPrice = $tier?->price_per_unit ?? $product->base_price ?? 0;
 
     //     // ============================
-    //     // ✅ selected options price
+    //     // 🟢 per-unit additions
     //     // ============================
+
+    //     // selected options
     //     if ($request->filled('selected_options')) {
     //         foreach ($request->selected_options as $option) {
-    //             if (isset($option['option_additional_price'])) {
-    //                 $price += (float) $option['option_additional_price'];
-    //             }
+    //             $unitPrice += (float) ($option['option_additional_price'] ?? 0);
     //         }
     //     }
 
-    //     // إضافة أسعار المقاس واللون لو متوفرة
+    //     // color
     //     if ($request->filled('color_id')) {
-    //         $color = $product->colors()->where('colors.id', $request->color_id)->first();
-    //         $price += $color?->additional_price ?? 0;
+    //         $color = $product->colors()->find($request->color_id);
+    //         $unitPrice += $color?->additional_price ?? 0;
     //     }
-    //     if ($request->filled('size_id')) {
-    //         $size = $product->sizes()
-    //             ->where('id', $request->size_id)
-    //             ->first();
 
-    //         $tier = $size?->productTiers()
+    //     // size (per unit)
+    //     if ($request->filled('size_id')) {
+    //         $size = $product->sizes()->find($request->size_id);
+
+    //         $sizeTier = $size?->productTiers()
     //             ->where('quantity', '<=', $quantity)
     //             ->orderByDesc('quantity')
     //             ->first();
 
-    //         $price += ($tier?->price_per_unit ?? 0) * $quantity;
+    //         $unitPrice += $sizeTier?->price_per_unit ?? 0;
     //     }
 
-    //     // مواقع الطباعة
-    //     if ($request->filled('print_locations')) {
-    //         // إذا كانت ids
-    //         $ids = $request->print_locations;
-    //         $price += PrintLocation::whereIn('id', $ids)->sum('additional_price');
-    //     }
-
-    //     if ($product->price) {
-    //         $price += $product->getFinalPriceAttribute();
-    //     }
-
-    //     // مواقع التطريز
-    //     if ($request->filled('embroider_locations')) {
-    //         $ids = $request->embroider_locations;
-    //         $price += EmbroiderLocation::whereIn('id', $ids)->sum('additional_price');
-    //     }
-
-    //     // طريقة الطباعة
+    //     // printing method
     //     if ($request->filled('printing_method_id')) {
     //         $method = PrintingMethod::find($request->printing_method_id);
-    //         $price += $method?->base_price ?? 0;
+    //         $unitPrice += $method?->base_price ?? 0;
     //     }
 
-    //     // خدمة التصميم
+    //     // ============================
+    //     // 🟡 one-time additions
+    //     // ============================
+    //     $oneTimePrice = 0;
+
+    //     if ($request->filled('print_locations')) {
+    //         $oneTimePrice += PrintLocation::whereIn('id', $request->print_locations)
+    //             ->sum('additional_price');
+    //     }
+
+    //     if ($request->filled('embroider_locations')) {
+    //         $oneTimePrice += EmbroiderLocation::whereIn('id', $request->embroider_locations)
+    //             ->sum('additional_price');
+    //     }
+
     //     if ($request->filled('design_service_id')) {
     //         $service = DesignService::find($request->design_service_id);
-    //         $price += $service?->price ?? 0;
+    //         $oneTimePrice += $service?->price ?? 0;
     //     }
 
-    //     $lineTotal = $price * $quantity;
+    //     // ============================
+    //     // 🧮 totals
+    //     // ============================
+    //     $lineTotal = ($unitPrice * $quantity) + $oneTimePrice;
 
     //     return [
-    //         'price_per_unit' => (float) $price,
-    //         'line_total' => (float) $lineTotal,
+    //         'price_per_unit' => round($unitPrice, 2),
+    //         'line_total'     => round($lineTotal, 2),
     //     ];
     // }
-
     private function calculateItemPrice(Request $request, Product $product = null): array
     {
-        $product = $product ?? Product::findOrFail($request->product_id);
+        $product  = $product ?? Product::findOrFail($request->product_id);
         $quantity = (int) ($request->quantity ?? 1);
 
         // ============================
@@ -356,17 +358,37 @@ class CartController extends Controller
             ->where('quantity', '<=', $quantity)
             ->orderByDesc('quantity')
             ->first();
-
         $unitPrice = $tier?->price_per_unit ?? $product->base_price ?? 0;
 
         // ============================
         // 🟢 per-unit additions
         // ============================
+        $oneTimePrice = 0;
 
-        // selected options
         if ($request->filled('selected_options')) {
-            foreach ($request->selected_options as $option) {
-                $unitPrice += (float) ($option['option_additional_price'] ?? 0);
+            foreach ($request->selected_options as $optionData) {
+
+                // بيانات من الـ request
+                $optionName = trim($optionData['option_name'] ?? '');
+                $productId  = $product->id;
+
+                // جلب السعر من قاعدة البيانات (product_id + name)
+                $option = ProductOptions::where('product_id', $productId)
+                    ->where('option_name', $optionName)
+                    ->first();
+
+                if (!$option) {
+                    continue; // لو مش موجود
+                }
+
+                // 🟡 خدمة تصميم → مرة واحدة فقط
+                if ($option->is_one_time) {
+                    $oneTimePrice += $option->additional_price;
+                }
+                // 🟢 أي خيار تاني → per unit
+                else {
+                    $unitPrice += $option->additional_price;
+                }
             }
         }
 
@@ -388,7 +410,7 @@ class CartController extends Controller
             $unitPrice += $sizeTier?->price_per_unit ?? 0;
         }
 
-        // printing method
+        // printing method (per unit)
         if ($request->filled('printing_method_id')) {
             $method = PrintingMethod::find($request->printing_method_id);
             $unitPrice += $method?->base_price ?? 0;
@@ -397,8 +419,6 @@ class CartController extends Controller
         // ============================
         // 🟡 one-time additions
         // ============================
-        $oneTimePrice = 0;
-
         if ($request->filled('print_locations')) {
             $oneTimePrice += PrintLocation::whereIn('id', $request->print_locations)
                 ->sum('additional_price');
@@ -407,11 +427,6 @@ class CartController extends Controller
         if ($request->filled('embroider_locations')) {
             $oneTimePrice += EmbroiderLocation::whereIn('id', $request->embroider_locations)
                 ->sum('additional_price');
-        }
-
-        if ($request->filled('design_service_id')) {
-            $service = DesignService::find($request->design_service_id);
-            $oneTimePrice += $service?->price ?? 0;
         }
 
         // ============================
