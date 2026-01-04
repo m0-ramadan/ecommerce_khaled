@@ -394,7 +394,7 @@
                                 
                                 <div class="alert alert-info mt-3" bis_skin_checked="1">
                                     <i class="fas fa-info-circle me-2"></i>
-                                    <strong>ملاحظة:</strong> الصور المسموح بها: JPEG, PNG, JPG, GIF, SVG. الحد الأقصى للحجم: 2 ميجابايت.
+                                    <strong>ملاحظة:</strong> الصور المسموح بها: JPEG, PNG, JPG, GIF, SVG, WEBP. الحد الأقصى للحجم: 2 ميجابايت.
                                 </div>
                             </div>
 

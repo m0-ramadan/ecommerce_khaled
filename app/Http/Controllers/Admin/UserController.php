@@ -69,7 +69,7 @@ class UserController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'phone' => 'nullable|string|max:20|unique:users',
             'password' => 'required|string|min:8|confirmed',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
         if ($request->hasFile('image')) {
@@ -125,7 +125,7 @@ class UserController extends Controller
                 Rule::unique('users')->ignore($user->id),
             ],
             'password' => 'nullable|string|min:8|confirmed',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
         if ($request->hasFile('image')) {

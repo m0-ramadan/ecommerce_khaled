@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Spatie\ImageOptimizer\OptimizerChainFactory;
 
 class CategoryController extends Controller
 {
@@ -364,8 +365,8 @@ class CategoryController extends Controller
             'parent_id' => 'nullable|exists:categories,id',
             'order' => 'nullable|integer|min:0',
             'status_id' => 'required|integer|exists:statuses,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'sub_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
+            'sub_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048'
         ]);
     }
 
@@ -404,17 +405,38 @@ class CategoryController extends Controller
      * @param  string|null  $oldImage
      * @return string
      */
-    private function uploadImage($file, string $folder, ?string $oldImage = null)
-    {
-        // Delete old image if exists
-        if ($oldImage && Storage::disk('public')->exists($oldImage)) {
-            Storage::disk('public')->delete($oldImage);
-        }
+    // private function uploadImage($file, string $folder, ?string $oldImage = null)
+    // {
+    //     // Delete old image if exists
+    //     if ($oldImage && Storage::disk('public')->exists($oldImage)) {
+    //         Storage::disk('public')->delete($oldImage);
+    //     }
 
-        $path = $file->store($folder, 'public');
-        return $path;
+    //     $path = $file->store($folder, 'public');
+    //     return $path;
+    // }
+private function uploadImage($file,$directory,?string $oldImage = null) {
+
+    // Delete old image
+    if ($oldImage && Storage::disk('public')->exists($oldImage)) {
+        Storage::disk('public')->delete($oldImage);
     }
 
+    // Generate webp filename
+    $filename = Str::uuid() . '.webp';
+    $path = $directory . '/' . $filename;
+
+    // Store file
+    Storage::disk('public')->put($path, file_get_contents($file));
+
+    // Optimize + convert
+    $optimizer = OptimizerChainFactory::create();
+    $optimizer->optimize(
+        Storage::disk('public')->path($path)
+    );
+
+    return $path;
+}
     /**
      * Delete category images.
      *

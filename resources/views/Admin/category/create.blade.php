@@ -436,7 +436,7 @@
                                 
                                 <div class="alert alert-info mt-3" bis_skin_checked="1">
                                     <i class="fas fa-info-circle me-2"></i>
-                                    <strong>ملاحظة:</strong> الصور المسموح بها: JPEG, PNG, JPG, GIF, SVG.
+                                    <strong>ملاحظة:</strong> الصور المسموح بها: JPEG, PNG, JPG, GIF, SVG, WEBP.
                                 </div>
                             </div>
 
@@ -724,7 +724,7 @@
                 Swal.fire({
                     icon: 'error',
                     title: 'نوع ملف غير مدعوم',
-                    text: 'الرجاء اختيار صورة من نوع: JPEG, PNG, JPG, GIF, SVG',
+                    text: 'الرجاء اختيار صورة من نوع: JPEG, PNG, JPG, GIF, SVG, WEBP',
                     confirmButtonText: 'حسناً'
                 });
                 input.value = ''; // Clear the file input
