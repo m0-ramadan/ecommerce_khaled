@@ -23,6 +23,7 @@ class CartItemResource extends JsonResource
             'selected_options'   => $this->selected_options,
             'design_service'     => $this->whenLoaded('designService', fn() => $this->designService?->name),
             'material'           => $this->material_id ? MaterialResource::make($this->material) : null,
+            'material_id'        => $this->material_id,
             'quantity'           => $this->quantity,
             'is_sample'          => $this->is_sample,
             'price_per_unit'     => $this->price_per_unit,
