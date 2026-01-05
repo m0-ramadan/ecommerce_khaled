@@ -157,15 +157,19 @@ class CartController extends Controller
             $selectedOptionsJson = isset($data['selected_options']) ? json_encode($data['selected_options'], JSON_UNESCAPED_UNICODE) : $cartItem->selected_options;
             $printingMethodId = null;
 
+            $printingMethodId = $cartItem->printing_method_id;
+
             if ($request->filled('printing_method_id')) {
-                $valid = Product::find($request->product_id)->printingMethods()
-                    ->where('printing_method_id', $request->printing_method_id)
+                $valid = $cartItem->product
+                    ->printingMethods()
+                    ->where('printing_methods.id', $request->printing_method_id)
                     ->exists();
 
                 if ($valid) {
-                    $printingMethodId = $request->printing_method_id;
+                    $printingMethodId = (int) $request->printing_method_id;
                 }
             }
+
             // إعادة توليد hash_key لأن التخصيصات قد تتغير
             $hashAttributes = [
                 'product_id' => $cartItem->product_id,
