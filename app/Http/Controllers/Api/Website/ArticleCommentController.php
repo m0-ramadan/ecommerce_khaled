@@ -40,7 +40,7 @@ class ArticleCommentController extends Controller
             'name' => $request->name ??  ($user ? $user->name : null),
             'email' => $request->email ?? ($user ? $user->email : null),
             'content' => $request->content,
-            'is_approved' => auth()->check() // إذا كان مسجل دخول يوافق تلقائياً
+            'is_approved' => auth()->guard('web')->check() // إذا كان مسجل دخول يوافق تلقائياً
         ]);
 
         return $this->success(new ArticleCommentResource($comment), 'تم إضافة التعليق بنجاح وسيظهر بعد المراجعة');
