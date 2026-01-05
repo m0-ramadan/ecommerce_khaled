@@ -27,7 +27,7 @@ class CartItemResource extends JsonResource
             'quantity'           => $this->quantity,
             'is_sample'          => $this->is_sample,
             'price_per_unit'     => $this->price_per_unit,
-            'image_design'       => $this->image_design ? asset('cart_items/' . $this->image_design) : null,
+            'image_design'       => $this->image_design ? asset('storage/' . $this->image_design) : null,
             'line_total'         => $this->line_total,
         ];
     }
