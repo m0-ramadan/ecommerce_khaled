@@ -22,6 +22,7 @@ class CartItemResource extends JsonResource
             'embroider_locations' => $this->embroider_locations,
             'selected_options'   => $this->selected_options,
             'design_service'     => $this->whenLoaded('designService', fn() => $this->designService?->name),
+            'material'           => $this->whenLoaded('material', fn() => $this->material?->name),
             'quantity'           => $this->quantity,
             'is_sample'          => $this->is_sample,
             'price_per_unit'     => $this->price_per_unit,

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Website;
 use App\Models\Cart;
 use App\Models\Product;
 use App\Models\CartItem;
+use App\Models\Material;
 use Illuminate\Http\Request;
 use App\Models\DesignService;
 use App\Models\PrintLocation;
@@ -16,8 +17,8 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Website\CartResource;
 use App\Http\Requests\Website\AddToCartRequest;
-use App\Http\Requests\Website\UpdateCartItemRequest;
 use App\Http\Resources\Website\CartItemResource;
+use App\Http\Requests\Website\UpdateCartItemRequest;
 
 class CartController extends Controller
 {
@@ -60,6 +61,7 @@ class CartController extends Controller
                 'product_id' => (int) $request->product_id,
                 'size_id' => $request->size_id ? (int) $request->size_id : null,
                 'color_id' => $request->color_id ? (int) $request->color_id : null,
+                'material_id' => $request->material_id ? (int) $request->material_id : null,
                 'printing_method_id' => $request->printing_method_id ? (int) $request->printing_method_id : null,
                 'print_locations' => $request->print_locations ?? [],
                 'embroider_locations' => $request->embroider_locations ?? [],
@@ -112,6 +114,7 @@ class CartController extends Controller
                     'line_total' => $priceData['line_total'],
                     'is_sample' => $request->boolean('is_sample', false),
                     'hash_key' => $hashKey,
+                    'material_id' => $request->input('quantity_id') ? (int) $request->input('material_id') : null,
                 ]);
             }
 
@@ -140,7 +143,8 @@ class CartController extends Controller
                 'is_sample',
                 'note',
                 'quantity_id',
-                'image_design'
+                'image_design',
+                'material_id'
             ]);
 
             // نحسب السعر بناء على التخصيص الجديد — نمرر المنتج الحالي كـ param اختياري
@@ -180,6 +184,7 @@ class CartController extends Controller
                 'embroider_locations' => isset($data['embroider_locations']) ? $data['embroider_locations'] : json_decode($cartItem->embroider_locations, true) ?? [],
                 'selected_options' => isset($data['selected_options']) ? $data['selected_options'] : json_decode($cartItem->selected_options, true) ?? [],
                 'design_service_id' => $data['design_service_id'] ?? $cartItem->design_service_id,
+                'material_id' => $data['material_id'] ?? $cartItem->material_id,
                 'is_sample' => isset($data['is_sample']) ? (bool)$data['is_sample'] : (bool)$cartItem->is_sample,
             ];
             $newHashKey = md5(json_encode($hashAttributes, JSON_UNESCAPED_UNICODE));
@@ -201,6 +206,7 @@ class CartController extends Controller
                 'price_per_unit' => $priceData['price_per_unit'],
                 'line_total' => $priceData['line_total'],
                 'hash_key' => $newHashKey,
+                'material_id' => $data['material_id'] ?? $cartItem->material_id,
             ]);
 
             // إعادة حساب السلة
@@ -430,6 +436,11 @@ class CartController extends Controller
         if ($request->filled('embroider_locations')) {
             $oneTimePrice += EmbroiderLocation::whereIn('id', $request->embroider_locations)
                 ->sum('additional_price');
+        }
+
+        if ($request->filled('material_id')) {
+            $material = DB::table('material_product')->where('product_id', $product->id)->where('material_id', $request->material_id)->first();
+            $unitPrice += $material?->additional_price ?? 0;
         }
 
         // ============================
