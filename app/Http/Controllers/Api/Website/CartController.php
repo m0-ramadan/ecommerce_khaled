@@ -117,7 +117,7 @@ class CartController extends Controller
 
             $this->recalculateCart($cart);
 
-            return $this->success(new CartResource($cart), 'تمت الإضافة إلى السلة');
+            return $this->success(new CartItemResource($cartItem), 'تمت الإضافة إلى السلة');
         });
     }
 
