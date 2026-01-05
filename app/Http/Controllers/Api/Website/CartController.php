@@ -17,6 +17,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Website\CartResource;
 use App\Http\Requests\Website\AddToCartRequest;
 use App\Http\Requests\Website\UpdateCartItemRequest;
+use App\Http\Resources\Website\CartItemResource;
 
 class CartController extends Controller
 {
@@ -242,7 +243,7 @@ class CartController extends Controller
             $imagePath = $request->file('image')->store('cart_items', 'public');
             $cartItem->update(['image_design' => $imagePath]);
 
-            return $this->success(new CartResource($cartItem->cart), 'تم رفع الصورة بنجاح');
+            return $this->success(new CartItemResource($cartItem), 'تم رفع الصورة بنجاح');
         });
     }
 

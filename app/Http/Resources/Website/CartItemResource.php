@@ -19,12 +19,13 @@ class CartItemResource extends JsonResource
             ]),
             'printing_method'    => $this->whenLoaded('printingMethod', fn() => $this->printingMethod?->name),
             'print_locations'    => $this->print_locations,
-            'embroider_locations'=> $this->embroider_locations,
+            'embroider_locations' => $this->embroider_locations,
             'selected_options'   => $this->selected_options,
             'design_service'     => $this->whenLoaded('designService', fn() => $this->designService?->name),
             'quantity'           => $this->quantity,
             'is_sample'          => $this->is_sample,
             'price_per_unit'     => $this->price_per_unit,
+            'image_design'       => $this->image_design ? asset('cart_items/' . $this->image_design) : null,
             'line_total'         => $this->line_total,
         ];
     }
