@@ -114,7 +114,7 @@ class CartController extends Controller
                     'line_total' => $priceData['line_total'],
                     'is_sample' => $request->boolean('is_sample', false),
                     'hash_key' => $hashKey,
-                    'material_id' => $request->input('quantity_id') ? (int) $request->input('material_id') : null,
+                    'material_id' => $request->input('material_id') ? (int) $request->input('material_id') : null,
                 ]);
             }
 

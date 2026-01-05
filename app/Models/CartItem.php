@@ -59,6 +59,6 @@ class CartItem extends Model
     }
     public function material()
     {
-        return $this->belongsTo(Material::class);
+        return $this->belongsTo(Material::class, 'material_id');
     }
 }
