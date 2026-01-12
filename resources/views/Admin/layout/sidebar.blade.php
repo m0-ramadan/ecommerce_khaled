@@ -148,6 +148,12 @@
                    <div>الكوبونات</div>
                </a>
            </li>
+           <li class="menu-item">
+               <a href="{{ route('admin.articles.index') }}" class="menu-link">
+                   <i class="menu-icon ti ti-article"></i>
+                   <div>المقالات</div>
+               </a>
+           </li>
 
 
            <li class="menu-item ">

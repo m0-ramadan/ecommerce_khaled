@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\CouponController;
 use App\Http\Controllers\Admin\RegionController;
 use App\Http\Controllers\Admin\SliderController;
+use App\Http\Controllers\Admin\ArticleController;
 use App\Http\Controllers\Admin\ContactController;
 use App\Http\Controllers\Admin\CountryController;
 use App\Http\Controllers\Admin\ManagerController;
@@ -258,6 +259,17 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
         Route::put('/{permission}', [PermissionController::class, 'update'])->name('update');
         Route::delete('/{permission}', [PermissionController::class, 'destroy'])->name('destroy');
     });
+
+    Route::prefix('articles')->name('articles.')->group(function () {
+        // مقالات
+        Route::resource('/', ArticleController::class);
+        Route::post('/bulk-actions', [ArticleController::class, 'bulkActions'])->name('bulk-actions');
+        Route::patch('/{article}/toggle-status', [ArticleController::class, 'toggleStatus'])->name('toggle-status');
+        Route::patch('/{article}/toggle-featured', [ArticleController::class, 'toggleFeatured'])->name('toggle-featured');
+    });
+
+    // إحصائيات المقالات
+    Route::get('/articles/statistics', [ArticleController::class, 'statistics'])->name('articles.statistics');
 
     Route::prefix('assign-roles')->name('roles.')->group(function () {
         Route::get('/', [RoleController::class, 'assignIndex'])->name('assign.index');
