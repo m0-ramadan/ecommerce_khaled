@@ -14,10 +14,20 @@ class Kernel extends ConsoleKernel
     /**
      * Define the application's command schedule.
      */
-    protected function schedule(Schedule $schedule): void
-    {
-        // $schedule->command('inspire')->hourly();
-    }
+protected function schedule(Schedule $schedule)
+{
+    // تحديث تتبع الشحنات كل 30 دقيقة
+    $schedule->command('oto:v2-sync tracking')->everyThirtyMinutes();
+    
+    // مزامنة المدن أسبوعياً
+    $schedule->command('oto:v2-sync cities')->weekly();
+    
+    // إنشاء الشحنات للطلاب الجديدة كل ساعة
+    $schedule->command('oto:v2-sync shipments')->hourly();
+    
+    // تنظيف الكاش اليومي
+    $schedule->command('cache:clear')->daily();
+}
 
     /**
      * Register the commands for the application.

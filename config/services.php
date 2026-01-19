@@ -13,7 +13,24 @@ return [
     | a conventional file to locate the various service credentials.
     |
     */
-
+ 
+    'oto' => [
+        'base_url' => env('OTO_API_URL', 'https://api.tryoto.com'),
+        'api_key' => env('OTO_API_KEY'),
+     //   'company_code' => env('OTO_COMPANY_CODE'),
+        'brand_id' => env('OTO_BRAND_ID'),
+        'sender_name' => env('OTO_SENDER_NAME', 'متجر برنتس'),
+        'sender_phone' => env('OTO_SENDER_PHONE'),
+        'sender_email' => env('OTO_SENDER_EMAIL'),
+        'sender_city' => env('OTO_SENDER_CITY', 'Riyadh'),
+        'sender_district' => env('OTO_SENDER_DISTRICT', 'Al Sulimaniyah'),
+        'sender_address' => env('OTO_SENDER_ADDRESS'),
+        'sender_postal_code' => env('OTO_SENDER_POSTAL_CODE'),
+        'order_prefix' => env('OTO_ORDER_PREFIX', 'OTO'),
+        'timeout' => env('OTO_TIMEOUT', 60),
+            'token' => env('OTO_API_KEY'),
+        'cache_ttl' => env('OTO_CACHE_TTL', 1440), // 24 ساعة بالدقائق
+    ],
     'mailgun' => [
         'domain' => env('MAILGUN_DOMAIN'),
         'secret' => env('MAILGUN_SECRET'),

@@ -3,12 +3,14 @@
 namespace App\Exceptions;
 
 use Throwable;
-use Illuminate\Auth\AuthenticationException;
+use App\Traits\ApiResponseTrait;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use App\Traits\ApiResponseTrait;
 
 class Handler extends ExceptionHandler
 {
@@ -75,5 +77,24 @@ class Handler extends ExceptionHandler
                 );
             }
         });
+
+         $this->renderable(function (HttpException $e) {
+        if ($e->getStatusCode() == 429) {
+            return response()->json([
+                'success' => false,
+                'message' => 'تم تجاوز عدد الطلبات المسموح بها. الرجاء المحاولة لاحقاً.',
+                'error' => 'RATE_LIMIT_EXCEEDED'
+            ], 429);
+        }
+    });
+    
+    $this->renderable(function (ValidationException $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'بيانات غير صالحة',
+            'errors' => $e->errors(),
+            'error' => 'VALIDATION_ERROR'
+        ], 422);
+    });
     }
 }
