@@ -53,24 +53,340 @@ class ProductOptionsAiService
     }
 
     /**
-     * Fetch products from Salla API
+     * Fetch ALL products from Salla API with CURSOR pagination
+     * Updated to handle cursor-based pagination
      */
-    public function fetchProductsFromApi()
+    public function fetchProductsFromApi($allPages = true, $limit = 50)
     {
         try {
-            $response = Http::withHeaders($this->baseHeaders)
-                ->get('https://api.salla.dev/store/v1/products');
+            $allProducts = [];
+            $nextCursorUrl = "https://api.salla.dev/store/v1/products?limit={$limit}";
+            $pageCount = 0;
 
-            if ($response->successful()) {
-                return $response->json();
+            while ($nextCursorUrl && ($allPages || $pageCount < 1)) {
+                $pageCount++;
+                Log::info("Fetching products page {$pageCount} from: " . $nextCursorUrl);
+
+                $response = Http::withHeaders($this->baseHeaders)
+                    ->get($nextCursorUrl);
+
+                if ($response->successful()) {
+                    $data = $response->json();
+
+                    // Check if data exists
+                    if (isset($data['data']) && is_array($data['data'])) {
+                        $allProducts = array_merge($allProducts, $data['data']);
+
+                        Log::info("Fetched " . count($data['data']) . " products from page {$pageCount}");
+
+                        // Check for next cursor URL
+                        if ($allPages && isset($data['cursor']['next']) && !empty($data['cursor']['next'])) {
+                            $nextCursorUrl = $data['cursor']['next'];
+
+                            // Add delay between requests
+                            sleep(1);
+                        } else {
+                            $nextCursorUrl = null;
+                        }
+                    } else {
+                        $nextCursorUrl = null;
+                        Log::warning("No data found in API response for page {$pageCount}");
+                    }
+                } else {
+                    Log::error('Failed to fetch products from API', [
+                        'page' => $pageCount,
+                        'url' => $nextCursorUrl,
+                        'status' => $response->status(),
+                        'response' => $response->body()
+                    ]);
+                    $nextCursorUrl = null;
+                }
             }
 
-            Log::error('Failed to fetch products from API', ['response' => $response->body()]);
-            return null;
+            Log::info("Total products fetched: " . count($allProducts) . " from {$pageCount} pages");
+
+            return [
+                'data' => $allProducts,
+                'total' => count($allProducts),
+                'pages_processed' => $pageCount,
+                'has_more' => !empty($nextCursorUrl)
+            ];
         } catch (\Exception $e) {
-            Log::error('Error fetching products from API', ['error' => $e->getMessage()]);
+            Log::error('Error fetching products from API with cursor pagination', ['error' => $e->getMessage()]);
             return null;
         }
+    }
+
+    /**
+     * Fetch products from specific cursor or start from beginning
+     */
+    public function fetchProductsFromApiWithProgress($startCursorUrl = null, $maxPages = 0, $limit = 50)
+    {
+        try {
+            $allProducts = [];
+            $nextCursorUrl = $startCursorUrl ?? "https://api.salla.dev/store/v1/products?limit={$limit}";
+            $pageCount = 0;
+            $hasMorePages = true;
+
+            while ($nextCursorUrl && $hasMorePages) {
+                $pageCount++;
+                Log::info("Fetching products page {$pageCount} from cursor URL");
+
+                $response = Http::withHeaders($this->baseHeaders)
+                    ->get($nextCursorUrl);
+
+                if ($response->successful()) {
+                    $data = $response->json();
+
+                    if (isset($data['data']) && is_array($data['data'])) {
+                        $allProducts = array_merge($allProducts, $data['data']);
+
+                        Log::info("Fetched " . count($data['data']) . " products from page {$pageCount}");
+
+                        // Check for next cursor URL
+                        if (isset($data['cursor']['next']) && !empty($data['cursor']['next'])) {
+                            $nextCursorUrl = $data['cursor']['next'];
+
+                            // Check if we reached max pages
+                            if ($maxPages > 0 && $pageCount >= $maxPages) {
+                                $hasMorePages = false;
+                                Log::info("Reached maximum pages limit: {$maxPages}");
+                            } else {
+                                // Add delay between requests
+                                sleep(1);
+                            }
+                        } else {
+                            $nextCursorUrl = null;
+                            $hasMorePages = false;
+                            Log::info("No more pages available. Reached end of pagination.");
+                        }
+                    } else {
+                        $nextCursorUrl = null;
+                        $hasMorePages = false;
+                        Log::warning("No data found in API response for page {$pageCount}");
+                    }
+                } else {
+                    Log::error('Failed to fetch products page', [
+                        'page' => $pageCount,
+                        'url' => $nextCursorUrl,
+                        'status' => $response->status()
+                    ]);
+
+                    // Retry logic for failed requests
+                    if ($pageCount <= 3) {
+                        Log::info("Retrying page {$pageCount} after 5 seconds...");
+                        sleep(5);
+                        continue;
+                    } else {
+                        $nextCursorUrl = null;
+                        $hasMorePages = false;
+                    }
+                }
+            }
+
+            Log::info("Total products fetched: " . count($allProducts) . " from {$pageCount} pages");
+
+            return [
+                'data' => $allProducts,
+                'total' => count($allProducts),
+                'pages_processed' => $pageCount,
+                'last_cursor_url' => $nextCursorUrl,
+                'has_more' => !empty($nextCursorUrl)
+            ];
+        } catch (\Exception $e) {
+            Log::error('Error fetching products with cursor progress', ['error' => $e->getMessage()]);
+            return null;
+        }
+    }
+
+    /**
+     * Extract cursor from URL for storage/resumption
+     */
+    public function extractCursorFromUrl($url)
+    {
+        if (empty($url)) {
+            return null;
+        }
+
+        $parsedUrl = parse_url($url);
+        $queryParams = [];
+
+        if (isset($parsedUrl['query'])) {
+            parse_str($parsedUrl['query'], $queryParams);
+        }
+
+        return [
+            'url' => $url,
+            'cursor_param' => $queryParams['cursor'] ?? null,
+            'page_param' => $queryParams['page'] ?? null,
+            'limit_param' => $queryParams['limit'] ?? null
+        ];
+    }
+
+    /**
+     * Save progress to resume later
+     */
+    public function saveFetchProgress($cursorUrl, $totalFetched, $pagesProcessed)
+    {
+        $progressData = [
+            'cursor_url' => $cursorUrl,
+            'total_fetched' => $totalFetched,
+            'pages_processed' => $pagesProcessed,
+            'last_updated' => now()->toDateTimeString(),
+            'extracted_cursor' => $this->extractCursorFromUrl($cursorUrl)
+        ];
+
+        // Save to file or database
+        $filePath = storage_path('app/fetch_progress.json');
+        file_put_contents($filePath, json_encode($progressData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+
+        Log::info("Fetch progress saved", $progressData);
+
+        return $progressData;
+    }
+
+    /**
+     * Load saved progress
+     */
+    public function loadFetchProgress()
+    {
+        $filePath = storage_path('app/fetch_progress.json');
+
+        if (file_exists($filePath)) {
+            $data = json_decode(file_get_contents($filePath), true);
+
+            if ($data) {
+                Log::info("Fetch progress loaded", $data);
+                return $data;
+            }
+        }
+
+        Log::info("No saved progress found, starting from beginning");
+        return null;
+    }
+
+    /**
+     * Batch process products with cursor pagination
+     */
+    public function batchProcessProducts($batchSize = 10, $resumeFromSaved = true)
+    {
+        try {
+            $results = [
+                'total_processed' => 0,
+                'successful' => 0,
+                'failed' => 0,
+                'cursor_history' => [],
+                'products' => []
+            ];
+
+            // Load saved progress if requested
+            $startCursorUrl = null;
+            if ($resumeFromSaved) {
+                $progress = $this->loadFetchProgress();
+                if ($progress && isset($progress['cursor_url'])) {
+                    $startCursorUrl = $progress['cursor_url'];
+                    Log::info("Resuming from saved cursor: " . $startCursorUrl);
+                }
+            }
+
+            // Fetch products with cursor pagination
+            $fetchResult = $this->fetchProductsFromApiWithProgress(
+                $startCursorUrl,
+                $batchSize,
+                50 // limit per page
+            );
+
+            if (!$fetchResult || empty($fetchResult['data'])) {
+                Log::warning("No products fetched from API");
+                return $results;
+            }
+
+            $products = $fetchResult['data'];
+            $results['total_processed'] = count($products);
+            $results['last_cursor'] = $fetchResult['last_cursor_url'] ?? null;
+            $results['has_more'] = $fetchResult['has_more'] ?? false;
+
+            // Process each product
+            foreach ($products as $productData) {
+                try {
+                    $productId = $productData['id'] ?? null;
+                    $productUrl = $productData['url'] ?? null;
+
+                    if (!$productId || !$productUrl) {
+                        continue;
+                    }
+
+                    Log::info("Processing product {$productId}: " . ($productData['name'] ?? 'Unknown'));
+
+                    // Extract options from product page
+                    $options = $this->extractOptionsFromHtml($productUrl);
+
+                    if ($options) {
+                        // Process options with AI
+                        $processResult = $this->processOptionsWithAi(
+                            $productId,
+                            $options,
+                            $productData['name'] ?? null,
+                            $productData['category']['name'] ?? null
+                        );
+
+                        if ($processResult) {
+                            $results['successful']++;
+
+                            $results['products'][] = [
+                                'id' => $productId,
+                                'name' => $productData['name'] ?? 'Unknown',
+                                'options_processed' => count($options),
+                                'categories_summary' => $processResult['summary'] ?? []
+                            ];
+                        } else {
+                            $results['failed']++;
+                        }
+                    } else {
+                        Log::warning("No options found for product {$productId}");
+                        $results['failed']++;
+                    }
+                } catch (\Exception $e) {
+                    Log::error("Error processing product {$productId}", [
+                        'error' => $e->getMessage(),
+                        'product_id' => $productId
+                    ]);
+                    $results['failed']++;
+                }
+            }
+
+            // Save progress for next batch
+            if ($results['last_cursor'] && $results['has_more']) {
+                $this->saveFetchProgress(
+                    $results['last_cursor'],
+                    $results['total_processed'],
+                    $batchSize
+                );
+
+                Log::info("Batch completed. Next cursor saved: " . $results['last_cursor']);
+            } else {
+                Log::info("Batch completed. No more pages or cursor not available.");
+            }
+
+            return $results;
+        } catch (\Exception $e) {
+            Log::error('Error in batch processing', ['error' => $e->getMessage()]);
+            return null;
+        }
+    }
+    /**
+     * Reset progress file
+     */
+    public function resetProgressFile()
+    {
+        $filePath = storage_path('app/fetch_progress.json');
+
+        if (file_exists($filePath)) {
+            unlink($filePath);
+            Log::info("Progress file deleted");
+        }
+
+        return true;
     }
 
     /**
@@ -125,7 +441,63 @@ class ProductOptionsAiService
     }
 
     /**
-     * Process options with AI categorization - UPDATED
+     * Alternative: Fetch products with next URL pagination
+     */
+    public function fetchProductsWithNextUrl($allPages = true)
+    {
+        try {
+            $allProducts = [];
+            $nextUrl = 'https://api.salla.dev/store/v1/products?per_page=100';
+
+            while ($nextUrl) {
+                Log::info("Fetching products from: " . $nextUrl);
+
+                $response = Http::withHeaders($this->baseHeaders)
+                    ->get($nextUrl);
+
+                if ($response->successful()) {
+                    $data = $response->json();
+
+                    if (isset($data['data']) && is_array($data['data'])) {
+                        $allProducts = array_merge($allProducts, $data['data']);
+
+                        Log::info("Fetched " . count($data['data']) . " products");
+
+                        // التحقق من وجود رابط للصفحة التالية
+                        if ($allPages && isset($data['pagination']['next'])) {
+                            $nextUrl = $data['pagination']['next'];
+
+                            // تأجيل بين الطلبات
+                            sleep(1);
+                        } else {
+                            $nextUrl = null;
+                        }
+                    } else {
+                        $nextUrl = null;
+                    }
+                } else {
+                    Log::error('Failed to fetch products page', [
+                        'url' => $nextUrl,
+                        'status' => $response->status()
+                    ]);
+                    $nextUrl = null;
+                }
+            }
+
+            Log::info("Total products fetched with next URL: " . count($allProducts));
+
+            return [
+                'data' => $allProducts,
+                'total' => count($allProducts)
+            ];
+        } catch (\Exception $e) {
+            Log::error('Error fetching products with next URL', ['error' => $e->getMessage()]);
+            return null;
+        }
+    }
+
+    /**
+     * Process options with AI categorization
      */
     public function processOptionsWithAi($productId, $options, $productName = null, $categoryName = null)
     {
@@ -148,7 +520,6 @@ class ProductOptionsAiService
                 // Fallback to manual processing
                 return $this->processOptionsWithoutAi($productId, $options);
             }
-
         } catch (\Exception $e) {
             Log::error('AI processing failed', [
                 'product_id' => $productId,
@@ -200,7 +571,7 @@ class ProductOptionsAiService
     }
 
     /**
-     * Send data to DeepSeek AI for categorization - UPDATED PROMPT
+     * Send data to DeepSeek AI for categorization
      */
     private function sendToDeepSeekAi($optionsData)
     {
@@ -239,7 +610,7 @@ class ProductOptionsAiService
                 $content = str_replace(['\n', '\r', '\t'], '', $content);
                 $content = preg_replace('/^json\s*/', '', $content);
                 $content = trim($content, '`');
-                
+
                 $aiResponse = json_decode($content, true);
 
                 if (json_last_error() === JSON_ERROR_NONE) {
@@ -254,7 +625,6 @@ class ProductOptionsAiService
             }
 
             return null;
-
         } catch (\Exception $e) {
             Log::error('DeepSeek AI request failed', ['error' => $e->getMessage()]);
             return null;
@@ -262,7 +632,7 @@ class ProductOptionsAiService
     }
 
     /**
-     * Create AI prompt for categorization - UPDATED
+     * Create AI prompt for categorization
      */
     private function createAiPrompt($optionsData)
     {
@@ -274,62 +644,38 @@ class ProductOptionsAiService
         $prompt .= "🔍 المنتج: {$productName}\n";
         $prompt .= "📂 الفئة: {$categoryName}\n";
         $prompt .= "📊 عدد الخيارات: {$optionsData['options_count']}\n\n";
-        
+
         $prompt .= "🔧 **تفاصيل الخيارات:**\n";
         $prompt .= "```json\n{$options}\n```\n\n";
-        
+
         $prompt .= "🎯 **مطلوب التصنيف إلى الفئات التالية:**\n";
-        $prompt .= "1. **design_service** - خدمات التصميم (يحتوي على: تصميم، خدمة تصميم، جرافيك، تصميم جرافيك، تصميم شعار)\n";
-        $prompt .= "2. **printing_method** - طرق الطباعة (يحتوي على: طريقة الطباعة، طباعة، ديجيتال، طباعة أوفست، سلك سكرين)\n";
-        $prompt .= "3. **print_location** - مواقع الطباعة (يحتوي على: مكان الطباعة، موقع الطباعة، وجه الطباعة، عدد الأوجه)\n";
-        $prompt .= "4. **embroider_location** - مواقع التطريز (يحتوي على: تطريز، مكان التطريز، موقع التطريز)\n";
-        $prompt .= "5. **material** - المواد/الخامات (يحتوي على: خامة، مادة، نوع الخامة، نوع القماش، الورق)\n";
-        $prompt .= "6. **size** - الأحجام/المقاسات (يحتوي على: مقاس، حجم، الحجم، الأبعاد، الطول، العرض، القياس)\n";
-        $prompt .= "7. **color** - الألوان (يحتوي على: لون، اللون، اختيار اللون، الألوان المتاحة، كود اللون)\n";
-        $prompt .= "8. **delivery_time** - وقت التوصيل (يحتوي على: وقت التوصيل، مدة التصنيع، وقت الإنتاج)\n";
-        $prompt .= "9. **quantity** - الكمية/العدد (يحتوي على: كمية، عدد، القطعة، العدد المطلوب)\n";
-        $prompt .= "10. **general** - خيارات عامة (كل ما لا ينتمي للفئات السابقة)\n\n";
-        
-        $prompt .= "📝 **ملاحظات مهمة للتعرف:**\n";
-        $prompt .= "- **الأحجام/المقاسات**: قد تأتي بأسماء مثل 'المقاس'، 'الحجم'، 'الأبعاد'، 'القياس'\n";
-        $prompt .= "- **الألوان**: قد تحتوي تفاصيلها على hex_code أو image\n";
-        $prompt .= "- **الكميات**: قد تكون مرتبطة بالأحجام (مثل: كميات لكل مقاس)\n";
-        $prompt .= "- **وقت التوصيل**: قد يكون بالأيام أو الأسابيع\n\n";
-        
+        $prompt .= "1. **design_service** - خدمات التصميم\n";
+        $prompt .= "2. **printing_method** - طرق الطباعة\n";
+        $prompt .= "3. **print_location** - مواقع الطباعة\n";
+        $prompt .= "4. **embroider_location** - مواقع التطريز\n";
+        $prompt .= "5. **material** - المواد/الخامات\n";
+        $prompt .= "6. **size** - الأحجام/المقاسات\n";
+        $prompt .= "7. **color** - الألوان\n";
+        $prompt .= "8. **delivery_time** - وقت التوصيل\n";
+        $prompt .= "9. **quantity** - الكمية/العدد\n";
+        $prompt .= "10. **general** - خيارات عامة\n\n";
+
         $prompt .= "🎨 **الهيكل المطلوب للرد (JSON فقط):**\n";
         $prompt .= "{\n";
         $prompt .= "  \"categorized_options\": [\n";
         $prompt .= "    {\n";
         $prompt .= "      \"option_id\": \"original_option_id\",\n";
         $prompt .= "      \"option_name\": \"original_option_name\",\n";
-        $prompt .= "      \"category\": \"one_of_the_categories_above\",\n";
-        $prompt .= "      \"confidence\": \"high/medium/low\",\n";
-        $prompt .= "      \"details_analysis\": [\n";
-        $prompt .= "        {\n";
-        $prompt .= "          \"detail_id\": \"detail_id\",\n";
-        $prompt .= "          \"detail_name\": \"detail_name\",\n";
-        $prompt .= "          \"is_size_quantity_combination\": true/false,\n";
-        $prompt .= "          \"size_name\": \"if_applicable\",\n";
-        $prompt .= "          \"quantity\": \"if_applicable\",\n";
-        $prompt .= "          \"price_per_unit\": \"if_applicable\"\n";
-        $prompt .= "        }\n";
-        $prompt .= "      ],\n";
-        $prompt .= "      \"processing_notes\": \"notes_for_processing\"\n";
+        $prompt .= "      \"category\": \"one_of_the_categories_above\"\n";
         $prompt .= "    }\n";
         $prompt .= "  ]\n";
-        $prompt .= "}\n\n";
-        
-        $prompt .= "⚠️ **تأكد من:**\n";
-        $prompt .= "- تحليل كل خيار بدقة\n";
-        $prompt .= "- التعرف على العلاقات بين الأحجام والكميات\n";
-        $prompt .= "- التعرف على الألوان من خلال hex_code أو الصور\n";
-        $prompt .= "- إذا كان هناك شك، استخدم 'general'\n";
-        
+        $prompt .= "}\n";
+
         return $prompt;
     }
 
     /**
-     * Process AI categorized options - UPDATED
+     * Process AI categorized options
      */
     private function processAiCategorizedOptions($productId, $categorizedOptions, $originalOptions)
     {
@@ -357,7 +703,7 @@ class ProductOptionsAiService
             $originalOptionsMap[$option['id']] = $option;
         }
 
-        // First pass: Process non-size options
+        // Process all options
         foreach ($categorizedOptions as $categorized) {
             $optionId = $categorized['option_id'];
             $category = $categorized['category'];
@@ -396,6 +742,12 @@ class ProductOptionsAiService
                         $results['summary']['material']++;
                         break;
 
+                    case 'size':
+                        $tiersCreated = $this->processSizeWithTiers($productId, $originalOption);
+                        $results['summary']['size']++;
+                        $results['summary']['size_tiers'] += $tiersCreated;
+                        break;
+
                     case 'color':
                         $this->processColor($productId, $originalOption);
                         $results['summary']['color']++;
@@ -411,10 +763,6 @@ class ProductOptionsAiService
                         $results['summary']['quantity']++;
                         break;
 
-                    case 'size':
-                        // Process size in second pass
-                        break;
-
                     case 'general':
                     default:
                         $this->processGeneralOption($productId, $originalOption);
@@ -422,47 +770,14 @@ class ProductOptionsAiService
                         break;
                 }
 
-                // Only add to processed if not size (sizes will be processed separately)
-                if ($category !== 'size') {
-                    $results['processed_options'][] = [
-                        'option_id' => $optionId,
-                        'option_name' => $originalOption['name'],
-                        'category' => $category,
-                        'details_count' => count($originalOption['details'] ?? [])
-                    ];
-                }
-
+                $results['processed_options'][] = [
+                    'option_id' => $optionId,
+                    'option_name' => $originalOption['name'],
+                    'category' => $category,
+                    'details_count' => count($originalOption['details'] ?? [])
+                ];
             } catch (\Exception $e) {
                 $results['errors'][] = "Failed to process option {$optionId}: " . $e->getMessage();
-            }
-        }
-
-        // Second pass: Process sizes and create tiers
-        foreach ($categorizedOptions as $categorized) {
-            if ($categorized['category'] === 'size') {
-                $optionId = $categorized['option_id'];
-                
-                if (isset($originalOptionsMap[$optionId])) {
-                    $originalOption = $originalOptionsMap[$optionId];
-                    
-                    // Process size and create tiers if analysis available
-                    $sizeTiersCreated = $this->processSizeWithTiers(
-                        $productId, 
-                        $originalOption, 
-                        $categorized['details_analysis'] ?? []
-                    );
-                    
-                    $results['summary']['size']++;
-                    $results['summary']['size_tiers'] += $sizeTiersCreated;
-                    
-                    $results['processed_options'][] = [
-                        'option_id' => $optionId,
-                        'option_name' => $originalOption['name'],
-                        'category' => 'size',
-                        'details_count' => count($originalOption['details'] ?? []),
-                        'tiers_created' => $sizeTiersCreated
-                    ];
-                }
             }
         }
 
@@ -473,25 +788,15 @@ class ProductOptionsAiService
     }
 
     /**
-     * Process size with tiers - NEW METHOD
+     * Process size with tiers
      */
     private function processSizeWithTiers($productId, $option, $detailsAnalysis = [])
     {
         $tiersCreated = 0;
-        $sizeRecords = [];
 
-        // First, create size records for each detail
         foreach ($option['details'] as $detail) {
             $sizeName = $detail['name'];
             $additionalPrice = $detail['additional_price'] ?? 0;
-            
-            // Try to extract size name from analysis if available
-            foreach ($detailsAnalysis as $analysis) {
-                if ($analysis['detail_id'] == $detail['id'] && !empty($analysis['size_name'])) {
-                    $sizeName = $analysis['size_name'];
-                    break;
-                }
-            }
 
             // Create or get size record
             $size = Size::updateOrCreate(
@@ -505,56 +810,9 @@ class ProductOptionsAiService
                 ]
             );
 
-            $sizeRecords[$detail['id']] = $size;
+            // Create default tiers
+            $defaultQuantities = [10, 50, 100, 500];
 
-            // Check if this detail contains quantity information
-            foreach ($detailsAnalysis as $analysis) {
-                if ($analysis['detail_id'] == $detail['id'] && 
-                    $analysis['is_size_quantity_combination'] && 
-                    !empty($analysis['quantity'])) {
-                    
-                    // Create size tier
-                    ProductSizeTier::updateOrCreate(
-                        [
-                            'product_id' => $productId,
-                            'size_id' => $size->id,
-                            'quantity' => $analysis['quantity']
-                        ],
-                        [
-                            'price_per_unit' => $analysis['price_per_unit'] ?? $additionalPrice
-                        ]
-                    );
-                    
-                    $tiersCreated++;
-                }
-            }
-        }
-
-        // If no tiers were created from analysis, check if there's a separate quantity option
-        if ($tiersCreated === 0) {
-            // Look for quantity options in the product to associate with sizes
-            $this->linkSizesWithQuantities($productId, $sizeRecords);
-        }
-
-        return $tiersCreated;
-    }
-
-    /**
-     * Link sizes with quantities - NEW METHOD
-     */
-    private function linkSizesWithQuantities($productId, $sizeRecords)
-    {
-        // This method would look for quantity options and link them with sizes
-        // Implementation depends on how your data is structured
-        
-        // Example: If you have a separate quantity option, you could:
-        // 1. Find quantity options for this product
-        // 2. Create tiers for each size with each quantity
-        
-        // For now, we'll create default tiers
-        $defaultQuantities = [10, 50, 100, 500];
-        
-        foreach ($sizeRecords as $size) {
             foreach ($defaultQuantities as $quantity) {
                 ProductSizeTier::firstOrCreate(
                     [
@@ -563,49 +821,46 @@ class ProductOptionsAiService
                         'quantity' => $quantity
                     ],
                     [
-                        'price_per_unit' => 0 // Default price
+                        'price_per_unit' => $additionalPrice / max($quantity, 1)
                     ]
                 );
+
+                $tiersCreated++;
             }
         }
-        
-        return count($sizeRecords) * count($defaultQuantities);
+
+        return $tiersCreated;
     }
 
     /**
-     * Process color - NEW METHOD
+     * Process color
      */
     private function processColor($productId, $option)
     {
         $product = Product::find($productId);
-        
+
         foreach ($option['details'] as $detail) {
             $colorData = [
                 'name' => $detail['name']
             ];
 
-            // Add hex code if available
             if (!empty($detail['hex_code'])) {
                 $colorData['hex_code'] = $detail['hex_code'];
             }
 
-            // Add image if available
             if (!empty($detail['image'])) {
                 $colorData['image'] = $detail['image'];
             }
 
-            // Add additional price
             if (!empty($detail['additional_price'])) {
                 $colorData['additional_price'] = $detail['additional_price'];
             }
 
-            // Create or update color
             $color = Color::updateOrCreate(
                 ['name' => $detail['name']],
                 $colorData
             );
 
-            // Attach to product
             if ($product && !$product->colors()->where('color_id', $color->id)->exists()) {
                 $product->colors()->attach($color->id);
             }
@@ -613,18 +868,15 @@ class ProductOptionsAiService
     }
 
     /**
-     * Process delivery time - NEW METHOD
+     * Process delivery time
      */
     private function processDeliveryTime($productId, $option)
     {
-        // Delete existing delivery time for this product
         DeliveryTime::where('product_id', $productId)->delete();
 
-        // Process each detail as a delivery time option
         foreach ($option['details'] as $detail) {
             $timeString = $detail['name'];
-            
-            // Try to extract days from string (e.g., "3-5 أيام", "أسبوع", "24 ساعة")
+
             preg_match('/(\d+)\s*-\s*(\d+)/', $timeString, $rangeMatches);
             preg_match('/(\d+)/', $timeString, $singleMatches);
 
@@ -639,7 +891,6 @@ class ProductOptionsAiService
                 $toDays = $fromDays + 2;
             }
 
-            // Check for weeks
             if (str_contains($timeString, 'أسبوع') || str_contains($timeString, 'اسبوع')) {
                 $fromDays = $fromDays * 7;
                 $toDays = $toDays * 7;
@@ -654,7 +905,7 @@ class ProductOptionsAiService
     }
 
     /**
-     * Process options without AI (fallback) - UPDATED
+     * Process options without AI (fallback)
      */
     public function processOptionsWithoutAi($productId, $options)
     {
@@ -676,28 +927,11 @@ class ProductOptionsAiService
             ]
         ];
 
-        // Separate sizes for special processing
-        $sizeOptions = [];
-        $otherOptions = [];
-
         foreach ($options as $option) {
-            $name = strtolower($option['name'] ?? '');
-            
-            if (str_contains($name, 'مقاس') || str_contains($name, 'حجم') || 
-                str_contains($name, 'قياس') || str_contains($name, 'بعد')) {
-                $sizeOptions[] = $option;
-            } else {
-                $otherOptions[] = $option;
-            }
-        }
-
-        // Process non-size options
-        foreach ($otherOptions as $option) {
             try {
                 $name = strtolower($option['name'] ?? '');
                 $processed = false;
 
-                // Manual categorization based on keywords - UPDATED
                 if (str_contains($name, 'خدمة التصميم') || str_contains($name, 'تصميم')) {
                     $this->processDesignService($productId, $option);
                     $results['summary']['design_service']++;
@@ -706,8 +940,10 @@ class ProductOptionsAiService
                     $this->processPrintingMethod($productId, $option);
                     $results['summary']['printing_method']++;
                     $processed = true;
-                } elseif (str_contains($name, 'مكان الطباعة') || str_contains($name, 'موقع الطباعة') || 
-                         str_contains($name, 'وجه') || str_contains($name, 'أوجه')) {
+                } elseif (
+                    str_contains($name, 'مكان الطباعة') || str_contains($name, 'موقع الطباعة') ||
+                    str_contains($name, 'وجه') || str_contains($name, 'أوجه')
+                ) {
                     $this->processPrintLocation($productId, $option);
                     $results['summary']['print_location']++;
                     $processed = true;
@@ -715,23 +951,39 @@ class ProductOptionsAiService
                     $this->processEmbroiderLocation($productId, $option);
                     $results['summary']['embroider_location']++;
                     $processed = true;
-                } elseif (str_contains($name, 'خامة') || str_contains($name, 'مادة') || 
-                         str_contains($name, 'قماش') || str_contains($name, 'ورق')) {
+                } elseif (
+                    str_contains($name, 'خامة') || str_contains($name, 'مادة') ||
+                    str_contains($name, 'قماش') || str_contains($name, 'ورق')
+                ) {
                     $this->processMaterial($productId, $option);
                     $results['summary']['material']++;
                     $processed = true;
-                } elseif (str_contains($name, 'لون') || str_contains($name, 'اللون') || 
-                         str_contains($name, 'ألوان')) {
+                } elseif (
+                    str_contains($name, 'مقاس') || str_contains($name, 'حجم') ||
+                    str_contains($name, 'قياس') || str_contains($name, 'بعد')
+                ) {
+                    $tiersCreated = $this->processSizeWithTiers($productId, $option);
+                    $results['summary']['size']++;
+                    $results['summary']['size_tiers'] += $tiersCreated;
+                    $processed = true;
+                } elseif (
+                    str_contains($name, 'لون') || str_contains($name, 'اللون') ||
+                    str_contains($name, 'ألوان')
+                ) {
                     $this->processColor($productId, $option);
                     $results['summary']['color']++;
                     $processed = true;
-                } elseif (str_contains($name, 'وقت التوصيل') || str_contains($name, 'مدة التصنيع') || 
-                         str_contains($name, 'وقت الإنتاج')) {
+                } elseif (
+                    str_contains($name, 'وقت التوصيل') || str_contains($name, 'مدة التصنيع') ||
+                    str_contains($name, 'وقت الإنتاج')
+                ) {
                     $this->processDeliveryTime($productId, $option);
                     $results['summary']['delivery_time']++;
                     $processed = true;
-                } elseif (str_contains($name, 'كمية') || str_contains($name, 'عدد') || 
-                         str_contains($name, 'قطعة')) {
+                } elseif (
+                    str_contains($name, 'كمية') || str_contains($name, 'عدد') ||
+                    str_contains($name, 'قطعة')
+                ) {
                     $this->processQuantity($productId, $option);
                     $results['summary']['quantity']++;
                     $processed = true;
@@ -748,32 +1000,11 @@ class ProductOptionsAiService
                     'category' => $processed ? 'manual' : 'general',
                     'details_count' => count($option['details'] ?? [])
                 ];
-
             } catch (\Exception $e) {
                 $results['errors'][] = "Failed to process option {$option['id']}: " . $e->getMessage();
             }
         }
 
-        // Process size options
-        foreach ($sizeOptions as $option) {
-            try {
-                $tiersCreated = $this->processSizeWithTiers($productId, $option);
-                $results['summary']['size']++;
-                $results['summary']['size_tiers'] += $tiersCreated;
-                
-                $results['processed_options'][] = [
-                    'option_id' => $option['id'],
-                    'option_name' => $option['name'],
-                    'category' => 'size',
-                    'details_count' => count($option['details'] ?? []),
-                    'tiers_created' => $tiersCreated
-                ];
-            } catch (\Exception $e) {
-                $results['errors'][] = "Failed to process size option {$option['id']}: " . $e->getMessage();
-            }
-        }
-
-        // Store visibility conditions
         $this->storeVisibilityConditions($productId, $options);
 
         return $results;
@@ -801,7 +1032,7 @@ class ProductOptionsAiService
     private function processPrintingMethod($productId, $option)
     {
         $product = Product::find($productId);
-        
+
         foreach ($option['details'] as $detail) {
             $printingMethod = PrintingMethod::firstOrCreate(
                 ['name' => $detail['name']],
@@ -811,7 +1042,6 @@ class ProductOptionsAiService
                 ]
             );
 
-            // Attach to product
             if ($product && !$product->printingMethods()->where('printing_method_id', $printingMethod->id)->exists()) {
                 $product->printingMethods()->attach($printingMethod->id);
             }
@@ -824,7 +1054,7 @@ class ProductOptionsAiService
     private function processPrintLocation($productId, $option)
     {
         $product = Product::find($productId);
-        
+
         foreach ($option['details'] as $detail) {
             $printLocation = PrintLocation::firstOrCreate(
                 ['name' => $detail['name']],
@@ -834,7 +1064,6 @@ class ProductOptionsAiService
                 ]
             );
 
-            // Attach to product
             if ($product) {
                 $product->printLocations()->syncWithoutDetaching([
                     $printLocation->id => ['additional_price' => $detail['additional_price'] ?? 0]
@@ -871,7 +1100,6 @@ class ProductOptionsAiService
                 ]
             );
 
-            // Link material to product if needed
             $product = Product::find($productId);
             if ($product) {
                 $product->materials()->syncWithoutDetaching([$material->id]);
@@ -884,8 +1112,6 @@ class ProductOptionsAiService
      */
     private function processQuantity($productId, $option)
     {
-        // Quantity can be stored in general options or processed specially
-        // For now, store in general options
         $this->processGeneralOption($productId, $option);
     }
 
@@ -974,7 +1200,6 @@ class ProductOptionsAiService
         $results = [];
 
         foreach ($options as $option) {
-            // Check visibility condition
             if (isset($option['visibility_condition']) && $option['visibility_condition']) {
                 $cond = $option['visibility_condition'];
                 if (!isset($selected[$cond['option']]) || $selected[$cond['option']] != $cond['value']) {
@@ -988,8 +1213,7 @@ class ProductOptionsAiService
 
                 $results[] = $newSelected;
 
-                // Recursive call for remaining options
-                $remainingOptions = array_filter($options, function($opt) use ($option) {
+                $remainingOptions = array_filter($options, function ($opt) use ($option) {
                     return $opt['id'] != $option['id'];
                 });
 
@@ -1004,57 +1228,64 @@ class ProductOptionsAiService
 
         return array_unique($results, SORT_REGULAR);
     }
-    // إضافة دالة لربط أوزان المنتجات مع الشحن
-private function processShippingIntegration($productId, $options)
-{
-    $product = Product::find($productId);
-    
-    if (!$product) return;
-    
-    // البحث عن خيار الوزن
-    foreach ($options as $option) {
-        $name = strtolower($option['name'] ?? '');
-        
-        if (str_contains($name, 'وزن') || str_contains($name, 'weight')) {
-            foreach ($option['details'] as $detail) {
-                $weight = $this->extractWeightFromDetail($detail['name']);
-                
-                if ($weight > 0) {
-                    $product->weight = $weight;
-                    $product->save();
-                    
-                    Log::info('Updated product weight from options', [
-                        'product_id' => $productId,
-                        'weight' => $weight
-                    ]);
+
+    private function processShippingIntegration($productId, $options)
+    {
+        $product = Product::find($productId);
+
+        if (!$product) return;
+
+        foreach ($options as $option) {
+            $name = strtolower($option['name'] ?? '');
+
+            if (str_contains($name, 'وزن') || str_contains($name, 'weight')) {
+                foreach ($option['details'] as $detail) {
+                    $weight = $this->extractWeightFromDetail($detail['name']);
+
+                    if ($weight > 0) {
+                        $product->weight = $weight;
+                        $product->save();
+
+                        Log::info('Updated product weight from options', [
+                            'product_id' => $productId,
+                            'weight' => $weight
+                        ]);
+                    }
                 }
             }
         }
     }
-}
 
-private function extractWeightFromDetail($detailName)
-{
-    $patterns = [
-        '/(\d+(\.\d+)?)\s*(كجم|kg|كيلو)/i',
-        '/وزن\s*(\d+(\.\d+)?)/i',
-        '/(\d+(\.\d+)?)\s*(جرام|g)/i'
-    ];
-    
-    foreach ($patterns as $pattern) {
-        if (preg_match($pattern, $detailName, $matches)) {
-            $value = floatval($matches[1]);
-            
-            // تحويل الجرام إلى كيلوجرام
-            if (strpos(strtolower($detailName), 'جرام') !== false || 
-                strpos(strtolower($detailName), 'g') !== false) {
-                $value = $value / 1000;
-            }
-            
-            return $value;
-        }
+    /**
+     * Get headers for API requests
+     */
+    public function getHeaders()
+    {
+        return $this->baseHeaders;
     }
-    
-    return 0;
-}
+    private function extractWeightFromDetail($detailName)
+    {
+        $patterns = [
+            '/(\d+(\.\d+)?)\s*(كجم|kg|كيلو)/i',
+            '/وزن\s*(\d+(\.\d+)?)/i',
+            '/(\d+(\.\d+)?)\s*(جرام|g)/i'
+        ];
+
+        foreach ($patterns as $pattern) {
+            if (preg_match($pattern, $detailName, $matches)) {
+                $value = floatval($matches[1]);
+
+                if (
+                    strpos(strtolower($detailName), 'جرام') !== false ||
+                    strpos(strtolower($detailName), 'g') !== false
+                ) {
+                    $value = $value / 1000;
+                }
+
+                return $value;
+            }
+        }
+
+        return 0;
+    }
 }
