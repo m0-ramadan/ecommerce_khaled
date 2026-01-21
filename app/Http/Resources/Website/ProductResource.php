@@ -108,14 +108,6 @@ class ProductResource extends JsonResource
                 ];
             }),
 
-            // ================== Pricing Tiers ==================
-            // 'pricing_tiers' => $this->pricingTiers->map(function ($tier) {
-            //     return [
-            //         'quantity'             => $tier->quantity,
-            //         'price'                => $tier->price,
-            //         'discount_percentage'  => $tier->discount_percentage,
-            //     ];
-            // }),
 
             // ================== Offers ==================
             'offers' => OfferResource::collection($this->offers),

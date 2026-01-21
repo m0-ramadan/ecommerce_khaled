@@ -14,8 +14,7 @@ class Size extends Model
     }
 
     public function productTiers()
-{
-    return $this->hasMany(ProductSizeTier::class);
-}
-
+    {
+        return $this->hasMany(ProductSizeTier::class);
+    }
 }

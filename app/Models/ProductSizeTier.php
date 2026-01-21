@@ -23,5 +23,4 @@ class ProductSizeTier extends Model
     {
         return $this->belongsTo(Size::class);
     }
-    
 }

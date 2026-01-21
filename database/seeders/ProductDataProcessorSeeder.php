@@ -23,14 +23,9 @@ class ProductDataProcessorSeeder extends Seeder
     {
         $this->command->info('Starting product data processing from Salla...');
 
-        // جلب قائمة المنتجات من API
-        $this->command->info('Fetching products list from Salla API...');
-        
-        // إذا كان لديك API لجلب المنتجات، استخدمه هنا
-        // أو يمكنك جلب المنتجات من قاعدة البيانات
         $products = Product::whereNotNull('external_id')
             ->whereNotNull('url')
-            ->limit(50) // معالجة 50 منتج في المرة الواحدة
+            ->limit(10) // تقليل العدد للاختبار
             ->get();
 
         $this->command->info('Found ' . $products->count() . ' products to process');
@@ -41,13 +36,13 @@ class ProductDataProcessorSeeder extends Seeder
         foreach ($products as $index => $product) {
             $productNumber = $index + 1;
             $totalProducts = $products->count();
-            
-            $this->command->info("[$productNumber/$totalProducts] Processing: {$product->name}");
+
+            $this->command->info("\n[$productNumber/$totalProducts] Processing: {$product->name}");
 
             try {
                 // استخراج البيانات من صفحة المنتج
                 $options = $this->processorService->extractDataFromHtml($product->url);
-                
+
                 if (!$options || !is_array($options)) {
                     $this->command->warn("  ↳ No data extracted from URL");
                     $failCount++;
@@ -56,30 +51,68 @@ class ProductDataProcessorSeeder extends Seeder
 
                 $this->command->info("  ↳ Extracted " . count($options) . " options");
 
-                // معالجة البيانات وتخزينها
-                $results = $this->processorService->processProductOptions($product->id, $options);
-                
-                if ($results) {
-                    // عرض ملخص المعالجة
-                    $this->displayProcessingSummary($results);
-                    
-                    // بناء التركيبات الممكنة
-                    $combinations = $this->processorService->buildAllCombinations($product->id);
-                    $this->command->info("  ↳ Built " . count($combinations) . " possible combinations");
-                    
-                    $successCount++;
-                    $this->command->info("  ↳ ✓ Successfully processed");
-                } else {
-                    $failCount++;
-                    $this->command->error("  ↳ ✗ Failed to process");
+                // تحليل العلاقات
+                $this->processorService->analyzeOptionRelationships($options);
+
+                // بناء التركيبات الذكية أولاً
+                $this->command->info("  ↳ Building smart combinations...");
+                $smartCombinations = $this->processorService->buildSmartCombinations($options, 50);
+
+                $this->command->info("  ↳ Built " . $smartCombinations->count() . " smart combinations");
+
+                // تخزين التركيبات
+                $this->storeSmartCombinations($product->id, $smartCombinations);
+
+                // معالجة باقي البيانات
+                $results = [
+                    'smart_combinations' => $smartCombinations->count(),
+                    'sizes' => [],
+                    'materials' => [],
+                    'design_services' => [],
+                    'printing_methods' => [],
+                    'print_locations' => [],
+                    'general_options' => [],
+                    'conditions' => [],
+                    'quantity_tiers' => []
+                ];
+
+                // معالجة الخيارات حسب النوع
+                foreach ($options as $option) {
+                    $name = $option['name'] ?? '';
+
+                    if (str_contains($name, 'المقاس') || str_contains($name, 'الحجم') || str_contains($name, 'Size')) {
+                        $this->processorService->processSizeOption($product, $option, $results);
+                    } elseif (str_contains($name, 'الكمية') || str_contains($name, 'عدد') || str_contains($name, 'Quantity')) {
+                        $this->processorService->processQuantityOption($product, $option, $results);
+                    } elseif (str_contains($name, 'الخامة') || str_contains($name, 'المادة') || str_contains($name, 'Material')) {
+                        $this->processorService->processMaterialOption($product, $option, $results);
+                    } elseif (str_contains($name, 'خدمة التصميم') || str_contains($name, 'تصميم') || str_contains($name, 'Design')) {
+                        $this->processorService->processDesignServiceOption($product, $option, $results);
+                    } elseif (str_contains($name, 'طريقة الطباعة') || str_contains($name, 'الطباعة') || str_contains($name, 'Printing')) {
+                        $this->processorService->processPrintingMethodOption($product, $option, $results);
+                    } elseif (str_contains($name, 'مكان الطباعة') || str_contains($name, 'موقع الطباعة') || str_contains($name, 'Print Location')) {
+                        $this->processorService->processPrintLocationOption($product, $option, $results);
+                    } else {
+                        $this->processorService->processGeneralOption($product, $option, $results);
+                    }
                 }
 
+                // عرض ملخص
+                $this->displayProcessingSummary($results);
+
+                // عرض أمثلة للتركيبات
+                $this->displayCombinationExamples($smartCombinations);
+
+                $successCount++;
+                $this->command->info("  ↳ ✓ Successfully processed");
             } catch (\Exception $e) {
                 $this->command->error("  ↳ ✗ Error: " . $e->getMessage());
+                $this->command->error("  ↳ Stack trace: " . $e->getTraceAsString());
                 $failCount++;
                 Log::error('Error processing product', [
                     'product_id' => $product->id,
-                    'error' => $e->getMessage()
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
                 ]);
             }
 
@@ -92,30 +125,56 @@ class ProductDataProcessorSeeder extends Seeder
     }
 
     /**
+     * تخزين التركيبات الذكية
+     */
+    private function storeSmartCombinations($productId, $combinations)
+    {
+        $product = Product::find($productId);
+        if (!$product) return;
+
+        $product->valid_combinations = $combinations->toArray();
+        $product->combination_count = $combinations->count();
+        $product->save();
+    }
+
+    /**
      * عرض ملخص المعالجة
      */
     private function displayProcessingSummary($results)
     {
         $summary = [];
-        
+
         if (!empty($results['sizes'])) {
             $summary[] = "Sizes: " . count($results['sizes']);
         }
         if (!empty($results['materials'])) {
             $summary[] = "Materials: " . count($results['materials']);
         }
-        if (!empty($results['design_services'])) {
-            $summary[] = "Design Services: " . count($results['design_services']);
+        if (isset($results['smart_combinations'])) {
+            $summary[] = "Smart Combinations: " . $results['smart_combinations'];
         }
-        if (!empty($results['printing_methods'])) {
-            $summary[] = "Printing Methods: " . count($results['printing_methods']);
-        }
-        if (!empty($results['general_options'])) {
-            $summary[] = "General Options: " . count($results['general_options']);
-        }
-        
+
         if (!empty($summary)) {
             $this->command->info("  ↳ Processed: " . implode(', ', $summary));
+        }
+    }
+
+    /**
+     * عرض أمثلة للتركيبات
+     */
+    private function displayCombinationExamples($combinations)
+    {
+        if ($combinations->count() > 0) {
+            $examples = $combinations->take(2)->map(function ($combination, $index) {
+                $options = collect($combination['combination'])->map(function ($value, $key) {
+                    return "{$key}: {$value}";
+                })->implode(', ');
+
+                return "    #" . ($index + 1) . ": {$options}";
+            })->implode("\n");
+
+            $this->command->info("  ↳ Example combinations:");
+            $this->command->info($examples);
         }
     }
 
@@ -124,12 +183,10 @@ class ProductDataProcessorSeeder extends Seeder
      */
     private function addDelay($currentIndex, $totalProducts)
     {
-        // إضافة تأخير أطول كل 5 منتجات
-        if (($currentIndex + 1) % 5 === 0 && ($currentIndex + 1) < $totalProducts) {
-            $this->command->info("  ↳ Waiting 5 seconds...");
-            sleep(5);
+        if (($currentIndex + 1) % 3 === 0 && ($currentIndex + 1) < $totalProducts) {
+            sleep(3);
         } else {
-            sleep(2);
+            sleep(1);
         }
     }
 
@@ -145,38 +202,5 @@ class ProductDataProcessorSeeder extends Seeder
         $this->command->info("✅ Successfully Processed: {$successCount}");
         $this->command->info("❌ Failed: {$failCount}");
         $this->command->info(str_repeat('=', 50));
-        
-        if ($successCount > 0) {
-            $this->command->info("🎉 Data has been successfully stored in appropriate tables!");
-        }
     }
-
-    /**
-     * معالجة منتج واحد (للتجربة)
-     */
-    public function runForSingleProduct($productId)
-    {
-        $product = Product::find($productId);
-        
-        if (!$product) {
-            $this->command->error("Product not found: {$productId}");
-            return;
-        }
-
-        $this->command->info("Processing single product: {$product->name}");
-        
-        try {
-            $options = $this->processorService->extractDataFromHtml($product->url);
-            
-            if ($options) {
-                $results = $this->processorService->processProductOptions($product->id, $options);
-                $this->displayProcessingSummary($results);
-                $this->command->info("✓ Product processed successfully");
-            } else {
-                $this->command->error("✗ No data extracted");
-            }
-        } catch (\Exception $e) {
-            $this->command->error("✗ Error: " . $e->getMessage());
-        }
-    }
-}
+};
