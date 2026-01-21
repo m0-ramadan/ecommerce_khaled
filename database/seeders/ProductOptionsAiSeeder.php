@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Product;
 use Illuminate\Support\Str;
 use App\Models\ProcessingLog;
+use App\Models\ProductOptions;
 use App\Models\SeederProgress;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -219,117 +220,7 @@ class ProductOptionsAiSeeder extends Seeder
         }
     }
     
-    /**
-     * Process a batch of products
-     */
-    private function processProductsBatch($productsData, $pageNumber)
-    {
-        $results = [
-            'success_count' => 0,
-            'fail_count' => 0,
-            'ai_processed_count' => 0,
-            'manual_processed_count' => 0,
-            'size_tiers_count' => 0
-        ];
 
-        $totalProducts = count($productsData);
-        
-        foreach ($productsData as $index => $productData) {
-            $productNumber = $index + 1;
-            $this->command->info("\n📦 [$productNumber/$totalProducts] Page {$pageNumber} - Processing: " . 
-                               ($productData['name'] ?? 'Unknown'));
-
-            // Find product in database
-            $product = Product::where('external_id', $productData['id'])->first();
-
-            if (!$product) {
-                $this->command->warn("  ↳ ⚠️ Product not found in database: " . $productData['id']);
-                $results['fail_count']++;
-                continue;
-            }
-
-            // Check if product has URL
-            $url = $productData['url'] ?? null;
-            if (!$url) {
-                $this->command->warn("  ↳ ⚠️ No URL for product: " . $product->id);
-                $results['fail_count']++;
-                continue;
-            }
-
-            $this->command->info("  ↳ 🌐 Fetching options from product page...");
-            
-            try {
-                $options = $this->optionsService->extractOptionsFromHtml($url);
-            } catch (\Exception $e) {
-                $this->command->error("  ↳ ❌ Failed to fetch options: " . $e->getMessage());
-                $results['fail_count']++;
-                continue;
-            }
-
-            if (!$options || !is_array($options)) {
-                $this->command->warn("  ↳ ⚠️ No options found for this product");
-                $results['fail_count']++;
-                continue;
-            }
-
-            $this->command->info("  ↳ ✅ Found " . count($options) . " options");
-
-            // Process options with AI or manual
-            $processingResult = null;
-
-            if ($this->useAi) {
-                $this->command->info("  ↳ 🤖 Processing with AI...");
-                try {
-                    $processingResult = $this->optionsService->processOptionsWithAi(
-                        $product->id,
-                        $options,
-                        $product->name,
-                        $product->category ? $product->category->name : null
-                    );
-
-                    if ($processingResult && empty($processingResult['errors'])) {
-                        $results['ai_processed_count']++;
-                        $this->command->info("  ↳ ✅ AI processing successful");
-                    } else {
-                        $this->command->warn("  ↳ ⚠️ AI processing failed, switching to manual...");
-                        $processingResult = $this->optionsService->processOptionsWithoutAi($product->id, $options);
-                        $results['manual_processed_count']++;
-                    }
-                } catch (\Exception $e) {
-                    $this->command->error("  ↳ ❌ AI processing error: " . $e->getMessage());
-                    $processingResult = $this->optionsService->processOptionsWithoutAi($product->id, $options);
-                    $results['manual_processed_count']++;
-                }
-            } else {
-                $this->command->info("  ↳ 👨‍💻 Processing manually...");
-                $processingResult = $this->optionsService->processOptionsWithoutAi($product->id, $options);
-                $results['manual_processed_count']++;
-            }
-
-            if ($processingResult) {
-                // Display processing summary
-                $this->displayProcessingSummary($processingResult);
-                
-                // Track size tiers
-                if (isset($processingResult['summary']['size_tiers'])) {
-                    $results['size_tiers_count'] += $processingResult['summary']['size_tiers'];
-                }
-
-                $results['success_count']++;
-            } else {
-                $this->command->error("  ↳ ❌ Failed to process options");
-                $results['fail_count']++;
-            }
-
-            // Clean up memory
-            $this->cleanupMemory($index);
-            
-            // Add delay between products
-            $this->addDelay($index, $totalProducts);
-        }
-        
-        return $results;
-    }
     
     /**
      * Display processing summary for a product
@@ -777,4 +668,194 @@ class ProductOptionsAiSeeder extends Seeder
             // تجاهل الأخطاء في عرض السجلات
         }
     }
+    /**
+ * معالجة التبعيات للمنتج
+ */
+private function processDependenciesForProduct($productId, $options)
+{
+    // التحقق من وجود خيارات الكميات المرتبطة
+    $this->linkRelatedQuantityOptions($productId, $options);
+}
+
+/**
+ * ربط خيارات الكميات بالخيارات التي تعتمد عليها
+ */
+private function linkRelatedQuantityOptions($productId, $options)
+{
+    foreach ($options as $option) {
+        if (isset($option['visibility_condition'])) {
+            $condition = $option['visibility_condition'];
+            
+            if (is_string($condition) && strpos($condition, 'options[') !== false) {
+                // استخراج معلومات التبعية
+                $parentOptionId = $this->extractParentOptionId($condition);
+                $parentDetailId = $this->extractParentDetailId($condition);
+                
+                if ($parentOptionId) {
+                    // البحث عن السجل الأصلي للخيار المعتمد عليه
+                    $parentOption = \App\Models\ProductOptions::where([
+                        'product_id' => $productId,
+                        'external_option_id' => $parentOptionId
+                    ])->first();
+                    
+                    // تحديث خيارات المنتج لإضافة التبعيات
+                    \App\Models\ProductOptions::where([
+                        'product_id' => $productId,
+                        'external_option_id' => $option['id']
+                    ])->update([
+                        'depends_on_option_id' => $parentOption->id ?? null,
+                        'depends_on_detail_id' => $parentDetailId,
+                        'dependency_condition' => 'depends_on'
+                    ]);
+                    
+                    $this->command->info("  ↳ 🔗 Linked option {$option['id']} to parent {$parentOptionId}");
+                }
+            }
+        }
+    }
+}
+
+/**
+ * استخراج معرف الخيار الأصلي من شرط التبعية
+ */
+private function extractParentOptionId($condition)
+{
+    // مثال: "options[628499549] = 1293578302"
+    if (preg_match('/options\[(\d+)\]/', $condition, $matches)) {
+        return $matches[1];
+    }
+    return null;
+}
+
+/**
+ * استخراج معرف التفصيل الأصلي من شرط التبعية
+ */
+private function extractParentDetailId($condition)
+{
+    // مثال: "options[628499549] = 1293578302"
+    if (preg_match('/options\[\d+\]\s*=\s*(\d+)/', $condition, $matches)) {
+        return $matches[1];
+    }
+    return null;
+}
+
+/**
+ * تحديث دالة processProductsBatch لإضافة استدعاء processDependenciesForProduct
+ */
+private function processProductsBatch($productsData, $pageNumber)
+{
+    $results = [
+        'success_count' => 0,
+        'fail_count' => 0,
+        'ai_processed_count' => 0,
+        'manual_processed_count' => 0,
+        'size_tiers_count' => 0,
+        'dependencies_linked' => 0
+    ];
+
+    $totalProducts = count($productsData);
+    
+    foreach ($productsData as $index => $productData) {
+        $productNumber = $index + 1;
+        $this->command->info("\n📦 [$productNumber/$totalProducts] Page {$pageNumber} - Processing: " . 
+                           ($productData['name'] ?? 'Unknown'));
+
+        // Find product in database
+        $product = \App\Models\Product::where('external_id', $productData['id'])->first();
+
+        if (!$product) {
+            $this->command->warn("  ↳ ⚠️ Product not found in database: " . $productData['id']);
+            $results['fail_count']++;
+            continue;
+        }
+
+        // Check if product has URL
+        $url = $productData['url'] ?? null;
+        if (!$url) {
+            $this->command->warn("  ↳ ⚠️ No URL for product: " . $product->id);
+            $results['fail_count']++;
+            continue;
+        }
+
+        $this->command->info("  ↳ 🌐 Fetching options from product page...");
+        
+        try {
+            $options = $this->optionsService->extractOptionsFromHtml($url);
+        } catch (\Exception $e) {
+            $this->command->error("  ↳ ❌ Failed to fetch options: " . $e->getMessage());
+            $results['fail_count']++;
+            continue;
+        }
+
+        if (!$options || !is_array($options)) {
+            $this->command->warn("  ↳ ⚠️ No options found for this product");
+            $results['fail_count']++;
+            continue;
+        }
+
+        $this->command->info("  ↳ ✅ Found " . count($options) . " options");
+
+        // Process options with AI or manual
+        $processingResult = null;
+
+        if ($this->useAi) {
+            $this->command->info("  ↳ 🤖 Processing with AI...");
+            try {
+                $processingResult = $this->optionsService->processOptionsWithAi(
+                    $product->id,
+                    $options,
+                    $product->name,
+                    $product->category ? $product->category->name : null
+                );
+
+                if ($processingResult && empty($processingResult['errors'])) {
+                    $results['ai_processed_count']++;
+                    $this->command->info("  ↳ ✅ AI processing successful");
+                } else {
+                    $this->command->warn("  ↳ ⚠️ AI processing failed, switching to manual...");
+                    $processingResult = $this->optionsService->processOptionsWithoutAi($product->id, $options);
+                    $results['manual_processed_count']++;
+                }
+            } catch (\Exception $e) {
+                $this->command->error("  ↳ ❌ AI processing error: " . $e->getMessage());
+                $processingResult = $this->optionsService->processOptionsWithoutAi($product->id, $options);
+                $results['manual_processed_count']++;
+            }
+        } else {
+            $this->command->info("  ↳ 👨‍💻 Processing manually...");
+            $processingResult = $this->optionsService->processOptionsWithoutAi($product->id, $options);
+            $results['manual_processed_count']++;
+        }
+
+        if ($processingResult) {
+            // Display processing summary
+            $this->displayProcessingSummary($processingResult);
+            
+            // Track size tiers
+            if (isset($processingResult['summary']['size_tiers'])) {
+                $results['size_tiers_count'] += $processingResult['summary']['size_tiers'];
+            }
+            
+            // معالجة التبعيات
+            $dependenciesLinked = $this->processDependenciesForProduct($product->id, $options);
+            if ($dependenciesLinked > 0) {
+                $results['dependencies_linked'] += $dependenciesLinked;
+                $this->command->info("  ↳ 🔗 Linked {$dependenciesLinked} dependencies");
+            }
+
+            $results['success_count']++;
+        } else {
+            $this->command->error("  ↳ ❌ Failed to process options");
+            $results['fail_count']++;
+        }
+
+        // Clean up memory
+        $this->cleanupMemory($index);
+        
+        // Add delay between products
+        $this->addDelay($index, $totalProducts);
+    }
+    
+    return $results;
+}
 }

@@ -2,20 +2,22 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
-use App\Models\Product;
-use App\Models\ProductOptions;
-use App\Models\DesignService;
-use App\Models\PrintingMethod;
-use App\Models\PrintLocation;
-use App\Models\EmbroiderLocation;
-use App\Models\Material;
 use App\Models\Size;
 use App\Models\Color;
+use App\Models\Product;
+use App\Models\Material;
+use Illuminate\Support\Str;
 use App\Models\DeliveryTime;
+use App\Models\DesignService;
+use App\Models\PrintLocation;
+use App\Models\PrintingMethod;
+use App\Models\ProductOptions;
 use App\Models\ProductSizeTier;
+use App\Models\EmbroiderLocation;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Request;
 
 class ProductOptionsAiService
 {
@@ -390,57 +392,6 @@ class ProductOptionsAiService
     }
 
     /**
-     * Extract JSON from product page
-     */
-    public function extractOptionsFromHtml($url)
-    {
-        try {
-            $response = Http::withHeaders($this->baseHeaders)->get($url);
-
-            if (!$response->successful()) {
-                Log::warning('Failed to fetch product page', ['url' => $url]);
-                return null;
-            }
-
-            $html = $response->body();
-
-            // Find salla-product-options and extract JSON
-            preg_match('/<salla-product-options\s+options="([^"]+)"/', $html, $matches);
-
-            if (!isset($matches[1])) {
-                // Try another pattern
-                preg_match('/options="([^"]+)"/', $html, $matches);
-            }
-
-            if (!isset($matches[1])) {
-                Log::warning('Options not found in page', ['url' => $url]);
-                return null;
-            }
-
-            // Decode HTML entities and convert to JSON
-            $jsonString = html_entity_decode($matches[1], ENT_QUOTES, 'UTF-8');
-            $options = json_decode($jsonString, true);
-
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                Log::warning('JSON conversion error', [
-                    'url' => $url,
-                    'error' => json_last_error_msg(),
-                    'json_string' => substr($jsonString, 0, 200)
-                ]);
-                return null;
-            }
-
-            return $options;
-        } catch (\Exception $e) {
-            Log::error('Error extracting options', [
-                'url' => $url,
-                'error' => $e->getMessage()
-            ]);
-            return null;
-        }
-    }
-
-    /**
      * Alternative: Fetch products with next URL pagination
      */
     public function fetchProductsWithNextUrl($allPages = true)
@@ -779,6 +730,8 @@ class ProductOptionsAiService
             } catch (\Exception $e) {
                 $results['errors'][] = "Failed to process option {$optionId}: " . $e->getMessage();
             }
+            // بعد معالجة جميع الخيارات، معالجة التبعيات
+            $this->processRelatedOptions($productId, $originalOptions);
         }
 
         // Store visibility conditions
@@ -905,7 +858,7 @@ class ProductOptionsAiService
     }
 
     /**
-     * Process options without AI (fallback)
+     * Process options without AI (fallback) with dependencies
      */
     public function processOptionsWithoutAi($productId, $options)
     {
@@ -923,92 +876,455 @@ class ProductOptionsAiService
                 'delivery_time' => 0,
                 'quantity' => 0,
                 'general' => 0,
-                'size_tiers' => 0
+                'size_tiers' => 0,
+                'dependencies' => 0
             ]
         ];
 
+        // تخزين mapping من external_option_id إلى db_id
+        $externalToDbMap = [];
+
+        // أولاً: تخزين جميع الخيارات
         foreach ($options as $option) {
             try {
                 $name = strtolower($option['name'] ?? '');
-                $processed = false;
+                $category = 'general';
 
+                // تحديد الفئة
                 if (str_contains($name, 'خدمة التصميم') || str_contains($name, 'تصميم')) {
                     $this->processDesignService($productId, $option);
                     $results['summary']['design_service']++;
-                    $processed = true;
+                    $category = 'design_service';
+                } elseif (str_contains($name, 'نوع الخامة') || str_contains($name, 'خامة') || str_contains($name, 'مادة')) {
+                    $category = 'material';
+                    $results['summary']['material']++;
                 } elseif (str_contains($name, 'طريقة الطباعة') || str_contains($name, 'طباعة')) {
                     $this->processPrintingMethod($productId, $option);
                     $results['summary']['printing_method']++;
-                    $processed = true;
-                } elseif (
-                    str_contains($name, 'مكان الطباعة') || str_contains($name, 'موقع الطباعة') ||
-                    str_contains($name, 'وجه') || str_contains($name, 'أوجه')
-                ) {
-                    $this->processPrintLocation($productId, $option);
-                    $results['summary']['print_location']++;
-                    $processed = true;
-                } elseif (str_contains($name, 'تطريز') || str_contains($name, 'مكان التطريز')) {
-                    $this->processEmbroiderLocation($productId, $option);
-                    $results['summary']['embroider_location']++;
-                    $processed = true;
-                } elseif (
-                    str_contains($name, 'خامة') || str_contains($name, 'مادة') ||
-                    str_contains($name, 'قماش') || str_contains($name, 'ورق')
-                ) {
-                    $this->processMaterial($productId, $option);
-                    $results['summary']['material']++;
-                    $processed = true;
-                } elseif (
-                    str_contains($name, 'مقاس') || str_contains($name, 'حجم') ||
-                    str_contains($name, 'قياس') || str_contains($name, 'بعد')
-                ) {
-                    $tiersCreated = $this->processSizeWithTiers($productId, $option);
-                    $results['summary']['size']++;
-                    $results['summary']['size_tiers'] += $tiersCreated;
-                    $processed = true;
-                } elseif (
-                    str_contains($name, 'لون') || str_contains($name, 'اللون') ||
-                    str_contains($name, 'ألوان')
-                ) {
-                    $this->processColor($productId, $option);
-                    $results['summary']['color']++;
-                    $processed = true;
-                } elseif (
-                    str_contains($name, 'وقت التوصيل') || str_contains($name, 'مدة التصنيع') ||
-                    str_contains($name, 'وقت الإنتاج')
-                ) {
-                    $this->processDeliveryTime($productId, $option);
-                    $results['summary']['delivery_time']++;
-                    $processed = true;
-                } elseif (
-                    str_contains($name, 'كمية') || str_contains($name, 'عدد') ||
-                    str_contains($name, 'قطعة')
-                ) {
-                    $this->processQuantity($productId, $option);
+                    $category = 'printing_method';
+                } elseif (str_contains($name, 'كمية') || str_contains($name, 'عدد')) {
+                    $category = 'quantity';
                     $results['summary']['quantity']++;
-                    $processed = true;
                 }
 
-                if (!$processed) {
-                    $this->processGeneralOption($productId, $option);
-                    $results['summary']['general']++;
+                // تخزين الخيار في قاعدة البيانات
+                $storageResult = $this->storeOptionInDatabase($productId, $option, $category);
+
+                // تخزين mapping للاستخدام في التبعيات
+                if ($storageResult['first_db_id']) {
+                    $externalToDbMap[$option['id']] = $storageResult['first_db_id'];
                 }
 
                 $results['processed_options'][] = [
                     'option_id' => $option['id'],
                     'option_name' => $option['name'],
-                    'category' => $processed ? 'manual' : 'general',
-                    'details_count' => count($option['details'] ?? [])
+                    'category' => $category,
+                    'details_count' => count($option['details'] ?? []),
+                    'db_id' => $storageResult['first_db_id'] ?? null
                 ];
             } catch (\Exception $e) {
                 $results['errors'][] = "Failed to process option {$option['id']}: " . $e->getMessage();
             }
         }
 
-        $this->storeVisibilityConditions($productId, $options);
+        // ثانياً: ربط التبعيات
+        $dependenciesLinked = $this->linkDependenciesWithMap($productId, $options, $externalToDbMap);
+        $results['summary']['dependencies'] = $dependenciesLinked;
 
         return $results;
     }
+    /**
+     * ربط التبعيات باستخدام الخريطة
+     */
+    private function linkDependenciesWithMap($productId, $options, $externalToDbMap)
+    {
+        $dependenciesLinked = 0;
+
+        foreach ($options as $option) {
+            $optionId = $option['id'] ?? null;
+
+            // التحقق من وجود معلومات التبعية
+            if ($optionId && isset($option['dependency_info'])) {
+                $dependencyInfo = $option['dependency_info'];
+                $parentExternalId = $dependencyInfo['depends_on_option_id'] ?? null;
+                $parentDetailId = $dependencyInfo['depends_on_detail_id'] ?? null;
+
+                if ($parentExternalId && isset($externalToDbMap[$parentExternalId])) {
+                    $parentDbId = $externalToDbMap[$parentExternalId];
+
+                    // تحديث جميع تفاصيل هذا الخيار
+                    $updatedCount = ProductOptions::where([
+                        'product_id' => $productId,
+                        'external_option_id' => $optionId
+                    ])->update([
+                        'depends_on_option_id' => $parentDbId,
+                        'depends_on_detail_id' => $parentDetailId,
+                        'dependency_condition' => $dependencyInfo['type'] ?? 'depends_on'
+                    ]);
+
+                    $dependenciesLinked += $updatedCount;
+
+                    Log::info("Linked dependency with map", [
+                        'product_id' => $productId,
+                        'option_external_id' => $optionId,
+                        'option_db_id' => $externalToDbMap[$optionId] ?? 'not_found',
+                        'parent_external_id' => $parentExternalId,
+                        'parent_db_id' => $parentDbId,
+                        'updated_count' => $updatedCount
+                    ]);
+                }
+            }
+        }
+
+        return $dependenciesLinked;
+    }
+    /**
+     * تخزين الخيار في قاعدة البيانات
+     */
+    /**
+     * تخزين الخيار في قاعدة البيانات وإرجاع id
+     */
+    private function storeOptionInDatabase($productId, $option, $category = 'general')
+    {
+        $optionRecords = [];
+        $dbIds = [];
+
+        foreach ($option['details'] as $detail) {
+            // استخراج السعر من النص
+            $additionalPrice = $detail['additional_price'] ?? 0;
+            if ($additionalPrice == 0 && isset($detail['name'])) {
+                $extractedPrice = $this->extractPriceFromText($detail['name']);
+                if ($extractedPrice > 0) {
+                    $additionalPrice = $extractedPrice;
+                }
+            }
+
+            $record = ProductOptions::updateOrCreate(
+                [
+                    'product_id' => $productId,
+                    'external_option_id' => $option['id'],
+                    'external_detail_id' => $detail['id']
+                ],
+                [
+                    'option_name' => $option['name'],
+                    'option_value' => $detail['name'],
+                    'additional_price' => $additionalPrice,
+                    'is_required' => $option['required'] ?? false,
+                    'depends_on_option_id' => null, // سيتم تحديثه لاحقاً
+                    'depends_on_detail_id' => null, // سيتم تحديثه لاحقاً
+                    'dependency_condition' => null // سيتم تحديثه لاحقاً
+                ]
+            );
+
+            $optionRecords[] = $record;
+            $dbIds[] = $record->id;
+        }
+
+        // إرجاع مصفوفة تحتوي على السجلات و id الأول (للاستخدام في التبعيات)
+        return [
+            'records' => $optionRecords,
+            'first_db_id' => !empty($dbIds) ? $dbIds[0] : null
+        ];
+    }
+
+
+    /**
+     * معالجة جميع خيارات المنتج مع التبعيات
+     */
+    public function processProductWithDependencies($productId, $url = null)
+    {
+        try {
+            if (!$url) {
+                $product = Product::find($productId);
+                if (!$product || !$product->url) {
+                    throw new \Exception("Product URL not found");
+                }
+                $url = $product->url;
+            }
+
+            // 1. استخراج الخيارات من HTML
+            $optionsData = $this->extractOptionsAndDependencies($url);
+
+            if (!$optionsData) {
+                throw new \Exception("Failed to extract options");
+            }
+
+            // 2. معالجة الخيارات وربط التبعيات
+            $result = $this->processOptionsWithDependencies($productId, $optionsData);
+
+            return $result;
+        } catch (\Exception $e) {
+            Log::error('Error processing product dependencies', [
+                'product_id' => $productId,
+                'error' => $e->getMessage()
+            ]);
+            return null;
+        }
+    }
+
+    /**
+     * استخراج الخيارات والتبعيات من HTML
+     */
+    private function extractOptionsAndDependencies($url)
+    {
+        try {
+            $response = Http::withHeaders($this->baseHeaders)->get($url);
+
+            if (!$response->successful()) {
+                throw new \Exception("HTTP request failed: " . $response->status());
+            }
+
+            $html = $response->body();
+
+            // استخراج الـ options
+            preg_match('/<salla-product-options\s+options="([^"]+)"/', $html, $matches);
+
+            if (!isset($matches[1])) {
+                preg_match('/options="([^"]+)"/', $html, $matches);
+            }
+
+            if (!isset($matches[1])) {
+                throw new \Exception("Options not found in HTML");
+            }
+
+            $jsonString = html_entity_decode($matches[1], ENT_QUOTES, 'UTF-8');
+            $options = json_decode($jsonString, true);
+
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new \Exception("JSON decode error: " . json_last_error_msg());
+            }
+
+            // استخراج التبعيات
+            $dependencies = $this->extractDependenciesFromHtml($html);
+
+            return [
+                'options' => $options,
+                'dependencies' => $dependencies,
+                'html' => $html
+            ];
+        } catch (\Exception $e) {
+            Log::error('Error extracting options and dependencies', [
+                'url' => $url,
+                'error' => $e->getMessage()
+            ]);
+            return null;
+        }
+    }
+
+    /**
+     * استخراج التبعيات من HTML
+     */
+    private function extractDependenciesFromHtml($html)
+    {
+        $dependencies = [];
+
+        // البحث عن جميع data-show-when
+        preg_match_all('/data-option-id="(\d+)"[^>]*data-show-when="([^"]+)"/', $html, $matches, PREG_SET_ORDER);
+
+        foreach ($matches as $match) {
+            $dependentId = $match[1];
+            $condition = $match[2];
+
+            // تحليل الشرط
+            if (preg_match('/options\[(\d+)\]\s*=\s*(\d+)/', $condition, $condMatches)) {
+                $dependencies[$dependentId] = [
+                    'type' => 'equals',
+                    'parent_option_id' => $condMatches[1],
+                    'parent_detail_id' => $condMatches[2]
+                ];
+            } elseif (preg_match('/options\[(\d+)\]\s*!=\s*(\d+)/', $condition, $condMatches)) {
+                $dependencies[$dependentId] = [
+                    'type' => 'not_equals',
+                    'parent_option_id' => $condMatches[1],
+                    'parent_detail_id' => $condMatches[2]
+                ];
+            }
+        }
+
+        return $dependencies;
+    }
+
+    /**
+     * معالجة الخيارات مع التبعيات
+     */
+    private function processOptionsWithDependencies($productId, $optionsData)
+    {
+        DB::beginTransaction();
+
+        try {
+            $options = $optionsData['options'];
+            $dependencies = $optionsData['dependencies'];
+
+            // 1. حذف الخيارات القديمة
+            ProductOptions::where('product_id', $productId)->delete();
+
+            // 2. تخزين جميع الخيارات (دون تبعيات أولاً)
+            $optionIdMap = []; // external_id => [db_ids]
+
+            foreach ($options as $option) {
+                $optionExternalId = $option['id'];
+                $optionIdMap[$optionExternalId] = [];
+
+                foreach ($option['details'] as $detail) {
+                    // استخراج السعر
+                    $price = $detail['additional_price'] ?? 0;
+                    if ($price == 0) {
+                        $extractedPrice = $this->extractPriceFromText($detail['name'] ?? '');
+                        if ($extractedPrice > 0) {
+                            $price = $extractedPrice;
+                        }
+                    }
+
+                    $dbOption = ProductOptions::create([
+                        'product_id' => $productId,
+                        'external_option_id' => $optionExternalId,
+                        'external_detail_id' => $detail['id'] ?? null,
+                        'option_name' => $option['name'] ?? '',
+                        'option_value' => $detail['name'] ?? '',
+                        'additional_price' => $price,
+                        'is_required' => $option['required'] ?? false,
+                        'depends_on_option_id' => null,
+                        'depends_on_detail_id' => null,
+                        'dependency_condition' => null
+                    ]);
+
+                    $optionIdMap[$optionExternalId][] = $dbOption->id;
+                }
+            }
+
+            // 3. ربط التبعيات
+            $linkedCount = 0;
+
+            foreach ($dependencies as $dependentExternalId => $dependencyInfo) {
+                if (!isset($optionIdMap[$dependentExternalId])) {
+                    continue;
+                }
+
+                $parentExternalId = $dependencyInfo['parent_option_id'] ?? null;
+                $parentDetailId = $dependencyInfo['parent_detail_id'] ?? null;
+
+                if (!$parentExternalId || !isset($optionIdMap[$parentExternalId])) {
+                    continue;
+                }
+
+                // نحتاج إلى معرف الـ id للخيار الأصلي (نأخذ أول سجل)
+                $parentDbId = $optionIdMap[$parentExternalId][0] ?? null;
+
+                if (!$parentDbId) {
+                    continue;
+                }
+
+                // تحديث جميع سجلات الخيار التابع
+                ProductOptions::where('product_id', $productId)
+                    ->where('external_option_id', $dependentExternalId)
+                    ->update([
+                        'depends_on_option_id' => $parentDbId,
+                        'depends_on_detail_id' => $parentDetailId,
+                        'dependency_condition' => $dependencyInfo['type'] ?? 'depends_on'
+                    ]);
+
+                $linkedCount++;
+            }
+
+            DB::commit();
+
+            return [
+                'success' => true,
+                'options_count' => count($options),
+                'dependencies_count' => count($dependencies),
+                'linked_dependencies' => $linkedCount,
+                'option_id_map' => $optionIdMap
+            ];
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error in processOptionsWithDependencies', [
+                'product_id' => $productId,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            throw $e;
+        }
+    }
+
+    /**
+     * استخراج السعر من النص
+     */
+    private function extractPriceFromText($text)
+    {
+        // 1. البحث عن سعر الوحدة
+        if (preg_match('/\(?\s*([\d\.\,]+)\s*ريال?\s*\/\s*للحبة\)?/u', $text, $matches)) {
+            $price = str_replace([',', '٫'], '.', $matches[1]);
+            return floatval($price);
+        }
+
+        // 2. البحث عن السعر الإجمالي بين قوسين
+        if (preg_match('/\(?\s*([\d\.\,]+)\s*ر\.س\)?/u', $text, $matches)) {
+            $price = str_replace([',', '٫'], '.', $matches[1]);
+            return floatval($price);
+        }
+
+        // 3. البحث عن أي رقم
+        if (preg_match('/(\d+(?:\.\d+)?)/', $text, $matches)) {
+            return floatval($matches[1]);
+        }
+
+        return 0;
+    }
+
+    /**
+     * إصلاح التبعيات لمنتج معين
+     */
+    public function fixDependenciesForProduct($productId)
+    {
+        $product = Product::find($productId);
+        if (!$product || !$product->url) {
+            return ['error' => 'Product or URL not found'];
+        }
+
+        return $this->processProductWithDependencies($productId, $product->url);
+    }
+
+    /**
+     * الحصول على خيارات المنتج مع التبعيات
+     */
+    public function getProductOptionsWithDependencies($productId)
+    {
+        $options = ProductOptions::where('product_id', $productId)
+            ->orderBy('depends_on_option_id')
+            ->orderBy('option_name')
+            ->get()
+            ->groupBy('external_option_id');
+
+        $structured = [];
+
+        foreach ($options as $externalId => $optionGroup) {
+            $firstOption = $optionGroup->first();
+
+            $structured[$externalId] = [
+                'id' => $firstOption->id,
+                'external_id' => $firstOption->external_option_id,
+                'name' => $firstOption->option_name,
+                'required' => $firstOption->is_required,
+                'depends_on' => [
+                    'option_id' => $firstOption->depends_on_option_id,
+                    'detail_id' => $firstOption->depends_on_detail_id,
+                    'condition' => $firstOption->dependency_condition
+                ],
+                'details' => $optionGroup->map(function ($item) {
+                    return [
+                        'id' => $item->id,
+                        'external_detail_id' => $item->external_detail_id,
+                        'value' => $item->option_value,
+                        'price' => $item->additional_price
+                    ];
+                })->toArray()
+            ];
+        }
+
+        return $structured;
+    }
+
+
 
     /**
      * Process design service
@@ -1090,20 +1406,26 @@ class ProductOptionsAiService
     /**
      * Process material
      */
+    /**
+     * Process material - تخزين كخيار عادي بدلاً من جدول منفصل
+     */
     private function processMaterial($productId, $option)
     {
+        // فقط تخزين في جدول الخيارات، لا ننشئ سجلات في جدول الخامات
         foreach ($option['details'] as $detail) {
-            $material = Material::firstOrCreate(
-                ['name' => $detail['name']],
+            ProductOptions::updateOrCreate(
                 [
-                    'description' => $detail['name']
+                    'product_id' => $productId,
+                    'external_option_id' => $option['id'],
+                    'external_detail_id' => $detail['id']
+                ],
+                [
+                    'option_name' => $option['name'],
+                    'option_value' => $detail['name'],
+                    'additional_price' => $detail['additional_price'] ?? 0,
+                    'is_required' => $option['required'] ?? false
                 ]
             );
-
-            $product = Product::find($productId);
-            if ($product) {
-                $product->materials()->syncWithoutDetaching([$material->id]);
-            }
         }
     }
 
@@ -1120,19 +1442,53 @@ class ProductOptionsAiService
      */
     private function processGeneralOption($productId, $option)
     {
+        $dependencyInfo = null;
+
+        // استخراج معلومات التبعية إذا وجدت
+        if (isset($option['visibility_condition'])) {
+            $dependencyInfo = $this->parseDependencyCondition($option['visibility_condition']);
+        }
+
+        // البحث عن الخيار الأصلي إذا كان هناك تبعية
+        $parentOptionRecord = null;
+        if ($dependencyInfo && isset($dependencyInfo['parent_option_id'])) {
+            $parentOptionRecord = ProductOptions::where([
+                'product_id' => $productId,
+                'external_option_id' => $dependencyInfo['parent_option_id']
+            ])->first();
+        }
+
         foreach ($option['details'] as $detail) {
+            // استخراج السعر من النص إذا لم يكن موجوداً
+            $additionalPrice = $detail['additional_price'] ?? 0;
+            if ($additionalPrice == 0 && isset($detail['name'])) {
+                $extractedPrice = $this->extractPriceFromOptionText($detail['name']);
+                if ($extractedPrice > 0) {
+                    $additionalPrice = $extractedPrice;
+                }
+            }
+
+            $data = [
+                'option_name' => $option['name'],
+                'option_value' => $detail['name'],
+                'additional_price' => $additionalPrice,
+                'is_required' => $option['required'] ?? false,
+            ];
+
+            // إضافة معلومات التبعية إذا وجدت
+            if ($parentOptionRecord) {
+                $data['depends_on_option_id'] = $parentOptionRecord->id;
+                $data['depends_on_detail_id'] = $dependencyInfo['parent_detail_id'] ?? null;
+                $data['dependency_condition'] = $dependencyInfo['condition'] ?? 'depends_on';
+            }
+
             ProductOptions::updateOrCreate(
                 [
                     'product_id' => $productId,
                     'external_option_id' => $option['id'],
                     'external_detail_id' => $detail['id']
                 ],
-                [
-                    'option_name' => $option['name'],
-                    'option_value' => $detail['name'],
-                    'additional_price' => $detail['additional_price'] ?? 0,
-                    'is_required' => $option['required'] ?? false
-                ]
+                $data
             );
         }
     }
@@ -1283,6 +1639,427 @@ class ProductOptionsAiService
                 }
 
                 return $value;
+            }
+        }
+
+        return 0;
+    }
+    /**
+     * معالجة الخيارات المترابطة مثل الكميات مع الطباعة
+     */
+    private function processRelatedOptions($productId, $options)
+    {
+        // البحث عن خيارات الكميات المرتبطة بخيارات أخرى
+        foreach ($options as $option) {
+            $optionName = strtolower($option['name'] ?? '');
+
+            // إذا كان خيار كمية ولديه شرط ظاهر
+            if ((str_contains($optionName, 'كمية') || str_contains($optionName, 'عدد'))
+                && isset($option['visibility_condition'])
+            ) {
+
+                // استخراج السعر من نص الخيار
+                $this->processQuantityWithDependencies($productId, $option);
+            }
+        }
+    }
+
+    /**
+     * معالجة خيار الكمية مع التبعيات
+     */
+    private function processQuantityWithDependencies($productId, $option)
+    {
+        $dependencyInfo = $this->parseDependencyCondition($option['visibility_condition']);
+
+        if (!$dependencyInfo) {
+            return $this->processGeneralOption($productId, $option);
+        }
+
+        $parentOptionId = $dependencyInfo['parent_option_id'];
+        $parentDetailId = $dependencyInfo['parent_detail_id'];
+
+        // البحث عن الخيار الأصلي (المعتمد عليه)
+        $parentOptionRecord = ProductOptions::where([
+            'product_id' => $productId,
+            'external_option_id' => $parentOptionId,
+            'external_detail_id' => $parentDetailId
+        ])->first();
+
+        foreach ($option['details'] as $detail) {
+            // استخراج السعر من نص الخيار
+            $priceInfo = $this->extractPriceFromQuantityText($detail['name']);
+
+            ProductOptions::updateOrCreate(
+                [
+                    'product_id' => $productId,
+                    'external_option_id' => $option['id'],
+                    'external_detail_id' => $detail['id']
+                ],
+                [
+                    'option_name' => $option['name'],
+                    'option_value' => $detail['name'],
+                    'additional_price' => $priceInfo['unit_price'] ?? 0,
+                    'is_required' => $option['required'] ?? false,
+                    'depends_on_option_id' => $parentOptionRecord->id ?? null,
+                    'depends_on_detail_id' => $parentOptionRecord->id ?? null,
+                    'dependency_condition' => 'depends_on'
+                ]
+            );
+
+            // إنشاء تسعير للكمية في جدول ProductSizeTier
+            if (isset($priceInfo['quantity']) && isset($priceInfo['unit_price'])) {
+                ProductSizeTier::updateOrCreate(
+                    [
+                        'product_id' => $productId,
+                        'option_id' => $option['id'],
+                        'quantity' => $priceInfo['quantity']
+                    ],
+                    [
+                        'price_per_unit' => $priceInfo['unit_price'],
+                        'total_price' => $priceInfo['total_price'] ?? ($priceInfo['quantity'] * $priceInfo['unit_price']),
+                        'is_quantity_tier' => true,
+                        'tier_name' => "كمية {$priceInfo['quantity']}"
+                    ]
+                );
+            }
+        }
+    }
+
+    /**
+     * استخراج السعر من نص خيار الكمية
+     */
+    private function extractPriceFromQuantityText($text)
+    {
+        // أمثلة للنصوص:
+        // "50 حبات ( 17.25 ريال / للحبة ) (٨٦٢٫٥ ر.س)"
+        // "100 حبات ( 16.675 ريال / للحبة ) (١٦٦٧٫٥ ر.س)"
+
+        $patterns = [
+            // استخراج الكمية
+            '/(\d+)\s*حبات?/u' => 'quantity',
+            // استخراج سعر الوحدة
+            '/\(?\s*([\d\.]+)\s*ريال?\s*\/\s*للحبة\s*\)?/u' => 'unit_price',
+            // استخراج السعر الإجمالي (بالأرقام العربية)
+            '/\(?([\d٫]+)\s*ر\.س\)?/u' => 'total_price_ar',
+            // استخراج السعر الإجمالي (بالأرقام الإنجليزية)
+            '/\(?\s*([\d\.]+)\s*ر\.س\)?/u' => 'total_price'
+        ];
+
+        $result = [];
+
+        foreach ($patterns as $pattern => $type) {
+            if (preg_match($pattern, $text, $matches)) {
+                $value = $matches[1];
+
+                // تحويل الأرقام العربية إلى إنجليزية
+                if (strpos($type, 'total_price_ar') !== false) {
+                    $value = $this->convertArabicNumbers($value);
+                }
+
+                // تحويل النقطة العربية إلى نقطة إنجليزية
+                $value = str_replace('٫', '.', $value);
+
+                $result[$type] = floatval($value);
+            }
+        }
+
+        // إذا لم يتم العثور على total_price مباشرة، احسبه
+        if (isset($result['quantity']) && isset($result['unit_price']) && !isset($result['total_price'])) {
+            $result['total_price'] = $result['quantity'] * $result['unit_price'];
+        }
+
+        return $result;
+    }
+
+    /**
+     * تحويل الأرقام العربية إلى إنجليزية
+     */
+    private function convertArabicNumbers($string)
+    {
+        $arabic = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩', '٫'];
+        $english = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.'];
+
+        return str_replace($arabic, $english, $string);
+    }
+
+
+    // في controller
+    public function getProductOptions($productId)
+    {
+        $product = Product::findOrFail($productId);
+
+        // الحصول على جميع الخيارات
+        $options = ProductOptions::where('product_id', $productId)
+            ->orderBy('depends_on_option_id')
+            ->orderBy('option_name')
+            ->get()
+            ->groupBy('external_option_id');
+
+        // بناء هيكل التبعيات
+        $structuredOptions = [];
+        foreach ($options as $optionGroup) {
+            $firstOption = $optionGroup->first();
+
+            $structuredOption = [
+                'id' => $firstOption->external_option_id,
+                'name' => $firstOption->option_name,
+                'required' => $firstOption->is_required,
+                'depends_on' => $firstOption->depends_on_option_id,
+                'details' => []
+            ];
+
+            foreach ($optionGroup as $detail) {
+                $structuredOption['details'][] = [
+                    'id' => $detail->external_detail_id,
+                    'value' => $detail->option_value,
+                    'additional_price' => $detail->additional_price,
+                    'depends_on_detail_id' => $detail->depends_on_detail_id
+                ];
+            }
+
+            $structuredOptions[] = $structuredOption;
+        }
+
+        // ترتيب الخيارات بناء على التبعيات
+        $sortedOptions = $this->sortOptionsByDependency($structuredOptions);
+
+        return response()->json([
+            'product' => $product->only(['id', 'name', 'price']),
+            'options' => $sortedOptions
+        ]);
+    }
+
+    /**
+     * ترتيب الخيارات بناء على التبعيات
+     */
+    private function sortOptionsByDependency($options)
+    {
+        $independent = [];
+        $dependent = [];
+
+        foreach ($options as $option) {
+            if (empty($option['depends_on'])) {
+                $independent[] = $option;
+            } else {
+                $dependent[] = $option;
+            }
+        }
+
+        // إضافة الخيارات المعتمدة بعد الخيارات المستقلة
+        return array_merge($independent, $dependent);
+    }
+
+    /**
+     * الحصول على الخيارات المتاحة بناء على الخيارات المختارة
+     */
+    public function getAvailableOptions($productId, Request $request)
+    {
+        $selectedOptions = $request->input('selected_options', []);
+
+        $availableOptions = ProductOptions::where('product_id', $productId)
+            ->where(function ($query) use ($selectedOptions) {
+                // الخيارات التي لا تعتمد على شيء
+                $query->whereNull('depends_on_option_id');
+
+                // أو الخيارات التي تعتمد على خيار تم اختياره
+                foreach ($selectedOptions as $optionId => $detailId) {
+                    $query->orWhere(function ($q) use ($optionId, $detailId) {
+                        $q->where('depends_on_option_id', $optionId)
+                            ->where('depends_on_detail_id', $detailId);
+                    });
+                }
+            })
+            ->get()
+            ->groupBy('external_option_id');
+
+        return response()->json(['options' => $availableOptions]);
+    }
+
+    /**
+     * معالجة جميع الخيارات مع التبعيات
+     */
+    // public function processOptionsWithDependencies($productId, $options)
+    // {
+    //     $results = $this->processOptionsWithoutAi($productId, $options);
+
+    //     // معالجة إضافية للتبعيات
+    //     $dependenciesLinked = $this->linkAllDependencies($productId, $options);
+
+    //     if (isset($results['summary'])) {
+    //         $results['summary']['dependencies_linked'] = $dependenciesLinked;
+    //     }
+
+    //     return $results;
+    // }
+
+    /**
+     * ربط جميع التبعيات
+     */
+
+    /**
+     * تحليل شرط التبعية
+     */
+    private function parseDependencyCondition($condition)
+    {
+        if (is_array($condition)) {
+            return [
+                'parent_option_id' => $condition['depends_on_option_id'] ?? null,
+                'parent_detail_id' => $condition['depends_on_detail_id'] ?? null
+            ];
+        }
+
+        if (is_string($condition)) {
+            // حالة: "options[628499549] = 1293578302"
+            if (preg_match('/options\[(\d+)\]\s*=\s*(\d+)/', $condition, $matches)) {
+                return [
+                    'parent_option_id' => $matches[1],
+                    'parent_detail_id' => $matches[2]
+                ];
+            }
+
+            // حالة: "options[770672800] != 812664647"
+            if (preg_match('/options\[(\d+)\]\s*!=\s*(\d+)/', $condition, $matches)) {
+                return [
+                    'parent_option_id' => $matches[1],
+                    'parent_detail_id' => $matches[2],
+                    'condition' => 'not_equals'
+                ];
+            }
+        }
+
+        return null;
+    }
+
+
+
+    /**
+     * تحديث دالة extractOptionsFromHtml
+     */
+    // في ProductOptionsAiService.php - تحديث دالة extractOptionsFromHtml
+    public function extractOptionsFromHtml($url)
+    {
+        try {
+            $response = Http::withHeaders($this->baseHeaders)->get($url);
+
+            if (!$response->successful()) {
+                Log::warning('Failed to fetch product page', ['url' => $url]);
+                return null;
+            }
+
+            $html = $response->body();
+
+            // استخراج الـ options
+            preg_match('/<salla-product-options\s+options="([^"]+)"/', $html, $matches);
+
+            if (!isset($matches[1])) {
+                preg_match('/options="([^"]+)"/', $html, $matches);
+            }
+
+            if (!isset($matches[1])) {
+                Log::warning('Options not found in page', ['url' => $url]);
+                return null;
+            }
+
+            $jsonString = html_entity_decode($matches[1], ENT_QUOTES, 'UTF-8');
+            $options = json_decode($jsonString, true);
+
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                Log::warning('JSON conversion error', [
+                    'url' => $url,
+                    'error' => json_last_error_msg(),
+                    'json_string' => substr($jsonString, 0, 200)
+                ]);
+                return null;
+            }
+
+            // استخراج جميع التبعيات من الـ HTML
+            $dependencies = $this->extractAllDependenciesFromHtml($html);
+
+            // إضافة التبعيات للخيارات
+            foreach ($options as &$option) {
+                $optionId = $option['id'] ?? null;
+                if ($optionId && isset($dependencies[$optionId])) {
+                    $option['dependency_info'] = $dependencies[$optionId];
+                }
+            }
+
+            return $options;
+        } catch (\Exception $e) {
+            Log::error('Error extracting options', [
+                'url' => $url,
+                'error' => $e->getMessage()
+            ]);
+            return null;
+        }
+    }
+
+    /**
+     * استخراج جميع التبعيات من الـ HTML
+     */
+    private function extractAllDependenciesFromHtml($html)
+    {
+        $dependencies = [];
+
+        // البحث عن جميع عناصر data-show-when
+        preg_match_all('/data-option-id="(\d+)"[^>]*data-show-when="([^"]+)"/', $html, $matches, PREG_SET_ORDER);
+
+        foreach ($matches as $match) {
+            $dependentOptionId = $match[1];
+            $condition = $match[2];
+
+            // تحليل الشرط
+            $parsedCondition = $this->parseVisibilityCondition($condition);
+
+            if ($parsedCondition) {
+                $dependencies[$dependentOptionId] = $parsedCondition;
+            }
+        }
+
+        return $dependencies;
+    }
+
+    /**
+     * تحليل شرط الظهور
+     */
+    private function parseVisibilityCondition($condition)
+    {
+        // حالة: options[192272123] = 557710796
+        if (preg_match('/options\[(\d+)\]\s*=\s*(\d+)/', $condition, $matches)) {
+            return [
+                'type' => 'equals',
+                'depends_on_option_id' => $matches[1],
+                'depends_on_detail_id' => $matches[2]
+            ];
+        }
+
+        // حالة: options[17052614] != 656781266
+        if (preg_match('/options\[(\d+)\]\s*!=\s*(\d+)/', $condition, $matches)) {
+            return [
+                'type' => 'not_equals',
+                'depends_on_option_id' => $matches[1],
+                'depends_on_detail_id' => $matches[2]
+            ];
+        }
+
+        return null;
+    }
+    /**
+     * استخراج السعر من نص الخيار
+     */
+    private function extractPriceFromOptionText($text)
+    {
+        // أنماط متنوعة لاستخراج السعر
+        $patterns = [
+            '/\(?\s*([\d\.\,]+)\s*ريال?/u',
+            '/\s*([\d\.\,]+)\s*ر\.س/u',
+            '/\s*([\d\.\,]+)\s*SAR/u',
+            '/\s*([\d\.\,]+)\s*$/u'
+        ];
+
+        foreach ($patterns as $pattern) {
+            if (preg_match($pattern, $text, $matches)) {
+                $price = str_replace([',', '٫'], '.', $matches[1]);
+                return floatval($price);
             }
         }
 

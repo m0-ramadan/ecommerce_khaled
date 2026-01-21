@@ -224,11 +224,6 @@ class Product extends Model
         return $this->morphMany(Favorite::class, 'favouritable');
     }
 
-    // العلاقات
-    public function pricingTiers()
-    {
-        return $this->hasMany(PricingTiers::class)->orderBy('quantity');
-    }
 
     // public function sizes()
     // {
@@ -303,4 +298,57 @@ class Product extends Model
             'print_location_id'
         )->withPivot('additional_price');
     }
+
+    // في Product.php أضف هذه العلاقات والخصائص
+public function getDynamicPricingAttribute()
+{
+    return [
+        'base_price' => $this->price,
+        'final_price' => $this->final_price,
+        'has_discount' => $this->has_discount,
+        'discount' => $this->discount,
+        'color_prices' => $this->colorPrices(),
+        'size_tiers' => $this->sizeTiers,
+        'pricing_tiers' => $this->pricingTiers,
+        'options_prices' => $this->options()->sum('additional_price')
+    ];
+}
+
+// طريقة لحساب السعر النهائي بناء على جميع العوامل
+public function calculateFinalPrice($options = [], $quantity = 1, $colorId = null, $sizeId = null)
+{
+    $basePrice = $this->price;
+    
+    // تطبيق خصم المنتج
+    if ($this->has_discount && $this->discount) {
+        if ($this->discount->discount_type === 'percentage') {
+            $basePrice -= ($basePrice * $this->discount->discount_value / 100);
+        } else {
+            $basePrice -= $this->discount->discount_value;
+        }
+    }
+    
+    // إضافة أسعار الخيارات
+    foreach ($options as $optionId) {
+        $option = $this->options()->find($optionId);
+        if ($option) {
+            $basePrice += $option->additional_price;
+        }
+    }
+    
+    // تطبيق تسعير الكمية
+    $tier = $this->pricingTiers()
+        ->where('quantity', '<=', $quantity)
+        ->orderBy('quantity', 'desc')
+        ->first();
+    
+    if ($tier) {
+        $basePrice = $tier->price_per_unit;
+        if ($tier->discount_percentage) {
+            $basePrice -= ($basePrice * $tier->discount_percentage / 100);
+        }
+    }
+    
+    return $basePrice;
+}
 }
