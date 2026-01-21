@@ -227,11 +227,6 @@ class Product extends Model
         return $this->morphMany(Favorite::class, 'favouritable');
     }
 
-    // العلاقات
-    public function pricingTiers()
-    {
-        return $this->hasMany(PricingTiers::class)->orderBy('quantity');
-    }
 
     // public function sizes()
     // {
@@ -305,38 +300,5 @@ class Product extends Model
             'product_id',
             'print_location_id'
         )->withPivot('additional_price');
-    }
-
-
-    /**
-     * الحصول على التركيبات الصالحة
-     */
-    public function getValidCombinationsAttribute($value)
-    {
-        return $value ? json_decode($value, true) : [];
-    }
-
-    /**
-     * تعيين التركيبات الصالحة
-     */
-    public function setValidCombinationsAttribute($value)
-    {
-        $this->attributes['valid_combinations'] = json_encode($value);
-    }
-
-    /**
-     * الحصول على شروط الخيارات
-     */
-    public function getOptionsConditionsAttribute($value)
-    {
-        return $value ? json_decode($value, true) : [];
-    }
-
-    /**
-     * تعيين شروط الخيارات
-     */
-    public function setOptionsConditionsAttribute($value)
-    {
-        $this->attributes['options_conditions'] = json_encode($value);
     }
 }

@@ -142,15 +142,36 @@ class ProductResource extends JsonResource
 
             // ================== Options ==================
             'options' => $this->options->map(function ($option) {
+
                 $keywords = ['رفع', 'ملف', 'صورة'];
-                $hasFile = collect($keywords)->contains(fn($word) => str_contains($option->option_value, $word));
+                $hasFile = collect($keywords)->contains(
+                    fn($word) => str_contains($option->option_value, $word)
+                );
+
                 return [
-                    'id'               => $option->id,
-                    'option_name'      => $option->option_name,
-                    'option_value'     => $option->option_value,
-                    'additional_price' => $option->additional_price,
-                    'is_required'      => (bool) $option->is_required,
-                    'file'             => $hasFile ? 1 : 0,
+                    'id'           => $option->id,
+                    'option_name'  => $option->option_name,
+                    'option_value' => $option->option_value,
+                    'is_required'  => (bool) $option->is_required,
+                    'has_file'     => $hasFile,
+
+                    // السعر الثابت (لو مفيش اختيارات)
+                    'base_price'   => (float) $option->additional_price,
+
+                    // الأسعار حسب الاختيار (sizes / quantities)
+                    'prices' => $option->productSizeTiers->map(function ($tier) {
+                        return [
+                            'id'             => $tier->id,
+                            'size_id'        => $tier->size_id,
+                            'size_name'      => optional($tier->size)->name,
+                            'quantity'       => $tier->quantity,
+                            'price_per_unit' => (float) $tier->price_per_unit,
+                            'total_price'    => $tier->quantity * $tier->price_per_unit,
+                        ];
+                    }),
+
+                    // هل الاختيار له أسعار متعددة
+                    'has_multiple_prices' => $option->productSizeTiers->isNotEmpty(),
                 ];
             }),
 
