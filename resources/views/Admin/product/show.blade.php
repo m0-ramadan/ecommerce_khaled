@@ -8,12 +8,27 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css" />
     <style>
+        :root {
+            --primary-color: #696cff;
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --info-color: #17a2b8;
+            --dark-bg: #1e1e2d;
+            --dark-card: #2b3b4c;
+            --text-light: rgba(255, 255, 255, 0.9);
+            --text-muted: rgba(255, 255, 255, 0.7);
+        }
+
         body {
             font-family: "Cairo", sans-serif !important;
+            background: var(--dark-bg);
+            color: var(--text-light);
         }
 
         .product-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--primary-gradient);
             color: white;
             border-radius: 15px;
             padding: 30px;
@@ -36,9 +51,10 @@
         .product-main-image {
             border-radius: 15px;
             overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             height: 400px;
             position: relative;
+            background: var(--dark-card);
         }
 
         .product-main-image img {
@@ -64,10 +80,11 @@
             cursor: pointer;
             border: 3px solid transparent;
             transition: all 0.3s ease;
+            background: var(--dark-card);
         }
 
         .gallery-thumb.active {
-            border-color: #696cff;
+            border-color: var(--primary-color);
         }
 
         .gallery-thumb img {
@@ -77,11 +94,12 @@
         }
 
         .product-info-card {
-            /* background: white; */
+            background: var(--dark-card);
             border-radius: 15px;
             padding: 25px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
             height: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .product-price-section {
@@ -105,7 +123,7 @@
         }
 
         .discount-badge {
-            background: #ff6b6b;
+            background: var(--danger-color);
             color: white;
             padding: 5px 15px;
             border-radius: 20px;
@@ -121,21 +139,22 @@
             padding: 8px 15px;
             border-radius: 20px;
             font-weight: 500;
+            background: rgba(255, 255, 255, 0.1);
         }
 
         .stock-status.in-stock {
-            /* background: #d1fae5; */
-            color: #065f46;
+            color: #20c997;
+            background: rgba(32, 201, 151, 0.1);
         }
 
         .stock-status.low-stock {
-            /* background: #fef3c7; */
-            color: #92400e;
+            color: #ffc107;
+            background: rgba(255, 193, 7, 0.1);
         }
 
         .stock-status.out-of-stock {
-            /* background: #fee2e2; */
-            color: #991b1b;
+            color: #dc3545;
+            background: rgba(220, 53, 69, 0.1);
         }
 
         .stock-indicator {
@@ -145,15 +164,15 @@
         }
 
         .stock-indicator.in-stock {
-            background-color: #10b981;
+            background-color: #20c997;
         }
 
         .stock-indicator.low-stock {
-            background-color: #f59e0b;
+            background-color: #ffc107;
         }
 
         .stock-indicator.out-of-stock {
-            background-color: #ef4444;
+            background-color: #dc3545;
         }
 
         .status-badge {
@@ -161,34 +180,33 @@
             border-radius: 20px;
             font-weight: 600;
             font-size: 14px;
+            background: rgba(255, 255, 255, 0.1);
         }
 
         .status-active {
-            /* background: #d1fae5; */
-            color: #065f46;
+            color: #20c997;
         }
 
         .status-inactive {
-            /* background: #fee2e2; */
-            color: #991b1b;
+            color: #dc3545;
         }
 
         .status-draft {
-            /* background: #fef3c7; */
-            color: #92400e;
+            color: #ffc107;
         }
 
         .detail-card {
-            /* background: white; */
+            background: var(--dark-card);
             border-radius: 10px;
             padding: 20px;
             margin-bottom: 20px;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .detail-card h5 {
-            /* color: #f8f9fa; */
-            border-bottom: 2px solid #f8f9fa;
+            color: var(--primary-color);
+            border-bottom: 2px solid rgba(105, 108, 255, 0.3);
             padding-bottom: 10px;
             margin-bottom: 15px;
             display: flex;
@@ -203,7 +221,7 @@
             display: flex;
             justify-content: space-between;
             padding: 8px 0;
-            border-bottom: 1px solid #f8f9fa;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .detail-item:last-child {
@@ -211,12 +229,12 @@
         }
 
         .detail-label {
-            color: #7f8c8d;
+            color: var(--text-muted);
             font-weight: 500;
         }
 
         .detail-value {
-            color: #2c3e50;
+            color: var(--text-light);
             font-weight: 600;
             text-align: left;
         }
@@ -227,15 +245,16 @@
             gap: 10px;
             margin: 5px;
             padding: 8px 15px;
-            background: #f8f9fa;
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .color-preview {
             width: 20px;
             height: 20px;
             border-radius: 50%;
-            border: 2px solid white;
+            border: 2px solid var(--dark-card);
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
 
@@ -245,18 +264,20 @@
             gap: 8px;
             margin: 5px;
             padding: 8px 15px;
-            /* background: #e7f5ff; */
+            background: rgba(23, 162, 184, 0.1);
             border-radius: 20px;
-            color: #1864ab;
+            color: var(--info-color);
+            border: 1px solid rgba(23, 162, 184, 0.3);
         }
 
         .feature-badge {
             display: inline-block;
             margin: 5px;
             padding: 8px 15px;
-            /* background: #fff3bf; */
+            background: rgba(255, 193, 7, 0.1);
             border-radius: 20px;
-            color: #5c940d;
+            color: var(--warning-color);
+            border: 1px solid rgba(255, 193, 7, 0.3);
         }
 
         .option-chip {
@@ -265,24 +286,59 @@
             gap: 8px;
             margin: 5px;
             padding: 8px 15px;
-            /* background: #e3fafc; */
+            background: rgba(105, 108, 255, 0.1);
             border-radius: 20px;
-            color: #0b7285;
+            color: var(--primary-color);
+            border: 1px solid rgba(105, 108, 255, 0.3);
+            position: relative;
+        }
+
+        .option-chip.has-dependency::before {
+            content: "↳";
+            position: absolute;
+            right: -20px;
+            color: var(--warning-color);
+            font-weight: bold;
         }
 
         .option-price {
-            background: #20c997;
+            background: var(--success-color);
             color: white;
             padding: 2px 8px;
             border-radius: 10px;
             font-size: 12px;
         }
 
+        .dependency-chain {
+            background: rgba(255, 193, 7, 0.1);
+            border-right: 3px solid var(--warning-color);
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 5px;
+            font-size: 12px;
+        }
+
+        .dependency-chain-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 5px;
+        }
+
+        .dependency-chain-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .dependency-chain-item i {
+            color: var(--warning-color);
+        }
+
         .pricing-tier {
-            /* background: #f8f9fa; */
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 10px;
             padding: 15px;
             margin-bottom: 10px;
+            border-left: 4px solid var(--info-color);
         }
 
         .tier-header {
@@ -294,22 +350,22 @@
 
         .tier-quantity {
             font-weight: bold;
-            color: #2c3e50;
+            color: var(--text-light);
         }
 
         .tier-price {
             font-size: 18px;
             font-weight: bold;
-            color: #2ecc71;
+            color: var(--success-color);
         }
 
         .tier-discount {
-            color: #e74c3c;
+            color: var(--danger-color);
             font-size: 14px;
         }
 
         .tier-sample {
-            background: #3498db;
+            background: var(--info-color);
             color: white;
             padding: 3px 10px;
             border-radius: 5px;
@@ -322,10 +378,11 @@
         }
 
         .review-card {
-            /* background: #f8f9fa; */
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 10px;
             padding: 15px;
             margin-bottom: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .review-header {
@@ -337,11 +394,11 @@
 
         .reviewer-name {
             font-weight: bold;
-            color: #2c3e50;
+            color: var(--text-light);
         }
 
         .review-date {
-            color: #7f8c8d;
+            color: var(--text-muted);
             font-size: 12px;
         }
 
@@ -361,7 +418,7 @@
             top: 0;
             bottom: 0;
             width: 2px;
-            /* background: #e0e0e0; */
+            background: rgba(255, 255, 255, 0.1);
         }
 
         .timeline-item {
@@ -381,28 +438,28 @@
             width: 16px;
             height: 16px;
             border-radius: 50%;
-            background: #3498db;
-            border: 3px solid white;
-            box-shadow: 0 0 0 3px #e0e0e0;
+            background: var(--info-color);
+            border: 3px solid var(--dark-card);
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
         }
 
         .timeline-content {
-            /* background: white; */
+            background: rgba(255, 255, 255, 0.05);
             padding: 15px;
             border-radius: 10px;
-            border: 1px solid #e9ecef;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .timeline-date {
             font-size: 12px;
-            color: #7f8c8d;
+            color: var(--text-muted);
             margin-bottom: 5px;
         }
 
         .timeline-title {
             font-weight: 600;
             margin-bottom: 5px;
-            color: #2c3e50;
+            color: var(--text-light);
         }
 
         .action-buttons {
@@ -413,7 +470,7 @@
         }
 
         .action-buttons .btn {
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
             border-radius: 50%;
             width: 60px;
             height: 60px;
@@ -421,18 +478,20 @@
             align-items: center;
             justify-content: center;
             margin-bottom: 10px;
+            border: none;
         }
 
         .qr-code {
             width: 150px;
             height: 150px;
             margin: 0 auto;
-            /* background: #f8f9fa; */
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #2c3e50;
+            color: var(--text-muted);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .social-share {
@@ -450,11 +509,12 @@
             align-items: center;
             justify-content: center;
             padding: 0;
+            border: none;
         }
 
         .product-description {
             line-height: 1.8;
-            color: #495057;
+            color: var(--text-light);
         }
 
         .product-description img {
@@ -472,19 +532,20 @@
 
         .product-description table th,
         .product-description table td {
-            border: 1px solid #dee2e6;
+            border: 1px solid rgba(255, 255, 255, 0.1);
             padding: 8px;
             text-align: right;
         }
 
         .product-description table th {
-            /* background-color: #f8f9fa; */
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--primary-color);
         }
 
         .empty-state {
             text-align: center;
             padding: 30px;
-            color: #7f8c8d;
+            color: var(--text-muted);
         }
 
         .empty-state i {
@@ -496,11 +557,12 @@
         .meta-tag {
             display: inline-block;
             padding: 5px 10px;
-            /* background: #e9ecef; */
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 5px;
             margin: 3px;
             font-size: 12px;
-            color: #495057;
+            color: var(--text-light);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .badge-new {
@@ -538,6 +600,66 @@
             align-items: center;
             justify-content: center;
             padding: 0;
+            border: none;
+        }
+
+        .option-type-badge {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-right: 5px;
+        }
+
+        .type-quantity {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .type-size {
+            background: var(--info-color);
+            color: white;
+        }
+
+        .type-color {
+            background: #e91e63;
+            color: white;
+        }
+
+        .type-regular {
+            background: var(--warning-color);
+            color: #000;
+        }
+
+        .quantity-tier {
+            background: rgba(32, 201, 151, 0.1);
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 10px;
+            border-left: 3px solid var(--success-color);
+        }
+
+        .combination-badge {
+            background: rgba(105, 108, 255, 0.1);
+            border: 1px solid rgba(105, 108, 255, 0.3);
+            border-radius: 20px;
+            padding: 8px 15px;
+            margin: 3px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .combination-count {
+            background: var(--primary-color);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
         }
     </style>
 @endsection
@@ -670,7 +792,7 @@
                                 <!-- Quick Stats -->
                                 <div class="row text-center mb-4" bis_skin_checked="1">
                                     <div class="col-4" bis_skin_checked="1">
-                                        <div class="h4 mb-1" bis_skin_checked="1">{{ $product->average_rating }}</div>
+                                        <div class="h4 mb-1" bis_skin_checked="1">{{ number_format($product->average_rating, 1) }}</div>
                                         <small class="text-muted">التقييم</small>
                                     </div>
                                     <div class="col-4" bis_skin_checked="1">
@@ -712,9 +834,99 @@
                     </div>
                 @endif
 
+                <!-- Product Options with Dependencies -->
+                @if ($product->options && $product->options->count() > 0)
+                    <div class="detail-card" bis_skin_checked="1">
+                        <h5><i class="fas fa-cogs"></i> خيارات المنتج</h5>
+                        
+                        <!-- Main Options -->
+                        <div class="mb-4" bis_skin_checked="1">
+                            <h6 class="mb-3 text-primary">الخيارات الرئيسية:</h6>
+                            <div class="d-flex flex-wrap" bis_skin_checked="1">
+                                @foreach ($product->options->whereNull('depends_on_option_id') as $option)
+                                    <div class="option-chip {{ $option->dependentOptions->count() > 0 ? 'has-dependency' : '' }}">
+                                        <span class="option-type-badge type-{{ $option->option_type ?? 'regular' }}">
+                                            @if($option->option_type === 'quantity') كمية
+                                            @elseif($option->option_type === 'size') مقاس
+                                            @elseif($option->option_type === 'color') لون
+                                            @else عادي
+                                            @endif
+                                        </span>
+                                        <strong>{{ $option->option_name }}:</strong> {{ $option->option_value }}
+                                        @if ($option->additional_price > 0)
+                                            <span class="option-price">+{{ $option->additional_price }} ج.م</span>
+                                        @endif
+                                        @if ($option->is_required)
+                                            <span class="badge bg-danger">مطلوب</span>
+                                        @endif
+                                        
+                                        <!-- Quantity Tiers -->
+                                        @if($option->quantityTiers->count() > 0)
+                                            <div class="quantity-tier">
+                                                <small class="d-block mb-2">شرائح الكمية:</small>
+                                                @foreach($option->quantityTiers as $tier)
+                                                    <div class="d-flex justify-content-between mb-1">
+                                                        <span>{{ $tier->quantity }} قطعة+</span>
+                                                        <span class="text-success">{{ $tier->price_per_unit }} ج.م</span>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        @endif
+                                        
+                                        <!-- Dependent Options -->
+                                        @if($option->dependentOptions->count() > 0)
+                                            <div class="dependency-chain">
+                                                <small class="d-block mb-2">خيارات تابعة:</small>
+                                                @foreach($option->dependentOptions as $dependent)
+                                                    <div class="dependency-chain-item">
+                                                        <i class="fas fa-link"></i>
+                                                        <span>{{ $dependent->option_name }} = {{ $dependent->option_value }}</span>
+                                                        <span class="badge bg-info">{{ $dependent->dependency_condition }}</span>
+                                                        @if($dependent->additional_price > 0)
+                                                            <span class="option-price">+{{ $dependent->additional_price }} ج.م</span>
+                                                        @endif
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        <!-- Valid Combinations -->
+                        @if($product->valid_combinations && $product->combination_count > 0)
+                            <div class="mb-4" bis_skin_checked="1">
+                                <h6 class="mb-3 text-success">التركيبات الممكنة:</h6>
+                                <div class="d-flex align-items-center mb-3">
+                                    <span class="combination-count">{{ $product->combination_count }}</span>
+                                    <span class="ms-2">تركيبة متاحة</span>
+                                </div>
+                                <div class="d-flex flex-wrap" bis_skin_checked="1">
+                                    @php
+                                        $combinations = json_decode($product->valid_combinations, true);
+                                        $displayCombinations = array_slice($combinations, 0, 10);
+                                    @endphp
+                                    @foreach($displayCombinations as $combination)
+                                        <div class="combination-badge">
+                                            @foreach($combination as $value)
+                                                <span>{{ $value }}</span>
+                                                @if(!$loop->last) • @endif
+                                            @endforeach
+                                        </div>
+                                    @endforeach
+                                    @if(count($combinations) > 10)
+                                        <span class="text-muted ms-2">+ {{ count($combinations) - 10 }} أكثر...</span>
+                                    @endif
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+                @endif
+
                 <!-- Specifications -->
                 <div class="detail-card" bis_skin_checked="1">
-                    <h5><i class="fas fa-cogs"></i> المواصفات والخصائص</h5>
+                    <h5><i class="fas fa-list-check"></i> المواصفات والخصائص</h5>
 
                     <!-- Colors -->
                     @if ($product->colors && $product->colors->count() > 0)
@@ -726,6 +938,9 @@
                                         <div class="color-preview" style="background-color: {{ $color->hex_code }};">
                                         </div>
                                         <span>{{ $color->name }}</span>
+                                        @if ($color->pivot->additional_price > 0)
+                                            <small class="text-success">+{{ $color->pivot->additional_price }} ج.م</small>
+                                        @endif
                                     </div>
                                 @endforeach
                             </div>
@@ -744,6 +959,9 @@
                                         <small class="text-muted">
                                             ({{ $material->pivot->quantity }} {{ $material->pivot->unit }})
                                         </small>
+                                        @if ($material->pivot->additional_price > 0)
+                                            <small class="text-success">+{{ $material->pivot->additional_price }} ج.م</small>
+                                        @endif
                                     </div>
                                 @endforeach
                             </div>
@@ -764,33 +982,35 @@
                         </div>
                     @endif
 
-                    <!-- Product Options -->
-                    @if ($product->options && $product->options->count() > 0)
+                    <!-- Size Tiers -->
+                    @if ($product->sizeTiers && $product->sizeTiers->count() > 0)
                         <div class="mb-4" bis_skin_checked="1">
-                            <h6 class="mb-3">خيارات المنتج:</h6>
-                            <div class="d-flex flex-wrap" bis_skin_checked="1">
-                                @foreach ($product->options as $option)
-                                    <div class="option-chip">
-                                        <strong>{{ $option->option_name }}:</strong> {{ $option->option_value }}
-                                        @if ($option->additional_price > 0)
-                                            <span class="option-price">+{{ $option->additional_price }} ج.م</span>
-                                        @endif
-                                        @if ($option->is_required)
-                                            <span class="badge bg-danger">مطلوب</span>
-                                        @endif
+                            <h6 class="mb-3">شرائح التسعير:</h6>
+                            <div class="row" bis_skin_checked="1">
+                                @foreach ($product->sizeTiers->where('is_quantity_tier', false) as $tier)
+                                    <div class="col-md-6 mb-3" bis_skin_checked="1">
+                                        <div class="pricing-tier" bis_skin_checked="1">
+                                            <div class="tier-header" bis_skin_checked="1">
+                                                <div class="tier-quantity" bis_skin_checked="1">
+                                                    <i class="fas fa-box me-2"></i> 
+                                                    @if($tier->option)
+                                                        {{ $tier->option->option_name }}: {{ $tier->option->option_value }}
+                                                    @endif
+                                                    - {{ $tier->quantity }} قطعة
+                                                </div>
+                                            </div>
+                                            <div class="tier-price" bis_skin_checked="1">
+                                                {{ number_format($tier->price_per_unit, 2) }} ج.م للقطعة
+                                            </div>
+                                            @if($tier->dependency_conditions)
+                                                <div class="mt-2">
+                                                    <small class="text-warning">
+                                                        <i class="fas fa-link"></i> يعتمد على: {{ json_encode($tier->dependency_conditions) }}
+                                                    </small>
+                                                </div>
+                                            @endif
+                                        </div>
                                     </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    @endif
-
-                    <!-- Sizes -->
-                    @if ($product->sizes && $product->sizes->count() > 0)
-                        <div class="mb-4" bis_skin_checked="1">
-                            <h6 class="mb-3">المقاسات المتاحة:</h6>
-                            <div class="d-flex flex-wrap gap-2" bis_skin_checked="1">
-                                @foreach ($product->sizes as $size)
-                                    <span class="badge bg-secondary">{{ $size->name }}</span>
                                 @endforeach
                             </div>
                         </div>
@@ -800,7 +1020,7 @@
                     @if ($product->deliveryTime)
                         <div class="mb-4" bis_skin_checked="1">
                             <h6 class="mb-3">وقت التوصيل:</h6>
-                            <div class="alert alert-info" bis_skin_checked="1">
+                            <div class="alert alert-info" style="background: rgba(23, 162, 184, 0.1); border-color: rgba(23, 162, 184, 0.3); color: var(--info-color);" bis_skin_checked="1">
                                 <i class="fas fa-shipping-fast me-2"></i>
                                 من {{ $product->deliveryTime->from_days }} إلى {{ $product->deliveryTime->to_days }} يوم
                                 عمل
@@ -812,73 +1032,16 @@
                     @if ($product->warranty)
                         <div class="mb-4" bis_skin_checked="1">
                             <h6 class="mb-3">الضمان:</h6>
-                            <div class="alert alert-success" bis_skin_checked="1">
+                            <div class="alert alert-success" style="background: rgba(32, 201, 151, 0.1); border-color: rgba(32, 201, 151, 0.3); color: var(--success-color);" bis_skin_checked="1">
                                 <i class="fas fa-shield-alt me-2"></i>
                                 ضمان {{ $product->warranty->months }} شهر
+                                @if($product->warranty->description)
+                                    <br><small>{{ $product->warranty->description }}</small>
+                                @endif
                             </div>
                         </div>
                     @endif
                 </div>
-
-                <!-- Pricing Tiers -->
-                @if ($product->pricingTiers && $product->pricingTiers->count() > 0)
-                    <div class="detail-card" bis_skin_checked="1">
-                        <h5><i class="fas fa-chart-line"></i> التسعير حسب الكمية</h5>
-                        <div class="row" bis_skin_checked="1">
-                            @foreach ($product->pricingTiers->sortBy('quantity') as $tier)
-                                <div class="col-md-6 mb-3" bis_skin_checked="1">
-                                    <div class="pricing-tier" bis_skin_checked="1">
-                                        <div class="tier-header" bis_skin_checked="1">
-                                            <div class="tier-quantity" bis_skin_checked="1">
-                                                <i class="fas fa-box me-2"></i> {{ $tier->quantity }} قطعة فما فوق
-                                            </div>
-                                            @if ($tier->is_sample)
-                                                <span class="tier-sample">عينة</span>
-                                            @endif
-                                        </div>
-                                        <div class="tier-price" bis_skin_checked="1">
-                                            {{ number_format($tier->price_per_unit, 2) }} ج.م للقطعة
-                                        </div>
-                                        @if ($tier->discount_percentage > 0)
-                                            <div class="tier-discount" bis_skin_checked="1">
-                                                <i class="fas fa-percentage"></i> خصم {{ $tier->discount_percentage }}%
-                                            </div>
-                                        @endif
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-                @endif
-
-                <!-- Size Tiers -->
-                @if ($product->sizeTiers && $product->sizeTiers->count() > 0)
-                    <div class="detail-card" bis_skin_checked="1">
-                        <h5><i class="fas fa-ruler-combined"></i> أسعار حسب المقاس والكمية</h5>
-                        <div class="table-responsive" bis_skin_checked="1">
-                            <table class="table table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th>المقاس</th>
-                                        <th>الكمية</th>
-                                        <th>السعر للوحدة</th>
-                                        <th>السعر الإجمالي</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($product->sizeTiers as $tier)
-                                        <tr>
-                                            <td>{{ $tier->size->name ?? 'غير محدد' }}</td>
-                                            <td>{{ $tier->quantity }}</td>
-                                            <td>{{ number_format($tier->price_per_unit, 2) }} ج.م</td>
-                                            <td>{{ number_format($tier->price_per_unit * $tier->quantity, 2) }} ج.م</td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                @endif
             </div>
 
             <!-- Right Column - Details & Actions -->
@@ -925,6 +1088,10 @@
                                 <span class="badge bg-secondary">لا</span>
                             @endif
                         </span>
+                    </div>
+                    <div class="detail-item" bis_skin_checked="1">
+                        <span class="detail-label">نص السعر</span>
+                        <span class="detail-value">{{ $product->price_text ?? 'غير محدد' }}</span>
                     </div>
                 </div>
 
@@ -974,7 +1141,7 @@
                     <div class="mb-3" bis_skin_checked="1">
                         <label class="form-label">الرابط (Slug)</label>
                         <div class="input-group" bis_skin_checked="1">
-                            <input type="text" class="form-control" value="{{ $product->slug }}" readonly>
+                            <input type="text" class="form-control" value="{{ $product->slug }}" readonly style="background: rgba(255,255,255,0.05); color: white; border-color: rgba(255,255,255,0.1);">
                             <button class="btn btn-outline-secondary" type="button" onclick="copySlug()">
                                 <i class="fas fa-copy"></i>
                             </button>
@@ -984,7 +1151,7 @@
                     @if ($product->meta_title)
                         <div class="mb-3" bis_skin_checked="1">
                             <label class="form-label">عنوان الصفحة</label>
-                            <div class="bg-light p-2 rounded" bis_skin_checked="1">
+                            <div class="bg-dark p-2 rounded" style="background: rgba(255,255,255,0.05);" bis_skin_checked="1">
                                 {{ $product->meta_title }}
                             </div>
                         </div>
@@ -993,7 +1160,7 @@
                     @if ($product->meta_description)
                         <div class="mb-3" bis_skin_checked="1">
                             <label class="form-label">وصف الصفحة</label>
-                            <div class="bg-light p-2 rounded" bis_skin_checked="1">
+                            <div class="bg-dark p-2 rounded" style="background: rgba(255,255,255,0.05);" bis_skin_checked="1">
                                 {{ $product->meta_description }}
                             </div>
                         </div>
@@ -1110,7 +1277,6 @@
                     <h5><i class="fas fa-qrcode"></i> رمز QR</h5>
                     <div class="text-center" bis_skin_checked="1">
                         <div class="qr-code mb-3" id="qrCode" bis_skin_checked="1">
-                            <!-- QR Code will be generated here -->
                             <div class="text-muted" bis_skin_checked="1">
                                 <i class="fas fa-qrcode fa-3x"></i>
                             </div>
@@ -1137,12 +1303,13 @@
         </button>
     </div>
 
+    <!-- Modals remain the same... -->
     <!-- Delete Modal -->
     <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">تأكيد الحذف</h5>
+            <div class="modal-content" style="background: var(--dark-card);">
+                <div class="modal-header" style="border-color: rgba(255,255,255,0.1);">
+                    <h5 class="modal-title text-white">تأكيد الحذف</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -1151,13 +1318,13 @@
                         <h5>هل أنت متأكد من حذف هذا المنتج؟</h5>
                         <p class="text-muted">سيتم حذف المنتج "<strong>{{ $product->name }}</strong>" بشكل دائم.</p>
 
-                        <div class="alert alert-danger mt-3" bis_skin_checked="1">
+                        <div class="alert alert-danger mt-3" style="background: rgba(220, 53, 69, 0.1); border-color: rgba(220, 53, 69, 0.3); color: var(--danger-color);" bis_skin_checked="1">
                             <i class="fas fa-exclamation-circle me-2"></i>
                             <strong>تحذير:</strong> هذا الإجراء لا يمكن التراجع عنه
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
+                <div class="modal-footer" style="border-color: rgba(255,255,255,0.1);">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
                     <form action="{{ route('admin.products.destroy', $product->id) }}" method="POST" id="deleteForm">
                         @csrf
@@ -1174,9 +1341,9 @@
     <!-- Share Modal -->
     <div class="modal fade" id="shareModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">مشاركة المنتج</h5>
+            <div class="modal-content" style="background: var(--dark-card);">
+                <div class="modal-header" style="border-color: rgba(255,255,255,0.1);">
+                    <h5 class="modal-title text-white">مشاركة المنتج</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -1184,7 +1351,7 @@
                         <label class="form-label">رابط المنتج</label>
                         <div class="input-group" bis_skin_checked="1">
                             <input type="text" class="form-control" id="shareUrl" readonly
-                                value="{{ url('/products/' . $product->slug) }}">
+                                value="{{ url('/products/' . $product->slug) }}" style="background: rgba(255,255,255,0.05); color: white; border-color: rgba(255,255,255,0.1);">
                             <button class="btn btn-outline-secondary" type="button" onclick="copyShareUrl()">
                                 <i class="fas fa-copy"></i>
                             </button>
@@ -1213,7 +1380,7 @@
                         <label class="form-label">نسخ HTML</label>
                         <div class="input-group" bis_skin_checked="1">
                             <input type="text" class="form-control" id="htmlCode" readonly
-                                value='<a href="{{ url('/products/' . $product->slug) }}">{{ $product->name }}</a>'>
+                                value='<a href="{{ url('/products/' . $product->slug) }}">{{ $product->name }}</a>' style="background: rgba(255,255,255,0.05); color: white; border-color: rgba(255,255,255,0.1);">
                             <button class="btn btn-outline-secondary" type="button" onclick="copyHtmlCode()">
                                 <i class="fas fa-copy"></i>
                             </button>
@@ -1227,9 +1394,9 @@
     <!-- Image Zoom Modal -->
     <div class="modal fade" id="imageZoomModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-xl">
-            <div class="modal-content">
+            <div class="modal-content" style="background: transparent; border: none;">
                 <div class="modal-body p-0">
-                    <img src="" alt="صورة مكبرة" id="zoomedImage" class="img-fluid w-100">
+                    <img src="" alt="صورة مكبرة" id="zoomedImage" class="img-fluid w-100 rounded">
                 </div>
             </div>
         </div>
@@ -1258,7 +1425,6 @@
         }
 
         function changeProductImage() {
-            // Simulate changing product image (in real app, this would open a file dialog)
             Swal.fire({
                 title: 'تغيير صورة المنتج',
                 text: 'هذه الميزة تحت التطوير',
@@ -1376,8 +1542,8 @@
                 width: 150,
                 margin: 1,
                 color: {
-                    dark: '#000000',
-                    light: '#ffffff'
+                    dark: '#696cff',
+                    light: '#1e1e2d'
                 }
             }, function(error, canvas) {
                 if (error) {
@@ -1454,11 +1620,9 @@
 
         // Preview product in store
         function previewProduct() {
-            const url = 'https://talaaljazeera.com/product/{{ $product->id }}';
+            const url = '{{ url('/products/' . $product->slug) }}';
             window.open(url, '_blank');
         }
-
-
 
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
@@ -1481,7 +1645,7 @@
             // Add print functionality to print button
             document.querySelector('[onclick="window.print()"]').addEventListener('click', function(e) {
                 e.preventDefault();
-                printProduct();
+                window.print();
             });
         });
     </script>

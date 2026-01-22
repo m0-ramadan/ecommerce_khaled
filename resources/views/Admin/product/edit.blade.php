@@ -2,7 +2,6 @@
 
 @section('title', 'تعديل المنتج: ' . $product->name)
 
-
 @section('css')
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
@@ -91,6 +90,10 @@
         .image-manager:hover {
             border-color: var(--primary-color);
             background: rgba(105, 108, 255, 0.1);
+        }
+
+        .select2-results__option--selectable {
+            color: #000000 !important;
         }
 
         .image-manager i {
@@ -598,6 +601,186 @@
         .breadcrumb-item.active {
             color: rgba(255, 255, 255, 0.7);
         }
+
+        /* Drag & Drop and Multi-Select Styles */
+        .option-drag-handle {
+            cursor: move;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 18px;
+            padding: 0 10px;
+            transition: color 0.3s;
+        }
+
+        .option-drag-handle:hover {
+            color: var(--primary-color);
+        }
+
+        .selectable-option {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .selectable-option:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .selectable-option.selected {
+            background: rgba(105, 108, 255, 0.15);
+            border-left: 4px solid var(--primary-color);
+            box-shadow: 0 0 20px rgba(105, 108, 255, 0.2);
+        }
+
+        .option-select-checkbox {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .option-select-checkbox.checked {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .option-select-checkbox.checked::after {
+            content: "✓";
+            color: white;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .bulk-actions-bar {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 10px 15px;
+            margin-bottom: 15px;
+            display: none;
+            align-items: center;
+            gap: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .bulk-actions-bar.active {
+            display: flex;
+        }
+
+        .selected-count {
+            background: var(--primary-color);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .option-quick-actions {
+            display: flex;
+            gap: 5px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .selectable-option:hover .option-quick-actions {
+            opacity: 1;
+        }
+
+        .option-type-badge {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-right: 5px;
+        }
+
+        .option-type-quantity { background: var(--success-color); }
+        .option-type-size { background: var(--info-color); }
+        .option-type-color { background: var(--warning-color); }
+        .option-type-regular { background: var(--secondary-color); }
+
+        .option-group-controls {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px dashed rgba(255, 255, 255, 0.1);
+        }
+
+        .group-option-item {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 6px;
+            padding: 8px 12px;
+            margin-bottom: 5px;
+            border-right: 3px solid var(--primary-color);
+        }
+
+        .option-values-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .option-value-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            padding: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid transparent;
+        }
+
+        .option-value-item:hover {
+            border-color: var(--primary-color);
+            background: rgba(105, 108, 255, 0.1);
+        }
+
+        .option-value-item.selected-value {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        /* Drag and drop styles */
+        .selectable-option.sortable-ghost {
+            opacity: 0.4;
+            background: rgba(105, 108, 255, 0.1);
+        }
+
+        .selectable-option.sortable-chosen {
+            box-shadow: 0 5px 25px rgba(105, 108, 255, 0.3);
+            transform: scale(1.02);
+        }
+
+        .selectable-option.sortable-drag {
+            opacity: 1;
+            background: var(--dark-card);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .ctrl-mode .selectable-option {
+            border: 1px dashed rgba(105, 108, 255, 0.5);
+        }
+
+        .selectable-option.grouped {
+            border-right: 3px solid var(--info-color);
+        }
+
+        .option-values-preview {
+            max-height: 200px;
+            overflow-y: auto;
+        }
     </style>
 @endsection
 
@@ -676,7 +859,7 @@
                             <div class="row align-items-center" bis_skin_checked="1">
                                 <div class="col-auto" bis_skin_checked="1">
                                     <img src="{{ $product->primaryImage ? get_user_image($product->primaryImage->path) : 'https://via.placeholder.com/100x100?text=No+Image' }}"
-                                        alt="{{ $product->name }}" class="preview-image">
+                                        alt="{{ $product->name }}" class="preview-image" style="width: 100px">
                                 </div>
                                 <div class="col" bis_skin_checked="1">
                                     <h6 class="mb-2" style="color: #fff;">{{ $product->name }}</h6>
@@ -901,7 +1084,6 @@
                                     </div>
                                 </div>
 
-
                                 <!-- Additional Images -->
                                 <div class="mb-4" bis_skin_checked="1">
                                     <label class="form-label">الصور الإضافية</label>
@@ -960,16 +1142,16 @@
                                                 step="0.01" value="{{ old('price', $product->price) }}" required>
                                         </div>
                                     </div>
-
-                                </div>
-                                <div class="col-md-8 mb-4">
-                                    <label for="price_text" class="form-label required"> نص السعر </label>
-                                    <div class="input-group">
-                                        <span class="input-group-text">ج.م</span>
-                                        <input type="text" class="form-control" id="price_text" name="price_text"
-                                            value="{{ old('price_text', $product->price_text) }}" required>
+                                    <div class="col-md-8 mb-4">
+                                        <label for="price_text" class="form-label required"> نص السعر </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">ج.م</span>
+                                            <input type="text" class="form-control" id="price_text" name="price_text"
+                                                value="{{ old('price_text', $product->price_text) }}" required>
+                                        </div>
                                     </div>
                                 </div>
+
                                 <!-- Additional Pricing Options -->
                                 <div class="row" bis_skin_checked="1">
                                     <div class="col-md-4 mb-3" bis_skin_checked="1">
@@ -1249,42 +1431,159 @@
                                     <div class="step-number" bis_skin_checked="1">4</div>
                                     <div bis_skin_checked="1">
                                         <h5 class="step-title">خيارات إضافية</h5>
-                                        <p class="step-description">تحديث الخيارات الخاصة بالمنتج</p>
+                                        <p class="step-description">إدارة الخيارات بسهولة - اسحب وأسقط، اختر متعدد</p>
                                     </div>
                                 </div>
 
-                                <!-- Product Options with Dependencies -->
-                                <div class="mb-4" bis_skin_checked="1">
-                                    <div class="d-flex justify-content-between align-items-center mb-3"
-                                        bis_skin_checked="1">
-                                        <label class="form-label mb-0">خيارات المنتج (مع الاعتمادات)</label>
-                                        <button type="button" class="btn btn-outline-primary btn-sm"
-                                            onclick="addProductOptionField()">
-                                            <i class="fas fa-plus me-1"></i> إضافة خيار
+                                <!-- Bulk Actions Bar -->
+                                <div class="bulk-actions-bar" id="bulkActionsBar">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <span class="selected-count" id="selectedCount">0 مختار</span>
+                                        <span>إجراءات جماعية:</span>
+                                        <div class="btn-group btn-group-sm">
+                                            <button type="button" class="btn btn-outline-primary" onclick="setAsRequired()">
+                                                <i class="fas fa-check-circle"></i> تعيين كمطلوب
+                                            </button>
+                                            <button type="button" class="btn btn-outline-success" onclick="setAsQuantityType()">
+                                                <i class="fas fa-layer-group"></i> تعيين ككمية
+                                            </button>
+                                            <button type="button" class="btn btn-outline-danger" onclick="deleteSelected()">
+                                                <i class="fas fa-trash"></i> حذف المحدد
+                                            </button>
+                                        </div>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary ms-auto" onclick="clearSelection()">
+                                            <i class="fas fa-times"></i> إلغاء التحديد
                                         </button>
                                     </div>
+                                </div>
 
-                                    <div id="productOptionsContainer">
-                                        @foreach ($product->options as $index => $option)
+                                <!-- Option Group Management -->
+                                <div class="option-group-controls mb-4">
+                                    <h6 class="mb-3"><i class="fas fa-object-group me-2"></i>إدارة مجموعات الخيارات</h6>
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <input type="text" class="form-control" id="optionGroupName" placeholder="اسم المجموعة (مثال: الألوان، المقاسات)">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <button type="button" class="btn btn-primary w-100" onclick="createOptionGroup()">
+                                                <i class="fas fa-plus me-2"></i>إنشاء مجموعة
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div id="optionGroupsContainer" class="mt-3">
+                                        <!-- Groups will be added here dynamically -->
+                                    </div>
+                                </div>
+
+                                <!-- Product Options with Drag & Drop and Multi-Select -->
+                                <div class="mb-4" bis_skin_checked="1">
+                                    <div class="d-flex justify-content-between align-items-center mb-3" bis_skin_checked="1">
+                                        <div>
+                                            <label class="form-label mb-0">خيارات المنتج</label>
+                                            <small class="text-muted d-block">اسحب لإعادة الترتيب - انقر للتحديد - اضغط Ctrl/Cmd للتحديد المتعدد</small>
+                                        </div>
+                                        <div class="btn-group" bis_skin_checked="1">
+                                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="addProductOptionField()">
+                                                <i class="fas fa-plus me-1"></i> إضافة خيار
+                                            </button>
+                                            <button type="button" class="btn btn-outline-info btn-sm" onclick="addMultipleOptions()">
+                                                <i class="fas fa-copy me-1"></i> إضافة متعددة
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Quick Add Multiple Options -->
+                                    <div class="card mb-3" id="multipleOptionsForm" style="display: none; background: rgba(255,255,255,0.03);">
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-md-4 mb-2">
+                                                    <label class="form-label">اسم الخيار</label>
+                                                    <input type="text" class="form-control" id="multipleOptionName" placeholder="مثال: اللون">
+                                                </div>
+                                                <div class="col-md-8 mb-2">
+                                                    <label class="form-label">القيم (افصل بفاصلة)</label>
+                                                    <input type="text" class="form-control" id="multipleOptionValues" placeholder="مثال: أحمر, أزرق, أخضر">
+                                                </div>
+                                                <div class="col-md-4 mb-2">
+                                                    <label class="form-label">السعر الإضافي</label>
+                                                    <input type="number" class="form-control" id="multipleOptionPrice" placeholder="0.00">
+                                                </div>
+                                                <div class="col-md-4 mb-2">
+                                                    <label class="form-label">النوع</label>
+                                                    <select class="form-select" id="multipleOptionType">
+                                                        <option value="regular">عادي</option>
+                                                        <option value="quantity">كمية</option>
+                                                        <option value="size">مقاس</option>
+                                                        <option value="color">لون</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-4 mb-2 d-flex align-items-end">
+                                                    <div class="btn-group w-100">
+                                                        <button type="button" class="btn btn-success" onclick="saveMultipleOptions()">
+                                                            <i class="fas fa-save"></i> حفظ
+                                                        </button>
+                                                        <button type="button" class="btn btn-secondary" onclick="cancelMultipleOptions()">
+                                                            <i class="fas fa-times"></i> إلغاء
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div id="productOptionsContainer" class="sortable-options-container">
+                                        <!-- Options will be rendered here with selectable and draggable functionality -->
+                                        @foreach($product->options as $index => $option)
                                             @php
                                                 $isMainOption = empty($option->depends_on_option_id);
                                                 $hasDependency = !$isMainOption;
+                                                $isQuantityType = $option->option_type === 'quantity' || 
+                                                                  str_contains(strtolower($option->option_name), 'كمية') || 
+                                                                  str_contains(strtolower($option->option_name), 'عدد');
                                             @endphp
                                             
-                                            <div class="dynamic-field {{ $isMainOption ? 'main-option' : 'option-with-dependency' }}">
+                                            <div class="dynamic-field selectable-option {{ $isMainOption ? 'main-option' : 'option-with-dependency' }} {{ $isQuantityType ? 'quantity-option' : '' }}"
+                                                 data-index="{{ $index }}"
+                                                 data-id="{{ $option->id }}"
+                                                 onclick="toggleOptionSelection({{ $index }}, event)">
+                                                
+                                                <!-- Selection Checkbox -->
+                                                <div class="option-select-checkbox"
+                                                     onclick="event.stopPropagation(); toggleOptionSelection({{ $index }}, event)">
+                                                </div>
+                                                
+                                                <!-- Drag Handle -->
+                                                <div class="option-drag-handle" onclick="event.stopPropagation()">
+                                                    <i class="fas fa-arrows-alt"></i>
+                                                </div>
+                                                
                                                 <div class="dynamic-field-header">
                                                     <div class="d-flex align-items-center gap-2">
                                                         <div class="dynamic-field-title">
-                                                            خيار {{ $index + 1 }} 
+                                                            {{ $option->option_name }}
+                                                            <span class="option-type-badge option-type-{{ $option->option_type ?? 'regular' }}">
+                                                                @php
+                                                                    $typeLabels = [
+                                                                        'regular' => 'عادي',
+                                                                        'quantity' => 'كمية',
+                                                                        'size' => 'مقاس',
+                                                                        'color' => 'لون'
+                                                                    ];
+                                                                @endphp
+                                                                {{ $typeLabels[$option->option_type ?? 'regular'] }}
+                                                            </span>
                                                             @if($isMainOption)
                                                                 <span class="badge bg-primary ms-2">رئيسي</span>
-                                                            @else
+                                                            @endif
+                                                            @if($hasDependency)
                                                                 <span class="badge bg-warning ms-2">معتمد</span>
                                                             @endif
-                                                            @if(str_contains(strtolower($option->option_name), 'كمية') || 
-                                                                str_contains(strtolower($option->option_name), 'عدد') ||
-                                                                str_contains(strtolower($option->option_name), 'حبات'))
+                                                            @if($isQuantityType)
                                                                 <span class="badge bg-success ms-1">كمية</span>
+                                                            @endif
+                                                            @if($option->is_required)
+                                                                <span class="badge bg-danger ms-1">مطلوب</span>
                                                             @endif
                                                         </div>
                                                         @if($hasDependency)
@@ -1293,13 +1592,25 @@
                                                             <span class="dependency-indicator no-dependency"></span>
                                                         @endif
                                                     </div>
-                                                    <button type="button" class="dynamic-field-remove"
-                                                        onclick="removeField(this)">
-                                                        <i class="fas fa-times"></i>
-                                                    </button>
+                                                    <div class="option-quick-actions">
+                                                        <button type="button" class="btn btn-sm btn-outline-info" 
+                                                                onclick="event.stopPropagation(); viewOptionValues({{ $index }})"
+                                                                title="عرض القيم">
+                                                            <i class="fas fa-eye"></i>
+                                                        </button>
+                                                        <button type="button" class="btn btn-sm btn-outline-warning"
+                                                                onclick="event.stopPropagation(); duplicateOption({{ $index }})"
+                                                                title="نسخ الخيار">
+                                                            <i class="fas fa-copy"></i>
+                                                        </button>
+                                                        <button type="button" class="btn btn-sm btn-outline-danger"
+                                                                onclick="event.stopPropagation(); removeField(this)"
+                                                                title="حذف الخيار">
+                                                            <i class="fas fa-times"></i>
+                                                        </button>
+                                                    </div>
                                                 </div>
                                                 
-                                                <!-- Dependency Chain Display -->
                                                 @if($hasDependency && $option->parentOption)
                                                 <div class="dependency-chain mb-3">
                                                     <small class="text-muted d-block mb-2">يعتمد على:</small>
@@ -1316,37 +1627,45 @@
                                                     <div class="col-md-3 mb-2" bis_skin_checked="1">
                                                         <label class="form-label small">اسم الخيار</label>
                                                         <input type="text" class="form-control"
-                                                            name="product_options[{{ $index }}][option_name]"
-                                                            value="{{ $option->option_name }}" placeholder="اسم الخيار"
-                                                            required>
+                                                               name="product_options[{{ $index }}][option_name]"
+                                                               value="{{ $option->option_name }}" 
+                                                               placeholder="اسم الخيار"
+                                                               required
+                                                               onchange="updateOptionPreview({{ $index }})">
                                                     </div>
                                                     <div class="col-md-3 mb-2" bis_skin_checked="1">
                                                         <label class="form-label small">القيمة</label>
                                                         <input type="text" class="form-control"
-                                                            name="product_options[{{ $index }}][option_value]"
-                                                            value="{{ $option->option_value }}" placeholder="القيمة"
-                                                            required>
+                                                               name="product_options[{{ $index }}][option_value]"
+                                                               value="{{ $option->option_value }}" 
+                                                               placeholder="القيمة"
+                                                               required
+                                                               onchange="updateOptionPreview({{ $index }})">
                                                     </div>
                                                     <div class="col-md-2 mb-2" bis_skin_checked="1">
                                                         <label class="form-label small">سعر إضافي</label>
                                                         <input type="number" class="form-control"
-                                                            name="product_options[{{ $index }}][additional_price]"
-                                                            value="{{ $option->additional_price }}"
-                                                            placeholder="السعر الإضافي" step="0.01">
+                                                               name="product_options[{{ $index }}][additional_price]"
+                                                               value="{{ $option->additional_price }}"
+                                                               placeholder="السعر الإضافي" 
+                                                               step="0.01">
                                                     </div>
                                                     <div class="col-md-2 mb-2" bis_skin_checked="1">
                                                         <label class="form-label small">مطلوب</label>
                                                         <div class="form-check mt-2" bis_skin_checked="1">
                                                             <input class="form-check-input" type="checkbox"
-                                                                name="product_options[{{ $index }}][is_required]"
-                                                                value="1"
-                                                                {{ $option->is_required ? 'checked' : '' }}>
-                                                            <label class="form-check-label">نعم</label>
+                                                                   name="product_options[{{ $index }}][is_required]"
+                                                                   value="1"
+                                                                   {{ $option->is_required ? 'checked' : '' }}
+                                                                   id="required_{{ $index }}">
+                                                            <label class="form-check-label" for="required_{{ $index }}">نعم</label>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-2 mb-2" bis_skin_checked="1">
                                                         <label class="form-label small">النوع</label>
-                                                        <select class="form-select" name="product_options[{{ $index }}][option_type]">
+                                                        <select class="form-select" 
+                                                                name="product_options[{{ $index }}][option_type]"
+                                                                onchange="updateOptionType({{ $index }}, this.value)">
                                                             <option value="regular" {{ $option->option_type == 'regular' ? 'selected' : '' }}>عادي</option>
                                                             <option value="quantity" {{ $option->option_type == 'quantity' ? 'selected' : '' }}>كمية</option>
                                                             <option value="size" {{ $option->option_type == 'size' ? 'selected' : '' }}>مقاس</option>
@@ -1361,23 +1680,25 @@
                                                         <div class="col-md-5 mb-2">
                                                             <label class="form-label small">يعتمد على الخيار</label>
                                                             <select class="form-select dependency-option-select"
-                                                                name="product_options[{{ $index }}][depends_on_option_id]"
-                                                                data-current="{{ $option->depends_on_option_id }}"
-                                                                onchange="updateDependencyConditions(this, {{ $index }})">
+                                                                    name="product_options[{{ $index }}][depends_on_option_id]"
+                                                                    data-current="{{ $option->depends_on_option_id }}"
+                                                                    onchange="updateDependencyConditions(this, {{ $index }})">
                                                                 <option value="">لا يعتمد على أي خيار (رئيسي)</option>
-                                                                @foreach ($product->options->where('id', '!=', $option->id)->whereNull('depends_on_option_id') as $parentOption)
+                                                                @foreach ($product->options->whereNull('depends_on_option_id') as $parentOption)
+                                                                    @if($parentOption->id != $option->id)
                                                                     <option value="{{ $parentOption->id }}"
-                                                                        {{ $option->depends_on_option_id == $parentOption->id ? 'selected' : '' }}>
+                                                                            {{ $option->depends_on_option_id == $parentOption->id ? 'selected' : '' }}>
                                                                         {{ $parentOption->option_name }} ({{ $parentOption->option_value }})
                                                                     </option>
+                                                                    @endif
                                                                 @endforeach
                                                             </select>
                                                         </div>
                                                         <div class="col-md-5 mb-2">
                                                             <label class="form-label small">شرط الاعتماد</label>
                                                             <select class="form-select dependency-condition-select"
-                                                                name="product_options[{{ $index }}][dependency_condition]"
-                                                                {{ empty($option->depends_on_option_id) ? 'disabled' : '' }}>
+                                                                    name="product_options[{{ $index }}][dependency_condition]"
+                                                                    {{ empty($option->depends_on_option_id) ? 'disabled' : '' }}>
                                                                 <option value="">اختر الشرط</option>
                                                                 <option value="equals" {{ $option->dependency_condition == 'equals' ? 'selected' : '' }}>يساوي</option>
                                                                 <option value="not_equals" {{ $option->dependency_condition == 'not_equals' ? 'selected' : '' }}>لا يساوي</option>
@@ -1389,16 +1710,16 @@
                                                         <div class="col-md-2 mb-2">
                                                             <label class="form-label small">القيمة المطلوبة</label>
                                                             <input type="text" class="form-control"
-                                                                name="product_options[{{ $index }}][dependency_value]"
-                                                                value="{{ $option->depends_on_option_id ? $option->parentOption->option_value ?? '' : '' }}"
-                                                                placeholder="القيمة"
-                                                                {{ empty($option->depends_on_option_id) ? 'disabled' : '' }}>
+                                                                   name="product_options[{{ $index }}][dependency_value]"
+                                                                   value="{{ $option->depends_on_option_id ? ($option->parentOption->option_value ?? '') : '' }}"
+                                                                   placeholder="القيمة"
+                                                                   {{ empty($option->depends_on_option_id) ? 'disabled' : '' }}>
                                                         </div>
                                                     </div>
                                                 </div>
                                                 
-                                                <!-- Quantity Tiers (for quantity options) -->
-                                                @if($option->quantityTiers->count() > 0 || str_contains(strtolower($option->option_name), 'كمية'))
+                                                <!-- Quantity Tiers -->
+                                                @if($option->quantityTiers->count() > 0 || $isQuantityType)
                                                 <div class="size-tier-section mt-3">
                                                     <h6 class="mb-3"><i class="fas fa-layer-group me-2"></i>شرائح التسعير حسب الكمية</h6>
                                                     <div id="quantityTiersContainer_{{ $index }}">
@@ -1441,6 +1762,16 @@
                                                 @endif
                                             </div>
                                         @endforeach
+                                    </div>
+
+                                    <!-- Option Values Preview -->
+                                    <div class="card mt-4" id="optionValuesPreview" style="display: none;">
+                                        <div class="card-body">
+                                            <h6 class="mb-3"><i class="fas fa-list me-2"></i>قيم الخيار المحدد</h6>
+                                            <div id="selectedOptionValues" class="option-values-grid">
+                                                <!-- Values will be populated here -->
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -1767,16 +2098,39 @@
     </template>
 
     <template id="productOptionFieldTemplate">
-        <div class="dynamic-field main-option">
+        <div class="dynamic-field selectable-option main-option" data-index="new">
+            <!-- Selection Checkbox -->
+            <div class="option-select-checkbox" onclick="event.stopPropagation(); toggleOptionSelection('new', event)">
+            </div>
+            
+            <!-- Drag Handle -->
+            <div class="option-drag-handle" onclick="event.stopPropagation()">
+                <i class="fas fa-arrows-alt"></i>
+            </div>
+            
             <div class="dynamic-field-header">
                 <div class="d-flex align-items-center gap-2">
-                    <div class="dynamic-field-title">خيار جديد <span class="badge bg-primary ms-2">رئيسي</span></div>
+                    <div class="dynamic-field-title">
+                        خيار جديد
+                        <span class="option-type-badge option-type-regular">عادي</span>
+                        <span class="badge bg-primary ms-2">رئيسي</span>
+                    </div>
                     <span class="dependency-indicator no-dependency"></span>
                 </div>
-                <button type="button" class="dynamic-field-remove" onclick="removeField(this)">
-                    <i class="fas fa-times"></i>
-                </button>
+                <div class="option-quick-actions">
+                    <button type="button" class="btn btn-sm btn-outline-info" 
+                            onclick="event.stopPropagation(); viewOptionValues('new')"
+                            title="عرض القيم">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-danger"
+                            onclick="event.stopPropagation(); removeField(this)"
+                            title="حذف الخيار">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
             </div>
+            
             <div class="row">
                 <div class="col-md-3 mb-2">
                     <label class="form-label small">اسم الخيار</label>
@@ -1811,6 +2165,8 @@
                     </select>
                 </div>
             </div>
+            
+            <!-- Dependency Settings -->
             <div class="option-dependency-section">
                 <div class="row">
                     <div class="col-md-5 mb-2">
@@ -1942,6 +2298,12 @@
         let removedImages = [];
         let currentQuickAddType = '';
         let quantityTierCounters = {};
+        
+        // Drag & Drop and Multi-Select variables
+        let selectedOptions = new Set();
+        let optionGroups = [];
+        let currentDragging = false;
+        let sortableInstance = null;
 
         $(document).ready(function() {
             // Initialize Summernote
@@ -2026,9 +2388,26 @@
                 quantityTierCounters[{{ $index }}] = {{ $option->quantityTiers->count() }};
             @endforeach
 
+            // Initialize options sortable
+            initializeOptionsSortable();
+            
+            // Keyboard shortcuts for selection
+            $(document).on('keydown', function(e) {
+                if (e.ctrlKey || e.metaKey) {
+                    $('.selectable-option').addClass('ctrl-mode');
+                }
+            });
+            
+            $(document).on('keyup', function(e) {
+                if (!e.ctrlKey && !e.metaKey) {
+                    $('.selectable-option').removeClass('ctrl-mode');
+                }
+            });
+            
             // Handle option type changes
             $(document).on('change', '[name*="[option_type]"]', function() {
-                const optionField = $(this).closest('.dynamic-field');
+                const optionField = $(this).closest('.selectable-option');
+                const optionIndex = optionField.data('index');
                 const optionType = $(this).val();
                 
                 if (optionType === 'quantity') {
@@ -2038,8 +2417,8 @@
                         tierSection = $(`
                             <div class="size-tier-section mt-3">
                                 <h6 class="mb-3"><i class="fas fa-layer-group me-2"></i>شرائح التسعير حسب الكمية</h6>
-                                <div class="quantity-tiers-container"></div>
-                                <button type="button" class="btn btn-sm btn-outline-primary mt-2" onclick="addQuantityTierToField(this)">
+                                <div id="quantityTiersContainer_${optionIndex}"></div>
+                                <button type="button" class="btn btn-sm btn-outline-primary mt-2" onclick="addQuantityTier(${optionIndex})">
                                     <i class="fas fa-plus me-1"></i>إضافة شريحة كمية
                                 </button>
                             </div>
@@ -2050,6 +2429,9 @@
                     // Hide quantity tiers section
                     optionField.find('.size-tier-section').remove();
                 }
+                
+                // Update option type badge
+                updateOptionType(optionIndex, optionType);
             });
         });
 
@@ -2309,6 +2691,7 @@
 
             // Update indices
             const optionIndex = optionCounter;
+            newField.attr('data-index', optionIndex);
             newField.find('[name]').each(function() {
                 const name = $(this).attr('name');
                 $(this).attr('name', name.replace('[]', `[${optionIndex}]`));
@@ -2324,6 +2707,9 @@
             
             // Initialize quantity tier counter for this option
             quantityTierCounters[optionIndex] = 0;
+            
+            // Reinitialize sortable
+            initializeOptionsSortable();
         }
 
         function addSizeTierField() {
@@ -2341,7 +2727,22 @@
         }
 
         function removeField(button) {
-            $(button).closest('.dynamic-field').remove();
+            const field = $(button).closest('.dynamic-field');
+            const index = field.data('index');
+            
+            // Remove from selected options
+            if (selectedOptions.has(index)) {
+                selectedOptions.delete(index);
+                updateSelectedCount();
+                showBulkActions();
+            }
+            
+            field.remove();
+            
+            // If it was an option, update option indices
+            if (field.hasClass('selectable-option')) {
+                updateOptionIndices();
+            }
         }
 
         function removeMaterial(button) {
@@ -2355,7 +2756,7 @@
         // Dependency Management Functions
         function updateDependencyConditions(select, optionIndex) {
             const optionId = $(select).val();
-            const optionField = $(select).closest('.dynamic-field');
+            const optionField = $(select).closest('.selectable-option');
             const conditionSelect = optionField.find('.dependency-condition-select');
             const valueInput = optionField.find('input[name*="[dependency_value]"]');
             
@@ -2408,30 +2809,473 @@
             newTier.find('[name="tier_name"]').attr('name', `product_options[${optionIndex}][quantity_tiers][${tierIndex}][tier_name]`);
             
             // Append to container
+            const container = $(`#quantityTiersContainer_${optionIndex}`);
+            if (container.length === 0) {
+                // Create container if it doesn't exist
+                const optionField = $(`.selectable-option[data-index="${optionIndex}"]`);
+                optionField.append(`
+                    <div class="size-tier-section mt-3">
+                        <h6 class="mb-3"><i class="fas fa-layer-group me-2"></i>شرائح التسعير حسب الكمية</h6>
+                        <div id="quantityTiersContainer_${optionIndex}"></div>
+                        <button type="button" class="btn btn-sm btn-outline-primary mt-2" onclick="addQuantityTier(${optionIndex})">
+                            <i class="fas fa-plus me-1"></i>إضافة شريحة كمية
+                        </button>
+                    </div>
+                `);
+            }
+            
             $(`#quantityTiersContainer_${optionIndex}`).append(newTier);
             
             // Increment counter
             quantityTierCounters[optionIndex]++;
         }
 
-        function addQuantityTierToField(button) {
-            const optionField = $(button).closest('.dynamic-field');
-            const optionIndex = optionField.index();
-            const tiersContainer = optionField.find('.quantity-tiers-container');
+        // Drag & Drop and Multi-Select Functions
+        function initializeOptionsSortable() {
+            const container = document.getElementById('productOptionsContainer');
             
-            const template = $('#quantityTierTemplate').html();
-            const newTier = $(template);
+            if (sortableInstance) {
+                sortableInstance.destroy();
+            }
             
-            // Get current tier count
-            const tierCount = tiersContainer.find('.tier-item').length;
+            sortableInstance = Sortable.create(container, {
+                animation: 150,
+                handle: '.option-drag-handle',
+                ghostClass: 'sortable-ghost',
+                chosenClass: 'sortable-chosen',
+                dragClass: 'sortable-drag',
+                onStart: function() {
+                    currentDragging = true;
+                },
+                onEnd: function() {
+                    currentDragging = false;
+                    updateOptionIndices();
+                }
+            });
+        }
+
+        // Toggle option selection
+        function toggleOptionSelection(index, event) {
+            // Prevent selection during drag
+            if (currentDragging) return;
             
-            // Update names
-            newTier.find('[name="quantity"]').attr('name', `product_options[${optionIndex}][quantity_tiers][${tierCount}][quantity]`);
-            newTier.find('[name="price_per_unit"]').attr('name', `product_options[${optionIndex}][quantity_tiers][${tierCount}][price_per_unit]`);
-            newTier.find('[name="tier_name"]').attr('name', `product_options[${optionIndex}][quantity_tiers][${tierCount}][tier_name]`);
+            const option = $(`.selectable-option[data-index="${index}"]`);
+            const checkbox = option.find('.option-select-checkbox');
             
-            // Append to container
-            tiersContainer.append(newTier);
+            // Check if Ctrl/Cmd is pressed for multi-select
+            if (event.ctrlKey || event.metaKey || event.shiftKey) {
+                if (selectedOptions.has(index)) {
+                    selectedOptions.delete(index);
+                    option.removeClass('selected');
+                    checkbox.removeClass('checked');
+                } else {
+                    selectedOptions.add(index);
+                    option.addClass('selected');
+                    checkbox.addClass('checked');
+                }
+            } else {
+                // Single selection - clear others
+                selectedOptions.clear();
+                $('.selectable-option').removeClass('selected');
+                $('.option-select-checkbox').removeClass('checked');
+                
+                selectedOptions.add(index);
+                option.addClass('selected');
+                checkbox.addClass('checked');
+            }
+            
+            updateSelectedCount();
+            showBulkActions();
+        }
+
+        // Update option indices after drag and drop
+        function updateOptionIndices() {
+            const options = $('#productOptionsContainer .selectable-option');
+            const newOrder = [];
+            
+            options.each(function(newIndex) {
+                const oldIndex = $(this).data('index');
+                newOrder[oldIndex] = newIndex;
+                
+                // Update data-index attribute
+                $(this).data('index', newIndex);
+                
+                // Update all inputs within this option
+                $(this).find('[name]').each(function() {
+                    const name = $(this).attr('name');
+                    const newName = name.replace(/product_options\[\d+\]/, `product_options[${newIndex}]`);
+                    $(this).attr('name', newName);
+                });
+                
+                // Update IDs
+                $(this).find('[id]').each(function() {
+                    const id = $(this).attr('id');
+                    if (id.includes('_')) {
+                        const newId = id.replace(/_\d+/, `_${newIndex}`);
+                        $(this).attr('id', newId);
+                        $(this).next('label').attr('for', newId);
+                    }
+                });
+            });
+            
+            // Update selected options indices
+            const newSelected = new Set();
+            selectedOptions.forEach(oldIndex => {
+                if (newOrder[oldIndex] !== undefined) {
+                    newSelected.add(newOrder[oldIndex]);
+                }
+            });
+            selectedOptions = newSelected;
+            
+            // Update quantity tier container IDs
+            options.each(function(newIndex) {
+                const oldContainer = $(this).find('[id^="quantityTiersContainer_"]');
+                if (oldContainer.length > 0) {
+                    oldContainer.attr('id', `quantityTiersContainer_${newIndex}`);
+                }
+            });
+        }
+
+        // Update selected count
+        function updateSelectedCount() {
+            $('#selectedCount').text(`${selectedOptions.size} مختار`);
+        }
+
+        // Show/hide bulk actions bar
+        function showBulkActions() {
+            const bar = $('#bulkActionsBar');
+            if (selectedOptions.size > 0) {
+                bar.addClass('active');
+            } else {
+                bar.removeClass('active');
+            }
+        }
+
+        // Clear all selections
+        function clearSelection() {
+            selectedOptions.clear();
+            $('.selectable-option').removeClass('selected');
+            $('.option-select-checkbox').removeClass('checked');
+            updateSelectedCount();
+            showBulkActions();
+        }
+
+        // Bulk Actions
+        function setAsRequired() {
+            selectedOptions.forEach(index => {
+                $(`.selectable-option[data-index="${index}"]`)
+                    .find('[name$="[is_required]"]')
+                    .prop('checked', true);
+            });
+            Swal.fire('تم!', 'تم تعيين الخيارات المحددة كمطلوبة', 'success');
+        }
+
+        function setAsQuantityType() {
+            selectedOptions.forEach(index => {
+                $(`.selectable-option[data-index="${index}"]`)
+                    .find('[name$="[option_type]"]')
+                    .val('quantity');
+                
+                // Add quantity tiers section if not exists
+                const option = $(`.selectable-option[data-index="${index}"]`);
+                if (!option.find('.size-tier-section').length) {
+                    option.append(`
+                        <div class="size-tier-section mt-3">
+                            <h6 class="mb-3"><i class="fas fa-layer-group me-2"></i>شرائح التسعير حسب الكمية</h6>
+                            <div id="quantityTiersContainer_${index}"></div>
+                            <button type="button" class="btn btn-sm btn-outline-primary mt-2" 
+                                    onclick="addQuantityTier(${index})">
+                                <i class="fas fa-plus me-1"></i>إضافة شريحة كمية
+                            </button>
+                        </div>
+                    `);
+                }
+            });
+            Swal.fire('تم!', 'تم تعيين الخيارات المحددة كنوع كمية', 'success');
+        }
+
+        function deleteSelected() {
+            Swal.fire({
+                title: 'هل أنت متأكد؟',
+                text: `سيتم حذف ${selectedOptions.size} خيار`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'نعم، احذف',
+                cancelButtonText: 'إلغاء'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const indicesToRemove = Array.from(selectedOptions).sort((a, b) => b - a);
+                    
+                    indicesToRemove.forEach(index => {
+                        $(`.selectable-option[data-index="${index}"]`).remove();
+                    });
+                    
+                    // Update indices after deletion
+                    setTimeout(() => updateOptionIndices(), 100);
+                    
+                    selectedOptions.clear();
+                    updateSelectedCount();
+                    showBulkActions();
+                    
+                    Swal.fire('تم الحذف!', 'تم حذف الخيارات المحددة', 'success');
+                }
+            });
+        }
+
+        // Multiple options functionality
+        function addMultipleOptions() {
+            $('#multipleOptionsForm').slideDown();
+        }
+
+        function saveMultipleOptions() {
+            const optionName = $('#multipleOptionName').val();
+            const values = $('#multipleOptionValues').val().split(',').map(v => v.trim()).filter(v => v);
+            const price = $('#multipleOptionPrice').val() || 0;
+            const type = $('#multipleOptionType').val();
+            
+            if (!optionName || values.length === 0) {
+                Swal.fire('خطأ!', 'يرجى إدخال اسم الخيار والقيم', 'error');
+                return;
+            }
+            
+            values.forEach((value, i) => {
+                const index = optionCounter + i;
+                const template = $('#productOptionFieldTemplate').html();
+                const newOption = $(template);
+                
+                // Update the option
+                newOption.attr('data-index', index);
+                newOption.find('.dynamic-field-title').html(`
+                    ${optionName}
+                    <span class="option-type-badge option-type-${type}">
+                        ${getOptionTypeLabel(type)}
+                    </span>
+                    <span class="badge bg-primary ms-2">رئيسي</span>
+                `);
+                newOption.find('[name$="[option_name]"]').val(optionName);
+                newOption.find('[name$="[option_value]"]').val(value);
+                newOption.find('[name$="[additional_price]"]').val(price);
+                newOption.find('[name$="[option_type]"]').val(type);
+                
+                // Update names
+                newOption.find('[name]').each(function() {
+                    const name = $(this).attr('name');
+                    $(this).attr('name', name.replace('[]', `[${index}]`));
+                });
+                
+                $('#productOptionsContainer').append(newOption);
+            });
+            
+            optionCounter += values.length;
+            
+            // Reset form
+            $('#multipleOptionName').val('');
+            $('#multipleOptionValues').val('');
+            $('#multipleOptionPrice').val('');
+            $('#multipleOptionsForm').slideUp();
+            
+            // Reinitialize sortable
+            initializeOptionsSortable();
+            
+            Swal.fire('تم!', `تم إضافة ${values.length} قيمة للخيار`, 'success');
+        }
+
+        function cancelMultipleOptions() {
+            $('#multipleOptionsForm').slideUp();
+        }
+
+        // Option groups
+        function createOptionGroup() {
+            const groupName = $('#optionGroupName').val();
+            if (!groupName) {
+                Swal.fire('خطأ!', 'يرجى إدخال اسم المجموعة', 'error');
+                return;
+            }
+            
+            const groupId = 'group_' + Date.now();
+            const group = {
+                id: groupId,
+                name: groupName,
+                options: Array.from(selectedOptions)
+            };
+            
+            optionGroups.push(group);
+            renderOptionGroup(group);
+            
+            // Mark grouped options
+            selectedOptions.forEach(index => {
+                $(`.selectable-option[data-index="${index}"]`).addClass('grouped');
+            });
+            
+            $('#optionGroupName').val('');
+            clearSelection();
+            
+            Swal.fire('تم!', 'تم إنشاء مجموعة الخيارات', 'success');
+        }
+
+        function renderOptionGroup(group) {
+            const container = $('#optionGroupsContainer');
+            const groupHtml = `
+                <div class="group-option-item" data-group-id="${group.id}">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>${group.name}</strong>
+                            <small class="text-muted ms-2">(${group.options.length} خيار)</small>
+                        </div>
+                        <div class="btn-group btn-group-sm">
+                            <button type="button" class="btn btn-outline-info" 
+                                    onclick="expandGroup('${group.id}')">
+                                <i class="fas fa-expand"></i>
+                            </button>
+                            <button type="button" class="btn btn-outline-danger" 
+                                    onclick="removeGroup('${group.id}')">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            container.append(groupHtml);
+        }
+
+        // View option values
+        function viewOptionValues(index) {
+            const option = $(`.selectable-option[data-index="${index}"]`);
+            const optionName = option.find('[name$="[option_name]"]').val();
+            const optionValue = option.find('[name$="[option_value]"]').val();
+            const optionType = option.find('[name$="[option_type]"]').val();
+            
+            $('#selectedOptionValues').empty();
+            
+            // If it's a quantity option, show tiers
+            if (optionType === 'quantity') {
+                const tiersContainer = option.find('.tier-item');
+                if (tiersContainer.length > 0) {
+                    tiersContainer.each(function() {
+                        const quantity = $(this).find('[name$="[quantity]"]').val();
+                        const price = $(this).find('[name$="[price_per_unit]"]').val();
+                        const tierName = $(this).find('[name$="[tier_name]"]').val() || `شريحة ${$(this).index() + 1}`;
+                        
+                        $('#selectedOptionValues').append(`
+                            <div class="option-value-item">
+                                <div class="small">${tierName}</div>
+                                <div class="fw-bold">${quantity} قطعة</div>
+                                <div class="text-success">${price} ج.م</div>
+                            </div>
+                        `);
+                    });
+                } else {
+                    $('#selectedOptionValues').append(`
+                        <div class="option-value-item">
+                            <div class="fw-bold">${optionValue}</div>
+                            <small>${optionName}</small>
+                            <div class="text-muted small">لا توجد شرائح كمية مضافة</div>
+                        </div>
+                    `);
+                }
+            } else {
+                // Show single value
+                $('#selectedOptionValues').append(`
+                    <div class="option-value-item selected-value">
+                        <div class="fw-bold">${optionValue}</div>
+                        <small>${optionName}</small>
+                    </div>
+                `);
+            }
+            
+            $('#optionValuesPreview').slideDown();
+        }
+
+        // Duplicate option
+        function duplicateOption(index) {
+            const originalOption = $(`.selectable-option[data-index="${index}"]`);
+            const clone = originalOption.clone();
+            
+            // Update index
+            const newIndex = optionCounter;
+            clone.data('index', newIndex);
+            
+            // Update all names and IDs
+            clone.find('[name]').each(function() {
+                const name = $(this).attr('name');
+                const newName = name.replace(/product_options\[\d+\]/, `product_options[${newIndex}]`);
+                $(this).attr('name', newName);
+            });
+            
+            clone.find('[id]').each(function() {
+                const id = $(this).attr('id');
+                if (id.includes('_')) {
+                    const newId = id.replace(/_\d+/, `_${newIndex}`);
+                    $(this).attr('id', newId);
+                }
+            });
+            
+            // Update quantity tiers container ID
+            const tiersContainer = clone.find('[id^="quantityTiersContainer_"]');
+            if (tiersContainer.length > 0) {
+                tiersContainer.attr('id', `quantityTiersContainer_${newIndex}`);
+            }
+            
+            // Clear selection checkbox
+            clone.find('.option-select-checkbox').removeClass('checked');
+            clone.removeClass('selected');
+            
+            // Add "نسخة" to option name
+            const nameInput = clone.find('[name$="[option_name]"]');
+            nameInput.val(nameInput.val() + ' (نسخة)');
+            
+            // Update option preview
+            updateOptionPreview(newIndex);
+            
+            // Insert after original
+            originalOption.after(clone);
+            
+            optionCounter++;
+            updateOptionIndices();
+            
+            Swal.fire('تم!', 'تم نسخ الخيار بنجاح', 'success');
+        }
+
+        // Helper functions
+        function getOptionTypeLabel(type) {
+            const labels = {
+                'regular': 'عادي',
+                'quantity': 'كمية',
+                'size': 'مقاس',
+                'color': 'لون'
+            };
+            return labels[type] || 'عادي';
+        }
+
+        function updateOptionPreview(index) {
+            const option = $(`.selectable-option[data-index="${index}"]`);
+            const name = option.find('[name$="[option_name]"]').val();
+            const type = option.find('[name$="[option_type]"]').val();
+            
+            option.find('.dynamic-field-title').html(`
+                ${name}
+                <span class="option-type-badge option-type-${type}">
+                    ${getOptionTypeLabel(type)}
+                </span>
+                ${option.find('.badge.bg-primary').length ? '<span class="badge bg-primary ms-2">رئيسي</span>' : ''}
+                ${option.find('.badge.bg-warning').length ? '<span class="badge bg-warning ms-2">معتمد</span>' : ''}
+                ${option.find('.badge.bg-success').length ? '<span class="badge bg-success ms-1">كمية</span>' : ''}
+                ${option.find('[name$="[is_required]"]').is(':checked') ? '<span class="badge bg-danger ms-1">مطلوب</span>' : ''}
+            `);
+        }
+
+        function updateOptionType(index, type) {
+            const option = $(`.selectable-option[data-index="${index}"]`);
+            const badge = option.find('.option-type-badge');
+            
+            badge.removeClass('option-type-regular option-type-quantity option-type-size option-type-color')
+                 .addClass(`option-type-${type}`)
+                 .text(getOptionTypeLabel(type));
+            
+            updateOptionPreview(index);
         }
 
         // Color Management Functions

@@ -62,7 +62,7 @@ class ProductResource extends JsonResource
                 : null,
 
             // ================== Colors ==================
-            'colors' => $this->colors->map(function ($color) {
+            'colors' => $this->colors?->map(function ($color) {
                 return [
                     'id'               => $color->id,
                     'name'             => $color->name,
@@ -93,7 +93,7 @@ class ProductResource extends JsonResource
             'reviews' => ReviewResource::collection($this->reviews),
 
             // ================== Sizes & Tiers ==================
-            'sizes' => $this->sizes->map(function ($size) {
+            'sizes' => $this->sizes?->map(function ($size) {
                 return [
                     'id'   => $size->id,
                     'name' => $size->name,
@@ -113,7 +113,7 @@ class ProductResource extends JsonResource
             'offers' => OfferResource::collection($this->offers),
 
             // ================== Materials ==================
-            'materials' => $this->materials->map(function ($material) {
+            'materials' => $this->materials?->map(function ($material) {
                 return [
                     'id'               => $material->id,
                     'name'             => $material->name,
@@ -139,45 +139,61 @@ class ProductResource extends JsonResource
                         'is_active'  => (bool) $image->is_active,
                     ];
                 }),
-
-            // ================== Options ==================
-            'options' => $this->options->map(function ($option) {
+// ================== Options (TREE STRUCTURE) ==================
+'options' => $this->options
+    ->whereNull('depends_on_option_id') // Main options only
+    ->groupBy('option_name')
+    ->map(function ($group) {
+        return [
+            'name' => $group->first()->option_name,
+            'items' => $group->map(function ($option) {
 
                 $keywords = ['رفع', 'ملف', 'صورة'];
                 $hasFile = collect($keywords)->contains(
-                    fn($word) => str_contains($option->option_value, $word)
+                    fn ($word) => str_contains($option->option_value, $word)
                 );
 
                 return [
-                    'id'           => $option->id,
-                    'option_name'  => $option->option_name,
-                    'option_value' => $option->option_value,
-                    'is_required'  => (bool) $option->is_required,
-                    'has_file'     => $hasFile,
+                    'id'          => $option->id,
+                    'value'       => $option->option_value,
+                    'is_required' => (bool) $option->is_required,
+                    'has_file'    => $hasFile,
+                    'base_price'  => (float) $option->additional_price,
 
-                    // السعر الثابت (لو مفيش اختيارات)
-                    'base_price'   => (float) $option->additional_price,
+                    // 👇 dependent options (مثل الكمية)
+                    'children' => $option->dependentOptions->map(function ($child) {
 
-                    // الأسعار حسب الاختيار (sizes / quantities)
-                    'prices' => $option->productSizeTiers->map(function ($tier) {
+                        $tiers = $child->getAvailableQuantityTiers();
+
+
                         return [
-                            'id'             => $tier->id,
-                            'size_id'        => $tier->size_id,
-                            'size_name'      => optional($tier->size)->name,
-                            'quantity'       => $tier->quantity,
-                            'price_per_unit' => (float) $tier->price_per_unit,
-                            'total_price'    => $tier->quantity * $tier->price_per_unit,
-                        ];
-                    }),
+                            'id'          => $child->id,
+                            'name'        => $child->option_name,
+                            'value'       => $child->option_value,
+                            'base_price'  => (float) $child->additional_price,
 
-                    // هل الاختيار له أسعار متعددة
-                    'has_multiple_prices' => $option->productSizeTiers->isNotEmpty(),
+                            'tiers' => $tiers->map(function ($tier) {
+                                return [
+                                    'id'             => $tier->id,
+                                    'quantity'       => $tier->quantity,
+                                    'price_per_unit' => (float) $tier->price_per_unit,
+                                    'total_price'    => (float) ($tier->quantity * $tier->price_per_unit),
+                                ];
+                            })->values(),
+
+                            'has_multiple_prices' => $tiers->isNotEmpty(),
+                        ];
+                    })->values(),
                 ];
-            }),
+            })->values(),
+        ];
+    })
+    ->values(),
+
 
 
             // ================== Printing Methods ==================
-            'printing_methods' => $this->printingMethods->map(function ($method) {
+            'printing_methods' => $this->printingMethods?->map(function ($method) {
                 return [
                     'id'          => $method->id,
                     'name'        => $method->name,
@@ -187,7 +203,7 @@ class ProductResource extends JsonResource
             }),
 
             // ================== Print Locations ==================
-            'print_locations' => $this->printLocations->map(function ($location) {
+            'print_locations' => $this->printLocations?->map(function ($location) {
                 return [
                     'id'   => $location->id,
                     'name' => $location->name,

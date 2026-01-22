@@ -108,17 +108,23 @@ class ProductOptions extends Model
     }
     
 
-    // في ProductOptions model
-public function parentOption()
-{
-    return $this->belongsTo(ProductOptions::class, 'depends_on_option_id');
-}
-
 public function dependentOptions()
 {
-    return $this->hasMany(ProductOptions::class, 'depends_on_option_id');
+    return $this->hasMany(
+        self::class,
+        'depends_on_option_id'
+    );
 }
 
+
+    public function parentOption()
+    {
+        return $this->belongsTo(
+            self::class,
+            'depends_on_option_id',
+            'id'
+        );
+    }
 public function getAvailableQuantityTiers()
 {
     return ProductSizeTier::where('option_id', $this->id)
