@@ -647,7 +647,7 @@ class ProductController extends Controller
             'printingMethods',
             'printLocations',
             'offers',
-            'pricingTiers',
+
             'sizeTiers',
             'images',
             'discount'
@@ -680,279 +680,541 @@ class ProductController extends Controller
      * @return \Illuminate\Http\RedirectResponse
      */
 
-    public function update(StoreProductRequest $request, $id)
-    {
-        DB::beginTransaction();
+   public function update(StoreProductRequest $request, $id)
+{
+    DB::beginTransaction();
 
-        try {
+    try {
+        $product = Product::with([
+            'colors',
+            'materials',
+            'printingMethods',
+            'printLocations',
+            'offers',
+            'deliveryTime',
+            'warranty',
+            'discount',
+            'images',
+            'adsText',
+            'options', // إضافة خيارات المنتج
+            'sizeTiers' // إضافة شرائح التسعير
+        ])->findOrFail($id);
 
-            $product = Product::with([
-                'colors',
-                'materials',
-                'printingMethods',
-                'printLocations',
-                'offers',
-                'deliveryTime',
-                'warranty',
-                'discount',
-                'images',
-                'adsText'
-            ])->findOrFail($id);
+        $validated = $request->validated();
 
-            $validated = $request->validated();
+        /* =====================================================
+        | MAIN IMAGE (products.image + product_images)
+        ===================================================== */
+        if ($request->hasFile('image')) {
+            // حذف القديمة
+            $product->images()->where('type', 'main')->each(function ($img) {
+                Storage::disk('public')->delete($img->path);
+                $img->delete();
+            });
 
-            /* =====================================================
-         | MAIN IMAGE (products.image + product_images)
-         ===================================================== */
-            if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('products', 'public');
+            $product->update(['image' => $path]);
 
-                // حذف القديمة
-                $product->images()->where('type', 'main')->each(function ($img) {
-                    Storage::disk('public')->delete($img->path);
-                    $img->delete();
-                });
-
-                $path = $request->file('image')->store('products', 'public');
-
-                $product->update(['image' => $path]);
-
-                $product->images()->create([
-                    'path' => $path,
-                    'type' => 'main',
-                    'is_primary' => 1,
-                    'order' => 1,
-                    'is_active' => 1,
-                    'alt' => $product->name,
-                ]);
-            }
-
-
-            // حذف الصورة الأساسية يدويًا
-            if ($request->boolean('remove_existing_main_image')) {
-
-                if ($product->image && Storage::disk('public')->exists($product->image)) {
-                    Storage::disk('public')->delete($product->image);
-                }
-
-                $product->update(['image' => null]);
-                $product->images()->where('is_primary', true)->delete();
-            }
-
-            /* =====================================================
-         | PRODUCT OPTIONS
-         ===================================================== */
-            $product->options()->delete(); // Delete existing options
-
-            if ($request->filled('product_options')) {
-                foreach ($request->product_options as $option) {
-                    if (!empty($option['option_name']) && !empty($option['option_value'])) {
-                        $product->options()->create([
-                            'option_name' => $option['option_name'],
-                            'option_value' => $option['option_value'],
-                            'additional_price' => $option['additional_price'] ?? 0,
-                            'is_required' => isset($option['is_required']) && $option['is_required'] == '1',
-                        ]);
-                    }
-                }
-            }
-
-
-            /* =====================================================
-         | BASIC PRODUCT DATA
-         ===================================================== */
-
-            $product->update([
-                'name' => $validated['name'],
-                'price_text' => $validated['price_text'] ?? null,
-                'category_id' => $validated['category_id'],
-                'description' => $validated['description'],
-                'price' => $validated['price'],
-                'stock' => $validated['stock'] ?? 0,
-                'status_id' => $validated['status_id'],
-                'has_discount' => $request->boolean('has_discount'),
-                'includes_tax' => $request->boolean('includes_tax'),
-                'includes_shipping' => $request->boolean('includes_shipping'),
+            $product->images()->create([
+                'path' => $path,
+                'type' => 'main',
+                'is_primary' => 1,
+                'order' => 1,
+                'is_active' => 1,
+                'alt' => $product->name,
             ]);
+        }
 
-            /* =====================================================
-         | DISCOUNT
-         ===================================================== */
-
-            if ($request->boolean('has_discount') && $request->filled('discount_value')) {
-                $product->discount()->updateOrCreate(
-                    [],
-                    [
-                        'discount_value' => $request->discount_value,
-                        'discount_type' => $request->input('discount_type', 'percentage'),
-                    ]
-                );
-            } else {
-                $product->discount()?->delete();
+        // حذف الصورة الأساسية يدويًا
+        if ($request->boolean('remove_existing_main_image')) {
+            if ($product->image && Storage::disk('public')->exists($product->image)) {
+                Storage::disk('public')->delete($product->image);
             }
 
-            /* =====================================================
-         | COLORS
-         ===================================================== */
+            $product->update(['image' => null]);
+            $product->images()->where('is_primary', true)->delete();
+        }
 
-            if ($request->filled('colors')) {
-                $colors = [];
-                foreach ($request->colors as $colorId) {
-                    $colors[$colorId] = [
-                        'additional_price' => $request->input("color_prices.$colorId", 0)
+        /* =====================================================
+        | PRODUCT OPTIONS WITH DEPENDENCIES
+        ===================================================== */
+        $product->options()->delete(); // حذف الخيارات القديمة
+        
+        if ($request->filled('product_options')) {
+            $options = [];
+            
+            foreach ($request->product_options as $index => $optionData) {
+                if (!empty($optionData['option_name']) && !empty($optionData['option_value'])) {
+                    // إنشاء الخيار الأساسي
+                    $option = [
+                        'option_name' => $optionData['option_name'],
+                        'option_value' => $optionData['option_value'],
+                        'additional_price' => $optionData['additional_price'] ?? 0,
+                        'is_required' => isset($optionData['is_required']) && $optionData['is_required'] == '1',
+                        'option_type' => $optionData['option_type'] ?? 'regular',
+                        'depends_on_option_id' => !empty($optionData['depends_on_option_id']) ? $optionData['depends_on_option_id'] : null,
+                        'dependency_condition' => !empty($optionData['depends_on_option_id']) ? ($optionData['dependency_condition'] ?? null) : null,
+                        'external_option_id' => $optionData['external_option_id'] ?? null,
+                        'external_detail_id' => $optionData['external_detail_id'] ?? null,
+                        'depends_on_detail_id' => $optionData['depends_on_detail_id'] ?? null,
                     ];
+
+                    $options[$index] = $option;
                 }
-                $product->colors()->sync($colors);
-            } else {
-                $product->colors()->detach();
             }
 
-            /* =====================================================
-         | MATERIALS
-         ===================================================== */
-
-            if ($request->filled('materials')) {
-                $materials = [];
-                foreach ($request->materials as $item) {
-                    if (!empty($item['material_id'])) {
-                        $materials[$item['material_id']] = [
-                            'quantity' => $item['quantity'] ?? 0,
-                            'unit' => $item['unit'] ?? 'piece',
-                            'additional_price' => $item['additional_price'] ?? 0,
-                        ];
-                    }
-                }
-                $product->materials()->sync($materials);
-            } else {
-                $product->materials()->detach();
-            }
-
-            /* =====================================================
-         | PRINTING METHODS
-         ===================================================== */
-
-            if ($request->filled('printing_methods')) {
-                $methods = [];
-                foreach ($request->printing_methods as $methodId) {
-                    $methods[$methodId] = [
-                        'additional_price' => $request->input("printing_method_prices.$methodId", 0)
-                    ];
-                }
-                $product->printingMethods()->sync($methods);
-            } else {
-                $product->printingMethods()->detach();
-            }
-
-            /* =====================================================
-         | PRINT LOCATIONS
-         ===================================================== */
-
-            if ($request->filled('print_locations')) {
-                $locations = [];
-                foreach ($request->print_locations as $locationId) {
-                    $locations[$locationId] = [
-                        'additional_price' => $request->input("print_location_prices.$locationId", 0)
-                    ];
-                }
-                $product->printLocations()->sync($locations);
-            } else {
-                $product->printLocations()->detach();
-            }
-
-            /* =====================================================
-         | OFFERS
-         ===================================================== */
-
-            $request->filled('offers')
-                ? $product->offers()->sync($request->offers)
-                : $product->offers()->detach();
-
-            /* =====================================================
-         | DELIVERY TIME
-         ===================================================== */
-
-            if ($request->filled('from_days') || $request->filled('to_days')) {
-                $product->deliveryTime()->updateOrCreate([], [
-                    'from_days' => $request->from_days,
-                    'to_days' => $request->to_days,
-                ]);
-            } else {
-                $product->deliveryTime()?->delete();
-            }
-
-            /* =====================================================
-         | WARRANTY
-         ===================================================== */
-
-            if ($request->filled('warranty_months')) {
-                $product->warranty()->updateOrCreate([], [
-                    'months' => $request->warranty_months
-                ]);
-            } else {
-                $product->warranty()?->delete();
-            }
-
-            /* =====================================================
-         | TEXT ADS
-         ===================================================== */
-
-            $product->adsText()->delete();
-            if ($request->filled('text_ads')) {
-                foreach ($request->text_ads as $ad) {
-                    if (!empty($ad['name'])) {
-                        $product->adsText()->create(['name' => $ad['name']]);
+            // الآن ننشئ الخيارات بعد أن تكون جميعها معروفة
+            foreach ($options as $index => $optionData) {
+                $createdOption = $product->options()->create($optionData);
+                
+                // إضافة شرائح الكمية إذا وجدت
+                if (isset($request->product_options[$index]['quantity_tiers'])) {
+                    foreach ($request->product_options[$index]['quantity_tiers'] as $tierData) {
+                        if (!empty($tierData['quantity']) && !empty($tierData['price_per_unit'])) {
+                            $product->sizeTiers()->create([
+                                'option_id' => $createdOption->id,
+                                'quantity' => $tierData['quantity'],
+                                'price_per_unit' => $tierData['price_per_unit'],
+                                'tier_name' => $tierData['tier_name'] ?? "شريحة {$tierData['quantity']}+",
+                                'is_quantity_tier' => true,
+                                'tier_type' => 'quantity',
+                            ]);
+                        }
                     }
                 }
             }
+        }
 
-            /* =====================================================
-         | ADDITIONAL IMAGES
-         ===================================================== */
-
-            if ($request->hasFile('additional_images')) {
-                $order = $product->images()->where('type', 'additional')->max('order') ?? 0;
-
-                foreach ($request->file('additional_images') as $image) {
-                    $path = $image->store('products/additional', 'public');
-
-                    $product->images()->create([
-                        'path' => $path,
-                        'alt' => $product->name,
-                        'is_primary' => false,
-                        'type' => 'additional',
-                        'order' => ++$order,
+        /* =====================================================
+        | SIZE TIERS (الشرائح حسب المقاس والكمية)
+        ===================================================== */
+        $product->sizeTiers()->where('is_quantity_tier', false)->delete();
+        
+        if ($request->filled('size_tiers')) {
+            foreach ($request->size_tiers as $tierData) {
+                if (!empty($tierData['option_id']) && !empty($tierData['quantity']) && !empty($tierData['price_per_unit'])) {
+                    $product->sizeTiers()->create([
+                        'option_id' => $tierData['option_id'],
+                        'related_option_id' => $tierData['related_option_id'] ?? null,
+                        'quantity' => $tierData['quantity'],
+                        'price_per_unit' => $tierData['price_per_unit'],
+                        'total_price' => $tierData['price_per_unit'] * $tierData['quantity'],
+                        'tier_name' => $tierData['tier_name'] ?? "شريحة {$tierData['quantity']}+",
+                        'is_quantity_tier' => false,
+                        'tier_type' => $tierData['tier_type'] ?? 'size',
+                        'dependency_conditions' => !empty($tierData['dependency_conditions']) ? 
+                            json_decode($tierData['dependency_conditions'], true) : null,
                     ]);
                 }
             }
+        }
 
-            /* =====================================================
-         | REMOVE ADDITIONAL IMAGES
-         ===================================================== */
+        /* =====================================================
+        | BASIC PRODUCT DATA
+        ===================================================== */
+        $product->update([
+            'name' => $validated['name'],
+            'price_text' => $validated['price_text'] ?? null,
+            'category_id' => $validated['category_id'],
+            'description' => $validated['description'],
+            'price' => $validated['price'],
+            'stock' => $validated['stock'] ?? 0,
+            'status_id' => $validated['status_id'],
+            'has_discount' => $request->boolean('has_discount'),
+            'includes_tax' => $request->boolean('includes_tax'),
+            'includes_shipping' => $request->boolean('includes_shipping'),
+            // الحقول الجديدة لتركيبات الخيارات
+            'valid_combinations' => $request->filled('valid_combinations') ? 
+                json_decode($request->valid_combinations, true) : null,
+            'combination_count' => $request->filled('combination_count') ? 
+                $request->combination_count : 0,
+            'options_conditions' => $request->filled('options_conditions') ? 
+                json_decode($request->options_conditions, true) : null,
+        ]);
 
-            if ($request->filled('removed_images')) {
-                foreach (explode(',', $request->removed_images) as $imageId) {
-                    $image = Image::find($imageId);
-                    if ($image && $image->imageable_id === $product->id) {
-                        Storage::disk('public')->delete($image->path);
-                        $image->delete();
+        /* =====================================================
+        | DISCOUNT
+        ===================================================== */
+        if ($request->boolean('has_discount') && $request->filled('discount_value')) {
+            $product->discount()->updateOrCreate(
+                [],
+                [
+                    'discount_value' => $request->discount_value,
+                    'discount_type' => $request->input('discount_type', 'percentage'),
+                    'is_active' => true,
+                ]
+            );
+        } else {
+            $product->discount()?->delete();
+        }
+
+        /* =====================================================
+        | COLORS
+        ===================================================== */
+        if ($request->filled('colors')) {
+            $colors = [];
+            foreach ($request->colors as $colorId) {
+                $colors[$colorId] = [
+                    'additional_price' => $request->input("color_prices.$colorId", 0)
+                ];
+            }
+            $product->colors()->sync($colors);
+        } else {
+            $product->colors()->detach();
+        }
+
+        /* =====================================================
+        | MATERIALS
+        ===================================================== */
+        if ($request->filled('materials')) {
+            $materials = [];
+            foreach ($request->materials as $item) {
+                if (!empty($item['material_id'])) {
+                    $materials[$item['material_id']] = [
+                        'quantity' => $item['quantity'] ?? 0,
+                        'unit' => $item['unit'] ?? 'piece',
+                        'additional_price' => $item['additional_price'] ?? 0,
+                    ];
+                }
+            }
+            $product->materials()->sync($materials);
+        } else {
+            $product->materials()->detach();
+        }
+
+        /* =====================================================
+        | FEATURES (المواصفات الإضافية)
+        ===================================================== */
+        $product->features()->delete();
+        if ($request->filled('features')) {
+            foreach ($request->features as $featureData) {
+                if (!empty($featureData['name']) && !empty($featureData['value'])) {
+                    $product->features()->create([
+                        'name' => $featureData['name'],
+                        'value' => $featureData['value'],
+                        'is_active' => true,
+                    ]);
+                }
+            }
+        }
+
+        /* =====================================================
+        | PRINTING METHODS
+        ===================================================== */
+        if ($request->filled('printing_methods')) {
+            $methods = [];
+            foreach ($request->printing_methods as $methodId) {
+                $methods[$methodId] = [
+                    'additional_price' => $request->input("printing_method_prices.$methodId", 0)
+                ];
+            }
+            $product->printingMethods()->sync($methods);
+        } else {
+            $product->printingMethods()->detach();
+        }
+
+        /* =====================================================
+        | PRINT LOCATIONS
+        ===================================================== */
+        if ($request->filled('print_locations')) {
+            $locations = [];
+            foreach ($request->print_locations as $locationId) {
+                $locations[$locationId] = [
+                    'additional_price' => $request->input("print_location_prices.$locationId", 0)
+                ];
+            }
+            $product->printLocations()->sync($locations);
+        } else {
+            $product->printLocations()->detach();
+        }
+
+        /* =====================================================
+        | OFFERS
+        ===================================================== */
+        $request->filled('offers')
+            ? $product->offers()->sync($request->offers)
+            : $product->offers()->detach();
+
+        /* =====================================================
+        | DELIVERY TIME
+        ===================================================== */
+        if ($request->filled('from_days') || $request->filled('to_days')) {
+            $product->deliveryTime()->updateOrCreate([], [
+                'from_days' => $request->from_days,
+                'to_days' => $request->to_days,
+                'is_active' => true,
+            ]);
+        } else {
+            $product->deliveryTime()?->delete();
+        }
+
+        /* =====================================================
+        | WARRANTY
+        ===================================================== */
+        if ($request->filled('warranty_months')) {
+            $product->warranty()->updateOrCreate([], [
+                'months' => $request->warranty_months,
+                'description' => 'ضمان المصنع',
+                'is_active' => true,
+            ]);
+        } else {
+            $product->warranty()?->delete();
+        }
+
+        /* =====================================================
+        | TEXT ADS
+        ===================================================== */
+        $product->adsText()->delete();
+        if ($request->filled('text_ads')) {
+            foreach ($request->text_ads as $ad) {
+                if (!empty($ad['name'])) {
+                    $product->adsText()->create([
+                        'name' => $ad['name'],
+                        'is_active' => true,
+                    ]);
+                }
+            }
+        }
+
+        /* =====================================================
+        | ADDITIONAL IMAGES
+        ===================================================== */
+        if ($request->hasFile('additional_images')) {
+            $order = $product->images()->where('type', 'additional')->max('order') ?? 0;
+
+            foreach ($request->file('additional_images') as $image) {
+                $path = $image->store('products/additional', 'public');
+
+                $product->images()->create([
+                    'path' => $path,
+                    'alt' => $product->name,
+                    'is_primary' => false,
+                    'type' => 'additional',
+                    'order' => ++$order,
+                    'is_active' => 1,
+                ]);
+            }
+        }
+
+        /* =====================================================
+        | REMOVE ADDITIONAL IMAGES
+        ===================================================== */
+        if ($request->filled('removed_images')) {
+            foreach (explode(',', $request->removed_images) as $imageId) {
+                $image = Image::find($imageId);
+                if ($image && $image->imageable_id === $product->id) {
+                    Storage::disk('public')->delete($image->path);
+                    $image->delete();
+                }
+            }
+        }
+
+        /* =====================================================
+        | UPDATE PRIMARY IMAGE
+        ===================================================== */
+        if ($request->filled('primary_image_id')) {
+            // إلغاء تعيين جميع الصور كرئيسية
+            $product->images()->update(['is_primary' => false]);
+            
+            // تعيين الصورة الجديدة كرئيسية
+            $primaryImage = Image::find($request->primary_image_id);
+            if ($primaryImage && $primaryImage->imageable_id === $product->id) {
+                $primaryImage->update(['is_primary' => true]);
+                
+                // تحديث الصورة الرئيسية في جدول المنتجات
+                $product->update(['image' => $primaryImage->path]);
+            }
+        }
+
+        /* =====================================================
+        | UPDATE IMAGES ORDER
+        ===================================================== */
+        if ($request->filled('images_order')) {
+            $orderArray = explode(',', $request->images_order);
+            foreach ($orderArray as $position => $imageId) {
+                $image = Image::find($imageId);
+                if ($image && $image->imageable_id === $product->id) {
+                    $image->update(['order' => $position + 1]);
+                }
+            }
+        }
+
+        /* =====================================================
+        | UPDATE SEO FIELDS
+        ===================================================== */
+        $seoFields = ['slug', 'meta_title', 'meta_description', 'meta_keywords'];
+        foreach ($seoFields as $field) {
+            if ($request->filled($field)) {
+                $product->update([$field => $request->$field]);
+            }
+        }
+
+        /* =====================================================
+        | GENERATE VALID COMBINATIONS (للمنتجات المتغيرة)
+        ===================================================== */
+        $this->generateProductCombinations($product);
+
+        DB::commit();
+
+        return redirect()
+            ->route('admin.products.show', $product->id)
+            ->with('success', 'تم تحديث المنتج بنجاح');
+    } catch (\Throwable $e) {
+        DB::rollBack();
+        Log::error('Update product error', [
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+            'product_id' => $id,
+        ]);
+
+        return back()
+            ->withInput()
+            ->with('error', 'حدث خطأ أثناء تحديث المنتج: ' . $e->getMessage());
+    }
+}
+
+/* =====================================================
+| HELPER FUNCTION: Generate Product Combinations
+===================================================== */
+private function generateProductCombinations(Product $product)
+{
+    try {
+        // الحصول على الخيارات الرئيسية فقط
+        $mainOptions = $product->options()->whereNull('depends_on_option_id')->get();
+        
+        if ($mainOptions->isEmpty()) {
+            $product->update([
+                'valid_combinations' => null,
+                'combination_count' => 0,
+            ]);
+            return;
+        }
+
+        // إنشاء مصفوفة للقيم لكل خيار
+        $optionValues = [];
+        foreach ($mainOptions as $option) {
+            // الحصول على القيم الممكنة لهذا الخيار
+            $values = $product->options()
+                ->where('option_name', $option->option_name)
+                ->pluck('option_value')
+                ->toArray();
+            
+            if (!empty($values)) {
+                $optionValues[$option->option_name] = $values;
+            }
+        }
+
+        // إنشاء جميع التركيبات الممكنة
+        $combinations = $this->generateCombinations($optionValues);
+        
+        // تصفية التركيبات بناءً على شروط الاعتماد
+        $filteredCombinations = $this->filterCombinationsByDependencies($combinations, $product);
+        
+        // تحديث قاعدة البيانات
+        $product->update([
+            'valid_combinations' => json_encode($filteredCombinations, JSON_UNESCAPED_UNICODE),
+            'combination_count' => count($filteredCombinations),
+        ]);
+
+        return $filteredCombinations;
+    } catch (\Exception $e) {
+        Log::error('Error generating product combinations', [
+            'product_id' => $product->id,
+            'error' => $e->getMessage(),
+        ]);
+        return [];
+    }
+}
+
+/* =====================================================
+| HELPER FUNCTION: Generate All Combinations
+===================================================== */
+private function generateCombinations($arrays, $i = 0)
+{
+    if (!isset($arrays[$i])) {
+        return [[]];
+    }
+    
+    $result = [];
+    foreach ($arrays[$i] as $value) {
+        $tmp = $this->generateCombinations($arrays, $i + 1);
+        foreach ($tmp as $t) {
+            $result[] = array_merge([$value], $t);
+        }
+    }
+    
+    return $result;
+}
+
+/* =====================================================
+| HELPER FUNCTION: Filter Combinations by Dependencies
+===================================================== */
+private function filterCombinationsByDependencies($combinations, Product $product)
+{
+    $filtered = [];
+    
+    // الحصول على جميع الخيارات المعتمدة
+    $dependentOptions = $product->options()
+        ->whereNotNull('depends_on_option_id')
+        ->with('parentOption')
+        ->get()
+        ->groupBy('depends_on_option_id');
+    
+    foreach ($combinations as $combination) {
+        $isValid = true;
+        
+        // التحقق من شروط الاعتماد لكل خيار معتمد
+        foreach ($dependentOptions as $parentOptionId => $dependents) {
+            $parentOption = $product->options()->find($parentOptionId);
+            if (!$parentOption) continue;
+            
+            // البحث عن قيمة الخيار الأب في التركيبة
+            $parentValueIndex = array_search($parentOption->option_name, array_keys($combination));
+            if ($parentValueIndex !== false) {
+                $parentValue = $combination[$parentValueIndex];
+                
+                // التحقق من كل خيار معتمد
+                foreach ($dependents as $dependent) {
+                    if (!$this->checkDependencyCondition(
+                        $parentValue,
+                        $dependent->dependency_condition,
+                        $dependent->parentOption->option_value
+                    )) {
+                        $isValid = false;
+                        break 2;
                     }
                 }
             }
-
-            DB::commit();
-
-            return redirect()
-                ->route('admin.products.show', $product->id)
-                ->with('success', 'تم تحديث المنتج بنجاح');
-        } catch (\Throwable $e) {
-
-            DB::rollBack();
-            Log::error('Update product error', ['error' => $e]);
-
-            return back()
-                ->withInput()
-                ->with('error', 'حدث خطأ أثناء تحديث المنتج');
+        }
+        
+        if ($isValid) {
+            $filtered[] = $combination;
         }
     }
+    
+    return $filtered;
+}
+
+/* =====================================================
+| HELPER FUNCTION: Check Dependency Condition
+===================================================== */
+private function checkDependencyCondition($actualValue, $condition, $expectedValue)
+{
+    switch ($condition) {
+        case 'equals':
+            return $actualValue == $expectedValue;
+        case 'not_equals':
+            return $actualValue != $expectedValue;
+        case 'greater_than':
+            return floatval($actualValue) > floatval($expectedValue);
+        case 'less_than':
+            return floatval($actualValue) < floatval($expectedValue);
+        case 'contains':
+            return strpos($actualValue, $expectedValue) !== false;
+        default:
+            return true;
+    }
+}
     public function destroy(Product $product)
     {
         $product->images()->delete();
