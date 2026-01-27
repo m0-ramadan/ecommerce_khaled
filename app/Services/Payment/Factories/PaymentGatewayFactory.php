@@ -13,15 +13,15 @@ use App\Services\Payment\Gateways\WalletGateway;
 
 class PaymentGatewayFactory
 {
-    protected UserWalletService $walletService;
-    protected ExchangeRateService $exchangeRateService;
+ //   protected UserWalletService $walletService;
+  //  protected ExchangeRateService $exchangeRateService;
 
     public function __construct(
-        UserWalletService $walletService,
-        ExchangeRateService $exchangeRateService
+     //   UserWalletService $walletService,
+       // ExchangeRateService $exchangeRateService
     ) {
-        $this->walletService = $walletService;
-        $this->exchangeRateService = $exchangeRateService;
+      //  $this->walletService = $walletService;
+      //  $this->exchangeRateService = $exchangeRateService;
     }
 
     public function make(string $gateway)
@@ -57,13 +57,6 @@ class PaymentGatewayFactory
                 'methods' => ['pay_later'],
                 'icon' => 'clock',
                 'supports_pay_later' => true,
-            ],
-            'wallet' => [
-                'name' => 'المحفظة',
-                'description' => 'الدفع من رصيدك',
-                'methods' => ['wallet'],
-                'icon' => 'wallet',
-                'requires_balance' => true,
             ],
         ];
     }

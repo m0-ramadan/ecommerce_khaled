@@ -9,20 +9,28 @@ use App\Models\Address;
 use App\Models\OrderItem;
 use App\Models\UserAddress;
 use Illuminate\Http\Request;
+use App\Models\PaymentMethod;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Traits\HandlesPaymobPayment;
+use App\Services\Payment\PaymentService;
 use App\Http\Resources\Website\OrderResource;
 use App\Http\Requests\Website\ApplyCouponRequest;
 use App\Http\Requests\Website\CreateOrderRequest;
 use App\Http\Resources\Website\OrderDetailsResource;
 use App\Http\Resources\Website\PaymentMethodResource;
-use App\Models\PaymentMethod;
 
 class OrderController extends Controller
 {
     use ApiResponseTrait, HandlesPaymobPayment;
+
+        private PaymentService $paymentService;
+
+    public function __construct(PaymentService $paymentService)
+    {
+        $this->paymentService = $paymentService;
+    }
 
     /**
      * عرض طلبات المستخدم المسجل
@@ -128,7 +136,33 @@ class OrderController extends Controller
             // تفريغ السلة بعد الطلب
             //  $cart->items()->delete();
             //  $cart->update(['subtotal' => 0, 'total' => 0]);
+   // إذا كان الدفع ليس نقداً (payment_method !== 1)
 
+      //  $paymentMethod = PaymentMethod::find($request->payment_method);
+     
+        // if ($paymentMethod && $paymentMethod->key !== 'cash') {
+        //     // استخدام key من جدول payment_methods لتحديد بوابة الدفع
+        //     $gateway = $paymentMethod->key; // 'paymob', 'tamara', 'tabby'
+            
+        //     $result = $this->paymentService->processOrderPayment(
+        //         $user,
+        //         $order,
+        //         $gateway,
+        //         $paymentMethod->key,
+        //         $cart->items->toArray()
+        //     );
+
+        //     if (!$result['success']) {
+        //         return $this->errorResponse($result['message'], 400);
+        //     }
+
+        //     return $this->successResponse([
+        //         'payment_url'  => $result['payment_url'],
+        //         'shorten_url'  => $result['shorten_url'],
+        //         'order_number' => $order->order_number,
+        //         'message'      => 'جاري توجيهك إلى بوابة الدفع الآمنة...'
+        //     ]);
+        // }
             if ($request->payment_method === 8) {
 
                 $payment = $this->initiatePaymobPayment($order);

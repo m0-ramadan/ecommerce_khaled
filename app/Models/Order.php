@@ -10,6 +10,11 @@ class Order extends Model
 {
     use HasFactory, SoftDeletes;
 
+        const PAYMENT_STATUS_PENDING = 'pending';
+    const PAYMENT_STATUS_PAID = 'paid';
+    const PAYMENT_STATUS_FAILED = 'failed';
+    const PAYMENT_STATUS_REFUNDED = 'refunded';
+    
     protected $table = 'orders';
 
     protected $fillable = [

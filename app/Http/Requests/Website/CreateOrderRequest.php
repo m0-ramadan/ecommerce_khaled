@@ -66,7 +66,8 @@ class CreateOrderRequest extends FormRequest
             'customer_email'    => 'nullable|email',
 
             // وسائل الدفع المتاحة
-            'payment_method'    => 'required|exists:payment_methods,id',
+'payment_method' => 'required|integer|exists:payment_methods,id',
+
 
             'notes'             => 'nullable|string|max:1000',
 

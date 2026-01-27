@@ -171,4 +171,15 @@ Route::prefix('v1')->group(function () {
     // تتبع عام للعملاء
     Route::get('/public/track/{trackingNumber}', [OtoV2ShippingController::class, 'trackShipment'])
         ->name('shipping.track.public');
+
+        
+Route::get('payment/callback/{orderId}', [PaymentController::class, 'handleSuccess'])
+    ->name('payment.callback.paymob');
+
+Route::get('payment/callback/{orderId}', [PaymentController::class, 'handleSuccess'])
+    ->name('payment.callback.tabby');
+
+Route::get('payment/callback/{orderId}', [PaymentController::class, 'handleSuccess'])
+    ->name('payment.callback.tamara');
+
 });

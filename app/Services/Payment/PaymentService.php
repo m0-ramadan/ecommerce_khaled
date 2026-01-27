@@ -5,72 +5,65 @@ namespace App\Services\Payment;
 use App\Models\User;
 use App\Models\Order;
 use App\Models\OrderOffer;
+use App\Models\PaymentMethod;
 use App\Services\Wallet\UserWalletService;
 use App\Services\Payment\Factories\PaymentGatewayFactory;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Notifications\PaymentSuccessful;
 use App\Notifications\OrderPaid;
+use Faker\Provider\Payment;
 
 class PaymentService
 {
-    private PaymentGatewayFactory $gatewayFactory;
-    private UserWalletService $walletService;
+     private PaymentGatewayFactory $gatewayFactory;
 
     public function __construct(
-        PaymentGatewayFactory $gatewayFactory,
-        UserWalletService $walletService
+        PaymentGatewayFactory $gatewayFactory
     ) {
         $this->gatewayFactory = $gatewayFactory;
-        $this->walletService = $walletService;
     }
 
     public function processOrderPayment(
-        User $user,
+        ?User $user,
         Order $order,
-        OrderOffer $offer,
         string $gateway,
         string $paymentMethod,
-        array $additionalData = []
+        array $cartItems = []
     ): array {
         DB::beginTransaction();
 
         try {
-            // التحقق من صحة الطلب والعرض
-            $this->validatePaymentRequest($order, $offer);
+            // تحضير بيانات الطلب للبوابة
+            $orderData = $this->prepareOrderData($order, $user, $gateway, $cartItems);
 
-            $amount = $offer->price;
-            $orderData = $this->prepareOrderData($order, $offer, $user, $gateway, $additionalData);
-
-
-            // اختيار Gateway المناسب
-            if ($gateway === 'wallet') {
-                $result = $this->processWalletPayment($user, $order, $amount);
-            } else {
-
-                $paymentGateway = $this->gatewayFactory->make($gateway);
-
-                $result = $paymentGateway->initiatePayment($orderData);
-            }
+            // إنشاء بوابة الدفع المناسبة
+            $paymentGateway = $this->gatewayFactory->make($gateway);
+dd($paymentGateway);
+            // بدء عملية الدفع
+            $result = $paymentGateway->initiatePayment($orderData);
 
             if (!$result['success']) {
-                throw new \Exception($result['error'] ?? 'Payment failed');
+                throw new \Exception($result['error'] ?? $result['message'] ?? 'Payment failed');
             }
-            // حفظ بيانات الدفع
-            $this->savePaymentData($order, $offer, $gateway, $paymentMethod, $result);
+
+            // حفظ بيانات الدفع في الطلب
+            $this->savePaymentData($order, $gateway, $paymentMethod, $result);
 
             DB::commit();
 
             return [
                 'success' => true,
-                'message' => 'Payment initiated successfully',
-                'payment' => $result,
-                'order' => $order->fresh(),
+                'message' => 'تم بدء عملية الدفع بنجاح',
+                'payment_url' => $result['payment_url'] ?? $result['checkout_url'] ?? null,
+                'shorten_url' => $result['shorten_url'] ?? null,
+                'order_number' => $order->order_number,
+                'gateway' => $gateway,
             ];
         } catch (\Exception $e) {
             DB::rollBack();
             Log::channel('payment')->error('Payment Processing Failed', [
-                'user_id' => $user->id,
+                'user_id' => $user?->id,
                 'order_id' => $order->id,
                 'gateway' => $gateway,
                 'error' => $e->getMessage(),
@@ -85,123 +78,96 @@ class PaymentService
         }
     }
 
-    private function validatePaymentRequest(Order $order, OrderOffer $offer): void
-    {
-        if ($order->isPaid()) {
-            throw new \Exception(message: 'Order is already paid');
-        }
-
-        if ($offer->status !== 'pending') {
-            throw new \Exception('Offer is not available for payment');
-        }
-
-        // if ($order->driver_id !== $offer->driver_id) {
-        //     throw new \Exception('Offer does not belong to the selected driver');
-        // }
-    }
-
     private function prepareOrderData(
         Order $order,
-        OrderOffer $offer,
-        User $user,
+        ?User $user,
         string $gateway,
-        array $additionalData
+        array $cartItems
     ): array {
+        // تحضير البيانات حسب البوابة
         $baseData = [
-            'order_id' => $order->id,
-            'amount' => $offer->price,
-            'description' => "Order #{$order->order_number} - Water Delivery",
+            'order_id' => $order->order_number,
+            'amount' => $order->total_amount,
+            'user' => $user,
             'customer' => [
-                'first_name' => $user->first_name,
-                'last_name' => $user->last_name,
-                'email' => $user->email,
-                'phone' => $user->phone,
+                'first_name' => $order->customer_name ?? $user?->name,
+                'last_name' => '',
+                'email' => $order->customer_email ?? $user?->email ?? 'customer@example.com',
+                'phone' => $order->customer_phone ?? $user?->phone ?? '+966500000000',
             ],
-            'items' => $this->getOrderItems($order, $offer),
-            'billing_address' => $this->getBillingAddress($order),
-            'shipping_address' => $this->getShippingAddress($order),
-            'callback_urls' => [
-                'success' => route('payment.callback.success', ['gateway' => $gateway]),
-                'failure' => route('payment.callback.failure', ['gateway' => $gateway]),
-                'cancel' => route('payment.callback.cancel', ['gateway' => $gateway]),
-            ],
-            'metadata' => [
-                'order_number' => $order->order_number,
-                'offer_id' => $offer->id,
-                'driver_id' => $offer->driver_id,
-                'service_type' => $order->service->name ?? 'Water Delivery',
-            ],
+         // 'callback_url' => $this->getCallbackUrl($gateway, $order->id),
         ];
 
-        return array_merge($baseData, $additionalData);
+        // إضافة بيانات إضافية حسب البوابة
+        switch ($gateway) {
+            case 'tamara':
+            case 'tabby':
+                $baseData['items'] = $this->prepareItemsFromCart($cartItems);
+                $baseData['shipping_address'] = $this->getShippingAddress($order);
+                $baseData['billing_address'] = $this->getBillingAddress($order);
+                // $baseData['callback_urls'] = [
+                //     'success' => route('payment.callback.success', ['gateway' => $gateway, 'order_id' => $order->id]),
+                //     'failure' => route('payment.callback.failure', ['gateway' => $gateway, 'order_id' => $order->id]),
+                //     'cancel' => route('payment.callback.cancel', ['gateway' => $gateway, 'order_id' => $order->id]),
+                // ];
+                break;
+        }
+
+        return $baseData;
     }
 
-    private function getOrderItems(Order $order, OrderOffer $offer): array
+    private function prepareItemsFromCart(array $cartItems): array
+    {
+        $items = [];
+foreach ($cartItems as $item) {
+    $items[] = [
+        'name' => $item['product']['name'] ?? 'منتج',
+        'description' => $item['product']['description'] ?? 'منتج',
+        'quantity' => $item['quantity'] ?? 1,
+        'unit_price' => $item['price_per_unit'] ?? 1,
+        'total_price' => $item['total_price']
+            ?? (($item['price_per_unit'] ?? 1) * ($item['quantity'] ?? 1)),
+        'sku' => $item['product']['sku'] ?? 'PROD-' . ($item['product_id'] ?? '000'),
+    ];
+}
+
+        return $items;
+    }
+
+    private function getShippingAddress(Order $order): array
     {
         return [
-            [
-                'name' => $order->service->name ?? 'Water Delivery Service',
-                'description' => 'Water delivery to your location',
-                'quantity' => 1,
-                'unit_price' => $offer->price,
-                'total_price' => $offer->price,
-                'sku' => 'SERVICE-' . $order->service_id,
-            ]
+            'first_name' => $order->customer_name ?? 'العميل',
+            'last_name' => '',
+            'address_line1' => $order->shipping_address ?? 'غير محدد',
+            'city' => 'الرياض',
+            'region' => 'الرياض',
+            'country_code' => 'SA',
+            'postal_code' => '',
+            'phone' => $order->customer_phone ?? '+966500000000',
         ];
     }
 
     private function getBillingAddress(Order $order): array
     {
-        $location = $order->location;
-
-        return [
-            'first_name' => $order->user->first_name,
-            'last_name' => $order->user->last_name,
-            'address_line1' => $location->address ?? 'Not specified',
-            'city' => $location->city ?? 'Riyadh',
-            'state' => $location->region ?? 'Riyadh',
-            'country' => 'SA',
-            'postal_code' => $location->postal_code ?? '',
-            'phone' => $order->user->phone,
-        ];
+        return $this->getShippingAddress($order);
     }
 
-    private function getShippingAddress(Order $order): array
+private function getCallbackUrl(string $gateway, int $orderId): string
+{
+    return route(
+        'payment.callback.' . $gateway,
+        ['orderId' => $orderId] 
+    );
+}
+
+
+    private function savePaymentData(Order $order, string $gateway, string $paymentMethod, array $paymentResult): void
     {
-        return $this->getBillingAddress($order);
-    }
-
-    private function processWalletPayment(User $user, Order $order, float $amount): array
-    {
-        $walletEntry = $this->walletService->withdraw($user, $amount, [
-            'description' => 'Payment for Order #' . $order->order_number,
-            'metadata' => [
-                'order_id' => $order->id,
-                'order_number' => $order->order_number,
-            ]
-        ]);
-
-        return [
-            'success' => true,
-            'transaction_id' => 'WALLET-' . $walletEntry->id,
-            'amount' => $amount,
-            'gateway' => 'wallet',
-            'message' => 'Payment processed from wallet',
-        ];
-    }
-
-    private function savePaymentData(
-        Order $order,
-        OrderOffer $offer,
-        string $gateway,
-        string $paymentMethod,
-        array $paymentResult
-    ): void {
         $order->update([
-            'payment_status' => Order::PAYMENT_STATUS_PENDING,
-            'payment_method' => $paymentMethod,
             'payment_gateway' => $gateway,
-            'payment_transaction_id' => $paymentResult['payment_id'] ?? null,
+            'transaction_id' => $paymentResult['payment_id'] ?? $paymentResult['order_id'] ?? null,
+            'payment_status' => 'pending',
             'payment_details' => array_merge(
                 $order->payment_details ?? [],
                 [
@@ -212,10 +178,23 @@ class PaymentService
                 ]
             ),
         ]);
-
-        // تحديث حالة العرض إلى "قيد الدفع"
-        $offer->update(['status' => 'payment_pending']);
     }
+ 
+
+    private function getOrderItems(Order $order): array
+    {
+        return [
+            [
+                'name' => $order->service->name ?? 'Water Delivery Service',
+                'description' => 'Water delivery to your location',
+                'quantity' => 1,
+                'unit_price' => $order->price,
+                'total_price' => $order->price,
+                'sku' => 'SERVICE-' . $order->service_id,
+            ]
+        ];
+    }
+
 
     public function verifyPayment(Order $order): array
     {
@@ -467,10 +446,6 @@ class PaymentService
                 $order->user->notify(new PaymentSuccessful($order));
             }
 
-            // إشعار للسائق
-            if ($order->driver) {
-                $order->driver->notify(new OrderPaid($order));
-            }
         } catch (\Exception $e) {
             Log::channel('payment')->error('Failed to send payment notifications', [
                 'order_id' => $order->id,
