@@ -100,4 +100,31 @@ class Order extends Model
             default       => 'غير معروف',
         };
     }
+
+    
+    // في نموذج Order، أضف هذه العلاقة
+public function shipments()
+{
+    return $this->hasMany(Shipment::class);
+}
+
+public function activeShipment()
+{
+    return $this->hasOne(Shipment::class)->latest();
+}
+
+public function getHasShipmentAttribute()
+{
+    return $this->shipments()->exists();
+}
+
+public function getShipmentStatusAttribute()
+{
+    return $this->activeShipment?->status;
+}
+
+public function getTrackingNumberAttribute()
+{
+    return $this->activeShipment?->tracking_number;
+}
 }

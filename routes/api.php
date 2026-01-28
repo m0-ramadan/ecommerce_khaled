@@ -25,6 +25,7 @@ use App\Http\Controllers\Api\Website\CustomizationOptionsController;
 
 
 Route::prefix('v1')->group(function () {
+    Route::get('order/shipping-options', [ShippingController::class, 'getDeliveryOptions']);
     Route::middleware('auth:sanctum')->group(function () {
         Route::prefix('addresses')->group(function () {
             Route::get('/', [UserAddressController::class, 'index']);
@@ -146,27 +147,27 @@ Route::prefix('v1')->group(function () {
 
 
 
-    // OTO V2 Shipping Routes
-    Route::prefix('shipping')->middleware(['auth:sanctum'])->group(function () {
-        // إنشاء الشحنات
-        Route::post('/create', [OtoV2ShippingController::class, 'createShipment']);
-        Route::post('/create-from-address/{orderId}/{addressId}', [OtoV2ShippingController::class, 'createShipmentFromAddress']);
+    // // OTO V2 Shipping Routes
+    // Route::prefix('shipping')->middleware(['auth:sanctum'])->group(function () {
+    //     // إنشاء الشحنات
+    //     Route::post('/create', [OtoV2ShippingController::class, 'createShipment']);
+    //     Route::post('/create-from-address/{orderId}/{addressId}', [OtoV2ShippingController::class, 'createShipmentFromAddress']);
 
-        // تتبع الشحنات
-        Route::get('/track/{trackingNumber}', [OtoV2ShippingController::class, 'trackShipment']);
-        Route::post('/track-driver', [OtoV2ShippingController::class, 'trackDriver']);
+    //     // تتبع الشحنات
+    //     Route::get('/track/{trackingNumber}', [OtoV2ShippingController::class, 'trackShipment']);
+    //     Route::post('/track-driver', [OtoV2ShippingController::class, 'trackDriver']);
 
-        // الحسابات والاستعلامات
-        Route::post('/calculate', [OtoV2ShippingController::class, 'calculateShipping']);
-        Route::get('/cities', [OtoV2ShippingController::class, 'getCities']);
-        Route::get('/cities/{cityCode}/districts', [OtoV2ShippingController::class, 'getDistricts']);
+    //     // الحسابات والاستعلامات
+    //     Route::post('/calculate', [OtoV2ShippingController::class, 'calculateShipping']);
+    //     Route::get('/cities', [OtoV2ShippingController::class, 'getCities']);
+    //     Route::get('/cities/{cityCode}/districts', [OtoV2ShippingController::class, 'getDistricts']);
 
-        // إدارة الشحنات
-        Route::get('/label/{trackingNumber}', [OtoV2ShippingController::class, 'getLabel']);
-        Route::post('/cancel', [OtoV2ShippingController::class, 'cancelShipment']);
-        Route::post('/sync', [OtoV2ShippingController::class, 'syncShipments']);
-        Route::get('/orders', [OtoV2ShippingController::class, 'getShippingOrders']);
-    });
+    //     // إدارة الشحنات
+    //     Route::get('/label/{trackingNumber}', [OtoV2ShippingController::class, 'getLabel']);
+    //     Route::post('/cancel', [OtoV2ShippingController::class, 'cancelShipment']);
+    //     Route::post('/sync', [OtoV2ShippingController::class, 'syncShipments']);
+    //     Route::get('/orders', [OtoV2ShippingController::class, 'getShippingOrders']);
+    // });
 
     // تتبع عام للعملاء
     Route::get('/public/track/{trackingNumber}', [OtoV2ShippingController::class, 'trackShipment'])
