@@ -176,10 +176,26 @@ Route::prefix('v1')->group(function () {
 Route::get('payment/callback/{orderId}', [PaymentController::class, 'handleSuccess'])
     ->name('payment.callback.paymob');
 
+Route::get('payment/success/tabby', [PaymentController::class, 'handleSuccess'])
+    ->name('payment.success.tabby');
+Route::get('payment/failure/tabby', [PaymentController::class, 'handleSuccess'])
+    ->name('payment.failure.tabby');
+Route::get('payment/cancel/tabby', [PaymentController::class, 'handlecancel'])
+    ->name('payment.cancel.tabby');
+
 Route::get('payment/callback/{orderId}', [PaymentController::class, 'handleSuccess'])
     ->name('payment.callback.tabby');
-
 Route::get('payment/callback/{orderId}', [PaymentController::class, 'handleSuccess'])
     ->name('payment.callback.tamara');
+    Route::get('payment/callback/{orderId}', [PaymentController::class, 'handleSuccess'])
+    ->name('payment.callback.paymob');
 
+Route::get('payment/success/tamara', [PaymentController::class, 'handleSuccess'])
+    ->name('payment.success.tamara');
+Route::get('payment/failure/tamara', [PaymentController::class, 'handleSuccess'])
+    ->name('payment.failure.tamara');
+Route::get('payment/cancel/tamara', [PaymentController::class, 'handlecancel'])
+    ->name('payment.cancel.tamara');
+Route::get('payment/webhook/tamara', [PaymentController::class, 'handlewebhook'])
+    ->name('payment.webhook.tamara');
 });

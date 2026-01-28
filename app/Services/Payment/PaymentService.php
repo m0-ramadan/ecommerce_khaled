@@ -39,14 +39,13 @@ class PaymentService
 
             // إنشاء بوابة الدفع المناسبة
             $paymentGateway = $this->gatewayFactory->make($gateway);
-dd($paymentGateway);
+
             // بدء عملية الدفع
             $result = $paymentGateway->initiatePayment($orderData);
 
             if (!$result['success']) {
                 throw new \Exception($result['error'] ?? $result['message'] ?? 'Payment failed');
             }
-
             // حفظ بيانات الدفع في الطلب
             $this->savePaymentData($order, $gateway, $paymentMethod, $result);
 

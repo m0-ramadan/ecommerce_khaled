@@ -67,6 +67,7 @@ class TamaraGateway extends BaseGateway
                 $checkoutData,
                 ['Authorization' => "Bearer {$authToken}"]
             );
+
             if (!$response['success']) {
                 Log::channel('payment')->error('Tamara API Error Response', [
                     'error' => $response['error'] ?? 'Unknown error',
@@ -143,7 +144,9 @@ class TamaraGateway extends BaseGateway
                     'currency' => $this->currency,
                 ],
                 'total_amount' => [
-                    'amount' => $totalAmount,
+                   // 'amount' => $totalAmount,
+                    'amount' => 10,
+
                     'currency' => $this->currency,
                 ],
             ];
@@ -160,7 +163,8 @@ class TamaraGateway extends BaseGateway
                 'item_url' => $metadata['order_url'] ?? null,
                 'image_url' => $metadata['service_image'] ?? null,
                 'unit_price' => [
-                    'amount' => (float) ($data['amount'] ?? 0),
+                   // 'amount' => (float) ($data['amount'] ?? 0),
+                    'amount' =>100,
                     'currency' => $this->currency,
                 ],
                 'tax_amount' => [
@@ -172,14 +176,17 @@ class TamaraGateway extends BaseGateway
                     'currency' => $this->currency,
                 ],
                 'total_amount' => [
-                    'amount' => (float) ($data['amount'] ?? 0),
+                   // 'amount' => (float) ($data['amount'] ?? 0),
+                    'amount' =>100,
+
                     'currency' => $this->currency,
                 ],
             ];
         }
 
         // حساب المبالغ الإجمالية
-        $totalAmount = (float) ($data['amount'] ?? 0);
+      //  $totalAmount = (float) ($data['amount'] ?? 0);
+        $totalAmount = 100;
         $shippingAmount = (float) ($data['shipping_amount'] ?? 0);
         $taxAmount = (float) ($data['tax_amount'] ?? 0);
         $discountAmount = (float) ($data['discount_amount'] ?? 0);

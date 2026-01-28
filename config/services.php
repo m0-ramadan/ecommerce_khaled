@@ -89,25 +89,26 @@ return [
     //     'cancel_url' => env('PAYMOB_CANCEL_URL'),
     // ],
     'tamara' => [
-        'sandbox' => env('TAMARA_SANDBOX', true),
-        'username' => env('TAMARA_USERNAME'),
-        'password' => env('TAMARA_PASSWORD'),
-        'api_key' => env('TAMARA_API_KEY'),
-        'notification_token' => env('TAMARA_NOTIFICATION_TOKEN'),
-        'webhook_token' => env('TAMARA_WEBHOOK_TOKEN'),
-        'api_token' => env('TAMARA_API_TOKEN'),
+        'sandbox' => env('TAMARA_SANDBOX', false),
+        'username' => env('TAMARA_USERNAME','a7madmabrouk701@gmail.com'),
+        'password' => env('TAMARA_PASSWORD','2uen8sCwuNn$!9D'),
+        'api_key' => env('TAMARA_API_KEY','aa852b8e-b3cf-4930-9b49-d412dee666fa'),
+        'notification_token' => env('TAMARA_NOTIFICATION_TOKEN','e495b422-a6a9-419a-ad2c-b9f58832bafc'),
+        'webhook_token' => env('TAMARA_WEBHOOK_TOKEN',''),
+        'api_token' => env('TAMARA_API_TOKEN','eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhY2NvdW50SWQiOiI1NDQxODRjMC1mMWI0LTQzZDYtOTAzOS1iZGE3ZjI4MjhlNzkiLCJ0eXBlIjoibWVyY2hhbnQiLCJzYWx0IjoiNDVhZTA2OTAtNzM0My00Y2VhLTk5ZTItMzNkN2FhODgzYmRiIiwicm9sZXMiOlsiUk9MRV9NRVJDSEFOVCJdLCJpc010bHMiOmZhbHNlLCJpYXQiOjE3NjkxOTIzMTQsImlzcyI6IlRhbWFyYSBQUCJ9.nSiuY_lv3gEGUNWlPCpYWxAZyc-GYaeJsO2M2dQilvNPVQhwWjDzp1KbVXNjW3q836Sa-o7dghGqitGV6ni-X-bRDnqNSEuN6YKrOh4qEiMLV8OGHEWMnsxuhIRbMjmmjOq15sD7lxDHe05TbxDBJIakW9oVVA9I5yN71JqMzp-uA_m0uZnh6kQw_QTGFGhi4CF-hkzPgn5LfHr5bqklZ5iP2riKQtbWVukKxYnuXAdREY5NeUx2rlDYVbAPq8fJo6s1oxLDZaffx_roUzQNto28iCWkD61L-1UyXu0To015G16_4VvS65gQ7miD0ApZvsgqUdajb773IKQaEbOKgw'),
         'currency' => 'SAR',
+         'merchant_code' => env('TAMARA_MERCHANT_CODE', 'TAL'),
     ],
     'tabby' => [
         // بيئة Tabby (Sandbox / Production)
         'sandbox' => env('TABBY_SANDBOX', true),
 
         // Merchant Info
-        'merchant_code' => env('TABBY_MERCHANT_CODE'),
+        'merchant_code' => env('TABBY_MERCHANT_CODE',  'TAL'),
 
         // Keys
-        'secret_key' => env('TABBY_SECRET_KEY'),
-        'public_key' => env('TABBY_PUBLIC_KEY'),
+        'secret_key' => env('TABBY_SECRET_KEY','sk_test_019b4606-613e-e6be-c627-296d96beb3de'),
+        'public_key' => env('TABBY_PUBLIC_KEY','pk_test_019b4606-613e-e6be-c627-296cfc69ea92'),
 
         // Webhook
         'webhook_secret' => env('TABBY_WEBHOOK_SECRET'),

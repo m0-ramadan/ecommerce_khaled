@@ -45,6 +45,7 @@ protected function getBaseUrl(): string
     {
         try {
             $authToken = $this->getAuthToken('tabby');
+
             if (!$authToken) {
                 throw new \Exception('Tabby authentication failed');
             }
@@ -65,7 +66,7 @@ protected function getBaseUrl(): string
                     'Authorization' => "Bearer {$authToken}",
                 ]
             );
-
+ 
             if (!$response['success']) {
                 Log::channel('payment')->error('Tabby API Error Response', [
                     'error' => $response['error'] ?? 'Unknown error',
@@ -78,7 +79,7 @@ protected function getBaseUrl(): string
             $responseData = $response['data'];
 
             // التحقق من توفر منتج التقسيط
-            // $installmentProduct = $responseData['configuration']['available_products']['installments'][0] ?? null;
+             $installmentProduct = $responseData['configuration']['available_products']['installments'][0] ?? null;
             
             // if (!$installmentProduct || !($installmentProduct['is_available'] ?? false)) {
             //     throw new \Exception('Tabby installments not available for this transaction');
@@ -154,7 +155,8 @@ protected function getBaseUrl(): string
 
         return [
             'payment' => [
-                'amount' => $this->formatAmount($data['amount'] ?? 0),
+                // 'amount' => $this->formatAmount($data['amount'] ?? 10),
+                'amount' => 10,
                 'currency' => $this->currency,
                 'description' => $data['description'] ?? 'Water Delivery Order',
                 'buyer' => [

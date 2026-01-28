@@ -138,46 +138,51 @@ class OrderController extends Controller
             //  $cart->update(['subtotal' => 0, 'total' => 0]);
    // إذا كان الدفع ليس نقداً (payment_method !== 1)
 
-      //  $paymentMethod = PaymentMethod::find($request->payment_method);
+       $paymentMethod = PaymentMethod::find($request->payment_method);
      
-        // if ($paymentMethod && $paymentMethod->key !== 'cash') {
-        //     // استخدام key من جدول payment_methods لتحديد بوابة الدفع
-        //     $gateway = $paymentMethod->key; // 'paymob', 'tamara', 'tabby'
-            
-        //     $result = $this->paymentService->processOrderPayment(
-        //         $user,
-        //         $order,
-        //         $gateway,
-        //         $paymentMethod->key,
-        //         $cart->items->toArray()
-        //     );
+        if ($paymentMethod && $paymentMethod->key !== 'cash') {
+            // استخدام key من جدول payment_methods لتحديد بوابة الدفع
+            $gateway = $paymentMethod->key; // 'paymob', 'tamara', 'tabby'
 
-        //     if (!$result['success']) {
-        //         return $this->errorResponse($result['message'], 400);
-        //     }
-
-        //     return $this->successResponse([
-        //         'payment_url'  => $result['payment_url'],
-        //         'shorten_url'  => $result['shorten_url'],
-        //         'order_number' => $order->order_number,
-        //         'message'      => 'جاري توجيهك إلى بوابة الدفع الآمنة...'
-        //     ]);
-        // }
-            if ($request->payment_method === 8) {
-
-                $payment = $this->initiatePaymobPayment($order);
-
-                if (!$payment['success']) {
-                    return $this->errorResponse([$payment['message']], 400);
-                }
-
-                return $this->successResponse([
-                    'payment_url'  => $payment['payment_url'],
-                    'shorten_url'  => $payment['shorten_url'],
-                    'order_number' => $order->order_number,
-                    'message'      => 'جاري توجيهك إلى بوابة الدفع الآمنة...'
-                ]);
+            if($gateway === 'paymob') {
+                 $result = $this->initiatePaymobPayment($order);
+            }else{
+            $result = $this->paymentService->processOrderPayment(
+                $user,
+                $order,
+                $gateway,
+                $paymentMethod->key,
+                $cart->items->toArray()
+            );
             }
+        
+
+            if (!$result['success']) {
+                return $this->errorResponse($result['message'], 400);
+            }
+
+            return $this->successResponse([
+                'payment_url'  => $result['payment_url'],
+                'shorten_url'  => $result['shorten_url'],
+                'order_number' => $order->order_number,
+                'message'      => 'جاري توجيهك إلى بوابة الدفع الآمنة...'
+            ]);
+        }
+            // if ($request->payment_method === 8) {
+
+            //     $payment = $this->initiatePaymobPayment($order);
+
+            //     if (!$payment['success']) {
+            //         return $this->errorResponse([$payment['message']], 400);
+            //     }
+
+            //     return $this->successResponse([
+            //         'payment_url'  => $payment['payment_url'],
+            //         'shorten_url'  => $payment['shorten_url'],
+            //         'order_number' => $order->order_number,
+            //         'message'      => 'جاري توجيهك إلى بوابة الدفع الآمنة...'
+            //     ]);
+            // }
 
             return $this->successResponse(
                 new OrderDetailsResource($order->load(['items.product', 'items.size', 'items.color', 'address'])),
