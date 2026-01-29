@@ -25,7 +25,7 @@ use App\Http\Controllers\Api\Website\CustomizationOptionsController;
 
 
 Route::prefix('v1')->group(function () {
-    Route::get('order/shipping-options', [ShippingController::class, 'getDeliveryOptions']);
+
     Route::middleware('auth:sanctum')->group(function () {
         Route::prefix('addresses')->group(function () {
             Route::get('/', [UserAddressController::class, 'index']);
@@ -63,6 +63,7 @@ Route::prefix('v1')->group(function () {
             Route::post('cancel/{codeOrder}', [OrderController::class, 'cancelled'])->name('cancel');
             Route::get('/payment-status', [OrderController::class, 'paymentStatus']);
         });
+    Route::get('/shippings-options', [ShippingController::class, 'getDeliveryOptions']);
 
 
         Route::post('coupon/apply', [OrderController::class, 'applyCoupon']);

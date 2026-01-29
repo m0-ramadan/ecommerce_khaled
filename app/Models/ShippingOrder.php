@@ -21,6 +21,7 @@ class ShippingOrder extends Model
         'sender_district',
         'sender_address',
         'sender_postal_code',
+        'short_address_code',
         
         // بيانات المستلم
         'receiver_name',

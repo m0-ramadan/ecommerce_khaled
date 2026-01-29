@@ -90,7 +90,6 @@ class OrderController extends Controller
 
                 $discountAmount = $coupon->calculateDiscount($cart->total);
             }
-            //dd($cart);
             // إنشاء الطلب
             $order = Order::create([
                 'user_id'           => $user?->id,
@@ -134,8 +133,8 @@ class OrderController extends Controller
             }
 
             // تفريغ السلة بعد الطلب
-            //  $cart->items()->delete();
-            //  $cart->update(['subtotal' => 0, 'total' => 0]);
+              $cart->items()->delete();
+              $cart->update(['subtotal' => 0, 'total' => 0]);
    // إذا كان الدفع ليس نقداً (payment_method !== 1)
 
        $paymentMethod = PaymentMethod::find($request->payment_method);
@@ -168,6 +167,7 @@ class OrderController extends Controller
                 'message'      => 'جاري توجيهك إلى بوابة الدفع الآمنة...'
             ]);
         }
+        
             // if ($request->payment_method === 8) {
 
             //     $payment = $this->initiatePaymobPayment($order);

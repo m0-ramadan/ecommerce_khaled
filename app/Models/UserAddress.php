@@ -14,13 +14,13 @@ class UserAddress extends Model
         //'floor',
         'apartment_number',
         'address_details',
-       // 'label',
+        'label',
         'phone',
         'city',
         'area',
         'type',
         'latitude',
-        'longitude',
+        'longitude','selected_address'
     ];
 
     public function user()
