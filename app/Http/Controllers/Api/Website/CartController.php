@@ -380,25 +380,29 @@ class CartController extends Controller
             foreach ($request->selected_options as $optionData) {
 
                 $optionName = trim($optionData['option_name'] ?? '');
+                $additionalPrice = (float) ($optionData['additional_price'] ?? 0);
 
-                // 🟡 خدمة التصميم → زي ما هي
+                if ($additionalPrice <= 0) {
+                    continue;
+                }
+
+                // 🟡 خدمة التصميم → سعر مرة واحدة
                 if (mb_strpos($optionName, 'خدمة تصميم') !== false) {
-                    $oneTimePrice += (float) ($optionData['additional_price'] ?? 0);
+                    $oneTimePrice += $additionalPrice;
                     continue;
                 }
 
-                // 🟢 باقي الأوبشنز → بحث مرن بالاسم
-                $option = ProductOptions::where('product_id', $product->id)
-                    ->where('option_name', 'LIKE', '%' . $optionName . '%')
-                    ->first();
-
-                if (!$option) {
+                // 🟢 الكمية → سعر إجمالي
+                if (mb_strpos($optionName, 'الكمية') !== false) {
+                    $unitPrice += $additionalPrice;
                     continue;
                 }
 
-                $unitPrice += $option->additional_price;
+                // 🔵 باقي الأوبشنز (زيادة على الوحدة)
+                $unitPrice += $additionalPrice;
             }
         }
+
 
 
 
@@ -459,7 +463,7 @@ class CartController extends Controller
         $subtotal = $cart->items()->sum('line_total');
         $cart->update([
             'subtotal' => $subtotal,
-            'total' => $subtotal, // مستقبلًا: + شحن - خصم
+            'total' => $subtotal,
         ]);
     }
 }
