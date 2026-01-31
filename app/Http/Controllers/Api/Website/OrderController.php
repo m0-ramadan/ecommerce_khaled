@@ -13,6 +13,7 @@ use App\Models\PaymentMethod;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use App\Services\OtoShippingService;
 use App\Traits\HandlesPaymobPayment;
 use App\Services\Payment\PaymentService;
 use App\Http\Resources\Website\OrderResource;
@@ -25,11 +26,12 @@ class OrderController extends Controller
 {
     use ApiResponseTrait, HandlesPaymobPayment;
 
-        private PaymentService $paymentService;
-
-    public function __construct(PaymentService $paymentService)
+    private PaymentService $paymentService;
+    private OtoShippingService $shippingServices;
+    public function __construct(PaymentService $paymentService, OtoShippingService $shippingServices)
     {
         $this->paymentService = $paymentService;
+        $this->shippingServices = $shippingServices;
     }
 
     /**
@@ -60,6 +62,7 @@ class OrderController extends Controller
     public function store(CreateOrderRequest $request)
     {
         $user = auth('sanctum')->user();
+
         $cart = $this->getCurrentCart();
 
         if ($cart->items()->count() === 0) {
@@ -133,56 +136,48 @@ class OrderController extends Controller
             }
 
             // تفريغ السلة بعد الطلب
-              $cart->items()->delete();
-              $cart->update(['subtotal' => 0, 'total' => 0]);
-   // إذا كان الدفع ليس نقداً (payment_method !== 1)
+            $cart->items()->delete();
+            $cart->update(['subtotal' => 0, 'total' => 0]);
+            // إذا كان الدفع ليس نقداً (payment_method !== 1)
 
-       $paymentMethod = PaymentMethod::find($request->payment_method);
-     
-        if ($paymentMethod && $paymentMethod->key !== 'cash') {
-            // استخدام key من جدول payment_methods لتحديد بوابة الدفع
-            $gateway = $paymentMethod->key; // 'paymob', 'tamara', 'tabby'
+            $paymentMethod = PaymentMethod::find($request->payment_method);
+            if ($request->filled('orderId') && $request->filled('deliveryOptionId')) {
+                $order->update([
+                    'shipping_amount' => $request->shippingPrice,
+                ]);
 
-            if($gateway === 'paymob') {
-                 $result = $this->initiatePaymobPayment($order);
-            }else{
-            $result = $this->paymentService->processOrderPayment(
-                $user,
-                $order,
-                $gateway,
-                $paymentMethod->key,
-                $cart->items->toArray()
-            );
-            }
-        
-
-            if (!$result['success']) {
-                return $this->errorResponse($result['message'], 400);
+                $this->shippingServices->createShipment($request->orderId, $request->deliveryOptionId, $request->shippingPrice);
             }
 
-            return $this->successResponse([
-                'payment_url'  => $result['payment_url'],
-                'shorten_url'  => $result['shorten_url'],
-                'order_number' => $order->order_number,
-                'message'      => 'جاري توجيهك إلى بوابة الدفع الآمنة...'
-            ]);
-        }
-        
-            // if ($request->payment_method === 8) {
+            if ($paymentMethod && $paymentMethod->key !== 'cash') {
+                $gateway = $paymentMethod->key; // 'paymob', 'tamara', 'tabby'
 
-            //     $payment = $this->initiatePaymobPayment($order);
+                if ($gateway === 'paymob') {
+                    $result = $this->initiatePaymobPayment($order);
+                } else {
+                    $result = $this->paymentService->processOrderPayment(
+                        $user,
+                        $order,
+                        $gateway,
+                        $paymentMethod->key,
+                        $cart->items->toArray(),
+                        $request->shippingPrice
+                    );
+                }
 
-            //     if (!$payment['success']) {
-            //         return $this->errorResponse([$payment['message']], 400);
-            //     }
 
-            //     return $this->successResponse([
-            //         'payment_url'  => $payment['payment_url'],
-            //         'shorten_url'  => $payment['shorten_url'],
-            //         'order_number' => $order->order_number,
-            //         'message'      => 'جاري توجيهك إلى بوابة الدفع الآمنة...'
-            //     ]);
-            // }
+                if (!$result['success']) {
+                    return $this->errorResponse($result['message'], 400);
+                }
+
+                return $this->successResponse([
+                    'payment_url'  => $result['payment_url'],
+                    'shorten_url'  => $result['shorten_url'],
+                    'order_number' => $order->order_number,
+                    'message'      => 'جاري توجيهك إلى بوابة الدفع الآمنة...'
+                ]);
+            }
+
 
             return $this->successResponse(
                 new OrderDetailsResource($order->load(['items.product', 'items.size', 'items.color', 'address'])),

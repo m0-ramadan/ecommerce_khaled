@@ -24,7 +24,7 @@ class OtoShippingService
     {
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
-        ])->post($this->baseUrl.'refreshToken', [
+        ])->post($this->baseUrl . 'refreshToken', [
             'refresh_token' => $this->token, // نفس اللي في cURL
         ]);
 
@@ -36,7 +36,7 @@ class OtoShippingService
     {
 
         $response = Http::withToken($token)
-            ->get($this->baseUrl.'getPickupLocationList');
+            ->get($this->baseUrl . 'getPickupLocationList');
 
         return $response->json();
     }
@@ -44,32 +44,44 @@ class OtoShippingService
     public function handleDataOrder(array $orderData, string $token)
     {
         $user = auth()->user();
-        $defaultAddress = $user->userAddresses->where('selected_address', true)->first();
+
+        $cart = $user->cart()->with(['items.product'])->firstOrFail();
+
+        $defaultAddress = $user->userAddresses()
+            ->where('selected_address', true)
+            ->first();
+
+        // 🟢 استخدم ID الطلب الحقيقي + suffix
+        $shippingOrderId = $orderData['id'] . rand(40, 1000000);
+
         $payload = [
-            'orderId' => (string) $orderData['id'].rand(600, 100000),
+            'orderId' => $shippingOrderId,
             'createShipment' => false,
-            'payment_method' => 'pendding',
-            'amount' => 99,
+            'payment_method' => 'pending',
+
+            // 💰 الحساب من الكارت
+            'amount' => $cart->total,
             'amount_due' => 0,
-            //  "brandId" => $orderData['brand_id'] ?? null,
-            // "customsValue" => "12",
-            // "customsCurrency" => "USD",
             'shippingAmount' => $orderData['shipping_amount'] ?? 0,
-            //  "subtotal" => $orderData['subtotal'],
+
             'currency' => 'SAR',
             'shippingNotes' => $orderData['notes'] ?? null,
+
             'packageSize' => 'small',
-            'packageCount' => 1,
+            'packageCount' => $cart->items->count(),
             'packageWeight' => 1,
+
             'boxWidth' => 10,
             'boxLength' => 10,
             'boxHeight' => 10,
+
             'orderDate' => now()->format('d/m/Y H:i'),
             'deliverySlotDate' => now()->addDay()->format('d/m/Y'),
             'deliverySlotFrom' => '2:30pm',
             'deliverySlotTo' => '12pm',
 
-            // Sender (Warehouse)
+            /* ================= Sender ================= */
+
             'senderName' => $orderData['name'],
             'senderInformation' => [
                 'senderAddressName' => $orderData['address'],
@@ -80,66 +92,61 @@ class OtoShippingService
                 'senderCountry' => 'SA',
                 'senderCity' => $orderData['city'],
                 'senderBuildingNo' => $orderData['buildingNo'],
-                //  "senderPostcode" => $orderData['postcode'],
                 'senderStreet' => $orderData['Street'],
                 'senderDistrict' => $orderData['district'],
-                //  "senderSecondaryAddressNumber" => $orderData['secondary_no'],
                 'senderAddressLine' => $orderData['address'],
-                //  "senderShortAddressCode" => $orderData['short_code'],
                 'lat' => (string) $orderData['lat'],
                 'lon' => (string) $orderData['lon'],
             ],
 
-            // Customer
+            /* ================= Customer ================= */
+
             'customer' => [
                 'name' => $user->name ?? '',
-                'email' => $user->email ?? null,
-                // "mobile" =>(string) $user->phone??'546607389',
-                'mobile' => (string) '546607389',
+                'email' => $user->email,
+                'mobile' => (string) ($user->phone ?? '0500000000'),
                 'address' => optional($defaultAddress)->address_details ?? '',
-                //  "district" => $orderData['customer']['district'],
                 'city' => optional($defaultAddress)->city ?? '',
-                // "buildingNo" => $orderData['customer']['building_no'],
-                //  "street" => $orderData['customer']['street'],
-                //  "shortAddressCode" => $orderData['customer']['short_code'],
                 'country' => 'SA',
-                // "postcode" => $orderData['customer']['postcode'],
-                // "lat" => (string) $orderData['customer']['lat'],
-                // "lon" => (string) $orderData['customer']['lon'],
-                'refID' => $user->id,
+                'refID' => (string) $user->id,
             ],
 
-            // Items
-            'items' => collect($user->cart->items)->map(function ($item) {
+            /* ================= Items (FROM CART ✅) ================= */
+
+            'items' => $cart->items->map(function ($item) {
                 return [
-                    'productId' => $item['id'],
-                    'name' => $item['name'],
-                    'price' => $item['price'],
-                    'rowTotal' => $item['price'] * $item['qty'],
-                    'taxAmount' => $item['tax'] ?? 0,
-                    'quantity' => $item['qty'] ?? 1,
-                    'sku' => $item['sku'],
+                    'productId' => $item->product_id,
+                    'name' => $item->product?->name ?? 'Product',
+                    'sku' => $item->product?->sku ?? 'SKU-' . $item->id,
+                    'price' => (float) $item->price_per_unit,
+                    'quantity' => (int) $item->quantity,
+                    'rowTotal' => (float) $item->line_total,
+                    'taxAmount' => 0,
                     'currency' => 'SAR',
                 ];
             })->toArray(),
         ];
 
+        /* ================= SEND REQUEST ================= */
+
         $response = Http::withToken($token)
-            ->post($this->baseUrl.'createOrder', $payload);
+            ->post($this->baseUrl . 'createOrder', $payload);
         if ($response->failed()) {
             Log::error('Failed to create OTO order', [
                 'response' => $response->body(),
                 'payload' => $payload,
             ]);
+
+            throw new \Exception('Failed to create shipping order');
         }
 
+        /* ================= SAVE SHIPPING ORDER ================= */
+
         $shippingOrder = ShippingOrder::create([
-
-            // Order
-            'order_id' => $payload['orderId'],
-            'oto_order_id' => $response['otoId'],
+            'order_id' => $shippingOrderId,
+            'oto_order_id' => $response['otoId'] ?? null,
             'status' => 'shipment_created',
-
+            'accessToken' => $token,
             // Sender
             'sender_name' => $payload['senderName'],
             'sender_phone' => $payload['senderInformation']['senderMobile'],
@@ -154,74 +161,104 @@ class OtoShippingService
             'receiver_email' => $payload['customer']['email'],
             'receiver_city' => $payload['customer']['city'],
             'receiver_address' => $payload['customer']['address'],
-            'receiver_postal_code' => null,
-            'short_address_code' => null,
 
-            // Shipment details
+            // Shipment
             'pieces_count' => $payload['packageCount'],
             'weight' => $payload['packageWeight'],
             'length' => $payload['boxLength'],
             'width' => $payload['boxWidth'],
             'height' => $payload['boxHeight'],
             'declared_value' => $payload['amount'],
-            'content_type' => 'products',
-            'content_description' => 'Order Items',
 
             // Payment
             'payment_type' => $payload['payment_method'],
             'shipping_cost' => $payload['shippingAmount'],
-            'cash_on_delivery_amount' => 0,
             'total_amount' => $payload['amount'],
-       //     'who_pays' => 'sender',
-
-            // Service
-        //   'delivery_company' => 'OTO',
-          //  'service_type' => 'standard',
-           // 'pickup_location' => $payload['senderInformation']['senderId'],
-           // 'delivery_type' => 'door_to_door',
 
             // OTO
-            'oto_response' => $response,
+            'oto_response' => $response->json(),
 
-            // Notes
             'notes' => $payload['shippingNotes'],
         ]);
 
         return $shippingOrder->order_id;
     }
 
-    public function getDeliveryFee($order_id,$accessToken){
+
+    public function getDeliveryFee($order_id, $accessToken)
+    {
         $response = Http::withToken($accessToken)
-            ->post($this->baseUrl.'getDeliveryFee', [
-                'orderId' =>(string) $order_id
+            ->post($this->baseUrl . 'getDeliveryFee', [
+                'orderId' => (string) $order_id
             ]);
-            
         return $response;
     }
 
     /**
      * الحصول على خيارات التوصيل المتاحة
      */
-    public function getDeliveryOptions()
+    public function getDeliveryOptions(): array
     {
         $tokenResponse = $this->refreshToken();
 
-        if (! isset($tokenResponse['access_token'])) {
+        if (!isset($tokenResponse['access_token'])) {
             throw new \Exception('Failed to refresh OTO token');
         }
 
         $accessToken = $tokenResponse['access_token'];
 
         $pickupLocations = $this->getPickupLocations($accessToken);
-        $warehouses = $pickupLocations['warehouses'][0] ?? [];
-        $order_id = $this->handleDataOrder($warehouses, $accessToken);
+        $warehouse       = $pickupLocations['warehouses'][0] ?? null;
 
-        $deliveryFees=$this->getDeliveryFee($order_id,$accessToken);
+        if (!$warehouse) {
+            throw new \Exception('No warehouses found');
+        }
 
-         return $deliveryFees->json();
+        $orderId = $this->handleDataOrder($warehouse, $accessToken);
 
+        $deliveryFeesResponse = $this->getDeliveryFee($orderId, $accessToken);
+
+        return [
+            'deliveryFees' => $deliveryFeesResponse->json(),
+            'orderId'      => $orderId,
+        ];
     }
 
+    public function createShipment($orderId, string $deliveryOptionId, $shippingPrice)
+    {
+        // جلب آخر ShippingOrder للـ Order
+        $shippingOrder = ShippingOrder::where('order_id', $orderId)
+            ->latest()
+            ->first();
 
+        // تحديث تكلفة الشحن إذا موجودة
+        if (isset($shippingOrder->shipping_amount)) {
+            $shippingOrder->update([
+                'shipping_cost' => $shippingPrice,
+            ]);
+        }
 
+        // التحقق من وجود Access Token
+        if (!$shippingOrder->accessToken) {
+            throw new \Exception("Access token not found for order {$orderId}");
+        }
+
+        // تجهيز Payload لإرسالها لـ OTO
+        $payload = [
+            'orderId'         => $orderId,
+            'deliveryOptionId' => $deliveryOptionId,
+        ];
+
+        // استدعاء API
+        $response = Http::withToken($shippingOrder->accessToken)
+            ->post($this->baseUrl . 'createShipment', $payload);
+
+        // تحقق من نجاح الطلب
+        if (!$response->successful()) {
+            throw new \Exception('Failed to create shipment: ' . $response->body());
+        }
+
+        // ارجع الـ response JSON
+        return $response->json();
+    }
 }

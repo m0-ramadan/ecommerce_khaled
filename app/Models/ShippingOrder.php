@@ -12,7 +12,7 @@ class ShippingOrder extends Model
         'oto_tracking_number',
         'shipping_service_id',
         'status',
-        
+
         // بيانات المرسل
         'sender_name',
         'sender_phone',
@@ -22,7 +22,7 @@ class ShippingOrder extends Model
         'sender_address',
         'sender_postal_code',
         'short_address_code',
-        
+
         // بيانات المستلم
         'receiver_name',
         'receiver_phone',
@@ -32,7 +32,7 @@ class ShippingOrder extends Model
         'receiver_address',
         'receiver_postal_code',
         'short_address_code',
-        
+
         // تفاصيل الشحنة
         'pieces_count',
         'weight',
@@ -42,7 +42,7 @@ class ShippingOrder extends Model
         'declared_value',
         'content_type',
         'content_description',
-        
+
         // معلومات الدفع
         'payment_type',
         'shipping_cost',
@@ -50,21 +50,22 @@ class ShippingOrder extends Model
         'insurance_amount',
         'total_amount',
         'who_pays',
-        
+
         // معلومات الخدمة
         'delivery_company',
         'service_type',
         'pickup_location',
         'delivery_type',
-        
+
         // معلومات OTO
         'oto_response',
         'oto_labels',
         'estimated_delivery_date',
         'actual_delivery_date',
-        
+
         // معلومات إضافية
-        'notes'
+        'notes',
+        'accessToken'
     ];
 
     protected $casts = [
@@ -112,7 +113,7 @@ class ShippingOrder extends Model
             'on_hold' => 'معلق',
             'lost_damaged' => 'مفقود/تالف'
         ];
-        
+
         return $labels[$this->status] ?? $this->status;
     }
 

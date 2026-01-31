@@ -17,7 +17,7 @@ return [
     */
 
     'name' => env('APP_NAME', 'Laravel'),
-
+    'frontend_url' => env('FRONT_URL', 'https://talaaljazeera.com'),
     /*
     |--------------------------------------------------------------------------
     | Application Environment

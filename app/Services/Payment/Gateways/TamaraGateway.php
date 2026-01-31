@@ -2,8 +2,12 @@
 
 namespace App\Services\Payment\Gateways;
 
+use Carbon\Carbon;
+use App\Models\Order;
+use App\Models\OrderItem;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
+use App\Services\Payment\Gateways\BaseGateway;
 
 class TamaraGateway extends BaseGateway
 {
@@ -106,97 +110,59 @@ class TamaraGateway extends BaseGateway
         }
     }
 
-    private function prepareCheckoutData(array $data): array
+    private function prepareCheckoutData(): array
     {
-        $customer = $data['customer'] ?? [];
-        $items = $data['items'] ?? [];
-        $shippingAddress = $data['shipping_address'] ?? [];
-        $billingAddress = $data['billing_address'] ?? $shippingAddress;
-        $metadata = $data['metadata'] ?? [];
+        $order = Order::where('user_id', auth()->id())->latest()->firstOrFail();
+        $user  = $order->user;
+        $address = $order->address;
+        $items = $order->orderItems;
 
-        // تحضير عناصر الطلب
-        $orderItems = [];
-        foreach ($items as $item) {
-            $unitPrice = (float) ($item['unit_price'] ?? 0);
-            $quantity = (int) ($item['quantity'] ?? 1);
-            $taxAmount = (float) ($item['tax_amount'] ?? 0);
-            $discountAmount = (float) ($item['discount_amount'] ?? 0);
-            $totalAmount = (float) ($item['total_price'] ?? ($unitPrice * $quantity));
+        // ==================== تجهيز العناصر ====================
+        $orderItems = $items->map(function (OrderItem $item) {
+            $unitPrice = (float) $item->price_per_unit;
+            $quantity  = (int) $item->quantity;
+            $totalAmount = (float) $item->total_price ?? $unitPrice * $quantity;
 
-            $orderItems[] = [
-                'reference_id' => $item['sku'] ?? 'ITEM-' . uniqid(),
-                'type' => $item['type'] ?? ($item['category'] ?? 'physical') === 'services' ? 'digital' : 'physical',
-                'name' => $item['name'] ?? 'Item',
-                'sku' => $item['sku'] ?? 'SKU-UNKNOWN',
-                'quantity' => $quantity,
-                'item_url' => $item['item_url'] ?? $item['product_url'] ?? null,
-                'image_url' => $item['image_url'] ?? null,
-                'unit_price' => [
+            return [
+                'reference_id' => 'ITEM-' . $item->id,
+                'type'         => ($item->category ?? 'physical') === 'services' ? 'digital' : 'physical',
+                'name'         => $item->product?->name ?? 'Product',
+                'sku'          => $item->product?->sku ?? 'SKU-' . $item->id,
+                'quantity'     => $quantity,
+                'unit_price'   => [
                     'amount' => $unitPrice,
                     'currency' => $this->currency,
                 ],
-                'tax_amount' => [
-                    'amount' => $taxAmount,
-                    'currency' => $this->currency,
-                ],
-                'discount_amount' => [
-                    'amount' => $discountAmount,
-                    'currency' => $this->currency,
-                ],
                 'total_amount' => [
-                   // 'amount' => $totalAmount,
-                    'amount' => 10,
-
-                    'currency' => $this->currency,
-                ],
-            ];
-        }
-
-        // إذا لم تكن هناك عناصر، نضيف عنصر افتراضي
-        if (empty($orderItems)) {
-            $orderItems[] = [
-                'reference_id' => 'SERVICE-' . ($data['order_id'] ?? uniqid()),
-                'type' => 'digital',
-                'name' => 'Water Delivery Service',
-                'sku' => 'WATER-DELIVERY',
-                'quantity' => 1,
-                'item_url' => $metadata['order_url'] ?? null,
-                'image_url' => $metadata['service_image'] ?? null,
-                'unit_price' => [
-                   // 'amount' => (float) ($data['amount'] ?? 0),
-                    'amount' =>100,
+                    'amount' => $totalAmount,
                     'currency' => $this->currency,
                 ],
                 'tax_amount' => [
-                    'amount' => 0.00,
+                    'amount' => (float) $item->tax_amount ?? 0,
                     'currency' => $this->currency,
                 ],
                 'discount_amount' => [
-                    'amount' => 0.00,
+                    'amount' => (float) $item->discount_amount ?? 0,
                     'currency' => $this->currency,
                 ],
-                'total_amount' => [
-                   // 'amount' => (float) ($data['amount'] ?? 0),
-                    'amount' =>100,
-
-                    'currency' => $this->currency,
-                ],
+                'item_url' => $item->product?->product_url ?? null,
+                'image_url' => $item->product?->image ?? null,
             ];
-        }
+        })->values()->toArray();
 
-        // حساب المبالغ الإجمالية
-      //  $totalAmount = (float) ($data['amount'] ?? 0);
-        $totalAmount = 100;
-        $shippingAmount = (float) ($data['shipping_amount'] ?? 0);
-        $taxAmount = (float) ($data['tax_amount'] ?? 0);
-        $discountAmount = (float) ($data['discount_amount'] ?? 0);
+        // ==================== المبالغ الكلية ====================
+        $totalAmount = (float) $order->total_amount;
+        $shippingAmount = (float) $order->shipping_amount;
+        $taxAmount = (float) $order->tax_amount;
+        $discountAmount = (float) $order->discount_amount;
 
-        // بيانات المخاطرة
-        $riskAssessment = $this->prepareRiskAssessment($customer);
+        $riskAssessment = $this->prepareRiskAssessment($user);
 
         return [
+            'order_reference_id' => (string) $order->id,
+            'order_number' => $order->order_number,
             'total_amount' => [
-                'amount' => $totalAmount,
+                'amount' => $totalAmount + $shippingAmount,
                 'currency' => $this->currency,
             ],
             'shipping_amount' => [
@@ -207,123 +173,111 @@ class TamaraGateway extends BaseGateway
                 'amount' => $taxAmount,
                 'currency' => $this->currency,
             ],
-            'order_reference_id' => (string) ($data['order_id'] ?? 'ORD-' . time()),
-            'order_number' => $data['order_number'] ?? $data['order_id'] ?? 'ORD-' . time(),
             'items' => $orderItems,
             'consumer' => [
-                'first_name' => $customer['first_name'] ?? 'Customer',
-                'last_name' => $customer['last_name'] ?? '',
-                'phone_number' => $this->formatPhoneNumber($customer['phone'] ?? '+966500000000'),
-                'email' => $customer['email'] ?? 'customer@example.com',
-                'national_id' => $customer['national_id'] ?? '',
-                'date_of_birth' => $customer['date_of_birth'] ?? null,
-                'is_first_order' => $customer['is_first_order'] ?? true,
+                'first_name' => $user->name,
+                'last_name' => '',
+                'email' => $user->email,
+                'phone_number' => $this->formatPhoneNumber($user->phone ?? '+966500000000'),
+                'is_first_order' => $user->orders()->count() === 1,
             ],
             'country_code' => 'SA',
-            'description' => $data['description'] ?? 'Water Delivery Order',
+            'description' => 'Order #' . $order->order_number,
             'merchant_url' => [
-                'success' => $data['callback_urls']['success'] ?? route('payment.success.tamara'),
-                'failure' => $data['callback_urls']['failure'] ?? route('payment.failure.tamara'),
-                'cancel' => $data['callback_urls']['cancel'] ?? route('payment.cancel.tamara'),
-                'notification' => route('payment.webhook.tamara'),
+                'success' => route('payment.tamara.success'),
+                'failure' => route('payment.tamara.failure'),
+                'cancel'  => route('payment.tamara.cancel'),
+                'notification' => route('payment.tamara.webhook'),
             ],
             'shipping_address' => [
-                'first_name' => $shippingAddress['first_name'] ?? 'Customer',
-                'last_name' => $shippingAddress['last_name'] ?? '',
-                'line1' => $shippingAddress['address_line1'] ?? 'Not specified',
-                'line2' => $shippingAddress['address_line2'] ?? '',
-                'city' => $shippingAddress['city'] ?? 'Riyadh',
+                'first_name' => $user->name,
+                'last_name' => '',
+                'line1' => $address?->address ?? 'N/A',
+                'line2' => '',
+                'city' => $address?->city ?? 'Riyadh',
                 'country_code' => 'SA',
-                'region' => $shippingAddress['region'] ?? 'Riyadh',
-                'phone_number' => $this->formatPhoneNumber($shippingAddress['phone'] ?? '+966500000000'),
+                'region' => $address?->region ?? 'Riyadh',
+                'phone_number' => $this->formatPhoneNumber($user->phone ?? '+966500000000'),
             ],
             'billing_address' => [
-                'first_name' => $billingAddress['first_name'] ?? 'Customer',
-                'last_name' => $billingAddress['last_name'] ?? '',
-                'line1' => $billingAddress['address_line1'] ?? 'Not specified',
-                'line2' => $billingAddress['address_line2'] ?? '',
-                'city' => $billingAddress['city'] ?? 'Riyadh',
+                'first_name' => $user->name,
+                'last_name' => '',
+                'line1' => $address?->address ?? 'N/A',
+                'line2' => '',
+                'city' => $address?->city ?? 'Riyadh',
                 'country_code' => 'SA',
-                'region' => $billingAddress['region'] ?? 'Riyadh',
-                'phone_number' => $this->formatPhoneNumber($billingAddress['phone'] ?? '+966500000000'),
+                'region' => $address?->region ?? 'Riyadh',
+                'phone_number' => $this->formatPhoneNumber($user->phone ?? '+966500000000'),
             ],
             'platform' => 'API',
-            'is_mobile' => false,
             'locale' => 'ar_SA',
             'risk_assessment' => $riskAssessment,
             'additional_data' => [
                 'delivery_method' => 'Home Delivery',
                 'vendor_amount' => 0,
                 'merchant_settlement_amount' => $totalAmount,
-                'vendor_reference_code' => 'VENDOR-' . ($data['order_id'] ?? uniqid()),
+                'vendor_reference_code' => 'VENDOR-' . $order->id,
             ],
-            // 'discount' => $discountAmount > 0 ? [
-            //     'name' => 'Customer Discount',
-            //     'amount' => [
-            //         'amount' => $discountAmount,
-            //         'currency' => $this->currency,
-            //     ],
-            // ] : null,
-            // 'expires_in_minutes' => 30, // Contact support to enable
         ];
     }
-/**
- * يحول أي قيمة تاريخية إلى Carbon بصيغة YYYY-MM-DD بشكل آمن
- */
-private function safeParseDate(mixed $date): \Carbon\Carbon
-{
-    try {
-        return \Carbon\Carbon::parse($date);
-    } catch (\Exception $e) {
-        return now();
+
+    /**
+     * يحول أي قيمة تاريخية إلى Carbon بصيغة YYYY-MM-DD بشكل آمن
+     */
+    private function safeParseDate(mixed $date): \Carbon\Carbon
+    {
+        try {
+            return \Carbon\Carbon::parse($date);
+        } catch (\Exception $e) {
+            return now();
+        }
     }
-}
-private function prepareRiskAssessment(array $customer): array
-{
-    // إذا كان created_at موجود، parse وإلا استخدم سنة مضت
-  //  $createdAt = isset($customer['created_at']) ? $this->safeParseDate($customer['created_at']) : now()->subYear();
+    private function prepareRiskAssessment(array $customer): array
+    {
+        // إذا كان created_at موجود، parse وإلا استخدم سنة مضت
+        //  $createdAt = isset($customer['created_at']) ? $this->safeParseDate($customer['created_at']) : now()->subYear();
 
-    // دالة مساعدة لتحويل أي تاريخ إلى string Y-m-d
-   //$toDate = fn($date, $default = null) => $this->safeParseDateString($date ?? $default ?? $createdAt);
+        // دالة مساعدة لتحويل أي تاريخ إلى string Y-m-d
+        //$toDate = fn($date, $default = null) => $this->safeParseDateString($date ?? $default ?? $createdAt);
 
-    return [
-        'customer_age' => (int) ($customer['age'] ?? 25),
-       // 'customer_dob' => $toDate($customer['date_of_birth'], '1990-01-01'),
-        'customer_gender' => $customer['gender'] ?? 'Male',
-        'customer_nationality' => 'SA',
-        'is_premium_customer' => false,
-        'is_existing_customer' => ($customer['order_count'] ?? 0) > 0,
-        'is_guest_user' => false,
-       // 'account_creation_date' => $toDate($customer['created_at']),
-       // 'platform_account_creation_date' => $toDate($customer['created_at']),
-       // 'date_of_first_transaction' => $toDate($customer['first_order_date']),
-        'is_card_on_file' => false,
-        'is_COD_customer' => false,
-        'has_delivered_order' => ($customer['completed_order_count'] ?? 0) > 0,
-        'is_phone_verified' => true,
-        'is_fraudulent_customer' => false,
-        'total_ltv' => (float) ($customer['total_spent'] ?? 0),
-        'total_order_count' => (int) ($customer['order_count'] ?? 0),
-        'order_amount_last3months' => (float) ($customer['last_3months_spent'] ?? 0),
-        'order_count_last3months' => (int) ($customer['last_3months_orders'] ?? 0),
-      //  'last_order_date' => $toDate($customer['last_order_date']),
-        'last_order_amount' => (float) ($customer['last_order_amount'] ?? 0),
-        'reward_program_enrolled' => false,
-        'reward_program_points' => 0,
-    ];
-}
-
-/**
- * يحول أي قيمة تاريخية إلى نص YYYY-MM-DD
- */
-private function safeParseDateString(mixed $date): string
-{
-    try {
-        return \Carbon\Carbon::parse($date)->format('Y-m-d');
-    } catch (\Exception $e) {
-        return now()->format('Y-m-d');
+        return [
+            'customer_age' => (int) ($customer['age'] ?? 25),
+            // 'customer_dob' => $toDate($customer['date_of_birth'], '1990-01-01'),
+            'customer_gender' => $customer['gender'] ?? 'Male',
+            'customer_nationality' => 'SA',
+            'is_premium_customer' => false,
+            'is_existing_customer' => ($customer['order_count'] ?? 0) > 0,
+            'is_guest_user' => false,
+            // 'account_creation_date' => $toDate($customer['created_at']),
+            // 'platform_account_creation_date' => $toDate($customer['created_at']),
+            // 'date_of_first_transaction' => $toDate($customer['first_order_date']),
+            'is_card_on_file' => false,
+            'is_COD_customer' => false,
+            'has_delivered_order' => ($customer['completed_order_count'] ?? 0) > 0,
+            'is_phone_verified' => true,
+            'is_fraudulent_customer' => false,
+            'total_ltv' => (float) ($customer['total_spent'] ?? 0),
+            'total_order_count' => (int) ($customer['order_count'] ?? 0),
+            'order_amount_last3months' => (float) ($customer['last_3months_spent'] ?? 0),
+            'order_count_last3months' => (int) ($customer['last_3months_orders'] ?? 0),
+            //  'last_order_date' => $toDate($customer['last_order_date']),
+            'last_order_amount' => (float) ($customer['last_order_amount'] ?? 0),
+            'reward_program_enrolled' => false,
+            'reward_program_points' => 0,
+        ];
     }
-}
+
+    /**
+     * يحول أي قيمة تاريخية إلى نص YYYY-MM-DD
+     */
+    private function safeParseDateString(mixed $date): string
+    {
+        try {
+            return \Carbon\Carbon::parse($date)->format('Y-m-d');
+        } catch (\Exception $e) {
+            return now()->format('Y-m-d');
+        }
+    }
 
 
 
@@ -331,22 +285,22 @@ private function safeParseDateString(mixed $date): string
     {
         // إزالة أي أحرف غير رقمية
         $phone = preg_replace('/[^0-9]/', '', $phone);
-        
+
         // إذا كان الرقم يحتوي على 966 في البداية
         if (strlen($phone) === 12 && str_starts_with($phone, '966')) {
             return $phone;
         }
-        
+
         // إذا كان الرقم 9 أرقام (بدون 966)
         if (strlen($phone) === 9) {
             return '966' . $phone;
         }
-        
+
         // إذا كان الرقم 10 أرقام ويبدأ بـ 0
         if (strlen($phone) === 10 && str_starts_with($phone, '0')) {
             return '966' . substr($phone, 1);
         }
-        
+
         // الافتراضي
         return '966500000000';
     }
@@ -390,7 +344,7 @@ private function safeParseDateString(mixed $date): string
             }
 
             $orderData = $response['data'];
-            
+
             // إذا كان الرد قائمة، خذ أول عنصر
             if (isset($orderData[0])) {
                 $orderData = $orderData[0];

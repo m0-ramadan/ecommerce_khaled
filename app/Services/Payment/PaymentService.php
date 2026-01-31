@@ -16,7 +16,7 @@ use Faker\Provider\Payment;
 
 class PaymentService
 {
-     private PaymentGatewayFactory $gatewayFactory;
+    private PaymentGatewayFactory $gatewayFactory;
 
     public function __construct(
         PaymentGatewayFactory $gatewayFactory
@@ -29,7 +29,8 @@ class PaymentService
         Order $order,
         string $gateway,
         string $paymentMethod,
-        array $cartItems = []
+        array $cartItems = [],
+        int $shippingPrice = null
     ): array {
         DB::beginTransaction();
 
@@ -94,7 +95,7 @@ class PaymentService
                 'email' => $order->customer_email ?? $user?->email ?? 'customer@example.com',
                 'phone' => $order->customer_phone ?? $user?->phone ?? '+966500000000',
             ],
-         // 'callback_url' => $this->getCallbackUrl($gateway, $order->id),
+            // 'callback_url' => $this->getCallbackUrl($gateway, $order->id),
         ];
 
         // إضافة بيانات إضافية حسب البوابة
@@ -104,11 +105,6 @@ class PaymentService
                 $baseData['items'] = $this->prepareItemsFromCart($cartItems);
                 $baseData['shipping_address'] = $this->getShippingAddress($order);
                 $baseData['billing_address'] = $this->getBillingAddress($order);
-                // $baseData['callback_urls'] = [
-                //     'success' => route('payment.callback.success', ['gateway' => $gateway, 'order_id' => $order->id]),
-                //     'failure' => route('payment.callback.failure', ['gateway' => $gateway, 'order_id' => $order->id]),
-                //     'cancel' => route('payment.callback.cancel', ['gateway' => $gateway, 'order_id' => $order->id]),
-                // ];
                 break;
         }
 
@@ -118,17 +114,17 @@ class PaymentService
     private function prepareItemsFromCart(array $cartItems): array
     {
         $items = [];
-foreach ($cartItems as $item) {
-    $items[] = [
-        'name' => $item['product']['name'] ?? 'منتج',
-        'description' => $item['product']['description'] ?? 'منتج',
-        'quantity' => $item['quantity'] ?? 1,
-        'unit_price' => $item['price_per_unit'] ?? 1,
-        'total_price' => $item['total_price']
-            ?? (($item['price_per_unit'] ?? 1) * ($item['quantity'] ?? 1)),
-        'sku' => $item['product']['sku'] ?? 'PROD-' . ($item['product_id'] ?? '000'),
-    ];
-}
+        foreach ($cartItems as $item) {
+            $items[] = [
+                'name' => $item['product']['name'] ?? 'منتج',
+                'description' => $item['product']['description'] ?? 'منتج',
+                'quantity' => $item['quantity'] ?? 1,
+                'unit_price' => $item['price_per_unit'] ?? 1,
+                'total_price' => $item['total_price']
+                    ?? (($item['price_per_unit'] ?? 1) * ($item['quantity'] ?? 1)),
+                'sku' => $item['product']['sku'] ?? 'PROD-' . ($item['product_id'] ?? '000'),
+            ];
+        }
 
         return $items;
     }
@@ -152,13 +148,7 @@ foreach ($cartItems as $item) {
         return $this->getShippingAddress($order);
     }
 
-private function getCallbackUrl(string $gateway, int $orderId): string
-{
-    return route(
-        'payment.callback.' . $gateway,
-        ['orderId' => $orderId] 
-    );
-}
+
 
 
     private function savePaymentData(Order $order, string $gateway, string $paymentMethod, array $paymentResult): void
@@ -178,66 +168,7 @@ private function getCallbackUrl(string $gateway, int $orderId): string
             ),
         ]);
     }
- 
 
-    private function getOrderItems(Order $order): array
-    {
-        return [
-            [
-                'name' => $order->service->name ?? 'Water Delivery Service',
-                'description' => 'Water delivery to your location',
-                'quantity' => 1,
-                'unit_price' => $order->price,
-                'total_price' => $order->price,
-                'sku' => 'SERVICE-' . $order->service_id,
-            ]
-        ];
-    }
-
-
-    public function verifyPayment(Order $order): array
-    {
-        try {
-            if (!$order->payment_gateway || !$order->payment_transaction_id) {
-                throw new \Exception('No payment information found');
-            }
-
-            if ($order->payment_gateway === 'wallet') {
-                return [
-                    'success' => true,
-                    'status' => 'paid',
-                    'gateway' => 'wallet',
-                    'verified' => true,
-                ];
-            }
-
-            $paymentGateway = $this->gatewayFactory->make($order->payment_gateway);
-
-            $verificationData = [
-                'payment_id' => $order->payment_transaction_id,
-                'order_id' => $order->id,
-            ];
-
-            $result = $paymentGateway->verifyPayment($verificationData);
-
-            if ($result['success'] && in_array($result['status'], ['captured', 'approved', 'success'])) {
-                $this->completePayment($order, $result);
-            }
-
-            return $result;
-        } catch (\Exception $e) {
-            Log::channel('payment')->error('Payment Verification Failed', [
-                'order_id' => $order->id,
-                'error' => $e->getMessage(),
-            ]);
-
-            return [
-                'success' => false,
-                'error' => $e->getMessage(),
-                'error_code' => 'PAYMENT_VERIFICATION_FAILED',
-            ];
-        }
-    }
 
     private function completePayment(Order $order, array $paymentResult): void
     {
@@ -280,36 +211,6 @@ private function getCallbackUrl(string $gateway, int $orderId): string
         }
     }
 
-    public function handleWebhook(string $gateway, array $data): array
-    {
-        try {
-            $paymentGateway = $this->gatewayFactory->make($gateway);
-
-            if (!$paymentGateway->isWebhookValid($data)) {
-                throw new \Exception('Invalid webhook signature');
-            }
-
-            $result = $paymentGateway->handleWebhook($data);
-
-            if ($result['success'] && $result['handled']) {
-                $this->processWebhookEvent($gateway, $result);
-            }
-
-            return $result;
-        } catch (\Exception $e) {
-            Log::channel('payment')->error('Webhook Processing Failed', [
-                'gateway' => $gateway,
-                'data' => $data,
-                'error' => $e->getMessage(),
-            ]);
-
-            return [
-                'success' => false,
-                'error' => $e->getMessage(),
-                'error_code' => 'WEBHOOK_PROCESSING_FAILED',
-            ];
-        }
-    }
 
     private function processWebhookEvent(string $gateway, array $webhookData): void
     {
@@ -365,77 +266,6 @@ private function getCallbackUrl(string $gateway, int $orderId): string
         }
     }
 
-    public function refundPayment(Order $order, string $reason = ''): array
-    {
-        try {
-            if (!$order->isPaid()) {
-                throw new \Exception('Order is not paid');
-            }
-
-            if ($order->payment_gateway === 'wallet') {
-                $result = $this->refundWalletPayment($order, $reason);
-            } else {
-                $paymentGateway = $this->gatewayFactory->make($order->payment_gateway);
-                $result = $paymentGateway->refundPayment(
-                    $order->payment_transaction_id,
-                    $order->getPaymentAmount(),
-                    $reason
-                );
-            }
-
-            if ($result['success']) {
-                $order->update([
-                    'payment_status' => Order::PAYMENT_STATUS_REFUNDED,
-                    'payment_details' => array_merge(
-                        $order->payment_details ?? [],
-                        [
-                            'refunded_at' => now(),
-                            'refund_reason' => $reason,
-                            'refund_data' => $result,
-                        ]
-                    ),
-                ]);
-            }
-
-            return $result;
-        } catch (\Exception $e) {
-            Log::channel('payment')->error('Refund Processing Failed', [
-                'order_id' => $order->id,
-                'error' => $e->getMessage(),
-            ]);
-
-            return [
-                'success' => false,
-                'error' => $e->getMessage(),
-                'error_code' => 'REFUND_PROCESSING_FAILED',
-            ];
-        }
-    }
-
-    private function refundWalletPayment(Order $order, string $reason)
-    {
-        $walletEntry = $this->walletService->deposit($order->user, $order->getPaymentAmount(), [
-            'description' => 'Refund for Order #' . $order->order_number,
-            'metadata' => [
-                'order_id' => $order->id,
-                'order_number' => $order->order_number,
-                'refund_reason' => $reason,
-            ]
-        ]);
-
-        return [
-            'success' => true,
-            'transaction_id' => 'REFUND-WALLET-' . $walletEntry->id,
-            'amount' => $order->getPaymentAmount(),
-            'gateway' => 'wallet',
-            'message' => 'Refund processed to wallet',
-        ];
-    }
-
-    public function getAvailableGateways(): array
-    {
-        return $this->gatewayFactory->getAvailableGateways();
-    }
 
     private function sendPaymentNotifications(Order $order): void
     {
@@ -444,7 +274,6 @@ private function getCallbackUrl(string $gateway, int $orderId): string
             if ($order->user) {
                 $order->user->notify(new PaymentSuccessful($order));
             }
-
         } catch (\Exception $e) {
             Log::channel('payment')->error('Failed to send payment notifications', [
                 'order_id' => $order->id,

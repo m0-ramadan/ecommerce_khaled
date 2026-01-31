@@ -2,8 +2,12 @@
 
 namespace App\Services\Payment\Gateways;
 
+use App\Models\User;
+use App\Models\Order;
+use App\Models\OrderItem;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
+use App\Services\Payment\Gateways\BaseGateway;
 use App\Contracts\Payment\PaymentGatewayInterface;
 
 class TabbyGateway extends BaseGateway
@@ -12,12 +16,12 @@ class TabbyGateway extends BaseGateway
     // Abstract methods implementation from BaseGateway
     // ----------------------------
 
-protected function getBaseUrl(): string
-{
-    return $this->isSandbox
-        ? 'https://api.tabby.ai/api/v2'
-        : 'https://api.tabby.ai/api/v2';
-}
+    protected function getBaseUrl(): string
+    {
+        return $this->isSandbox
+            ? 'https://api.tabby.ai/api/v2'
+            : 'https://api.tabby.ai/api/v2';
+    }
 
 
     protected function getGatewayName(): string
@@ -51,7 +55,8 @@ protected function getBaseUrl(): string
             }
 
             // التحضير للبيانات المطلوبة من Tabby
-            $sessionData = $this->prepareTabbySessionData($data);
+            $sessionData = $this->prepareTabbySessionData();
+
             Log::channel('payment')->debug('Tabby session payload', [
                 'payload' => $sessionData,
                 'auth_token_prefix' => substr($authToken, 0, 10) . '...',
@@ -66,7 +71,6 @@ protected function getBaseUrl(): string
                     'Authorization' => "Bearer {$authToken}",
                 ]
             );
- 
             if (!$response['success']) {
                 Log::channel('payment')->error('Tabby API Error Response', [
                     'error' => $response['error'] ?? 'Unknown error',
@@ -79,8 +83,8 @@ protected function getBaseUrl(): string
             $responseData = $response['data'];
 
             // التحقق من توفر منتج التقسيط
-             $installmentProduct = $responseData['configuration']['available_products']['installments'][0] ?? null;
-            
+            $installmentProduct = $responseData['configuration']['available_products']['installments'][0] ?? null;
+
             // if (!$installmentProduct || !($installmentProduct['is_available'] ?? false)) {
             //     throw new \Exception('Tabby installments not available for this transaction');
             // }
@@ -116,160 +120,132 @@ protected function getBaseUrl(): string
         }
     }
 
-    private function prepareTabbySessionData(array $data): array
+    private function prepareTabbySessionData(): array
     {
-        $customer = $data['customer'] ?? [];
-        $shippingAddress = $data['shipping_address'] ?? [];
-        $billingAddress = $data['billing_address'] ?? $shippingAddress;
-        $items = $data['items'] ?? [];
-        $orderHistory = $this->getCustomerOrderHistory($customer['email'] ?? null, $data['order_id'] ?? null);
+        $order = Order::where('user_id', auth()->user()->id)->latest()->first();
 
-        // تحضير عناصر الطلب الحالي
-        $orderItems = [];
-        foreach ($items as $item) {
-            $orderItems[] = [
-                'title' => $item['name'] ?? 'Water Delivery Service',
-                'description' => $item['description'] ?? 'Water delivery to your location',
-                'quantity' => $item['quantity'] ?? 1,
-                'unit_price' => $this->formatAmount($item['unit_price'] ?? $data['amount'] ?? 0),
-                'category' => $item['category'] ?? 'services',
-                'reference_id' => $item['sku'] ?? 'ITEM-' . uniqid(),
-                'discount_amount' => $this->formatAmount($item['discount_amount'] ?? 0),
-                'is_refundable' => $item['is_refundable'] ?? true,
-            ];
-        }
+        $user = $order->user;
+        $address = $order->address;
+        $items = $order->orderItems;
 
-        // إذا لم تكن هناك عناصر، نضيف عنصر افتراضي
-        if (empty($orderItems)) {
-            $orderItems[] = [
-                'title' => 'Water Delivery Service',
-                'description' => 'Water delivery to your location',
-                'quantity' => 1,
-                'unit_price' => $this->formatAmount($data['amount'] ?? 0),
-                'category' => 'services',
-                'reference_id' => 'SERVICE-' . ($data['order_id'] ?? uniqid()),
+        // تجهيز items
+        $orderItems = $items->map(function (OrderItem $item) {
+            return [
+                'title'        => $item->product?->name ?? 'Custom Product',
+                'description'  => $item->note ?? 'Order Item',
+                'quantity'     => $item->quantity,
+                'unit_price'   => $this->formatAmount($item->price_per_unit),
+                'category'     => 'fashion',
+                'reference_id' => 'ITEM-' . $item->id,
                 'discount_amount' => '0.00',
-                'is_refundable' => true,
+                'is_refundable'   => true,
             ];
-        }
+        })->values()->toArray();
 
         return [
             'payment' => [
-                // 'amount' => $this->formatAmount($data['amount'] ?? 10),
-                'amount' => 10,
-                'currency' => $this->currency,
-                'description' => $data['description'] ?? 'Water Delivery Order',
+                'amount'      => $this->formatAmount($order->total_amount) + $this->formatAmount($order->shipping_amount),
+                'currency'    => $this->currency,
+                'description' => 'Order #' . $order->order_number,
+
                 'buyer' => [
-                    'name' => trim(($customer['first_name'] ?? '') . ' ' . ($customer['last_name'] ?? 'Customer')),
-                    'email' => $customer['email'] ?? 'customer@example.com',
-                    'phone' => $customer['phone'] ?? '+966500000000',
-                    'dob' => $customer['dob'] ?? null,
+                    'name'  => $order->customer_name ?? $user?->name ?? 'Customer',
+                    'email' => $order->customer_email ?? $user?->email,
+                    'phone' => $order->customer_phone ?? $user?->phone,
                 ],
+
                 'shipping_address' => [
-                    'city' => $shippingAddress['city'] ?? 'Riyadh',
-                    'address' => $shippingAddress['address_line1'] ?? 'Not specified',
-                    'zip' => $shippingAddress['postal_code'] ?? '11111',
+                    'city'    => $address?->city ?? 'Riyadh',
+                    'address' => $address?->address ?? 'N/A',
+                    'zip'     => $address?->postal_code ?? '00000',
                 ],
+
                 'order' => [
-                    'reference_id' => $data['order_id'] ?? 'ORD-' . time(),
-                    'items' => $orderItems,
-                    'updated_at' => now()->toIso8601String(),
-                    'tax_amount' => $this->formatAmount($data['tax_amount'] ?? 0),
-                    'shipping_amount' => $this->formatAmount($data['shipping_amount'] ?? 0),
-                    'discount_amount' => $this->formatAmount($data['discount_amount'] ?? 0),
+                    'reference_id'    => $order->order_number,
+                    'items'           => $orderItems,
+                    'tax_amount'      => $this->formatAmount($order->tax_amount),
+                    'shipping_amount' => $this->formatAmount($order->shipping_amount),
+                    'discount_amount' => $this->formatAmount($order->discount_amount),
+                    'updated_at'      => $order->updated_at->toIso8601String(),
                 ],
+
                 'buyer_history' => [
-                    'registered_since' => $customer['created_at'] ?? now()->subYear()->toIso8601String(),
-                    'loyalty_level' => $customer['order_count'] ?? 0,
-                    'wishlist_count' => 0,
-                    'is_social_networks_connected' => false,
+                    'registered_since' => optional($user?->created_at)->toIso8601String(),
+                    'loyalty_level'    => $user?->orders()->count() ?? 0,
+                    'wishlist_count'   => $user?->favourites()->count() ?? 0,
                     'is_phone_number_verified' => true,
-                    'is_email_verified' => true,
+                    'is_email_verified'        => true,
                 ],
-                'order_history' => $orderHistory,
+
+                'order_history' => $this->getCustomerOrderHistory($user, $order->id),
+
                 'meta' => [
-                    'customer' => '#customer-' . ($customer['id'] ?? uniqid()),
-                    'order_id' => '#' . ($data['order_id'] ?? 'unknown'),
-                ],
-                'attachment' => [
-                    'body' => json_encode([
-                        'payment_history_simple' => [
-                            'unique_account_identifier' => 'customer-' . ($customer['id'] ?? uniqid()),
-                            'paid_before_flag' => ($customer['order_count'] ?? 0) > 0,
-                            'date_of_last_paid_purchase' => $customer['last_order_date'] ?? null,
-                            'date_of_first_paid_purchase' => $customer['first_order_date'] ?? null,
-                        ],
-                    ]),
-                    'content_type' => 'application/vnd.tabby.v1+json',
+                    'order_id' => (string) $order->id,
+                    'user_id'  => (string) $user?->id,
                 ],
             ],
+
             'lang' => 'ar',
-            'merchant_code' => $this->config['merchant_code'] ?? '',
+            'merchant_code' => $this->config['merchant_code'],
+
             'merchant_urls' => [
-                'success' => $data['callback_urls']['success'] ?? route('payment.success.tabby'),
-                'failure' => $data['callback_urls']['failure'] ?? route('payment.failure.tabby'),
-                'cancel' => $data['callback_urls']['cancel'] ?? route('payment.cancel.tabby'),
+                'success' => route('payment.tabby.success', $order->id),
+                'failure' => route('payment.tabby.failure', $order->id),
+                'cancel'  => route('payment.tabby.cancel', $order->id),
             ],
         ];
     }
 
-    private function getCustomerOrderHistory(?string $email, ?string $excludeOrderId): array
+    private function getCustomerOrderHistory(?User $user, int $excludeOrderId): array
     {
-        // هنا يمكنك جلب تاريخ طلبات العميل من قاعدة البيانات
-        // هذا مثال افتراضي
-        
-        if (!$email) {
+        if (!$user) {
             return [];
         }
 
-        try {
-            // جلب الطلبات السابقة للعميل (استثناء الطلب الحالي)
-            // $orders = Order::where('user_email', $email)
-            //     ->where('id', '!=', $excludeOrderId)
-            //     ->orderBy('created_at', 'desc')
-            //     ->limit(5)
-            //     ->get();
+        return $user->orders()
+            ->where('id', '!=', $excludeOrderId)
+            ->where('status_payment', Order::PAYMENT_STATUS_PAID)
+            ->latest()
+            ->limit(5)
+            ->get()
+            ->map(function (Order $order) {
+                return [
+                    'purchased_at' => $order->created_at->toIso8601String(),
+                    'amount'       => $this->formatAmount($order->total_amount),
+                    'status'       => 'delivered',
 
-            // لأغراض الاختبار، نرجع بيانات افتراضية
-            return [
-                [
-                    'purchased_at' => now()->subDays(30)->toIso8601String(),
-                    'amount' => '100.00',
-                    'status' => 'delivered',
                     'buyer' => [
-                        'name' => 'Customer Name',
-                        'email' => $email,
-                        'phone' => '+966500000000',
+                        'name'  => $order->customer_name,
+                        'email' => $order->customer_email,
+                        'phone' => $order->customer_phone,
                     ],
+
                     'shipping_address' => [
-                        'city' => 'Riyadh',
-                        'address' => 'Sample Address',
-                        'zip' => '11111',
+                        'city'    => optional($order->address)->city,
+                        'address' => optional($order->address)->address,
+                        'zip'     => optional($order->address)->postal_code,
                     ],
-                    'payment_method' => 'card',
-                    'items' => [
-                        [
-                            'title' => 'Water Delivery',
-                            'quantity' => 1,
-                            'unit_price' => '100.00',
-                            'category' => 'services',
-                        ],
-                    ],
-                ],
-            ];
-        } catch (\Exception $e) {
-            Log::channel('payment')->warning('Failed to fetch customer order history', [
-                'email' => $email,
-                'error' => $e->getMessage(),
-            ]);
-            return [];
-        }
+
+                    'payment_method' => $order->payment_method,
+
+                    'items' => $order->orderItems->map(function (OrderItem $item) {
+                        return [
+                            'title'      => $item->product?->name ?? 'Product',
+                            'quantity'   => $item->quantity,
+                            'unit_price' => $this->formatAmount($item->price_per_unit),
+                            'category'   => 'fashion',
+                        ];
+                    })->values()->toArray(),
+                ];
+            })
+            ->toArray();
     }
+
 
     private function formatAmount(float $amount): string
     {
         // Tabby يتطلب سلسلة نصية للمبالغ مع منزلتين عشريتين
-        return number_format($amount, 2, '.', '');
+        return number_format($amount, 4, '.', '');
     }
 
     public function verifyTransaction(array $data): array
@@ -329,7 +305,7 @@ protected function getBaseUrl(): string
             }
 
             $responseData = $response['data'];
-            
+
             // إذا كان الرد قائمة، خذ أول عنصر
             if (isset($responseData[0])) {
                 $responseData = $responseData[0];
@@ -443,7 +419,7 @@ protected function getBaseUrl(): string
     {
         // Tabby يرسل التوقيع في header: X-Tabby-Signature
         // هذا التحقق يجب أن يتم في الـ Controller
-        
+
         $webhookSecret = $this->config['webhook_secret'] ?? config('services.tabby.webhook_secret', '');
 
         if (!$webhookSecret) {
@@ -464,7 +440,7 @@ protected function getBaseUrl(): string
     {
         try {
             // Note: Tabby webhook validation is done via headers in controller
-            
+
             $eventType = $data['event'] ?? '';
             $paymentId = $data['payment']['id'] ?? $data['id'] ?? null;
             $orderId = $data['payment']['order']['reference_id'] ?? $data['order']['reference_id'] ?? null;

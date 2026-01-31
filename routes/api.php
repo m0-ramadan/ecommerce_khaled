@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\Website\OrderController;
 use App\Http\Controllers\Api\Website\BannerController;
 use App\Http\Controllers\Api\Website\ReviewController;
 use App\Http\Controllers\Api\Website\ArticleController;
+use App\Http\Controllers\Api\Website\PaymentController;
 use App\Http\Controllers\Api\Website\ProductController;
 use App\Http\Controllers\Api\Website\CategoryController;
 use App\Http\Controllers\Api\Website\FavoriteController;
@@ -63,7 +64,7 @@ Route::prefix('v1')->group(function () {
             Route::post('cancel/{codeOrder}', [OrderController::class, 'cancelled'])->name('cancel');
             Route::get('/payment-status', [OrderController::class, 'paymentStatus']);
         });
-    Route::get('/shippings-options', [ShippingController::class, 'getDeliveryOptions']);
+        Route::get('/shippings-options', [ShippingController::class, 'getDeliveryOptions']);
 
 
         Route::post('coupon/apply', [OrderController::class, 'applyCoupon']);
@@ -147,57 +148,32 @@ Route::prefix('v1')->group(function () {
     });
 
 
+    Route::prefix('payment')->name('payment.')->group(function () {
 
-    // // OTO V2 Shipping Routes
-    // Route::prefix('shipping')->middleware(['auth:sanctum'])->group(function () {
-    //     // إنشاء الشحنات
-    //     Route::post('/create', [OtoV2ShippingController::class, 'createShipment']);
-    //     Route::post('/create-from-address/{orderId}/{addressId}', [OtoV2ShippingController::class, 'createShipmentFromAddress']);
+        // ================= TABBY =================
+        Route::prefix('tabby')->name('tabby.')->group(function () {
+            Route::get('success', [PaymentController::class, 'handleSuccess'])->name('success');
+            Route::get('failure', [PaymentController::class, 'handleFailure'])->name('failure');
+            Route::get('cancel',  [PaymentController::class, 'handleCancel'])->name('cancel');
+        });
 
-    //     // تتبع الشحنات
-    //     Route::get('/track/{trackingNumber}', [OtoV2ShippingController::class, 'trackShipment']);
-    //     Route::post('/track-driver', [OtoV2ShippingController::class, 'trackDriver']);
+        // ================= TAMARA =================
+        Route::prefix('tamara')->name('tamara.')->group(function () {
+            Route::get('success', [PaymentController::class, 'handleSuccess'])->name('success');
+            Route::get('failure', [PaymentController::class, 'handleFailure'])->name('failure');
+            Route::get('cancel',  [PaymentController::class, 'handleCancel'])->name('cancel');
+            Route::post('webhook', [PaymentController::class, 'handleWebhook'])->name('webhook');
+        });
 
-    //     // الحسابات والاستعلامات
-    //     Route::post('/calculate', [OtoV2ShippingController::class, 'calculateShipping']);
-    //     Route::get('/cities', [OtoV2ShippingController::class, 'getCities']);
-    //     Route::get('/cities/{cityCode}/districts', [OtoV2ShippingController::class, 'getDistricts']);
-
-    //     // إدارة الشحنات
-    //     Route::get('/label/{trackingNumber}', [OtoV2ShippingController::class, 'getLabel']);
-    //     Route::post('/cancel', [OtoV2ShippingController::class, 'cancelShipment']);
-    //     Route::post('/sync', [OtoV2ShippingController::class, 'syncShipments']);
-    //     Route::get('/orders', [OtoV2ShippingController::class, 'getShippingOrders']);
-    // });
+        // ================= PAYMOB (مثال) =================
+        Route::post('callback', [PaymentController::class, 'handlePaymobCallback'])->name('callback.paymob');
+    });
 
     // تتبع عام للعملاء
     Route::get('/public/track/{trackingNumber}', [OtoV2ShippingController::class, 'trackShipment'])
         ->name('shipping.track.public');
 
-        
-Route::get('payment/callback/{orderId}', [PaymentController::class, 'handleSuccess'])
-    ->name('payment.callback.paymob');
 
-Route::get('payment/success/tabby', [PaymentController::class, 'handleSuccess'])
-    ->name('payment.success.tabby');
-Route::get('payment/failure/tabby', [PaymentController::class, 'handleSuccess'])
-    ->name('payment.failure.tabby');
-Route::get('payment/cancel/tabby', [PaymentController::class, 'handlecancel'])
-    ->name('payment.cancel.tabby');
-
-Route::get('payment/callback/{orderId}', [PaymentController::class, 'handleSuccess'])
-    ->name('payment.callback.tabby');
-Route::get('payment/callback/{orderId}', [PaymentController::class, 'handleSuccess'])
-    ->name('payment.callback.tamara');
-    Route::get('payment/callback/{orderId}', [PaymentController::class, 'handleSuccess'])
-    ->name('payment.callback.paymob');
-
-Route::get('payment/success/tamara', [PaymentController::class, 'handleSuccess'])
-    ->name('payment.success.tamara');
-Route::get('payment/failure/tamara', [PaymentController::class, 'handleSuccess'])
-    ->name('payment.failure.tamara');
-Route::get('payment/cancel/tamara', [PaymentController::class, 'handlecancel'])
-    ->name('payment.cancel.tamara');
-Route::get('payment/webhook/tamara', [PaymentController::class, 'handlewebhook'])
-    ->name('payment.webhook.tamara');
+    Route::get('payment/callback', [PaymentController::class, 'handlePaymobCallback'])
+        ->name('payment.callback.paymob');
 });

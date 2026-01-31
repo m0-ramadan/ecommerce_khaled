@@ -78,23 +78,23 @@ class Handler extends ExceptionHandler
             }
         });
 
-         $this->renderable(function (HttpException $e) {
-        if ($e->getStatusCode() == 429) {
+        $this->renderable(function (HttpException $e) {
+            if ($e->getStatusCode() == 429) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'تم تجاوز عدد الطلبات المسموح بها. الرجاء المحاولة لاحقاً.',
+                    'error' => 'RATE_LIMIT_EXCEEDED'
+                ], 429);
+            }
+        });
+
+        $this->renderable(function (ValidationException $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'تم تجاوز عدد الطلبات المسموح بها. الرجاء المحاولة لاحقاً.',
-                'error' => 'RATE_LIMIT_EXCEEDED'
-            ], 429);
-        }
-    });
-    
-    $this->renderable(function (ValidationException $e) {
-        return response()->json([
-            'success' => false,
-            'message' => 'بيانات غير صالحة',
-            'errors' => $e->errors(),
-            'error' => 'VALIDATION_ERROR'
-        ], 422);
-    });
+                'message' => 'بيانات غير صالحة',
+                'errors' => $e->errors(),
+                'error' => 'VALIDATION_ERROR'
+            ], 422);
+        });
     }
 }
