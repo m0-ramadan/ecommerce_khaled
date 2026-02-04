@@ -19,9 +19,31 @@ class Category extends Model
 
         static::creating(function ($category) {
             if (empty($category->slug)) {
-                $category->slug = Str::slug($category->name);
+                $category->slug = static::generateUniqueSlug($category->name);
             }
         });
+
+        static::updating(function ($category) {
+            if ($category->isDirty('name') && !$category->isDirty('slug')) {
+                $category->slug = static::generateUniqueSlug($category->name, $category->id);
+            }
+        });
+    }
+
+    public static function generateUniqueSlug($name, $excludeId = null)
+    {
+        $slug = Str::slug($name);
+        $originalSlug = $slug;
+        $count = 1;
+
+        while (static::where('slug', $slug)->when($excludeId, function($query) use ($excludeId) {
+            return $query->where('id', '!=', $excludeId);
+        })->exists()) {
+            $slug = $originalSlug . '-' . $count;
+            $count++;
+        }
+
+        return $slug;
     }
 
     public function parent()

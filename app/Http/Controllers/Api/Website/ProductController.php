@@ -50,10 +50,26 @@ class ProductController extends Controller
     }
 
 
-    public function show($id)
+    public function show($identifier)
     {
         try {
-            $product = Product::find($id);
+            $product = Product::with([
+                'category',
+                'discount',
+                'colors',
+                'deliveryTime',
+                'warranty',
+                'features',
+                'reviews',
+                'sizes',
+                'offers',
+                'materials'
+            ])
+            ->where(function($query) use ($identifier) {
+                $query->where('id', $identifier)
+                      ->orWhere('slug', $identifier);
+            })
+            ->first();
 
             if (!$product) {
                 return $this->error('المنتج غير موجود', 404);

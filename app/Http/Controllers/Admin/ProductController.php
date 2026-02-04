@@ -354,6 +354,7 @@ class ProductController extends Controller
             // Create product
             $product = Product::create([
                 'name' => $validated['name'],
+                'slug' => $validated['slug'] ?? null,
                 'price_text' => $validated['price_text'],
                 'category_id' => $validated['category_id'],
                 'description' => $validated['description'],
@@ -830,6 +831,7 @@ class ProductController extends Controller
             ===================================================== */
             $product->update([
                 'name' => $validated['name'],
+                'slug' => $validated['slug'] ?? $product->slug,
                 'price_text' => $validated['price_text'] ?? null,
                 'category_id' => $validated['category_id'],
                 'description' => $validated['description'],
@@ -1058,7 +1060,7 @@ class ProductController extends Controller
             /* =====================================================
             | UPDATE SEO FIELDS
             ===================================================== */
-            $seoFields = ['slug', 'meta_title', 'meta_description', 'meta_keywords'];
+            $seoFields = ['meta_title', 'meta_description', 'meta_keywords'];
             foreach ($seoFields as $field) {
                 if ($request->filled($field)) {
                     $product->update([$field => $request->$field]);
@@ -1072,6 +1074,14 @@ class ProductController extends Controller
 
             DB::commit();
 
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'تم تحديث المنتج بنجاح',
+                    'product_id' => $product->id
+                ]);
+            }
+
             return redirect()
                 ->route('admin.products.show', $product->id)
                 ->with('success', 'تم تحديث المنتج بنجاح');
@@ -1082,6 +1092,13 @@ class ProductController extends Controller
                 'trace' => $e->getTraceAsString(),
                 'product_id' => $id,
             ]);
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'حدث خطأ أثناء تحديث المنتج: '.$e->getMessage()
+                ], 500);
+            }
 
             return back()
                 ->withInput()

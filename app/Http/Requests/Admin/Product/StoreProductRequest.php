@@ -26,6 +26,7 @@ class StoreProductRequest extends FormRequest
         return  [
             // Basic product fields
             'name' => 'required|string|max:255',
+            'slug' => 'nullable|string|max:255|unique:products,slug,' . $this->route('id'),
             'category_id' => 'required|exists:categories,id',
             'description' => 'nullable|string',
             'price' => 'nullable|numeric|min:0',

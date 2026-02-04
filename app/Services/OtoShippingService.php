@@ -50,6 +50,9 @@ class OtoShippingService
         $defaultAddress = $user->userAddresses()
             ->where('selected_address', true)
             ->first();
+        if (empty($defaultAddress)) {
+          $defaultAddress = $user->userAddresses()->first();
+        }
 
         // 🟢 استخدم ID الطلب الحقيقي + suffix
         $shippingOrderId = $orderData['id'] . rand(40, 1000000);

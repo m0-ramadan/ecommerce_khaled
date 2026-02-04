@@ -88,13 +88,15 @@ class Handler extends ExceptionHandler
             }
         });
 
-        $this->renderable(function (ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'بيانات غير صالحة',
-                'errors' => $e->errors(),
-                'error' => 'VALIDATION_ERROR'
-            ], 422);
+        $this->renderable(function (ValidationException $e, $request) {
+            if ($request->expectsJson() || $request->is('api/*')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'بيانات غير صالحة',
+                    'errors' => $e->errors(),
+                    'error' => 'VALIDATION_ERROR'
+                ], 422);
+            }
         });
     }
 }

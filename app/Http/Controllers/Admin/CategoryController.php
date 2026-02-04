@@ -111,11 +111,6 @@ class CategoryController extends Controller
             $category = new Category();
             $this->fillCategoryData($category, $validated, $request);
 
-            // Generate slug if not provided
-            if (empty($category->slug)) {
-                $category->slug = $this->generateUniqueSlug($validated['name']);
-            }
-
             $category->save();
 
             DB::commit();
@@ -207,11 +202,6 @@ class CategoryController extends Controller
             DB::beginTransaction();
 
             $this->fillCategoryData($category, $validated, $request);
-
-            // Update slug if name changed
-            if ($category->isDirty('name') && empty($validated['slug'])) {
-                $category->slug = $this->generateUniqueSlug($validated['name'], $category->id);
-            }
 
             $category->save();
 
@@ -381,7 +371,9 @@ class CategoryController extends Controller
     private function fillCategoryData(Category $category, array $data, Request $request)
     {
         $category->name = $data['name'];
-        $category->slug = $data['slug'] ?? null;
+        if (!empty($data['slug'])) {
+            $category->slug = $data['slug'];
+        }
         $category->description = $data['description'] ?? null;
         $category->parent_id = $data['parent_id'] ?? null;
         $category->order = $data['order'] ?? 0;
@@ -455,31 +447,6 @@ private function uploadImage($file,$directory,?string $oldImage = null) {
     }
 
     /**
-     * Generate unique slug for category.
-     *
-     * @param  string  $name
-     * @param  int|null  $excludeId
-     * @return string
-     */
-    private function generateUniqueSlug(string $name, ?int $excludeId = null)
-    {
-        $slug = Str::slug($name);
-        $originalSlug = $slug;
-        $count = 1;
-
-        while (Category::where('slug', $slug)
-            ->when($excludeId, function ($query) use ($excludeId) {
-                $query->where('id', '!=', $excludeId);
-            })
-            ->exists()
-        ) {
-            $slug = $originalSlug . '-' . $count++;
-        }
-
-        return $slug;
-    }
-
-    /**
      * Handle errors and return appropriate response.
      *
      * @param  \Exception  $exception
@@ -518,7 +485,7 @@ private function uploadImage($file,$directory,?string $oldImage = null) {
             // Duplicate category
             $newCategory = $category->replicate();
             $newCategory->name = $request->name;
-            $newCategory->slug = $this->generateUniqueSlug($request->name);
+            $newCategory->slug = Category::generateUniqueSlug($request->name);
             $newCategory->save();
 
             // Duplicate images if they exist

@@ -44,10 +44,13 @@ class CategoryController extends Controller
         }
     }
 
-    public function show($id)
+    public function show($identifier)
     {
         try {
-            $category = Category::find($id);
+            $category = Category::where(function($query) use ($identifier) {
+                $query->where('id', $identifier)
+                      ->orWhere('slug', $identifier);
+            })->first();
 
             if (!$category) {
                 return $this->error('القسم غير موجود', 404);

@@ -93,6 +93,12 @@ class OrderController extends Controller
 
                 $discountAmount = $coupon->calculateDiscount($cart->total);
             }
+            $shippingPrice = $request->input('shippingPrice', 0);
+
+            $totalAmount = ($cart->total - $discountAmount) + $shippingPrice;
+            $taxRate = 0.15;
+            $taxAmount = $totalAmount * ($taxRate / (1 + $taxRate));
+
             // إنشاء الطلب
             $order = Order::create([
                 'user_id'           => $user?->id,
@@ -103,14 +109,16 @@ class OrderController extends Controller
                 'customer_email'    => $request->customer_email ?? $user?->email,
                 'shipping_address'  => $request->shipping_address,
                 'subtotal'          => $cart->subtotal,
-                'shipping_amount'   => 0, // لاحقًا: حسب المنطقة
+                'shipping_amount'   => $shippingPrice,
                 'discount_amount'   => $discountAmount,
-                'tax_amount'        => 0,
-                'total_amount'      => $cart->total - $discountAmount,
+                'tax_amount'        => $taxAmount,
+                'total_amount'      => $totalAmount,
                 'payment_method'    => $request->payment_method,
                 'status'            => 'pending',
                 'notes'             => $request->notes,
-                'coupon_id'         => $coupon?->id
+                'coupon_id'         => $coupon?->id,
+                'shipping_method_name' => $request->deliveryOptionName,
+                'oto_order_id'      => $request->orderId,
             ]);
 
             // نقل العناصر من السلة إلى الطلب
@@ -142,10 +150,6 @@ class OrderController extends Controller
 
             $paymentMethod = PaymentMethod::find($request->payment_method);
             if ($request->filled('orderId') && $request->filled('deliveryOptionId')) {
-                $order->update([
-                    'shipping_amount' => $request->shippingPrice,
-                ]);
-
                 $this->shippingServices->createShipment($request->orderId, $request->deliveryOptionId, $request->shippingPrice);
             }
 

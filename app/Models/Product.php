@@ -13,6 +13,7 @@ class Product extends Model
     protected $fillable = [
         'category_id',
         'name',
+        'slug',
         'description',
         'price',
         'has_discount',
@@ -36,12 +37,53 @@ class Product extends Model
         'options_conditions'  // حقل جديد
     ];
 
+    public static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($product) {
+            if (empty($product->slug)) {
+                $product->slug = static::generateUniqueSlug($product->name);
+            }
+        });
+
+        static::updating(function ($product) {
+            if ($product->isDirty('name') && empty($product->slug)) {
+                $product->slug = static::generateUniqueSlug($product->name);
+            }
+        });
+    }
+
+    public static function generateUniqueSlug($name)
+    {
+        $slug = \Illuminate\Support\Str::slug($name);
+        $originalSlug = $slug;
+        $count = 1;
+
+        while (static::where('slug', $slug)->exists()) {
+            $slug = "{$originalSlug}-{$count}";
+            $count++;
+        }
+
+        return $slug;
+    }
+
     protected $casts = [
         'has_discount' => 'boolean',
         'includes_tax' => 'boolean',
         'includes_shipping' => 'boolean',
         'price' => 'decimal:2',
     ];
+
+    public function getSlugAttribute($value)
+    {
+        if ($value) return $value;
+        $slug = static::generateUniqueSlug($this->name);
+        $this->updateQuietly([
+            'slug' => $slug
+        ]);
+        return $slug;
+    }
 
     public function category()
     {
