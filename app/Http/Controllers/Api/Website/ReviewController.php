@@ -313,10 +313,10 @@ class ReviewController extends Controller
     public function productReviews($productId, Request $request)
     {
         try {
-            $product = Product::findOrFail($productId);
+            $product = Product::where('id', $productId)->orWhere('slug',$productId)->firstOrFail();
 
             $query = Review::with(['user'])
-                ->where('product_id', $productId)
+                ->where('product_id', $product->id)
                 ->latest();
 
             // فلتر حسب التقييم
