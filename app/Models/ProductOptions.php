@@ -2,13 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class ProductOptions extends Model
 {
-    use HasFactory;
-    
+    protected $table = 'product_options';
+
     protected $fillable = [
         'product_id',
         'external_option_id',
@@ -17,17 +16,25 @@ class ProductOptions extends Model
         'option_value',
         'additional_price',
         'is_required',
+        'category',
+        'extra_data',
         'depends_on_option_id',
         'depends_on_detail_id',
-        'dependency_condition'
+        'dependency_condition',
+        'dependency_operator',
     ];
-    
-    public $table = 'product_options';
-    
-    // Casts
+
     protected $casts = [
+        'additional_price' => 'decimal:2',
         'is_required' => 'boolean',
-        'additional_price' => 'decimal:2'
+        'extra_data' => 'array',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime'
+    ];
+
+    protected $hidden = [
+        'created_at',
+        'updated_at'
     ];
 
     // Relationships
@@ -36,100 +43,88 @@ class ProductOptions extends Model
         return $this->belongsTo(Product::class);
     }
 
- 
-
-    public function parentDetail()
+    public function dependsOn()
     {
-        return $this->belongsTo(ProductOptions::class, 'depends_on_detail_id');
+        return $this->belongsTo(ProductOptions::class, 'depends_on_option_id');
     }
 
-
-
-    public function quantityTiers()
+    public function dependents()
     {
-        return $this->hasMany(ProductSizeTier::class, 'option_id');
+        return $this->hasMany(ProductOptions::class, 'depends_on_option_id');
     }
 
-    public function relatedTiers()
-    {
-        return $this->hasMany(ProductSizeTier::class, 'related_option_id');
-    }
-    
     // Scopes
-    public function scopeMainOptions($query)
+    public function scopeByProduct($query, $productId)
+    {
+        return $query->where('product_id', $productId);
+    }
+
+    public function scopeByCategory($query, $category)
+    {
+        return $query->where('category', $category);
+    }
+
+    public function scopeRequired($query)
+    {
+        return $query->where('is_required', true);
+    }
+
+    public function scopeIndependent($query)
     {
         return $query->whereNull('depends_on_option_id');
     }
-    
-    public function scopeDependentOptions($query, $optionId = null)
+
+    public function scopeDependent($query)
     {
-        $query = $query->whereNotNull('depends_on_option_id');
-        
-        if ($optionId) {
-            $query->where('depends_on_option_id', $optionId);
-        }
-        
-        return $query;
+        return $query->whereNotNull('depends_on_option_id');
     }
-    
-    public function scopeQuantityOptions($query)
+
+    public function scopeWithPrice($query)
     {
-        return $query->where('option_name', 'like', '%كمية%')
-                    ->orWhere('option_name', 'like', '%عدد%')
-                    ->orWhere('option_name', 'like', '%حبات%');
+        return $query->where('additional_price', '>', 0);
     }
-    
-    // Helper Methods
-    public function hasDependencies()
+
+    // Accessors
+    public function getFormattedPriceAttribute()
+    {
+        return number_format($this->additional_price, 2) . ' SAR';
+    }
+
+    public function getHasDependencyAttribute()
     {
         return !is_null($this->depends_on_option_id);
     }
-    
-    public function getDependencyChain()
+
+    public function getExtraDataArrayAttribute()
     {
-        $chain = [];
-        $current = $this;
-        
-        while ($current->depends_on_option_id) {
-            $parent = $current->parentOption;
-            if ($parent) {
-                $chain[] = [
-                    'option' => $parent->option_name,
-                    'value' => $parent->option_value,
-                    'condition' => $current->dependency_condition
-                ];
-                $current = $parent;
-            } else {
-                break;
-            }
-        }
-        
-        return array_reverse($chain);
+        return is_array($this->extra_data) ? $this->extra_data : [];
     }
-    
 
-public function dependentOptions()
-{
-    return $this->hasMany(
-        self::class,
-        'depends_on_option_id'
-    );
-}
-
-
-    public function parentOption()
+    // Helpers
+    public function getSizeTiers()
     {
-        return $this->belongsTo(
-            self::class,
-            'depends_on_option_id',
-            'id'
-        );
+        $extra = $this->extra_data_array;
+        return $extra['size_tiers'] ?? [];
     }
-public function getAvailableQuantityTiers()
-{
-    return ProductSizeTier::where('option_id', $this->id)
-        ->where('is_quantity_tier', true)
-        ->orderBy('quantity')
-        ->get();
-}
+
+    public function getHexCode()
+    {
+        $extra = $this->extra_data_array;
+        return $extra['hex_code'] ?? null;
+    }
+
+    public function getDeliveryDays()
+    {
+        $extra = $this->extra_data_array;
+        return [
+            'from' => $extra['from_days'] ?? null,
+            'to' => $extra['to_days'] ?? null
+        ];
+    }
+
+    public function getWeight()
+    {
+        $extra = $this->extra_data_array;
+        return $extra['weight'] ?? null;
+    }
 }
