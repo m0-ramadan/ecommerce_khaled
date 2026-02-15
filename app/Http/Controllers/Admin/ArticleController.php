@@ -74,9 +74,7 @@ class ArticleController extends Controller
 
         $articles = $query->paginate(15);
         $categories = ArticleCategory::active()->get();
-        $authors = User::whereHas('roles', function ($q) {
-            $q->whereIn('name', ['admin', 'author', 'editor']);
-        })->get();
+        $authors = User::all();
 
         // الإحصائيات
         $stats = [
