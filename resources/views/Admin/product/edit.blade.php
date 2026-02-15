@@ -6,7 +6,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css" />
     <style>
         :root {
             --primary-color: #696cff;
@@ -15,9 +14,6 @@
             --danger-color: #dc3545;
             --warning-color: #ffc107;
             --info-color: #17a2b8;
-            --light-bg: #f8f9fa;
-            --border-color: #e9ecef;
-            --text-muted: #6c757d;
             --dark-bg: #1e1e2d;
             --dark-card: #2b3b4c;
         }
@@ -28,6 +24,11 @@
             color: #fff;
         }
 
+        .select2-results__option--highlighte {
+            color: black !important;
+        }
+
+        /* Card Styles */
         .step-card {
             background: var(--dark-card);
             border-radius: 15px;
@@ -59,213 +60,20 @@
             margin-left: 15px;
         }
 
-        .step-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: white;
-            margin-bottom: 5px;
-        }
-
-        .step-description {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 14px;
-        }
-
-        /* Image Management */
-        .image-manager {
-            border: 2px dashed rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            padding: 20px;
-            text-align: center;
+        /* Form Controls */
+        .form-control,
+        .form-select {
             background: rgba(255, 255, 255, 0.05);
-            min-height: 200px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .image-manager:hover {
-            border-color: var(--primary-color);
-            background: rgba(105, 108, 255, 0.1);
-        }
-
-        .select2-results__option--selectable {
-            color: #000000 !important;
-        }
-
-        .image-manager i {
-            font-size: 48px;
-            color: var(--primary-color);
-            margin-bottom: 15px;
-        }
-
-        .image-preview-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 15px;
-            margin-top: 15px;
-        }
-
-        .image-preview-item {
-            position: relative;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
-            height: 150px;
-            background: var(--dark-card);
-        }
-
-        .image-preview-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .image-actions {
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            left: 0;
-            background: rgba(0, 0, 0, 0.8);
-            padding: 10px;
-            display: flex;
-            justify-content: center;
-            gap: 5px;
-            transform: translateY(100%);
-            transition: transform 0.3s ease;
-        }
-
-        .image-preview-item:hover .image-actions {
-            transform: translateY(0);
-        }
-
-        .image-actions .btn {
-            width: 30px;
-            height: 30px;
-            padding: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .primary-badge {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: var(--primary-gradient);
-            color: white;
-            padding: 3px 8px;
-            border-radius: 5px;
-            font-size: 11px;
-            font-weight: 600;
-        }
-
-        /* Dynamic Fields */
-        .dynamic-field {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 15px;
-            position: relative;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .dynamic-field-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .dynamic-field-title {
-            font-weight: 600;
+            border-color: rgba(255, 255, 255, 0.1);
             color: #fff;
         }
 
-        .dynamic-field-remove {
-            color: var(--danger-color);
-            cursor: pointer;
-            background: none;
-            border: none;
-            font-size: 18px;
-        }
-
-        .add-more-btn {
-            width: 100%;
-            padding: 10px;
-            border: 2px dashed rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--primary-color);
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .add-more-btn:hover {
+        .form-control:focus,
+        .form-select:focus {
+            background: rgba(255, 255, 255, 0.1);
             border-color: var(--primary-color);
-            background: rgba(105, 108, 255, 0.1);
-        }
-
-        /* Toggle Switch */
-        .toggle-container {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .toggle-switch {
-            position: relative;
-            width: 60px;
-            height: 30px;
-        }
-
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .toggle-slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(255, 255, 255, 0.2);
-            transition: .4s;
-            border-radius: 34px;
-        }
-
-        .toggle-slider:before {
-            position: absolute;
-            content: "";
-            height: 22px;
-            width: 22px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-
-        input:checked+.toggle-slider {
-            background-color: var(--primary-color);
-        }
-
-        input:checked+.toggle-slider:before {
-            transform: translateX(30px);
-        }
-
-        .toggle-label {
-            font-weight: 500;
             color: #fff;
+            box-shadow: 0 0 0 0.25rem rgba(105, 108, 255, 0.25);
         }
 
         /* Wizard Steps */
@@ -305,7 +113,6 @@
             justify-content: center;
             margin: 0 auto 10px;
             font-weight: bold;
-            border: 4px solid var(--dark-bg);
         }
 
         .wizard-step.active .wizard-step-circle {
@@ -313,22 +120,339 @@
             color: white;
         }
 
-        .wizard-step.completed .wizard-step-circle {
-            background: var(--success-color);
+        /* ================ */
+        /* ⭐ OPTIONS STYLES */
+        /* ================ */
+
+        /* Options Container - Very Smooth Drag & Drop */
+        .options-sortable-container {
+            min-height: 100px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        /* Option Item - Main Container */
+        .option-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: move;
+        }
+
+        .option-item:hover {
+            background: rgba(105, 108, 255, 0.08);
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(105, 108, 255, 0.2);
+        }
+
+        /* Drag & Drop States - Super Smooth */
+        .option-item.sortable-ghost {
+            opacity: 0.5;
+            background: rgba(105, 108, 255, 0.1);
+            border: 2px dashed var(--primary-color);
+            transform: scale(0.98);
+        }
+
+        .option-item.sortable-chosen {
+            box-shadow: 0 15px 30px rgba(105, 108, 255, 0.3);
+            transform: scale(1.02) translateY(-3px);
+            background: var(--dark-card);
+            border-color: var(--primary-color);
+        }
+
+        .option-item.sortable-drag {
+            opacity: 1;
+            transform: rotate(1deg) scale(1.05);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Drag Handle */
+        .option-drag-handle {
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 20px;
+            cursor: move;
+            transition: all 0.2s;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .option-drag-handle:hover {
+            color: var(--primary-color);
+            background: rgba(105, 108, 255, 0.15);
+        }
+
+        /* Option Header */
+        .option-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding-right: 40px;
+        }
+
+        .option-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .badge-main {
+            background: var(--primary-gradient);
             color: white;
         }
 
-        .wizard-step-label {
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.7);
-            font-weight: 500;
+        .badge-dependent {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+            border: 1px solid rgba(255, 193, 7, 0.4);
         }
 
-        .wizard-step.active .wizard-step-label {
-            color: var(--primary-color);
+        .badge-required {
+            background: rgba(220, 53, 69, 0.2);
+            color: #dc3545;
         }
 
-        /* Required field indicator */
+        /* Option Type Badges */
+        .type-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .type-regular {
+            background: rgba(108, 117, 125, 0.2);
+            color: #adb5bd;
+        }
+
+        .type-quantity {
+            background: rgba(40, 167, 69, 0.2);
+            color: #28a745;
+        }
+
+        .type-size {
+            background: rgba(23, 162, 184, 0.2);
+            color: #17a2b8;
+        }
+
+        .type-color {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+        }
+
+        /* Option Content Grid */
+        .option-content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        /* Dependency Section */
+        .dependency-section {
+            background: rgba(255, 193, 7, 0.05);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            border-right: 3px solid #ffc107;
+            display: none;
+        }
+
+        .dependency-section.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Quantity Tiers Section */
+        .tiers-section {
+            background: rgba(23, 162, 184, 0.05);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            border-right: 3px solid #17a2b8;
+        }
+
+        .tier-item {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+        }
+
+        /* Add Option Button - Fixed at Top */
+        .add-option-section {
+            background: linear-gradient(135deg, rgba(105, 108, 255, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px dashed var(--primary-color);
+        }
+
+        .btn-add-option {
+            background: var(--primary-gradient);
+            border: none;
+            color: white;
+            padding: 10px 25px;
+            border-radius: 30px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-add-option:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(105, 108, 255, 0.4);
+        }
+
+        /* Image Management */
+        .image-preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .image-preview-item {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            height: 120px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .image-preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .image-actions {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            padding: 8px;
+            transform: translateY(100%);
+            transition: transform 0.3s;
+        }
+
+        .image-preview-item:hover .image-actions {
+            transform: translateY(0);
+        }
+
+        /* Preview Card */
+        .preview-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .preview-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 10px;
+            object-fit: cover;
+        }
+
+        .preview-price {
+            font-size: 22px;
+            font-weight: bold;
+            color: #28a745;
+        }
+
+        /* Toggle Switch */
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 56px;
+            height: 28px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.2);
+            transition: 0.3s;
+            border-radius: 34px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        input:checked+.toggle-slider {
+            background-color: var(--primary-color);
+        }
+
+        input:checked+.toggle-slider:before {
+            transform: translateX(28px);
+        }
+
+        /* Required Field */
         .required::after {
             content: " *";
             color: var(--danger-color);
@@ -336,1696 +460,552 @@
 
         /* Alert Guide */
         .alert-guide {
-            background: rgba(38, 37, 61, 0.8);
+            background: rgba(105, 108, 255, 0.05);
             border-right: 4px solid var(--primary-color);
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
+            border-radius: 8px;
+            padding: 15px 20px;
+            margin-bottom: 25px;
         }
 
-        .alert-guide h6 {
-            color: var(--primary-color);
-            margin-bottom: 10px;
+        .action-buttons-fixed {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            display: flex;
+            gap: 12px;
+            z-index: 999;
         }
 
-        .alert-guide ul {
-            margin-bottom: 0;
-            padding-left: 20px;
-        }
-
-        .alert-guide li {
-            margin-bottom: 5px;
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.8);
-        }
-
-        /* Form Controls */
-        .form-control, .form-select {
-            background: rgba(255, 255, 255, 0.05);
-            border-color: rgba(255, 255, 255, 0.1);
-            color: #fff;
-        }
-
-        .form-control:focus, .form-select:focus {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: var(--primary-color);
-            color: #fff;
-            box-shadow: 0 0 0 0.25rem rgba(105, 108, 255, 0.25);
-        }
-
-        .form-control::placeholder {
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        /* Select2 Customization */
-        .select2-container--default .select2-selection--multiple,
-        .select2-container--default .select2-selection--single {
-            background-color: rgba(255, 255, 255, 0.05) !important;
-            border-color: rgba(255, 255, 255, 0.1) !important;
-            color: #fff !important;
-        }
-
-        .select2-container--default .select2-selection--multiple .select2-selection__choice {
-            background: var(--primary-gradient) !important;
-            border-color: var(--primary-color) !important;
-            color: white !important;
-        }
-
-        .select2-container--default .select2-results__option--highlighted[aria-selected] {
-            background-color: var(--primary-color) !important;
-        }
-
-        /* Option Dependencies */
-        .dependency-indicator {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
+        .action-buttons-fixed .btn {
+            width: 55px;
+            height: 55px;
             border-radius: 50%;
-            margin-left: 5px;
-        }
-
-        .has-dependency {
-            background: var(--warning-color);
-        }
-
-        .no-dependency {
-            background: var(--success-color);
-        }
-
-        .dependency-chain {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-            padding: 10px;
-            margin-top: 10px;
-            border-right: 3px solid var(--warning-color);
-        }
-
-        .dependency-chain-item {
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 5px;
-            padding-bottom: 5px;
-            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+            justify-content: center;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
         }
 
-        .dependency-chain-item:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
-        }
-
-        /* Tier Management */
-        .tier-item {
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 8px;
-            border-left: 3px solid var(--info-color);
-        }
-
-        .tier-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .tier-title {
-            font-weight: 600;
-            color: var(--info-color);
-            font-size: 14px;
-        }
-
-        /* Preview Card */
-        .preview-card {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            margin-bottom: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .preview-price {
-            font-size: 20px;
-            font-weight: bold;
-            color: var(--success-color);
-        }
-
-        .preview-old-price {
-            font-size: 16px;
-            color: rgba(255, 255, 255, 0.5);
-            text-decoration: line-through;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .wizard-steps {
-                flex-direction: column;
-                gap: 15px;
-            }
-
-            .wizard-steps::before {
-                display: none;
-            }
-
-            .wizard-step {
-                text-align: right;
-                display: flex;
-                align-items: center;
-                gap: 15px;
-            }
-
-            .wizard-step-circle {
-                margin: 0;
-            }
-        }
-
-        /* Option Dependencies Styles */
-        .option-dependency-section {
-            background: rgba(105, 108, 255, 0.05);
-            border-radius: 8px;
-            padding: 15px;
-            margin-top: 15px;
-            border: 1px dashed rgba(105, 108, 255, 0.3);
-        }
-
-        .dependency-option-select {
-            background: rgba(255, 255, 255, 0.07);
-            border-color: rgba(105, 108, 255, 0.5);
-        }
-
-        .dependency-condition-select {
-            background: rgba(255, 255, 255, 0.07);
-            border-color: rgba(255, 193, 7, 0.5);
-        }
-
-        .dependency-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .option-with-dependency {
-            border-left: 4px solid var(--warning-color);
-            background: rgba(255, 193, 7, 0.05);
-        }
-
-        .main-option {
-            border-left: 4px solid var(--primary-color);
-            background: rgba(105, 108, 255, 0.05);
-        }
-
-        .quantity-option {
-            border-left: 4px solid var(--success-color);
-            background: rgba(32, 201, 151, 0.05);
-        }
-
-        .size-tier-section {
-            background: rgba(23, 162, 184, 0.05);
-            border: 1px dashed rgba(23, 162, 184, 0.3);
-            border-radius: 8px;
-            padding: 15px;
-            margin-top: 15px;
-        }
-
-        /* Tab Content */
-        .tab-content {
-            padding: 20px 0;
-        }
-
-        /* Image Sortable */
-        .sortable-image-list .image-preview-item {
-            cursor: move;
-        }
-
-        .sortable-image-list .image-preview-item.sortable-chosen {
-            box-shadow: 0 0 20px rgba(105, 108, 255, 0.3);
-        }
-
-        .alert {
-            background: rgba(255, 255, 255, 0.05);
-            border-color: rgba(255, 255, 255, 0.1);
-            color: #fff;
-        }
-
-        .alert-success {
-            background: rgba(32, 201, 151, 0.1);
-            border-color: rgba(32, 201, 151, 0.3);
-            color: #20c997;
-        }
-
-        .alert-danger {
-            background: rgba(220, 53, 69, 0.1);
-            border-color: rgba(220, 53, 69, 0.3);
-            color: #dc3545;
-        }
-
-        .alert-warning {
-            background: rgba(255, 193, 7, 0.1);
-            border-color: rgba(255, 193, 7, 0.3);
-            color: #ffc107;
-        }
-
-        .breadcrumb {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-            padding: 10px 15px;
-        }
-
-        .breadcrumb-item a {
-            color: var(--primary-color);
-        }
-
-        .breadcrumb-item.active {
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        /* Drag & Drop and Multi-Select Styles */
-        .option-drag-handle {
-            cursor: move;
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 18px;
-            padding: 0 10px;
-            transition: color 0.3s;
-        }
-
-        .option-drag-handle:hover {
-            color: var(--primary-color);
-        }
-
-        .selectable-option {
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .selectable-option:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        }
-
-        .selectable-option.selected {
-            background: rgba(105, 108, 255, 0.15);
-            border-left: 4px solid var(--primary-color);
-            box-shadow: 0 0 20px rgba(105, 108, 255, 0.2);
-        }
-
-        .option-select-checkbox {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            width: 20px;
-            height: 20px;
-            border-radius: 4px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            background: rgba(255, 255, 255, 0.1);
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .option-select-checkbox.checked {
-            background: var(--primary-color);
-            border-color: var(--primary-color);
-        }
-
-        .option-select-checkbox.checked::after {
-            content: "✓";
+        .badge-new {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
             color: white;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 14px;
-            font-weight: bold;
-        }
-
-        .bulk-actions-bar {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            padding: 10px 15px;
-            margin-bottom: 15px;
-            display: none;
-            align-items: center;
-            gap: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .bulk-actions-bar.active {
-            display: flex;
-        }
-
-        .selected-count {
-            background: var(--primary-color);
-            color: white;
-            padding: 2px 8px;
+            padding: 4px 12px;
             border-radius: 20px;
             font-size: 12px;
-            font-weight: 600;
-        }
-
-        .option-quick-actions {
-            display: flex;
-            gap: 5px;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .selectable-option:hover .option-quick-actions {
-            opacity: 1;
-        }
-
-        .option-type-badge {
-            font-size: 10px;
-            padding: 2px 6px;
-            border-radius: 4px;
-            margin-right: 5px;
-        }
-
-        .option-type-quantity { background: var(--success-color); }
-        .option-type-size { background: var(--info-color); }
-        .option-type-color { background: var(--warning-color); }
-        .option-type-regular { background: var(--secondary-color); }
-
-        .option-group-controls {
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 8px;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px dashed rgba(255, 255, 255, 0.1);
-        }
-
-        .group-option-item {
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 6px;
-            padding: 8px 12px;
-            margin-bottom: 5px;
-            border-right: 3px solid var(--primary-color);
-        }
-
-        .option-values-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .option-value-item {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 6px;
-            padding: 8px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            border: 1px solid transparent;
-        }
-
-        .option-value-item:hover {
-            border-color: var(--primary-color);
-            background: rgba(105, 108, 255, 0.1);
-        }
-
-        .option-value-item.selected-value {
-            background: var(--primary-color);
-            color: white;
-            border-color: var(--primary-color);
-        }
-
-        /* Drag and drop styles */
-        .selectable-option.sortable-ghost {
-            opacity: 0.4;
-            background: rgba(105, 108, 255, 0.1);
-        }
-
-        .selectable-option.sortable-chosen {
-            box-shadow: 0 5px 25px rgba(105, 108, 255, 0.3);
-            transform: scale(1.02);
-        }
-
-        .selectable-option.sortable-drag {
-            opacity: 1;
-            background: var(--dark-card);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-        }
-
-        .ctrl-mode .selectable-option {
-            border: 1px dashed rgba(105, 108, 255, 0.5);
-        }
-
-        .selectable-option.grouped {
-            border-right: 3px solid var(--info-color);
-        }
-
-        .option-values-preview {
-            max-height: 200px;
-            overflow-y: auto;
+            font-weight: bold;
         }
     </style>
 @endsection
 
 @section('content')
-    <div class="container-xxl flex-grow-1 container-p-y" bis_skin_checked="1">
+    <div class="container-xxl flex-grow-1 container-p-y">
+
+        <!-- Breadcrumb -->
         <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item">
-                    <a href="{{ route('admin.index') }}">الرئيسية</a>
+            <ol class="breadcrumb bg-transparent p-0 mb-4">
+                <li class="breadcrumb-item"><a href="{{ route('admin.index') }}" class="text-primary">الرئيسية</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('admin.products.index') }}" class="text-primary">المنتجات</a>
                 </li>
-                <li class="breadcrumb-item">
-                    <a href="{{ route('admin.products.index') }}">المنتجات</a>
-                </li>
-                <li class="breadcrumb-item">
-                    <a href="{{ route('admin.products.show', $product->id) }}">{{ Str::limit($product->name, 30) }}</a>
-                </li>
-                <li class="breadcrumb-item active">تعديل</li>
+                <li class="breadcrumb-item"><a href="{{ route('admin.products.show', $product->id) }}"
+                        class="text-primary">{{ Str::limit($product->name, 30) }}</a></li>
+                <li class="breadcrumb-item active text-white">تعديل</li>
             </ol>
         </nav>
 
-        <div class="row" bis_skin_checked="1">
-            <div class="col-12" bis_skin_checked="1">
-                <div class="card mb-4" style="background: var(--dark-card); border-color: rgba(255,255,255,0.1);" bis_skin_checked="1">
-                    <div class="card-header d-flex justify-content-between align-items-center" bis_skin_checked="1">
-                        <div bis_skin_checked="1">
-                            <h5 class="mb-0" style="color: #fff;">تعديل المنتج</h5>
-                            <small class="text-muted">ID: #{{ $product->id }}</small>
-                        </div>
-                        <div class="btn-group" bis_skin_checked="1">
-                            <a href="{{ route('admin.products.show', $product->id) }}" class="btn btn-outline-info btn-sm">
-                                <i class="fas fa-eye me-1"></i> عرض
-                            </a>
-                            <a href="{{ route('admin.products.index') }}" class="btn btn-outline-secondary btn-sm">
-                                <i class="fas fa-arrow-right me-1"></i> رجوع
-                            </a>
+        <!-- Wizard Steps -->
+        <div class="wizard-steps">
+            <div class="wizard-step active" id="step1">
+                <div class="wizard-step-circle">1</div>
+                <div class="wizard-step-label">المعلومات الأساسية</div>
+            </div>
+            <div class="wizard-step" id="step2">
+                <div class="wizard-step-circle">2</div>
+                <div class="wizard-step-label">الصور والتسعير</div>
+            </div>
+            <div class="wizard-step" id="step3">
+                <div class="wizard-step-circle">3</div>
+                <div class="wizard-step-label">خيارات المنتج</div>
+            </div>
+            <div class="wizard-step" id="step4">
+                <div class="wizard-step-circle">4</div>
+                <div class="wizard-step-label">SEO والنشر</div>
+            </div>
+        </div>
+
+        <!-- Product Preview Card -->
+        <div class="preview-card">
+            <img src="{{ $product->primaryImage ? get_user_image($product->primaryImage->path) : 'https://via.placeholder.com/80x80?text=No+Image' }}"
+                alt="{{ $product->name }}" class="preview-image">
+            <div class="flex-grow-1">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h5 class="mb-1">{{ $product->name }}</h5>
+                        <div class="d-flex gap-3">
+                            <span class="text-muted"><i class="fas fa-tag me-1"></i> #{{ $product->id }}</span>
+                            <span class="text-muted"><i class="fas fa-folder me-1"></i>
+                                {{ $product->category->name ?? 'غير مصنف' }}</span>
                         </div>
                     </div>
-
-                    <div class="card-body" bis_skin_checked="1">
-                        <!-- Quick Guide -->
-                        <div class="alert-guide" bis_skin_checked="1">
-                            <h6><i class="fas fa-lightbulb me-2"></i>نصائح للتعديل:</h6>
-                            <ul>
-                                <li>يمكنك تحديث أي معلومات عن المنتج</li>
-                                <li>يمكنك إضافة أو إزالة الصور</li>
-                                <li>يمكنك تحديث الألوان والمواد والخيارات</li>
-                                <li>تأكد من تحديث المخزون والسعر بدقة</li>
-                                <li>احفظ التغييرات قبل الانتقال إلى قسم آخر</li>
-                            </ul>
-                        </div>
-
-                        @if (session('success'))
-                            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                <i class="fas fa-check-circle me-2"></i>
-                                {{ session('success') }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"
-                                    aria-label="Close"></button>
-                            </div>
+                    <div class="text-start">
+                        <span class="preview-price">{{ number_format($product->final_price, 2) }} ج.م</span>
+                        @if ($product->has_discount && $product->price > $product->final_price)
+                            <div class="text-muted"><del>{{ number_format($product->price, 2) }} ج.م</del></div>
                         @endif
-
-                        @if ($errors->any())
-                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                <i class="fas fa-exclamation-circle me-2"></i>
-                                <ul class="mb-0">
-                                    @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"
-                                    aria-label="Close"></button>
-                            </div>
-                        @endif
-
-                        <!-- Product Preview -->
-                        <div class="preview-card mb-4" bis_skin_checked="1">
-                            <div class="row align-items-center" bis_skin_checked="1">
-                                <div class="col-auto" bis_skin_checked="1">
-                                    <img src="{{ $product->primaryImage ? get_user_image($product->primaryImage->path) : 'https://via.placeholder.com/100x100?text=No+Image' }}"
-                                        alt="{{ $product->name }}" class="preview-image" style="width: 100px">
-                                </div>
-                                <div class="col" bis_skin_checked="1">
-                                    <h6 class="mb-2" style="color: #fff;">{{ $product->name }}</h6>
-                                    <div class="mb-2" bis_skin_checked="1">
-                                        <span class="preview-price">
-                                            {{ number_format($product->final_price, 2) }} ج.م
-                                        </span>
-                                        @if ($product->has_discount && $product->price > $product->final_price)
-                                            <span class="preview-old-price ms-2">
-                                                {{ number_format($product->price, 2) }} ج.م
-                                            </span>
-                                        @endif
-                                    </div>
-                                    <div class="d-flex gap-3" bis_skin_checked="1">
-                                        <small class="text-muted">
-                                            <i class="fas fa-box me-1"></i> المخزون: {{ $product->stock }}
-                                        </small>
-                                        <small class="text-muted">
-                                            <i class="fas fa-folder me-1"></i> {{ $product->category->name ?? 'غير مصنف' }}
-                                        </small>
-                                        <small class="text-muted">
-                                            @if ($product->status_id == 1)
-                                                <span class="badge bg-success">نشط</span>
-                                            @elseif($product->status_id == 2)
-                                                <span class="badge bg-danger">غير نشط</span>
-                                            @else
-                                                <span class="badge bg-warning">مسودة</span>
-                                            @endif
-                                        </small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Wizard Steps -->
-                        <div class="wizard-steps" bis_skin_checked="1">
-                            <div class="wizard-step active" id="step1">
-                                <div class="wizard-step-circle">1</div>
-                                <div class="wizard-step-label">المعلومات الأساسية</div>
-                            </div>
-                            <div class="wizard-step" id="step2">
-                                <div class="wizard-step-circle">2</div>
-                                <div class="wizard-step-label">الصور والتسعير</div>
-                            </div>
-                            <div class="wizard-step" id="step3">
-                                <div class="wizard-step-circle">3</div>
-                                <div class="wizard-step-label">المواصفات</div>
-                            </div>
-                            <div class="wizard-step" id="step4">
-                                <div class="wizard-step-circle">4</div>
-                                <div class="wizard-step-label">خيارات إضافية</div>
-                            </div>
-                        </div>
-
-                        <form action="{{ route('admin.products.update', $product->id) }}" method="POST"
-                            enctype="multipart/form-data" id="editProductForm">
-                            @csrf
-                            @method('POST')
-
-                            <!-- Step 1: Basic Information -->
-                            <div class="step-card step-1" bis_skin_checked="1">
-                                <div class="step-header" bis_skin_checked="1">
-                                    <div class="step-number" bis_skin_checked="1">1</div>
-                                    <div bis_skin_checked="1">
-                                        <h5 class="step-title">المعلومات الأساسية</h5>
-                                        <p class="step-description">تحديث المعلومات الأساسية للمنتج</p>
-                                    </div>
-                                </div>
-
-                                <div class="row" bis_skin_checked="1">
-                                    <div class="col-md-8 mb-3" bis_skin_checked="1">
-                                        <label for="name" class="form-label required">اسم المنتج</label>
-                                        <input type="text" class="form-control" id="name" name="name"
-                                            value="{{ old('name', $product->name) }}" required>
-                                        <small class="text-muted">اسم واضح ومعبر عن المنتج</small>
-                                    </div>
-
-                                    <div class="col-md-4 mb-3" bis_skin_checked="1">
-                                        <label for="category_id" class="form-label required">القسم</label>
-                                        <div class="input-group" bis_skin_checked="1">
-                                            <select class="form-control select2" id="category_id" name="category_id"
-                                                required>
-                                                <option value="">اختر القسم</option>
-                                                @foreach ($categories as $category)
-                                                    <option value="{{ $category->id }}"
-                                                        {{ old('category_id', $product->category_id) == $category->id ? 'selected' : '' }}>
-                                                        {{ $category->name }}
-                                                        @if (!$category->isParent())
-                                                            (تابع لـ: {{ $category->parent->name ?? '' }})
-                                                        @endif
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                            <button type="button" class="btn btn-outline-primary"
-                                                onclick="openQuickAddModal('category')">
-                                                <i class="fas fa-plus"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-12 mb-3" bis_skin_checked="1">
-                                        <label for="description" class="form-label">الوصف</label>
-                                        <textarea class="form-control summernote" id="description" name="description" rows="6">{{ old('description', $product->description) }}</textarea>
-                                    </div>
-
-                                    <div class="col-md-6 mb-3" bis_skin_checked="1">
-                                        <label for="status_id" class="form-label required">الحالة</label>
-                                        <select class="form-select" id="status_id" name="status_id" required>
-                                            <option value="1"
-                                                {{ old('status_id', $product->status_id) == 1 ? 'selected' : '' }}>نشط
-                                            </option>
-                                            <option value="2"
-                                                {{ old('status_id', $product->status_id) == 2 ? 'selected' : '' }}>غير نشط
-                                            </option>
-                                            <option value="3"
-                                                {{ old('status_id', $product->status_id) == 3 ? 'selected' : '' }}>قيد
-                                                المراجعة</option>
-                                        </select>
-                                    </div>
-
-                                    <div class="col-md-6 mb-3" bis_skin_checked="1">
-                                        <label for="stock" class="form-label required">الكمية المتاحة</label>
-                                        <input type="number" class="form-control" id="stock" name="stock"
-                                            value="{{ old('stock', $product->stock) }}" min="0" required>
-                                        @if ($product->stock < 10)
-                                            <div class="alert alert-warning mt-2" bis_skin_checked="1">
-                                                <i class="fas fa-exclamation-triangle me-2"></i>
-                                                <span>المخزون منخفض! نوصي بإضافة المزيد</span>
-                                            </div>
-                                        @endif
-                                    </div>
-                                </div>
-
-                                <div class="d-flex justify-content-between mt-4" bis_skin_checked="1">
-                                    <div></div>
-                                    <button type="button" class="btn btn-primary next-step" data-next="2">
-                                        التالي <i class="fas fa-arrow-left ms-1"></i>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- Step 2: Images & Pricing -->
-                            <div class="step-card step-2" style="display: none;" bis_skin_checked="1">
-                                <div class="step-header" bis_skin_checked="1">
-                                    <div class="step-number" bis_skin_checked="1">2</div>
-                                    <div bis_skin_checked="1">
-                                        <h5 class="step-title">الصور والتسعير</h5>
-                                        <p class="step-description">تحديث صور المنتج والتسعير</p>
-                                    </div>
-                                </div>
-
-                                <!-- Main Image Section -->
-                                <div class="mb-4" bis_skin_checked="1">
-                                    <label class="form-label required">الصورة الرئيسية</label>
-
-                                    <!-- Current Main Image -->
-                                    @if ($product->image)
-                                        <div class="mb-3">
-                                            <p class="text-muted mb-2">الصورة الرئيسية الحالية:</p>
-                                            <div class="image-preview-grid" id="currentMainImageContainer">
-                                                <div class="image-preview-item">
-                                                    <span class="primary-badge">رئيسية</span>
-                                                    <img src="{{ get_product_image($product->image) }}"
-                                                        alt="الصورة الرئيسية الحالية">
-                                                    <div class="image-actions">
-                                                        <button type="button" class="btn btn-info btn-sm"
-                                                            onclick="viewImage('{{ get_product_image($product->image) }}')">
-                                                            <i class="fas fa-eye"></i>
-                                                        </button>
-                                                        <button type="button" class="btn btn-danger btn-sm"
-                                                            onclick="removeCurrentMainImage()">
-                                                            <i class="fas fa-trash"></i>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    @else
-                                        <div class="alert alert-warning mb-3">
-                                            <i class="fas fa-exclamation-triangle me-2"></i>
-                                            لا توجد صورة رئيسية للمنتج
-                                        </div>
-                                    @endif
-
-                                    <!-- Upload New Main Image -->
-                                    <div class="mb-3">
-                                        <p class="text-muted mb-2">تغيير الصورة الرئيسية:</p>
-                                        <div class="image-manager"
-                                            onclick="document.getElementById('image').click()">
-                                            <i class="fas fa-cloud-upload-alt"></i>
-                                            <p class="mb-0">انقر لرفع صورة جديدة</p>
-                                            <small class="text-muted">الحجم الموصى به: 800×800 بكسل</small>
-                                        </div>
-                                        <input type="file" id="image" name="image" accept="image/*"
-                                            style="display: none;">
-                                        <input type="hidden" id="remove_main_image" name="remove_main_image"
-                                            value="0">
-                                    </div>
-
-                                    <!-- Preview of New Main Image -->
-                                    <div id="newMainImagePreview" class="mt-3" style="display: none;">
-                                        <p class="text-muted mb-2">الصورة الجديدة المختارة:</p>
-                                        <div class="image-preview-grid">
-                                            <div class="image-preview-item">
-                                                <span class="primary-badge" style="background: var(--success-color);">جديدة</span>
-                                                <img id="newMainImagePreviewImg" src=""
-                                                    alt="الصورة الرئيسية الجديدة">
-                                                <div class="image-actions">
-                                                    <button type="button" class="btn btn-info btn-sm"
-                                                        onclick="viewNewMainImage()">
-                                                        <i class="fas fa-eye"></i>
-                                                    </button>
-                                                    <button type="button" class="btn btn-danger btn-sm"
-                                                        onclick="removeNewMainImage()">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <small class="text-muted d-block mt-1">سيتم استبدال الصورة الرئيسية الحالية بهذه
-                                            الصورة</small>
-                                    </div>
-                                </div>
-
-                                <!-- Additional Images -->
-                                <div class="mb-4" bis_skin_checked="1">
-                                    <label class="form-label">الصور الإضافية</label>
-
-                                    @if ($product->images && $product->images->count() > 0)
-                                        <div class="image-preview-grid sortable-image-list" id="existingImagesGrid">
-                                            @foreach ($product->images as $image)
-                                                <div class="image-preview-item" data-id="{{ $image->id }}">
-                                                    @if ($image->is_primary)
-                                                        <span class="primary-badge">رئيسية</span>
-                                                    @endif
-                                                    <img src="{{ get_user_image($image->path) }}" alt="صورة إضافية">
-                                                    <div class="image-actions">
-                                                        <button type="button" class="btn btn-info btn-sm"
-                                                            onclick="viewImage('{{ get_user_image($image->path) }}')">
-                                                            <i class="fas fa-eye"></i>
-                                                        </button>
-                                                        <button type="button" class="btn btn-danger btn-sm"
-                                                            onclick="removeAdditionalImage({{ $image->id }})">
-                                                            <i class="fas fa-trash"></i>
-                                                        </button>
-                                                        @if (!$image->is_primary)
-                                                            <button type="button" class="btn btn-primary btn-sm"
-                                                                onclick="setAsPrimary({{ $image->id }})">
-                                                                <i class="fas fa-star"></i>
-                                                            </button>
-                                                        @endif
-                                                    </div>
-                                                </div>
-                                            @endforeach
-                                        </div>
-                                    @endif
-
-                                    <div class="image-manager mt-3"
-                                        onclick="document.getElementById('additional_images').click()">
-                                        <i class="fas fa-images"></i>
-                                        <p class="mb-0">انقر لإضافة صور إضافية</p>
-                                        <small class="text-muted">يمكنك رفع أكثر من صورة</small>
-                                    </div>
-                                    <input type="file" id="additional_images" name="additional_images[]"
-                                        accept="image/*" multiple style="display: none;">
-                                    <div id="newImagesPreview" class="image-preview-grid mt-3"></div>
-                                    <input type="hidden" id="removed_images" name="removed_images" value="">
-                                    <input type="hidden" id="primary_image_id" name="primary_image_id"
-                                        value="{{ $product->images->where('is_primary', true)->first()->id ?? '' }}">
-                                    <input type="hidden" id="images_order" name="images_order" value="">
-                                </div>
-
-                                <!-- Pricing -->
-                                <div class="row" bis_skin_checked="1">
-                                    <div class="col-md-4 mb-2" bis_skin_checked="1">
-                                        <label for="price" class="form-label required">السعر الأساسي</label>
-                                        <div class="input-group" bis_skin_checked="1">
-                                            <span class="input-group-text">ج.م</span>
-                                            <input type="number" class="form-control" id="price" name="price"
-                                                step="0.01" value="{{ old('price', $product->price) }}" required>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-8 mb-4">
-                                        <label for="price_text" class="form-label required"> نص السعر </label>
-                                        <div class="input-group">
-                                            <span class="input-group-text">ج.م</span>
-                                            <input type="text" class="form-control" id="price_text" name="price_text"
-                                                value="{{ old('price_text', $product->price_text) }}" required>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Additional Pricing Options -->
-                                <div class="row" bis_skin_checked="1">
-                                    <div class="col-md-4 mb-3" bis_skin_checked="1">
-                                        <div class="toggle-container mb-3" bis_skin_checked="1">
-                                            <label class="toggle-switch">
-                                                <input type="checkbox" id="has_discount" name="has_discount"
-                                                    {{ old('has_discount', $product->has_discount) ? 'checked' : '' }}>
-                                                <span class="toggle-slider"></span>
-                                            </label>
-                                            <span class="toggle-label">هل يحتوي المنتج على خصم؟</span>
-                                        </div>
-
-                                        <div id="discountSection"
-                                            style="{{ old('has_discount', $product->has_discount) ? '' : 'display: none;' }}">
-                                            <div class="row" bis_skin_checked="1">
-                                                <div class="col-6" bis_skin_checked="1">
-                                                    <label for="discount_type" class="form-label">نوع الخصم</label>
-                                                    <select class="form-select" id="discount_type" name="discount_type">
-                                                        <option value="percentage"
-                                                            {{ old('discount_type', $product->discount->discount_type ?? '') == 'percentage' ? 'selected' : '' }}>
-                                                            نسبة مئوية %</option>
-                                                        <option value="fixed"
-                                                            {{ old('discount_type', $product->discount->discount_type ?? '') == 'fixed' ? 'selected' : '' }}>
-                                                            قيمة ثابتة</option>
-                                                    </select>
-                                                </div>
-                                                <div class="col-6" bis_skin_checked="1">
-                                                    <label for="discount_value" class="form-label">قيمة الخصم</label>
-                                                    <input type="number" class="form-control" id="discount_value"
-                                                        name="discount_value" step="0.01"
-                                                        value="{{ old('discount_value', $product->discount->discount_value ?? '') }}">
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-4 mb-3" bis_skin_checked="1">
-                                        <div class="toggle-container" bis_skin_checked="1">
-                                            <label class="toggle-switch">
-                                                <input type="checkbox" id="includes_tax" name="includes_tax"
-                                                    {{ old('includes_tax', $product->includes_tax) ? 'checked' : '' }}>
-                                                <span class="toggle-slider"></span>
-                                            </label>
-                                            <span class="toggle-label">يشمل الضريبة</span>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-4 mb-3" bis_skin_checked="1">
-                                        <div class="toggle-container" bis_skin_checked="1">
-                                            <label class="toggle-switch">
-                                                <input type="checkbox" id="includes_shipping" name="includes_shipping"
-                                                    {{ old('includes_shipping', $product->includes_shipping) ? 'checked' : '' }}>
-                                                <span class="toggle-slider"></span>
-                                            </label>
-                                            <span class="toggle-label">يشمل الشحن</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="d-flex justify-content-between mt-4" bis_skin_checked="1">
-                                    <button type="button" class="btn btn-outline-secondary prev-step" data-prev="1">
-                                        <i class="fas fa-arrow-right me-1"></i> السابق
-                                    </button>
-                                    <button type="button" class="btn btn-primary next-step" data-next="3">
-                                        التالي <i class="fas fa-arrow-left ms-1"></i>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- Step 3: Specifications -->
-                            <div class="step-card step-3" style="display: none;" bis_skin_checked="1">
-                                <div class="step-header" bis_skin_checked="1">
-                                    <div class="step-number" bis_skin_checked="1">3</div>
-                                    <div bis_skin_checked="1">
-                                        <h5 class="step-title">المواصفات والخصائص</h5>
-                                        <p class="step-description">تحديث مواصفات المنتج وخياراته</p>
-                                    </div>
-                                </div>
-
-                                <!-- Colors -->
-                                <div class="mb-4" bis_skin_checked="1">
-                                    <div class="d-flex justify-content-between align-items-center mb-3"
-                                        bis_skin_checked="1">
-                                        <label class="form-label mb-0">الألوان المتاحة</label>
-                                        <button type="button" class="btn btn-outline-primary btn-sm"
-                                            onclick="openQuickAddModal('color')">
-                                            <i class="fas fa-plus me-1"></i> إضافة لون جديد
-                                        </button>
-                                    </div>
-
-                                    <div class="mb-3" bis_skin_checked="1">
-                                        <div id="selectedColorsContainer" class="d-flex flex-wrap gap-2 mb-3">
-                                            @foreach ($product->colors as $color)
-                                                <div class="color-swatch" data-id="{{ $color->id }}">
-                                                    <div class="color-preview"
-                                                        style="background-color: {{ $color->hex_code }};"></div>
-                                                    <span>{{ $color->name }}</span>
-                                                    <input type="hidden" name="colors[]" value="{{ $color->id }}">
-                                                    <button type="button" class="btn btn-sm btn-outline-danger ms-2"
-                                                        onclick="removeColor({{ $color->id }})">
-                                                        <i class="fas fa-times"></i>
-                                                    </button>
-                                                </div>
-                                            @endforeach
-                                        </div>
-                                    </div>
-
-                                    <!-- Available Colors -->
-                                    <div bis_skin_checked="1">
-                                        <label class="form-label">اختر من الألوان المتاحة:</label>
-                                        <div class="color-grid" id="availableColorsGrid">
-                                            @foreach ($colors as $color)
-                                                @if (!$product->colors->contains($color->id))
-                                                    <div class="color-item"
-                                                        style="background-color: {{ $color->hex_code }};"
-                                                        data-id="{{ $color->id }}" data-name="{{ $color->name }}"
-                                                        data-hex="{{ $color->hex_code }}" onclick="addColor(this)">
-                                                    </div>
-                                                @endif
-                                            @endforeach
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Materials -->
-                                <div class="mb-4" bis_skin_checked="1">
-                                    <div class="d-flex justify-content-between align-items-center mb-3"
-                                        bis_skin_checked="1">
-                                        <label class="form-label mb-0">المواد المستخدمة</label>
-                                        <button type="button" class="btn btn-outline-primary btn-sm"
-                                            onclick="openQuickAddModal('material')">
-                                            <i class="fas fa-plus me-1"></i> إضافة مادة جديدة
-                                        </button>
-                                    </div>
-
-                                    <!-- Existing Materials -->
-                                    <div id="materialsContainer">
-                                        @foreach ($product->materials as $material)
-                                            <div class="material-item" data-id="{{ $material->id }}">
-                                                <div class="material-header">
-                                                    <div class="material-title" bis_skin_checked="1">
-                                                        <strong>{{ $material->name }}</strong>
-                                                    </div>
-                                                    <button type="button" class="material-remove"
-                                                        onclick="removeMaterial(this)">
-                                                        <i class="fas fa-times"></i>
-                                                    </button>
-                                                </div>
-                                                <div class="row" bis_skin_checked="1">
-                                                    <div class="col-md-4 mb-2" bis_skin_checked="1">
-                                                        <input type="hidden"
-                                                            name="materials[{{ $loop->index }}][material_id]"
-                                                            value="{{ $material->id }}">
-                                                        <input type="number" class="form-control"
-                                                            name="materials[{{ $loop->index }}][quantity]"
-                                                            value="{{ $material->pivot->quantity }}" placeholder="الكمية"
-                                                            min="0" step="0.01">
-                                                    </div>
-                                                    <div class="col-md-4 mb-2" bis_skin_checked="1">
-                                                        <select class="form-select"
-                                                            name="materials[{{ $loop->index }}][unit]" required>
-                                                            <option value="piece"
-                                                                {{ $material->pivot->unit == 'piece' ? 'selected' : '' }}>
-                                                                قطعة</option>
-                                                            <option value="meter"
-                                                                {{ $material->pivot->unit == 'meter' ? 'selected' : '' }}>
-                                                                متر</option>
-                                                            <option value="kg"
-                                                                {{ $material->pivot->unit == 'kg' ? 'selected' : '' }}>كجم
-                                                            </option>
-                                                            <option value="liter"
-                                                                {{ $material->pivot->unit == 'liter' ? 'selected' : '' }}>
-                                                                لتر</option>
-                                                            <option value="gram"
-                                                                {{ $material->pivot->unit == 'gram' ? 'selected' : '' }}>
-                                                                جرام</option>
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-md-4 mb-2" bis_skin_checked="1">
-                                                        <input type="number" class="form-control"
-                                                            name="materials[{{ $loop->index }}][additional_price]"
-                                                            value="{{ $material->pivot->additional_price ?? 0 }}"
-                                                            placeholder="سعر إضافي" step="0.01" min="0">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        @endforeach
-                                    </div>
-
-                                    <!-- Add Material Button -->
-                                    <button type="button" class="btn btn-outline-primary btn-sm mt-3"
-                                        onclick="addMaterialField()">
-                                        <i class="fas fa-plus me-1"></i> إضافة مادة أخرى
-                                    </button>
-                                </div>
-
-                                <!-- Features -->
-                                <div class="mb-4" bis_skin_checked="1">
-                                    <div class="d-flex justify-content-between align-items-center mb-3"
-                                        bis_skin_checked="1">
-                                        <label class="form-label mb-0">المواصفات الإضافية</label>
-                                        <button type="button" class="btn btn-outline-primary btn-sm"
-                                            onclick="addFeatureField()">
-                                            <i class="fas fa-plus me-1"></i> إضافة مواصفة
-                                        </button>
-                                    </div>
-
-                                    <div id="featuresContainer">
-                                        @foreach ($product->features as $index => $feature)
-                                            <div class="dynamic-field">
-                                                <div class="dynamic-field-header">
-                                                    <div class="dynamic-field-title">مواصفة {{ $index + 1 }}</div>
-                                                    <button type="button" class="dynamic-field-remove"
-                                                        onclick="removeField(this)">
-                                                        <i class="fas fa-times"></i>
-                                                    </button>
-                                                </div>
-                                                <div class="row" bis_skin_checked="1">
-                                                    <div class="col-md-5 mb-2" bis_skin_checked="1">
-                                                        <input type="text" class="form-control"
-                                                            name="features[{{ $index }}][name]"
-                                                            value="{{ $feature->name }}" placeholder="اسم المواصفة"
-                                                            required>
-                                                    </div>
-                                                    <div class="col-md-7 mb-2" bis_skin_checked="1">
-                                                        <input type="text" class="form-control"
-                                                            name="features[{{ $index }}][value]"
-                                                            value="{{ $feature->value }}" placeholder="القيمة" required>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                </div>
-
-                                <!-- Delivery Time -->
-                                <div class="mb-4" bis_skin_checked="1">
-                                    <label class="form-label">وقت التوصيل</label>
-                                    <div class="row" bis_skin_checked="1">
-                                        <div class="col-md-6 mb-3" bis_skin_checked="1">
-                                            <label for="from_days" class="form-label">من (أيام)</label>
-                                            <input type="number" class="form-control" id="from_days" name="from_days"
-                                                value="{{ old('from_days', $product->deliveryTime->from_days ?? '') }}"
-                                                min="0">
-                                        </div>
-                                        <div class="col-md-6 mb-3" bis_skin_checked="1">
-                                            <label for="to_days" class="form-label">إلى (أيام)</label>
-                                            <input type="number" class="form-control" id="to_days" name="to_days"
-                                                value="{{ old('to_days', $product->deliveryTime->to_days ?? '') }}"
-                                                min="0">
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Warranty -->
-                                <div class="mb-4" bis_skin_checked="1">
-                                    <label for="warranty_months" class="form-label">الضمان (بالأشهر)</label>
-                                    <input type="number" class="form-control" id="warranty_months"
-                                        name="warranty_months"
-                                        value="{{ old('warranty_months', $product->warranty->months ?? '') }}"
-                                        min="0">
-                                </div>
-
-                                <div class="d-flex justify-content-between mt-4" bis_skin_checked="1">
-                                    <button type="button" class="btn btn-outline-secondary prev-step" data-prev="2">
-                                        <i class="fas fa-arrow-right me-1"></i> السابق
-                                    </button>
-                                    <button type="button" class="btn btn-primary next-step" data-next="4">
-                                        التالي <i class="fas fa-arrow-left ms-1"></i>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- Step 4: Additional Options -->
-                            <div class="step-card step-4" style="display: none;" bis_skin_checked="1">
-                                <div class="step-header" bis_skin_checked="1">
-                                    <div class="step-number" bis_skin_checked="1">4</div>
-                                    <div bis_skin_checked="1">
-                                        <h5 class="step-title">خيارات إضافية</h5>
-                                        <p class="step-description">إدارة الخيارات بسهولة - اسحب وأسقط، اختر متعدد</p>
-                                    </div>
-                                </div>
-
-                                <!-- Bulk Actions Bar -->
-                                <div class="bulk-actions-bar" id="bulkActionsBar">
-                                    <div class="d-flex align-items-center gap-3">
-                                        <span class="selected-count" id="selectedCount">0 مختار</span>
-                                        <span>إجراءات جماعية:</span>
-                                        <div class="btn-group btn-group-sm">
-                                            <button type="button" class="btn btn-outline-primary" onclick="setAsRequired()">
-                                                <i class="fas fa-check-circle"></i> تعيين كمطلوب
-                                            </button>
-                                            <button type="button" class="btn btn-outline-success" onclick="setAsQuantityType()">
-                                                <i class="fas fa-layer-group"></i> تعيين ككمية
-                                            </button>
-                                            <button type="button" class="btn btn-outline-danger" onclick="deleteSelected()">
-                                                <i class="fas fa-trash"></i> حذف المحدد
-                                            </button>
-                                        </div>
-                                        <button type="button" class="btn btn-sm btn-outline-secondary ms-auto" onclick="clearSelection()">
-                                            <i class="fas fa-times"></i> إلغاء التحديد
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <!-- Option Group Management -->
-                                <div class="option-group-controls mb-4">
-                                    <h6 class="mb-3"><i class="fas fa-object-group me-2"></i>إدارة مجموعات الخيارات</h6>
-                                    <div class="row">
-                                        <div class="col-md-8">
-                                            <input type="text" class="form-control" id="optionGroupName" placeholder="اسم المجموعة (مثال: الألوان، المقاسات)">
-                                        </div>
-                                        <div class="col-md-4">
-                                            <button type="button" class="btn btn-primary w-100" onclick="createOptionGroup()">
-                                                <i class="fas fa-plus me-2"></i>إنشاء مجموعة
-                                            </button>
-                                        </div>
-                                    </div>
-                                    
-                                    <div id="optionGroupsContainer" class="mt-3">
-                                        <!-- Groups will be added here dynamically -->
-                                    </div>
-                                </div>
-
-                                <!-- Product Options with Drag & Drop and Multi-Select -->
-                                <div class="mb-4" bis_skin_checked="1">
-                                    <div class="d-flex justify-content-between align-items-center mb-3" bis_skin_checked="1">
-                                        <div>
-                                            <label class="form-label mb-0">خيارات المنتج</label>
-                                            <small class="text-muted d-block">اسحب لإعادة الترتيب - انقر للتحديد - اضغط Ctrl/Cmd للتحديد المتعدد</small>
-                                        </div>
-                                        <div class="btn-group" bis_skin_checked="1">
-                                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="addProductOptionField()">
-                                                <i class="fas fa-plus me-1"></i> إضافة خيار
-                                            </button>
-                                            <button type="button" class="btn btn-outline-info btn-sm" onclick="addMultipleOptions()">
-                                                <i class="fas fa-copy me-1"></i> إضافة متعددة
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <!-- Quick Add Multiple Options -->
-                                    <div class="card mb-3" id="multipleOptionsForm" style="display: none; background: rgba(255,255,255,0.03);">
-                                        <div class="card-body">
-                                            <div class="row">
-                                                <div class="col-md-4 mb-2">
-                                                    <label class="form-label">اسم الخيار</label>
-                                                    <input type="text" class="form-control" id="multipleOptionName" placeholder="مثال: اللون">
-                                                </div>
-                                                <div class="col-md-8 mb-2">
-                                                    <label class="form-label">القيم (افصل بفاصلة)</label>
-                                                    <input type="text" class="form-control" id="multipleOptionValues" placeholder="مثال: أحمر, أزرق, أخضر">
-                                                </div>
-                                                <div class="col-md-4 mb-2">
-                                                    <label class="form-label">السعر الإضافي</label>
-                                                    <input type="number" class="form-control" id="multipleOptionPrice" placeholder="0.00">
-                                                </div>
-                                                <div class="col-md-4 mb-2">
-                                                    <label class="form-label">النوع</label>
-                                                    <select class="form-select" id="multipleOptionType">
-                                                        <option value="regular">عادي</option>
-                                                        <option value="quantity">كمية</option>
-                                                        <option value="size">مقاس</option>
-                                                        <option value="color">لون</option>
-                                                    </select>
-                                                </div>
-                                                <div class="col-md-4 mb-2 d-flex align-items-end">
-                                                    <div class="btn-group w-100">
-                                                        <button type="button" class="btn btn-success" onclick="saveMultipleOptions()">
-                                                            <i class="fas fa-save"></i> حفظ
-                                                        </button>
-                                                        <button type="button" class="btn btn-secondary" onclick="cancelMultipleOptions()">
-                                                            <i class="fas fa-times"></i> إلغاء
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div id="productOptionsContainer" class="sortable-options-container">
-                                        <!-- Options will be rendered here with selectable and draggable functionality -->
-                                        @foreach($product->options as $index => $option)
-                                            @php
-                                                $isMainOption = empty($option->depends_on_option_id);
-                                                $hasDependency = !$isMainOption;
-                                                $isQuantityType = $option->option_type === 'quantity' || 
-                                                                  str_contains(strtolower($option->option_name), 'كمية') || 
-                                                                  str_contains(strtolower($option->option_name), 'عدد');
-                                            @endphp
-                                            
-                                            <div class="dynamic-field selectable-option {{ $isMainOption ? 'main-option' : 'option-with-dependency' }} {{ $isQuantityType ? 'quantity-option' : '' }}"
-                                                 data-index="{{ $index }}"
-                                                 data-id="{{ $option->id }}"
-                                                 onclick="toggleOptionSelection({{ $index }}, event)">
-                                                
-                                                <!-- Selection Checkbox -->
-                                                <div class="option-select-checkbox"
-                                                     onclick="event.stopPropagation(); toggleOptionSelection({{ $index }}, event)">
-                                                </div>
-                                                
-                                                <!-- Drag Handle -->
-                                                <div class="option-drag-handle" onclick="event.stopPropagation()">
-                                                    <i class="fas fa-arrows-alt"></i>
-                                                </div>
-                                                
-                                                <div class="dynamic-field-header">
-                                                    <div class="d-flex align-items-center gap-2">
-                                                        <div class="dynamic-field-title">
-                                                            {{ $option->option_name }}
-                                                            <span class="option-type-badge option-type-{{ $option->option_type ?? 'regular' }}">
-                                                                @php
-                                                                    $typeLabels = [
-                                                                        'regular' => 'عادي',
-                                                                        'quantity' => 'كمية',
-                                                                        'size' => 'مقاس',
-                                                                        'color' => 'لون'
-                                                                    ];
-                                                                @endphp
-                                                                {{ $typeLabels[$option->option_type ?? 'regular'] }}
-                                                            </span>
-                                                            @if($isMainOption)
-                                                                <span class="badge bg-primary ms-2">رئيسي</span>
-                                                            @endif
-                                                            @if($hasDependency)
-                                                                <span class="badge bg-warning ms-2">معتمد</span>
-                                                            @endif
-                                                            @if($isQuantityType)
-                                                                <span class="badge bg-success ms-1">كمية</span>
-                                                            @endif
-                                                            @if($option->is_required)
-                                                                <span class="badge bg-danger ms-1">مطلوب</span>
-                                                            @endif
-                                                        </div>
-                                                        @if($hasDependency)
-                                                            <span class="dependency-indicator has-dependency"></span>
-                                                        @else
-                                                            <span class="dependency-indicator no-dependency"></span>
-                                                        @endif
-                                                    </div>
-                                                    <div class="option-quick-actions">
-                                                        <button type="button" class="btn btn-sm btn-outline-info" 
-                                                                onclick="event.stopPropagation(); viewOptionValues({{ $index }})"
-                                                                title="عرض القيم">
-                                                            <i class="fas fa-eye"></i>
-                                                        </button>
-                                                        <button type="button" class="btn btn-sm btn-outline-warning"
-                                                                onclick="event.stopPropagation(); duplicateOption({{ $index }})"
-                                                                title="نسخ الخيار">
-                                                            <i class="fas fa-copy"></i>
-                                                        </button>
-                                                        <button type="button" class="btn btn-sm btn-outline-danger"
-                                                                onclick="event.stopPropagation(); removeField(this)"
-                                                                title="حذف الخيار">
-                                                            <i class="fas fa-times"></i>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                                
-                                                @if($hasDependency && $option->parentOption)
-                                                <div class="dependency-chain mb-3">
-                                                    <small class="text-muted d-block mb-2">يعتمد على:</small>
-                                                    <div class="dependency-chain-item">
-                                                        <i class="fas fa-link text-warning"></i>
-                                                        <span>{{ $option->parentOption->option_name }} = {{ $option->parentOption->option_value }}</span>
-                                                        <span class="badge bg-info ms-2">{{ $option->dependency_condition }}</span>
-                                                    </div>
-                                                </div>
-                                                @endif
-                                                
-                                                <div class="row" bis_skin_checked="1">
-                                                    <input type="hidden" name="product_options[{{ $index }}][id]" value="{{ $option->id }}">
-                                                    <div class="col-md-3 mb-2" bis_skin_checked="1">
-                                                        <label class="form-label small">اسم الخيار</label>
-                                                        <input type="text" class="form-control"
-                                                               name="product_options[{{ $index }}][option_name]"
-                                                               value="{{ $option->option_name }}" 
-                                                               placeholder="اسم الخيار"
-                                                               required
-                                                               onchange="updateOptionPreview({{ $index }})">
-                                                    </div>
-                                                    <div class="col-md-3 mb-2" bis_skin_checked="1">
-                                                        <label class="form-label small">القيمة</label>
-                                                        <input type="text" class="form-control"
-                                                               name="product_options[{{ $index }}][option_value]"
-                                                               value="{{ $option->option_value }}" 
-                                                               placeholder="القيمة"
-                                                               required
-                                                               onchange="updateOptionPreview({{ $index }})">
-                                                    </div>
-                                                    <div class="col-md-2 mb-2" bis_skin_checked="1">
-                                                        <label class="form-label small">سعر إضافي</label>
-                                                        <input type="number" class="form-control"
-                                                               name="product_options[{{ $index }}][additional_price]"
-                                                               value="{{ $option->additional_price }}"
-                                                               placeholder="السعر الإضافي" 
-                                                               step="0.01">
-                                                    </div>
-                                                    <div class="col-md-2 mb-2" bis_skin_checked="1">
-                                                        <label class="form-label small">مطلوب</label>
-                                                        <div class="form-check mt-2" bis_skin_checked="1">
-                                                            <input class="form-check-input" type="checkbox"
-                                                                   name="product_options[{{ $index }}][is_required]"
-                                                                   value="1"
-                                                                   {{ $option->is_required ? 'checked' : '' }}
-                                                                   id="required_{{ $index }}">
-                                                            <label class="form-check-label" for="required_{{ $index }}">نعم</label>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-2 mb-2" bis_skin_checked="1">
-                                                        <label class="form-label small">النوع</label>
-                                                        <select class="form-select" 
-                                                                name="product_options[{{ $index }}][option_type]"
-                                                                onchange="updateOptionType({{ $index }}, this.value)">
-                                                            <option value="regular" {{ $option->option_type == 'regular' ? 'selected' : '' }}>عادي</option>
-                                                            <option value="quantity" {{ $option->option_type == 'quantity' ? 'selected' : '' }}>كمية</option>
-                                                            <option value="size" {{ $option->option_type == 'size' ? 'selected' : '' }}>مقاس</option>
-                                                            <option value="color" {{ $option->option_type == 'color' ? 'selected' : '' }}>لون</option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                                
-                                                <!-- Dependency Settings -->
-                                                <div class="option-dependency-section">
-                                                    <div class="row">
-                                                        <div class="col-md-5 mb-2">
-                                                            <label class="form-label small">يعتمد على الخيار</label>
-                                                            <select class="form-select dependency-option-select"
-                                                                    name="product_options[{{ $index }}][depends_on_option_id]"
-                                                                    data-current="{{ $option->depends_on_option_id }}"
-                                                                    onchange="updateDependencyConditions(this, {{ $index }})">
-                                                                <option value="">لا يعتمد على أي خيار (رئيسي)</option>
-                                                                @foreach ($product->options->whereNull('depends_on_option_id') as $parentOption)
-                                                                    @if($parentOption->id != $option->id)
-                                                                    <option value="{{ $parentOption->id }}"
-                                                                            {{ $option->depends_on_option_id == $parentOption->id ? 'selected' : '' }}>
-                                                                        {{ $parentOption->option_name }} ({{ $parentOption->option_value }})
-                                                                    </option>
-                                                                    @endif
-                                                                @endforeach
-                                                            </select>
-                                                        </div>
-                                                        <div class="col-md-5 mb-2">
-                                                            <label class="form-label small">شرط الاعتماد</label>
-                                                            <select class="form-select dependency-condition-select"
-                                                                    name="product_options[{{ $index }}][dependency_condition]"
-                                                                    {{ empty($option->depends_on_option_id) ? 'disabled' : '' }}>
-                                                                <option value="">اختر الشرط</option>
-                                                                <option value="equals" {{ $option->dependency_condition == 'equals' ? 'selected' : '' }}>يساوي</option>
-                                                                <option value="not_equals" {{ $option->dependency_condition == 'not_equals' ? 'selected' : '' }}>لا يساوي</option>
-                                                                <option value="greater_than" {{ $option->dependency_condition == 'greater_than' ? 'selected' : '' }}>أكبر من</option>
-                                                                <option value="less_than" {{ $option->dependency_condition == 'less_than' ? 'selected' : '' }}>أقل من</option>
-                                                                <option value="contains" {{ $option->dependency_condition == 'contains' ? 'selected' : '' }}>يحتوي على</option>
-                                                            </select>
-                                                        </div>
-                                                        <div class="col-md-2 mb-2">
-                                                            <label class="form-label small">القيمة المطلوبة</label>
-                                                            <input type="text" class="form-control"
-                                                                   name="product_options[{{ $index }}][dependency_value]"
-                                                                   value="{{ $option->depends_on_option_id ? ($option->parentOption->option_value ?? '') : '' }}"
-                                                                   placeholder="القيمة"
-                                                                   {{ empty($option->depends_on_option_id) ? 'disabled' : '' }}>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                
-                                                <!-- Quantity Tiers -->
-                                                @if($option->quantityTiers->count() > 0 || $isQuantityType)
-                                                <div class="size-tier-section mt-3">
-                                                    <h6 class="mb-3"><i class="fas fa-layer-group me-2"></i>شرائح التسعير حسب الكمية</h6>
-                                                    <div id="quantityTiersContainer_{{ $index }}">
-                                                        @foreach($option->quantityTiers as $tierIndex => $tier)
-                                                        <div class="tier-item">
-                                                            <div class="tier-header">
-                                                                <div class="tier-title">شريحة {{ $tierIndex + 1 }}</div>
-                                                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeTier(this)">
-                                                                    <i class="fas fa-times"></i>
-                                                                </button>
-                                                            </div>
-                                                            <div class="row">
-                                                                <div class="col-md-4 mb-2">
-                                                                    <label class="form-label small">الكمية</label>
-                                                                    <input type="number" class="form-control" 
-                                                                           name="product_options[{{ $index }}][quantity_tiers][{{ $tierIndex }}][quantity]"
-                                                                           value="{{ $tier->quantity }}" min="1" placeholder="الكمية">
-                                                                </div>
-                                                                <div class="col-md-4 mb-2">
-                                                                    <label class="form-label small">السعر للوحدة</label>
-                                                                    <input type="number" class="form-control" 
-                                                                           name="product_options[{{ $index }}][quantity_tiers][{{ $tierIndex }}][price_per_unit]"
-                                                                           value="{{ $tier->price_per_unit }}" step="0.01" placeholder="السعر">
-                                                                </div>
-                                                                <div class="col-md-4 mb-2">
-                                                                    <label class="form-label small">اسم الشريحة</label>
-                                                                    <input type="text" class="form-control" 
-                                                                           name="product_options[{{ $index }}][quantity_tiers][{{ $tierIndex }}][tier_name]"
-                                                                           value="{{ $tier->tier_name }}" placeholder="اسم الشريحة">
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        @endforeach
-                                                    </div>
-                                                    <button type="button" class="btn btn-sm btn-outline-primary mt-2" 
-                                                            onclick="addQuantityTier({{ $index }})">
-                                                        <i class="fas fa-plus me-1"></i>إضافة شريحة كمية
-                                                    </button>
-                                                </div>
-                                                @endif
-                                            </div>
-                                        @endforeach
-                                    </div>
-
-                                    <!-- Option Values Preview -->
-                                    <div class="card mt-4" id="optionValuesPreview" style="display: none;">
-                                        <div class="card-body">
-                                            <h6 class="mb-3"><i class="fas fa-list me-2"></i>قيم الخيار المحدد</h6>
-                                            <div id="selectedOptionValues" class="option-values-grid">
-                                                <!-- Values will be populated here -->
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Printing Methods -->
-                                <div class="mb-4" bis_skin_checked="1">
-                                    <div class="d-flex justify-content-between align-items-center mb-3"
-                                        bis_skin_checked="1">
-                                        <label class="form-label mb-0">طرق الطباعة</label>
-                                        <button type="button" class="btn btn-outline-primary btn-sm"
-                                            onclick="openQuickAddModal('printing_method')">
-                                            <i class="fas fa-plus me-1"></i> إضافة طريقة طباعة جديدة
-                                        </button>
-                                    </div>
-
-                                    <div class="mb-3" bis_skin_checked="1">
-                                        <label class="form-label">اختر طرق الطباعة:</label>
-                                        <select class="form-select select2" id="printingMethodsSelect"
-                                            name="printing_methods[]" multiple>
-                                            @foreach ($printingMethods as $method)
-                                                <option value="{{ $method->id }}"
-                                                    data-price="{{ $method->base_price }}"
-                                                    {{ $product->printingMethods->contains($method->id) ? 'selected' : '' }}>
-                                                    {{ $method->name }} - {{ $method->base_price }} ج.م
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <!-- Print Locations -->
-                                <div class="mb-4" bis_skin_checked="1">
-                                    <div class="d-flex justify-content-between align-items-center mb-3"
-                                        bis_skin_checked="1">
-                                        <label class="form-label mb-0">أماكن الطباعة</label>
-                                        <button type="button" class="btn btn-outline-primary btn-sm"
-                                            onclick="openQuickAddModal('print_location')">
-                                            <i class="fas fa-plus me-1"></i> إضافة مكان طباعة جديد
-                                        </button>
-                                    </div>
-
-                                    <div class="mb-3" bis_skin_checked="1">
-                                        <label class="form-label">اختر أماكن الطباعة:</label>
-                                        <select class="form-select select2" id="printLocationsSelect"
-                                            name="print_locations[]" multiple>
-                                            @foreach ($printLocations as $location)
-                                                <option value="{{ $location->id }}" data-type="{{ $location->type }}"
-                                                    data-price="{{ $location->additional_price }}"
-                                                    {{ $product->printLocations->contains($location->id) ? 'selected' : '' }}>
-                                                    {{ $location->name }} ({{ $location->type }}) -
-                                                    {{ $location->additional_price }} ج.م
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <!-- Offers -->
-                                <div class="mb-4" bis_skin_checked="1">
-                                    <div class="d-flex justify-content-between align-items-center mb-3"
-                                        bis_skin_checked="1">
-                                        <label class="form-label mb-0">العروض</label>
-                                        <button type="button" class="btn btn-outline-primary btn-sm"
-                                            onclick="openQuickAddModal('offer')">
-                                            <i class="fas fa-plus me-1"></i> إضافة عرض جديد
-                                        </button>
-                                    </div>
-
-                                    <div class="mb-3" bis_skin_checked="1">
-                                        <label class="form-label">اختر العروض:</label>
-                                        <select class="form-select select2" id="offersSelect" name="offers[]" multiple>
-                                            @foreach ($offers as $offer)
-                                                <option value="{{ $offer->id }}"
-                                                    {{ $product->offers->contains($offer->id) ? 'selected' : '' }}>
-                                                    {{ $offer->name }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <!-- Size Tiers -->
-                                <div class="mb-4" bis_skin_checked="1">
-                                    <div class="d-flex justify-content-between align-items-center mb-3"
-                                        bis_skin_checked="1">
-                                        <label class="form-label mb-0">أسعار حسب المقاس والكمية</label>
-                                        <button type="button" class="btn btn-outline-primary btn-sm"
-                                            onclick="addSizeTierField()">
-                                            <i class="fas fa-plus me-1"></i> إضافة سعر للمقاس
-                                        </button>
-                                    </div>
-
-                                    <div id="sizeTiersContainer">
-                                        @foreach ($product->sizeTiers as $index => $tier)
-                                            <div class="dynamic-field">
-                                                <div class="dynamic-field-header">
-                                                    <div class="dynamic-field-title">سعر حسب المقاس {{ $index + 1 }}
-                                                    </div>
-                                                    <button type="button" class="dynamic-field-remove"
-                                                        onclick="removeField(this)">
-                                                        <i class="fas fa-times"></i>
-                                                    </button>
-                                                </div>
-                                                <div class="row" bis_skin_checked="1">
-                                                    <div class="col-md-4 mb-2" bis_skin_checked="1">
-                                                        <label class="form-label small">المقاس</label>
-                                                        <select class="form-select" name="size_tiers[{{ $index }}][option_id]">
-                                                            <option value="">اختر الخيار</option>
-                                                            @foreach ($product->options as $option)
-                                                                @if(str_contains(strtolower($option->option_name), 'مقاس') || str_contains(strtolower($option->option_name), 'size'))
-                                                                <option value="{{ $option->id }}" {{ $tier->option_id == $option->id ? 'selected' : '' }}>
-                                                                    {{ $option->option_name }} - {{ $option->option_value }}
-                                                                </option>
-                                                                @endif
-                                                            @endforeach
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-md-3 mb-2" bis_skin_checked="1">
-                                                        <label class="form-label small">الكمية</label>
-                                                        <input type="number" class="form-control"
-                                                            name="size_tiers[{{ $index }}][quantity]"
-                                                            value="{{ $tier->quantity }}" placeholder="الكمية"
-                                                            min="1" required>
-                                                    </div>
-                                                    <div class="col-md-3 mb-2" bis_skin_checked="1">
-                                                        <label class="form-label small">السعر للوحدة</label>
-                                                        <input type="number" class="form-control"
-                                                            name="size_tiers[{{ $index }}][price_per_unit]"
-                                                            value="{{ $tier->price_per_unit }}"
-                                                            placeholder="السعر للوحدة" step="0.01" required>
-                                                    </div>
-                                                    <div class="col-md-2 mb-2" bis_skin_checked="1">
-                                                        <label class="form-label small">اسم الشريحة</label>
-                                                        <input type="text" class="form-control"
-                                                            name="size_tiers[{{ $index }}][tier_name]"
-                                                            value="{{ $tier->tier_name }}" placeholder="اسم الشريحة">
-                                                    </div>
-                                                </div>
-                                                
-                                                @if($tier->related_option_id)
-                                                <div class="option-dependency-section mt-3">
-                                                    <div class="row">
-                                                        <div class="col-md-6 mb-2">
-                                                            <label class="form-label small">يعتمد على الخيار</label>
-                                                            <select class="form-select" name="size_tiers[{{ $index }}][related_option_id]">
-                                                                <option value="">لا يعتمد</option>
-                                                                @foreach ($product->options->where('id', '!=', $tier->option_id) as $relatedOption)
-                                                                <option value="{{ $relatedOption->id }}" {{ $tier->related_option_id == $relatedOption->id ? 'selected' : '' }}>
-                                                                    {{ $relatedOption->option_name }} - {{ $relatedOption->option_value }}
-                                                                </option>
-                                                                @endforeach
-                                                            </select>
-                                                        </div>
-                                                        <div class="col-md-6 mb-2">
-                                                            <label class="form-label small">شروط الاعتماد</label>
-                                                            <input type="text" class="form-control"
-                                                                name="size_tiers[{{ $index }}][dependency_conditions]"
-                                                                value="{{ $tier->dependency_conditions }}"
-                                                                placeholder='مثال: {"option_id": "1", "value": "كبير"}'>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                @endif
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                </div>
-
-                                <!-- SEO Information -->
-                                <div class="mb-4" bis_skin_checked="1">
-                                    <label class="form-label mb-3">إعدادات SEO</label>
-                                    <div class="row" bis_skin_checked="1">
-                                        <div class="col-md-6 mb-3" bis_skin_checked="1">
-                                            <label for="slug" class="form-label">الرابط (Slug)</label>
-                                            <div class="input-group" bis_skin_checked="1">
-                                                <input type="text" class="form-control" id="slug" name="slug"
-                                                    value="{{ old('slug', $product->slug) }}">
-                                                <button type="button" class="btn btn-outline-secondary"
-                                                    onclick="generateSlug()">
-                                                    <i class="fas fa-sync-alt"></i>
-                                                </button>
-                                            </div>
-                                            <small class="text-muted">رابط SEO الخاص بالمنتج</small>
-                                        </div>
-
-                                        <div class="col-md-6 mb-3" bis_skin_checked="1">
-                                            <label for="meta_title" class="form-label">عنوان الصفحة (Meta Title)</label>
-                                            <input type="text" class="form-control" id="meta_title" name="meta_title"
-                                                value="{{ old('meta_title', $product->meta_title) }}">
-                                            <small class="text-muted">الطول الموصى به: 50-60 حرفاً</small>
-                                        </div>
-
-                                        <div class="col-md-12 mb-3" bis_skin_checked="1">
-                                            <label for="meta_description" class="form-label">وصف الصفحة (Meta
-                                                Description)</label>
-                                            <textarea class="form-control" id="meta_description" name="meta_description" rows="3">{{ old('meta_description', $product->meta_description) }}</textarea>
-                                            <small class="text-muted">الطول الموصى به: 150-160 حرفاً</small>
-                                        </div>
-
-                                        <div class="col-md-12 mb-3" bis_skin_checked="1">
-                                            <label for="meta_keywords" class="form-label">الكلمات المفتاحية</label>
-                                            <input type="text" class="form-control" id="meta_keywords"
-                                                name="meta_keywords"
-                                                value="{{ old('meta_keywords', $product->meta_keywords) }}">
-                                            <small class="text-muted">كلمات مفتاحية مفصولة بفواصل (,)</small>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="d-flex justify-content-between mt-4" bis_skin_checked="1">
-                                    <button type="button" class="btn btn-outline-secondary prev-step" data-prev="3">
-                                        <i class="fas fa-arrow-right me-1"></i> السابق
-                                    </button>
-                                    <button type="submit" class="btn btn-success">
-                                        <i class="fas fa-save me-1"></i> حفظ التعديلات
-                                    </button>
-                                    <button type="button" class="btn btn-primary" onclick="saveAndContinue()">
-                                        <i class="fas fa-redo me-1"></i> حفظ ومتابعة التعديل
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Quick Guide -->
+        <div class="alert-guide">
+            <div class="d-flex align-items-center gap-3">
+                <i class="fas fa-lightbulb fa-2x" style="color: var(--primary-color);"></i>
+                <div>
+                    <h6 class="mb-1">نصائح سريعة لتعديل المنتج</h6>
+                    <p class="mb-0 text-muted">يمكنك سحب وإفلات الخيارات لإعادة ترتيبها - الخيارات الجديدة تُضاف من الأعلى
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        @if (session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
+
+        @if ($errors->any())
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                <ul class="mb-0">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
+
+        <!-- Main Form -->
+        <form action="{{ route('admin.products.update', $product->id) }}" method="POST" enctype="multipart/form-data"
+            id="editProductForm">
+            @csrf
+            @method('POST')
+
+            <!-- ============ STEP 1: BASIC INFO ============ -->
+            <div class="step-card step-1">
+                <div class="step-header">
+                    <div class="step-number">1</div>
+                    <div>
+                        <h5 class="step-title">المعلومات الأساسية</h5>
+                        <p class="step-description">البيانات الرئيسية للمنتج</p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-8 mb-3">
+                        <label for="name" class="form-label required">اسم المنتج</label>
+                        <input type="text" class="form-control" id="name" name="name"
+                            value="{{ old('name', $product->name) }}" required>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="category_id" class="form-label required">القسم</label>
+                        <select class="form-control select2" id="category_id" name="category_id" required>
+                            <option value="">اختر القسم</option>
+                            @foreach ($categories as $category)
+                                <option style="color: black !important;" value="{{ $category->id }}"
+                                    {{ old('category_id', $product->category_id) == $category->id ? 'selected' : '' }}>
+                                    {{ $category->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label for="description" class="form-label">الوصف</label>
+                        <textarea class="form-control summernote" id="description" name="description" rows="6">{{ old('description', $product->description) }}</textarea>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="status_id" class="form-label required">الحالة</label>
+                        <select class="form-select" id="status_id" name="status_id" required>
+                            <option value="1" {{ old('status_id', $product->status_id) == 1 ? 'selected' : '' }}>نشط
+                            </option>
+                            <option value="2" {{ old('status_id', $product->status_id) == 2 ? 'selected' : '' }}>غير
+                                نشط</option>
+                            <option value="3" {{ old('status_id', $product->status_id) == 3 ? 'selected' : '' }}>
+                                مسودة</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="stock" class="form-label required">الكمية المتاحة</label>
+                        <input type="number" class="form-control" id="stock" name="stock"
+                            value="{{ old('stock', $product->stock) }}" min="0" required>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between mt-4">
+                    <div></div>
+                    <button type="button" class="btn btn-primary next-step" data-next="2">
+                        التالي <i class="fas fa-arrow-left ms-1"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ============ STEP 2: IMAGES & PRICING ============ -->
+            <div class="step-card step-2" style="display: none;">
+                <div class="step-header">
+                    <div class="step-number">2</div>
+                    <div>
+                        <h5 class="step-title">الصور والتسعير</h5>
+                        <p class="step-description">إدارة الصور وتحديث الأسعار</p>
+                    </div>
+                </div>
+
+                <!-- Main Image -->
+                <div class="mb-4">
+                    <label class="form-label required">الصورة الرئيسية</label>
+
+                    @if ($product->image)
+                        <div class="image-preview-grid" id="currentMainImageContainer">
+                            <div class="image-preview-item">
+                                <span class="badge-new">حالية</span>
+                                <img src="{{ get_product_image($product->image) }}" alt="الصورة الرئيسية">
+                                <div class="image-actions">
+                                    <button type="button" class="btn btn-sm btn-info"
+                                        onclick="viewImage('{{ get_product_image($product->image) }}')">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-danger"
+                                        onclick="removeCurrentMainImage()">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
+                    <div class="image-manager mt-3" onclick="document.getElementById('image').click()">
+                        <i class="fas fa-cloud-upload-alt fa-3x mb-2" style="color: var(--primary-color);"></i>
+                        <p class="mb-0">انقر لرفع صورة رئيسية جديدة</p>
+                        <small class="text-muted">الحجم الموصى به: 800×800 بكسل</small>
+                    </div>
+                    <input type="file" id="image" name="image" accept="image/*" style="display: none;">
+                    <input type="hidden" id="remove_main_image" name="remove_main_image" value="0">
+                    <div id="newMainImagePreview" class="image-preview-grid mt-3" style="display: none;"></div>
+                </div>
+
+                <!-- Additional Images -->
+                <div class="mb-4">
+                    <label class="form-label">الصور الإضافية</label>
+
+                    @if ($product->images && $product->images->count() > 0)
+                        <div class="image-preview-grid sortable-image-list" id="existingImagesGrid">
+                            @foreach ($product->images as $image)
+                                <div class="image-preview-item" data-id="{{ $image->id }}">
+                                    @if ($image->is_primary)
+                                        <span class="badge-new">رئيسية</span>
+                                    @endif
+                                    <img src="{{ get_user_image($image->path) }}" alt="صورة إضافية">
+                                    <div class="image-actions">
+                                        <button type="button" class="btn btn-sm btn-info"
+                                            onclick="viewImage('{{ get_user_image($image->path) }}')">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-danger"
+                                            onclick="removeAdditionalImage({{ $image->id }})">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                        @if (!$image->is_primary)
+                                            <button type="button" class="btn btn-sm btn-primary"
+                                                onclick="setAsPrimary({{ $image->id }})">
+                                                <i class="fas fa-star"></i>
+                                            </button>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+
+                    <div class="image-manager mt-3" onclick="document.getElementById('additional_images').click()">
+                        <i class="fas fa-images fa-3x mb-2" style="color: var(--primary-color);"></i>
+                        <p class="mb-0">انقر لإضافة صور إضافية</p>
+                        <small class="text-muted">يمكنك رفع أكثر من صورة</small>
+                    </div>
+                    <input type="file" id="additional_images" name="additional_images[]" accept="image/*" multiple
+                        style="display: none;">
+                    <div id="newImagesPreview" class="image-preview-grid mt-3"></div>
+
+                    <input type="hidden" id="removed_images" name="removed_images" value="">
+                    <input type="hidden" id="primary_image_id" name="primary_image_id"
+                        value="{{ $product->images->where('is_primary', true)->first()->id ?? '' }}">
+                    <input type="hidden" id="images_order" name="images_order" value="">
+                </div>
+
+                <!-- Pricing -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="price" class="form-label required">السعر الأساسي</label>
+                        <div class="input-group">
+                            <span class="input-group-text">ج.م</span>
+                            <input type="number" class="form-control" id="price" name="price" step="0.01"
+                                value="{{ old('price', $product->price) }}" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="price_text" class="form-label">نص السعر</label>
+                        <input type="text" class="form-control" id="price_text" name="price_text"
+                            value="{{ old('price_text', $product->price_text) }}" placeholder="مثال: ١٠٠ ريال">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div class="toggle-container">
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="has_discount" name="has_discount"
+                                    {{ old('has_discount', $product->has_discount) ? 'checked' : '' }}>
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span class="toggle-label">خصم على المنتج</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="toggle-container">
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="includes_tax" name="includes_tax"
+                                    {{ old('includes_tax', $product->includes_tax) ? 'checked' : '' }}>
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span class="toggle-label">يشمل الضريبة</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="toggle-container">
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="includes_shipping" name="includes_shipping"
+                                    {{ old('includes_shipping', $product->includes_shipping) ? 'checked' : '' }}>
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span class="toggle-label">الشحن مجاني</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Discount Section -->
+                <div id="discountSection"
+                    style="{{ old('has_discount', $product->has_discount) ? '' : 'display: none;' }}">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="discount_type" class="form-label">نوع الخصم</label>
+                            <select class="form-select" id="discount_type" name="discount_type">
+                                <option value="percentage"
+                                    {{ old('discount_type', $product->discount->discount_type ?? '') == 'percentage' ? 'selected' : '' }}>
+                                    نسبة مئوية</option>
+                                <option value="fixed"
+                                    {{ old('discount_type', $product->discount->discount_type ?? '') == 'fixed' ? 'selected' : '' }}>
+                                    قيمة ثابتة</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="discount_value" class="form-label">قيمة الخصم</label>
+                            <input type="number" class="form-control" id="discount_value" name="discount_value"
+                                step="0.01"
+                                value="{{ old('discount_value', $product->discount->discount_value ?? '') }}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between mt-4">
+                    <button type="button" class="btn btn-outline-secondary prev-step" data-prev="1">
+                        <i class="fas fa-arrow-right me-1"></i> السابق
+                    </button>
+                    <button type="button" class="btn btn-primary next-step" data-next="3">
+                        التالي <i class="fas fa-arrow-left ms-1"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ============ STEP 3: PRODUCT OPTIONS ============ -->
+            <!-- ⭐ THIS IS THE MAIN STEP - DRAG & DROP OPTIONS ⭐ -->
+            <div class="step-card step-3" style="display: none;">
+                <div class="step-header">
+                    <div class="step-number">3</div>
+                    <div>
+                        <h5 class="step-title">خيارات المنتج</h5>
+                        <p class="step-description">إضافة وتعديل الخيارات - اسحب لإعادة الترتيب - الخيارات الجديدة تضاف من
+                            الأعلى</p>
+                    </div>
+                </div>
+
+                <!-- ========================================= -->
+                <!-- ⭐ ADD NEW OPTION SECTION - ALWAYS AT TOP ⭐ -->
+                <!-- ========================================= -->
+                <div class="add-option-section">
+                    <h6 class="mb-3"><i class="fas fa-plus-circle me-2" style="color: var(--primary-color);"></i> إضافة
+                        خيار جديد (سيُضاف إلى الأعلى)</h6>
+
+                    <div class="row align-items-end">
+                        <div class="col-md-3 mb-2">
+                            <label class="form-label small">اسم الخيار</label>
+                            <input type="text" class="form-control" id="new_option_name"
+                                placeholder="مثال: اللون، المقاس">
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <label class="form-label small">القيمة</label>
+                            <input type="text" class="form-control" id="new_option_value"
+                                placeholder="مثال: أحمر، كبير">
+                        </div>
+                        <div class="col-md-2 mb-2">
+                            <label class="form-label small">السعر الإضافي</label>
+                            <input type="number" class="form-control" id="new_option_price" placeholder="0.00"
+                                step="0.01">
+                        </div>
+                        <div class="col-md-2 mb-2">
+                            <label class="form-label small">النوع</label>
+                            <select class="form-select" id="new_option_type">
+                                <option value="regular">عادي</option>
+                                <option value="quantity">كمية</option>
+                                <option value="size">مقاس</option>
+                                <option value="color">لون</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 mb-2">
+                            <label class="form-label small">&nbsp;</label>
+                            <div class="d-flex gap-2">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="new_option_required">
+                                    <label class="form-check-label small">مطلوب</label>
+                                </div>
+                                <button type="button" class="btn btn-add-option flex-grow-1" onclick="addNewOption()">
+                                    <i class="fas fa-plus me-1"></i> إضافة
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Add Multiple Values (Optional) -->
+                    <div class="mt-3">
+                        <div class="d-flex align-items-center gap-3">
+                            <span class="text-muted small">إضافة متعددة:</span>
+                            <input type="text" class="form-control form-control-sm" id="bulk_option_values"
+                                placeholder="قيم مفصولة بفاصلة (مثال: أحمر, أزرق, أخضر)" style="width: 300px;">
+                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="addBulkOptions()">
+                                <i class="fas fa-copy me-1"></i> إضافة الكل
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ========================================= -->
+                <!-- ⭐ DRAG & DROP OPTIONS CONTAINER ⭐ -->
+                <!-- ========================================= -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="mb-0"><i class="fas fa-sort me-2"></i> خيارات المنتج الحالية - اسحب وأسفل لإعادة الترتيب
+                    </h6>
+                    <span class="badge bg-primary" id="optionsCount">{{ $product->options->count() }} خيار</span>
+                </div>
+
+                <div id="optionsContainer" class="options-sortable-container">
+                    <!-- ⭐ ALL OPTIONS WILL BE RENDERED HERE VIA JAVASCRIPT ⭐ -->
+                </div>
+
+                <!-- ========================================= -->
+                <!-- ⭐ DEPENDENCY HELPERS ⭐ -->
+                <!-- ========================================= -->
+                <div class="mt-4 p-3" style="background: rgba(255, 193, 7, 0.05); border-radius: 8px;">
+                    <div class="d-flex align-items-center gap-3">
+                        <i class="fas fa-link fa-lg" style="color: #ffc107;"></i>
+                        <div>
+                            <small class="text-muted d-block">يمكنك جعل الخيار يعتمد على خيار آخر عن طريق تحديد "يعتمد على"
+                                في إعدادات الخيار</small>
+                            <small class="text-muted">مثال: خيار "الكمية" يعتمد على خيار "عدد أوجه الطباعة"</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between mt-4">
+                    <button type="button" class="btn btn-outline-secondary prev-step" data-prev="2">
+                        <i class="fas fa-arrow-right me-1"></i> السابق
+                    </button>
+                    <button type="button" class="btn btn-primary next-step" data-next="4">
+                        التالي <i class="fas fa-arrow-left ms-1"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ============ STEP 4: SEO & PUBLISH ============ -->
+            <div class="step-card step-4" style="display: none;">
+                <div class="step-header">
+                    <div class="step-number">4</div>
+                    <div>
+                        <h5 class="step-title">SEO والنشر</h5>
+                        <p class="step-description">تحسين ظهور المنتج في محركات البحث</p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <label for="slug" class="form-label">الرابط (Slug)</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="slug" name="slug"
+                                value="{{ old('slug', $product->slug) }}">
+                            <button type="button" class="btn btn-outline-secondary" onclick="generateSlug()">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="meta_title" class="form-label">عنوان الصفحة</label>
+                        <input type="text" class="form-control" id="meta_title" name="meta_title"
+                            value="{{ old('meta_title', $product->meta_title) }}">
+                        <small class="text-muted">50-60 حرفاً</small>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="meta_keywords" class="form-label">الكلمات المفتاحية</label>
+                        <input type="text" class="form-control" id="meta_keywords" name="meta_keywords"
+                            value="{{ old('meta_keywords', $product->meta_keywords) }}">
+                        <small class="text-muted">مفصولة بفواصل</small>
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label for="meta_description" class="form-label">وصف الصفحة</label>
+                        <textarea class="form-control" id="meta_description" name="meta_description" rows="4">{{ old('meta_description', $product->meta_description) }}</textarea>
+                        <small class="text-muted">150-160 حرفاً</small>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between mt-4">
+                    <button type="button" class="btn btn-outline-secondary prev-step" data-prev="3">
+                        <i class="fas fa-arrow-right me-1"></i> السابق
+                    </button>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save me-1"></i> حفظ التغييرات
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="saveAndContinue()">
+                            <i class="fas fa-redo me-1"></i> حفظ ومتابعة
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
     </div>
 
-    <!-- Quick Add Modals -->
-    <div class="modal fade quick-add-modal" id="quickAddModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content" style="background: var(--dark-card);">
-                <div class="modal-header" style="background: var(--primary-gradient);">
-                    <h5 class="modal-title text-white" id="quickAddModalTitle"></h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="quickAddForm">
-                        <div id="quickAddFormContent">
-                            <!-- Form content will be dynamically loaded here -->
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer" style="border-top-color: rgba(255,255,255,0.1);">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
-                    <button type="button" class="btn btn-primary" onclick="saveQuickAdd()">إضافة</button>
-                </div>
-            </div>
-        </div>
+    <!-- Fixed Action Buttons -->
+    <div class="action-buttons-fixed">
+        <a href="{{ route('admin.products.show', $product->id) }}" class="btn btn-info" title="عرض المنتج">
+            <i class="fas fa-eye"></i>
+        </a>
+        <button type="button" class="btn btn-success" onclick="window.scrollTo({top: 0, behavior: 'smooth'})"
+            title="العودة للأعلى">
+            <i class="fas fa-arrow-up"></i>
+        </button>
     </div>
 
     <!-- Image View Modal -->
     <div class="modal fade" id="imageViewModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg">
-            <div class="modal-content" style="background: transparent; border: none;">
+            <div class="modal-content bg-transparent border-0">
                 <div class="modal-body p-0">
                     <img src="" alt="صورة المنتج" id="viewedImage" class="img-fluid w-100 rounded">
                 </div>
@@ -2033,298 +1013,99 @@
         </div>
     </div>
 
-    <!-- Templates -->
-    <template id="materialFieldTemplate">
-        <div class="material-item">
-            <div class="material-header">
-                <div class="material-title">
-                    <strong>مادة جديدة</strong>
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content" style="background: var(--dark-card);">
+                <div class="modal-header" style="border-color: rgba(255,255,255,0.1);">
+                    <h5 class="modal-title text-white">تأكيد الحذف</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <button type="button" class="material-remove" onclick="removeMaterial(this)">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="row">
-                <div class="col-md-4 mb-2">
-                    <select class="form-select material-select" name="materials[][material_id]" required>
-                        <option value="">اختر المادة</option>
-                        @foreach ($materials as $material)
-                            <option value="{{ $material->id }}">{{ $material->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="col-md-4 mb-2">
-                    <input type="number" class="form-control" name="materials[][quantity]" placeholder="الكمية"
-                        min="0" step="0.01">
-                </div>
-                <div class="col-md-4 mb-2">
-                    <select class="form-select" name="materials[][unit]">
-                        <option value="piece">قطعة</option>
-                        <option value="meter">متر</option>
-                        <option value="kg">كجم</option>
-                        <option value="liter">لتر</option>
-                        <option value="gram">جرام</option>
-                    </select>
-                </div>
-                <div class="col-md-12 mb-2">
-                    <div class="material-additional-price">
-                        <label class="form-label">سعر إضافي</label>
-                        <input type="number" class="form-control" name="materials[][additional_price]"
-                            placeholder="سعر إضافي" step="0.01" min="0">
+                <div class="modal-body">
+                    <div class="text-center">
+                        <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+                        <h6>هل أنت متأكد من حذف هذا المنتج؟</h6>
+                        <p class="text-muted">هذا الإجراء لا يمكن التراجع عنه</p>
                     </div>
+                </div>
+                <div class="modal-footer" style="border-color: rgba(255,255,255,0.1);">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <form action="{{ route('admin.products.destroy', $product->id) }}" method="POST">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash me-1"></i> حذف
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
-    </template>
-
-    <template id="featureFieldTemplate">
-        <div class="dynamic-field">
-            <div class="dynamic-field-header">
-                <div class="dynamic-field-title">مواصفة جديدة</div>
-                <button type="button" class="dynamic-field-remove" onclick="removeField(this)">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="row">
-                <div class="col-md-5 mb-2">
-                    <input type="text" class="form-control" name="features[][name]" placeholder="اسم المواصفة"
-                        required>
-                </div>
-                <div class="col-md-7 mb-2">
-                    <input type="text" class="form-control" name="features[][value]" placeholder="القيمة" required>
-                </div>
-            </div>
-        </div>
-    </template>
-
-    <template id="productOptionFieldTemplate">
-        <div class="dynamic-field selectable-option main-option" data-index="new">
-            <!-- Selection Checkbox -->
-            <div class="option-select-checkbox" onclick="event.stopPropagation(); toggleOptionSelection('new', event)">
-            </div>
-            
-            <!-- Drag Handle -->
-            <div class="option-drag-handle" onclick="event.stopPropagation()">
-                <i class="fas fa-arrows-alt"></i>
-            </div>
-            
-            <div class="dynamic-field-header">
-                <div class="d-flex align-items-center gap-2">
-                    <div class="dynamic-field-title">
-                        خيار جديد
-                        <span class="option-type-badge option-type-regular">عادي</span>
-                        <span class="badge bg-primary ms-2">رئيسي</span>
-                    </div>
-                    <span class="dependency-indicator no-dependency"></span>
-                </div>
-                <div class="option-quick-actions">
-                    <button type="button" class="btn btn-sm btn-outline-info" 
-                            onclick="event.stopPropagation(); viewOptionValues('new')"
-                            title="عرض القيم">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                    <button type="button" class="btn btn-sm btn-outline-danger"
-                            onclick="event.stopPropagation(); removeField(this)"
-                            title="حذف الخيار">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-            </div>
-            
-            <div class="row">
-                <div class="col-md-3 mb-2">
-                    <label class="form-label small">اسم الخيار</label>
-                    <input type="text" class="form-control" name="product_options[][option_name]"
-                        placeholder="اسم الخيار" required>
-                </div>
-                <div class="col-md-3 mb-2">
-                    <label class="form-label small">القيمة</label>
-                    <input type="text" class="form-control" name="product_options[][option_value]"
-                        placeholder="القيمة" required>
-                </div>
-                <div class="col-md-2 mb-2">
-                    <label class="form-label small">سعر إضافي</label>
-                    <input type="number" class="form-control" name="product_options[][additional_price]"
-                        placeholder="السعر الإضافي" step="0.01">
-                </div>
-                <div class="col-md-2 mb-2">
-                    <label class="form-label small">مطلوب</label>
-                    <div class="form-check mt-2">
-                        <input class="form-check-input" type="checkbox" name="product_options[][is_required]"
-                            value="1">
-                        <label class="form-check-label">نعم</label>
-                    </div>
-                </div>
-                <div class="col-md-2 mb-2">
-                    <label class="form-label small">النوع</label>
-                    <select class="form-select" name="product_options[][option_type]">
-                        <option value="regular">عادي</option>
-                        <option value="quantity">كمية</option>
-                        <option value="size">مقاس</option>
-                        <option value="color">لون</option>
-                    </select>
-                </div>
-            </div>
-            
-            <!-- Dependency Settings -->
-            <div class="option-dependency-section">
-                <div class="row">
-                    <div class="col-md-5 mb-2">
-                        <label class="form-label small">يعتمد على الخيار</label>
-                        <select class="form-select dependency-option-select"
-                            name="product_options[][depends_on_option_id]"
-                            onchange="updateDependencyConditions(this, 'new')">
-                            <option value="">لا يعتمد على أي خيار (رئيسي)</option>
-                            @foreach ($product->options->whereNull('depends_on_option_id') as $parentOption)
-                                <option value="{{ $parentOption->id }}">
-                                    {{ $parentOption->option_name }} ({{ $parentOption->option_value }})
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-md-5 mb-2">
-                        <label class="form-label small">شرط الاعتماد</label>
-                        <select class="form-select dependency-condition-select"
-                            name="product_options[][dependency_condition]" disabled>
-                            <option value="">اختر الشرط</option>
-                            <option value="equals">يساوي</option>
-                            <option value="not_equals">لا يساوي</option>
-                            <option value="greater_than">أكبر من</option>
-                            <option value="less_than">أقل من</option>
-                            <option value="contains">يحتوي على</option>
-                        </select>
-                    </div>
-                    <div class="col-md-2 mb-2">
-                        <label class="form-label small">القيمة المطلوبة</label>
-                        <input type="text" class="form-control"
-                            name="product_options[][dependency_value]"
-                            placeholder="القيمة" disabled>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </template>
-
-    <template id="quantityTierTemplate">
-        <div class="tier-item">
-            <div class="tier-header">
-                <div class="tier-title">شريحة كمية جديدة</div>
-                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeTier(this)">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="row">
-                <div class="col-md-4 mb-2">
-                    <label class="form-label small">الكمية</label>
-                    <input type="number" class="form-control" name="quantity" min="1" placeholder="الكمية">
-                </div>
-                <div class="col-md-4 mb-2">
-                    <label class="form-label small">السعر للوحدة</label>
-                    <input type="number" class="form-control" name="price_per_unit" step="0.01" placeholder="السعر">
-                </div>
-                <div class="col-md-4 mb-2">
-                    <label class="form-label small">اسم الشريحة</label>
-                    <input type="text" class="form-control" name="tier_name" placeholder="اسم الشريحة">
-                </div>
-            </div>
-        </div>
-    </template>
-
-    <template id="sizeTierFieldTemplate">
-        <div class="dynamic-field">
-            <div class="dynamic-field-header">
-                <div class="dynamic-field-title">سعر حسب المقاس جديد</div>
-                <button type="button" class="dynamic-field-remove" onclick="removeField(this)">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="row">
-                <div class="col-md-4 mb-2">
-                    <label class="form-label small">المقاس</label>
-                    <select class="form-select" name="size_tiers[][option_id]">
-                        <option value="">اختر الخيار</option>
-                        @foreach ($product->options as $option)
-                            @if(str_contains(strtolower($option->option_name), 'مقاس') || str_contains(strtolower($option->option_name), 'size'))
-                            <option value="{{ $option->id }}">
-                                {{ $option->option_name }} - {{ $option->option_value }}
-                            </option>
-                            @endif
-                        @endforeach
-                    </select>
-                </div>
-                <div class="col-md-3 mb-2">
-                    <label class="form-label small">الكمية</label>
-                    <input type="number" class="form-control" name="size_tiers[][quantity]" placeholder="الكمية"
-                        min="1" required>
-                </div>
-                <div class="col-md-3 mb-2">
-                    <label class="form-label small">السعر للوحدة</label>
-                    <input type="number" class="form-control" name="size_tiers[][price_per_unit]"
-                        placeholder="السعر للوحدة" step="0.01" required>
-                </div>
-                <div class="col-md-2 mb-2">
-                    <label class="form-label small">اسم الشريحة</label>
-                    <input type="text" class="form-control" name="size_tiers[][tier_name]" placeholder="اسم الشريحة">
-                </div>
-            </div>
-        </div>
-    </template>
-
-    <template id="colorSwatchTemplate">
-        <div class="color-swatch" data-id="{id}">
-            <div class="color-preview" style="background-color: {hex};"></div>
-            <span>{name}</span>
-            <input type="hidden" name="colors[]" value="{id}">
-            <button type="button" class="btn btn-sm btn-outline-danger ms-2" onclick="removeColor({id})">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-    </template>
+    </div>
 @endsection
 
 @section('js')
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    @php
+        $existingOptions = $product->options
+            ->map(function ($option) {
+                return [
+                    'id' => $option->id,
+                    'option_name' => $option->option_name,
+                    'option_value' => $option->option_value,
+                    'additional_price' => $option->additional_price,
+                    'is_required' => $option->is_required,
+                    'option_type' => $option->option_type ?? 'regular',
+                    'depends_on_option_id' => $option->depends_on_option_id,
+                    'dependency_condition' => $option->dependency_condition ?? 'equals',
+                    'dependency_value' => $option->dependency_value ?? '',
+                    'parent_option' => $option->parentOption
+                        ? [
+                            'id' => $option->parentOption->id,
+                            'option_name' => $option->parentOption->option_name,
+                            'option_value' => $option->parentOption->option_value,
+                        ]
+                        : null,
+                    'quantity_tiers' => $option->quantityTiers ?? [],
+                ];
+            })
+            ->values();
+    @endphp
     <script>
-        // Global variables
-        let materialCounter = {{ $product->materials->count() }};
-        let featureCounter = {{ $product->features->count() }};
-        let optionCounter = {{ $product->options->count() }};
-        let sizeTierCounter = {{ $product->sizeTiers->count() }};
+        // ============================================
+        // ⭐ GLOBAL VARIABLES
+        // ============================================
         let removedImages = [];
-        let currentQuickAddType = '';
-        let quantityTierCounters = {};
-        
-        // Drag & Drop and Multi-Select variables
-        let selectedOptions = new Set();
-        let optionGroups = [];
-        let currentDragging = false;
+        let optionCounter = {{ $product->options->count() }};
         let sortableInstance = null;
 
+        // Existing options from database
+
+        const existingOptions = @json($existingOptions);
+
+
+        // ============================================
+        // ⭐ DOCUMENT READY
+        // ============================================
         $(document).ready(function() {
             // Initialize Summernote
             $('.summernote').summernote({
-                height: 200,
+                height: 250,
                 lang: 'ar-AR',
                 toolbar: [
                     ['style', ['bold', 'italic', 'underline', 'clear']],
-                    ['font', ['strikethrough', 'superscript', 'subscript']],
-                    ['fontsize', ['fontsize']],
-                    ['color', ['color']],
                     ['para', ['ul', 'ol', 'paragraph']],
-                    ['height', ['height']],
-                    ['insert', ['link', 'picture', 'video']],
-                    ['view', ['fullscreen', 'codeview', 'help']]
+                    ['insert', ['link', 'picture']],
+                    ['view', ['fullscreen', 'codeview']]
                 ]
             });
 
-            // Initialize Select2 with custom styling
+            // Initialize Select2
             $('.select2').select2({
-                placeholder: 'اختر الخيارات',
+                placeholder: 'اختر',
                 allowClear: true,
                 theme: "classic"
             });
@@ -2341,27 +1122,28 @@
                 });
             }
 
-            // Step Navigation
+            // ========================================
+            // ⭐ LOAD EXISTING OPTIONS
+            // ========================================
+            loadExistingOptions();
+
+            // ========================================
+            // ⭐ STEP NAVIGATION
+            // ========================================
             $('.next-step').click(function() {
-                const nextStep = $(this).data('next');
-                navigateToStep(nextStep);
+                navigateToStep($(this).data('next'));
             });
 
             $('.prev-step').click(function() {
-                const prevStep = $(this).data('prev');
-                navigateToStep(prevStep);
+                navigateToStep($(this).data('prev'));
             });
 
-            // Discount Toggle
+            // Discount toggle
             $('#has_discount').change(function() {
-                if ($(this).is(':checked')) {
-                    $('#discountSection').slideDown();
-                } else {
-                    $('#discountSection').slideUp();
-                }
+                $('#discountSection').slideToggle();
             });
 
-            // Image Upload Handlers
+            // Image upload handlers
             $('#image').change(function(e) {
                 previewMainImage(e.target.files[0]);
             });
@@ -2370,125 +1152,533 @@
                 previewMultipleImages(e.target.files);
             });
 
-            // Initialize tooltips
-            $('[data-bs-toggle="tooltip"]').tooltip();
-
-            // Auto-generate slug when name changes
+            // Generate slug from name
             $('#name').on('blur', function() {
                 if (!$('#slug').val()) {
                     generateSlug();
                 }
             });
-
-            // Initialize fancybox for image viewing
-            $('[data-fancybox]').fancybox();
-
-            // Initialize quantity tier counters for existing options
-            @foreach ($product->options as $index => $option)
-                quantityTierCounters[{{ $index }}] = {{ $option->quantityTiers->count() }};
-            @endforeach
-
-            // Initialize options sortable
-            initializeOptionsSortable();
-            
-            // Keyboard shortcuts for selection
-            $(document).on('keydown', function(e) {
-                if (e.ctrlKey || e.metaKey) {
-                    $('.selectable-option').addClass('ctrl-mode');
-                }
-            });
-            
-            $(document).on('keyup', function(e) {
-                if (!e.ctrlKey && !e.metaKey) {
-                    $('.selectable-option').removeClass('ctrl-mode');
-                }
-            });
-            
-            // Handle option type changes
-            $(document).on('change', '[name*="[option_type]"]', function() {
-                const optionField = $(this).closest('.selectable-option');
-                const optionIndex = optionField.data('index');
-                const optionType = $(this).val();
-                
-                if (optionType === 'quantity') {
-                    // Show quantity tiers section
-                    let tierSection = optionField.find('.size-tier-section');
-                    if (tierSection.length === 0) {
-                        tierSection = $(`
-                            <div class="size-tier-section mt-3">
-                                <h6 class="mb-3"><i class="fas fa-layer-group me-2"></i>شرائح التسعير حسب الكمية</h6>
-                                <div id="quantityTiersContainer_${optionIndex}"></div>
-                                <button type="button" class="btn btn-sm btn-outline-primary mt-2" onclick="addQuantityTier(${optionIndex})">
-                                    <i class="fas fa-plus me-1"></i>إضافة شريحة كمية
-                                </button>
-                            </div>
-                        `);
-                        optionField.append(tierSection);
-                    }
-                } else {
-                    // Hide quantity tiers section
-                    optionField.find('.size-tier-section').remove();
-                }
-                
-                // Update option type badge
-                updateOptionType(optionIndex, optionType);
-            });
         });
 
-        // Step Navigation
-        function navigateToStep(step) {
-            // Hide all steps
-            $('.step-card').hide();
+        // ============================================
+        // ⭐ OPTIONS MANAGEMENT - CORE FUNCTIONS
+        // ============================================
 
-            // Show target step
+        /**
+         * Load existing options into the sortable container
+         * ⭐ NEW OPTIONS WILL BE ADDED AT THE TOP
+         */
+        function loadExistingOptions() {
+            const container = document.getElementById('optionsContainer');
+            container.innerHTML = '';
+
+            // Add existing options
+            existingOptions.forEach((option, index) => {
+                const optionHtml = generateOptionHtml(option, index);
+                container.innerHTML += optionHtml;
+            });
+
+            // Initialize sortable after loading
+            initializeSortable();
+            updateOptionsCount();
+        }
+
+        /**
+         * Generate HTML for an option
+         */
+        function generateOptionHtml(option, index) {
+            const isMain = !option.depends_on_option_id;
+            const mainBadge = isMain ?
+                '<span class="badge-main option-badge"><i class="fas fa-cube me-1"></i>رئيسي</span>' :
+                '<span class="badge-dependent option-badge"><i class="fas fa-link me-1"></i>معتمد</span>';
+            const requiredBadge = option.is_required ?
+                '<span class="badge-required option-badge"><i class="fas fa-check-circle me-1"></i>مطلوب</span>' : '';
+            const typeClass = `type-${option.option_type}`;
+            const typeLabel = getOptionTypeLabel(option.option_type);
+
+            // Dependency section (only show if dependent)
+            let dependencyHtml = '';
+            if (!isMain && option.parent_option) {
+                dependencyHtml = `
+                    <div class="dependency-section show">
+                        <div class="row">
+                            <div class="col-md-12 mb-2">
+                                <small class="text-muted d-block mb-2"><i class="fas fa-link text-warning me-1"></i> يعتمد على: <strong>${option.parent_option.option_name} = ${option.parent_option.option_value}</strong></small>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Quantity tiers (only for quantity type)
+            let tiersHtml = '';
+            if (option.option_type === 'quantity' && option.quantity_tiers && option.quantity_tiers.length > 0) {
+                tiersHtml = `
+                    <div class="tiers-section">
+                        <h6 class="mb-3" style="color: #17a2b8;"><i class="fas fa-layer-group me-2"></i>شرائح الكمية</h6>
+                        <div id="tiersContainer_${index}">
+                            ${option.quantity_tiers.map((tier, tierIndex) => `
+                                                                                    <div class="tier-item">
+                                                                                        <input type="number" class="form-control form-control-sm" 
+                                                                                               name="product_options[${index}][quantity_tiers][${tierIndex}][quantity]" 
+                                                                                               value="${tier.quantity}" placeholder="الكمية">
+                                                                                        <input type="number" class="form-control form-control-sm" 
+                                                                                               name="product_options[${index}][quantity_tiers][${tierIndex}][price_per_unit]" 
+                                                                                               value="${tier.price_per_unit}" placeholder="السعر للوحدة">
+                                                                                        <input type="text" class="form-control form-control-sm" 
+                                                                                               name="product_options[${index}][quantity_tiers][${tierIndex}][tier_name]" 
+                                                                                               value="${tier.tier_name || ''}" placeholder="اسم الشريحة">
+                                                                                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeTier(this)">
+                                                                                            <i class="fas fa-times"></i>
+                                                                                        </button>
+                                                                                    </div>
+                                                                                `).join('')}
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-info mt-2" onclick="addQuantityTier(${index})">
+                            <i class="fas fa-plus me-1"></i> إضافة شريحة
+                        </button>
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="option-item" data-index="${index}" data-id="${option.id || ''}">
+                    <div class="option-drag-handle">
+                        <i class="fas fa-grip-vertical"></i>
+                    </div>
+                    
+                    <div class="option-header">
+                        ${mainBadge}
+                        ${requiredBadge}
+                        <span class="type-badge ${typeClass}">${typeLabel}</span>
+                    </div>
+
+                    <input type="hidden" name="product_options[${index}][id]" value="${option.id || ''}">
+
+                    <div class="option-content-grid">
+                        <div>
+                            <label class="form-label small">اسم الخيار</label>
+                            <input type="text" class="form-control" name="product_options[${index}][option_name]" 
+                                   value="${option.option_name}" placeholder="اسم الخيار" onchange="updateOptionPreview(this)">
+                        </div>
+                        <div>
+                            <label class="form-label small">القيمة</label>
+                            <input type="text" class="form-control" name="product_options[${index}][option_value]" 
+                                   value="${option.option_value}" placeholder="القيمة" onchange="updateOptionPreview(this)">
+                        </div>
+                        <div>
+                            <label class="form-label small">السعر الإضافي</label>
+                            <input type="number" class="form-control" name="product_options[${index}][additional_price]" 
+                                   value="${option.additional_price}" placeholder="0.00" step="0.01">
+                        </div>
+                        <div>
+                            <label class="form-label small">النوع</label>
+                            <select class="form-select" name="product_options[${index}][option_type]" onchange="updateOptionType(this, ${index})">
+                                <option value="regular" ${option.option_type === 'regular' ? 'selected' : ''}>عادي</option>
+                                <option value="quantity" ${option.option_type === 'quantity' ? 'selected' : ''}>كمية</option>
+                                <option value="size" ${option.option_type === 'size' ? 'selected' : ''}>مقاس</option>
+                                <option value="color" ${option.option_type === 'color' ? 'selected' : ''}>لون</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label small">&nbsp;</label>
+                            <div class="form-check mt-2">
+                                <input class="form-check-input" type="checkbox" name="product_options[${index}][is_required]" 
+                                       value="1" ${option.is_required ? 'checked' : ''} id="required_${index}">
+                                <label class="form-check-label small" for="required_${index}">مطلوب</label>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="form-label small">&nbsp;</label>
+                            <button type="button" class="btn btn-sm btn-outline-danger w-100" onclick="deleteOption(${index})">
+                                <i class="fas fa-trash me-1"></i> حذف
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Dependency Selector -->
+                    <div class="mt-3">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label class="form-label small">يعتمد على الخيار</label>
+                                <select class="form-select form-select-sm" name="product_options[${index}][depends_on_option_id]" 
+                                        onchange="toggleDependencySection(this, ${index})">
+                                    <option value="">لا يعتمد (رئيسي)</option>
+                                    ${generateParentOptions(index, option.depends_on_option_id)}
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small">شرط الاعتماد</label>
+                                <select class="form-select form-select-sm" name="product_options[${index}][dependency_condition]">
+                                    <option value="equals" ${option.dependency_condition === 'equals' ? 'selected' : ''}>يساوي (=)</option>
+                                    <option value="not_equals" ${option.dependency_condition === 'not_equals' ? 'selected' : ''}>لا يساوي (!=)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small">القيمة المطلوبة</label>
+                                <input type="text" class="form-control form-control-sm" 
+                                       name="product_options[${index}][dependency_value]" 
+                                       value="${option.dependency_value || ''}" placeholder="القيمة">
+                            </div>
+                        </div>
+                    </div>
+
+                    ${dependencyHtml}
+                    ${tiersHtml}
+                </div>
+            `;
+        }
+
+        /**
+         * Generate parent options for dependency select
+         */
+        function generateParentOptions(currentIndex, selectedValue) {
+            let options = '<option value="">-- اختر --</option>';
+
+            existingOptions.forEach((opt, idx) => {
+                if (idx !== currentIndex && !opt.depends_on_option_id) {
+                    const selected = selectedValue == opt.id ? 'selected' : '';
+                    options +=
+                        `<option value="${opt.id}" ${selected}>${opt.option_name} (${opt.option_value})</option>`;
+                }
+            });
+
+            return options;
+        }
+
+        /**
+         * Add new option at the TOP of the container
+         */
+        function addNewOption() {
+            const name = $('#new_option_name').val();
+            const value = $('#new_option_value').val();
+            const price = $('#new_option_price').val() || 0;
+            const type = $('#new_option_type').val();
+            const isRequired = $('#new_option_required').is(':checked');
+
+            if (!name || !value) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'بيانات ناقصة',
+                    text: 'يرجى إدخال اسم الخيار والقيمة'
+                });
+                return;
+            }
+
+            // Create new option object
+            const newOption = {
+                id: null,
+                option_name: name,
+                option_value: value,
+                additional_price: price,
+                is_required: isRequired,
+                option_type: type,
+                depends_on_option_id: null,
+                dependency_condition: 'equals',
+                dependency_value: '',
+                parent_option: null,
+                quantity_tiers: []
+            };
+
+            // Add to beginning of array
+            existingOptions.unshift(newOption);
+
+            // Refresh container (adds to top because we unshifted)
+            refreshOptionsContainer();
+
+            // Reset form
+            $('#new_option_name').val('');
+            $('#new_option_value').val('');
+            $('#new_option_price').val('');
+            $('#new_option_required').prop('checked', false);
+            $('#new_option_type').val('regular');
+            $('#bulk_option_values').val('');
+
+            Swal.fire({
+                icon: 'success',
+                title: 'تم!',
+                text: 'تم إضافة الخيار في الأعلى',
+                timer: 1500,
+                showConfirmButton: false
+            });
+        }
+
+        /**
+         * Add multiple options at once
+         */
+        function addBulkOptions() {
+            const name = $('#new_option_name').val();
+            const values = $('#bulk_option_values').val().split(',').map(v => v.trim()).filter(v => v);
+
+            if (!name) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'خطأ',
+                    text: 'يرجى إدخال اسم الخيار أولاً'
+                });
+                return;
+            }
+
+            if (values.length === 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'خطأ',
+                    text: 'يرجى إدخال قيم مفصولة بفاصلة'
+                });
+                return;
+            }
+
+            const price = $('#new_option_price').val() || 0;
+            const type = $('#new_option_type').val();
+            const isRequired = $('#new_option_required').is(':checked');
+
+            values.reverse().forEach(value => {
+                const newOption = {
+                    id: null,
+                    option_name: name,
+                    option_value: value,
+                    additional_price: price,
+                    is_required: isRequired,
+                    option_type: type,
+                    depends_on_option_id: null,
+                    dependency_condition: 'equals',
+                    dependency_value: '',
+                    parent_option: null,
+                    quantity_tiers: []
+                };
+                existingOptions.unshift(newOption);
+            });
+
+            refreshOptionsContainer();
+
+            Swal.fire({
+                icon: 'success',
+                title: 'تم!',
+                text: `تم إضافة ${values.length} خيار في الأعلى`,
+                timer: 1500,
+                showConfirmButton: false
+            });
+
+            $('#bulk_option_values').val('');
+        }
+
+        /**
+         * Delete an option
+         */
+        function deleteOption(index) {
+            Swal.fire({
+                title: 'هل أنت متأكد؟',
+                text: 'سيتم حذف هذا الخيار',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'نعم، احذف',
+                cancelButtonText: 'إلغاء'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    existingOptions.splice(index, 1);
+                    refreshOptionsContainer();
+                    Swal.fire('تم الحذف!', 'تم حذف الخيار بنجاح', 'success');
+                }
+            });
+        }
+
+        /**
+         * Refresh the entire options container
+         */
+        function refreshOptionsContainer() {
+            const container = document.getElementById('optionsContainer');
+            container.innerHTML = '';
+
+            existingOptions.forEach((option, index) => {
+                option.index = index;
+                const optionHtml = generateOptionHtml(option, index);
+                container.innerHTML += optionHtml;
+            });
+
+            initializeSortable();
+            updateOptionsCount();
+        }
+
+        /**
+         * Initialize Sortable.js for smooth drag & drop
+         */
+        function initializeSortable() {
+            const container = document.getElementById('optionsContainer');
+
+            if (sortableInstance) {
+                sortableInstance.destroy();
+            }
+
+            sortableInstance = Sortable.create(container, {
+                animation: 200,
+                handle: '.option-drag-handle',
+                ghostClass: 'sortable-ghost',
+                chosenClass: 'sortable-chosen',
+                dragClass: 'sortable-drag',
+                easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+                scrollSensitivity: 30,
+                scrollSpeed: 10,
+                onEnd: function(evt) {
+                    // Reorder existingOptions array
+                    const movedItem = existingOptions.splice(evt.oldIndex, 1)[0];
+                    existingOptions.splice(evt.newIndex, 0, movedItem);
+
+                    // Refresh indices
+                    refreshOptionsContainer();
+                }
+            });
+        }
+
+        /**
+         * Update options count badge
+         */
+        function updateOptionsCount() {
+            $('#optionsCount').text(existingOptions.length + ' خيار');
+        }
+
+        /**
+         * Toggle dependency section
+         */
+        function toggleDependencySection(select, index) {
+            const optionItem = $(select).closest('.option-item');
+            const hasDependency = select.value !== '';
+
+            if (hasDependency) {
+                // Change badge to dependent
+                optionItem.find('.badge-main').removeClass('badge-main').addClass('badge-dependent');
+                optionItem.find('.badge-dependent').html('<i class="fas fa-link me-1"></i>معتمد');
+            } else {
+                // Change badge to main
+                optionItem.find('.badge-dependent').removeClass('badge-dependent').addClass('badge-main');
+                optionItem.find('.badge-main').html('<i class="fas fa-cube me-1"></i>رئيسي');
+            }
+        }
+
+        /**
+         * Add quantity tier to an option
+         */
+        function addQuantityTier(index) {
+            const option = existingOptions[index];
+            if (!option.quantity_tiers) {
+                option.quantity_tiers = [];
+            }
+
+            option.quantity_tiers.push({
+                quantity: '',
+                price_per_unit: '',
+                tier_name: ''
+            });
+
+            refreshOptionsContainer();
+        }
+
+        /**
+         * Remove a tier
+         */
+        function removeTier(button) {
+            $(button).closest('.tier-item').remove();
+        }
+
+        /**
+         * Update option preview (badge text)
+         */
+        function updateOptionPreview(input) {
+            const optionItem = $(input).closest('.option-item');
+            const name = $(input).val();
+            const header = optionItem.find('.option-header');
+
+            // Update the first part of header if needed
+            // This is handled by the badge text
+        }
+
+        /**
+         * Update option type
+         */
+        function updateOptionType(select, index) {
+            const type = $(select).val();
+            const optionItem = $(select).closest('.option-item');
+            const typeBadge = optionItem.find('.type-badge');
+
+            typeBadge.removeClass('type-regular type-quantity type-size type-color')
+                .addClass(`type-${type}`)
+                .text(getOptionTypeLabel(type));
+
+            // Add/remove quantity tiers section
+            const existingTiers = optionItem.find('.tiers-section');
+            if (type === 'quantity' && existingTiers.length === 0) {
+                // Add tiers section
+                const tiersHtml = `
+                    <div class="tiers-section">
+                        <h6 class="mb-3" style="color: #17a2b8;"><i class="fas fa-layer-group me-2"></i>شرائح الكمية</h6>
+                        <div id="tiersContainer_${index}"></div>
+                        <button type="button" class="btn btn-sm btn-outline-info mt-2" onclick="addQuantityTier(${index})">
+                            <i class="fas fa-plus me-1"></i> إضافة شريحة
+                        </button>
+                    </div>
+                `;
+                optionItem.append(tiersHtml);
+            } else if (type !== 'quantity' && existingTiers.length > 0) {
+                existingTiers.remove();
+            }
+        }
+
+        /**
+         * Get option type label in Arabic
+         */
+        function getOptionTypeLabel(type) {
+            const labels = {
+                'regular': 'عادي',
+                'quantity': 'كمية',
+                'size': 'مقاس',
+                'color': 'لون'
+            };
+            return labels[type] || 'عادي';
+        }
+
+        // ============================================
+        // ⭐ STEP NAVIGATION
+        // ============================================
+        function navigateToStep(step) {
+            $('.step-card').hide();
             $(`.step-${step}`).show();
 
-            // Update wizard steps
             $('.wizard-step').removeClass('active completed');
-
             for (let i = 1; i <= step; i++) {
                 $(`#step${i}`).addClass(i === step ? 'active' : 'completed');
             }
 
-            // Scroll to top
             $('html, body').animate({
                 scrollTop: 0
             }, 300);
         }
 
-        // Image Management Functions
+        // ============================================
+        // ⭐ IMAGE MANAGEMENT
+        // ============================================
         function previewMainImage(file) {
-            if (!file.type.match('image.*')) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'خطأ',
-                    text: 'الملف يجب أن يكون صورة'
-                });
-                return;
-            }
+            if (!file) return;
 
             const reader = new FileReader();
             reader.onload = function(e) {
-                // Show preview container
-                $('#newMainImagePreview').show();
-
-                // Set image source
-                $('#newMainImagePreviewImg').attr('src', e.target.result);
-
-                // Update product preview
+                const html = `
+                    <div class="image-preview-item">
+                        <span class="badge-new">جديد</span>
+                        <img src="${e.target.result}" alt="صورة جديدة">
+                        <div class="image-actions">
+                            <button type="button" class="btn btn-sm btn-info" onclick="viewImage('${e.target.result}')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-danger" onclick="removeNewMainImage()">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                $('#newMainImagePreview').html(html).show();
                 $('.preview-image').attr('src', e.target.result);
-
-                // Reset remove main image flag
                 $('#remove_main_image').val('0');
-
-                // Show success message
-                Swal.fire({
-                    icon: 'success',
-                    title: 'تم اختيار الصورة',
-                    text: 'تم اختيار الصورة الرئيسية الجديدة بنجاح',
-                    timer: 1500,
-                    showConfirmButton: false
-                });
             };
             reader.readAsDataURL(file);
         }
@@ -2502,21 +1692,21 @@
 
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    const previewHtml = `
-                    <div class="image-preview-item" data-new-index="${index}">
-                        <span class="primary-badge">جديد</span>
-                        <img src="${e.target.result}" alt="صورة جديدة">
-                        <div class="image-actions">
-                            <button type="button" class="btn btn-info btn-sm" onclick="viewImage('${e.target.result}')">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                            <button type="button" class="btn btn-danger btn-sm" onclick="removeNewImage(${index})">
-                                <i class="fas fa-trash"></i>
-                            </button>
+                    const html = `
+                        <div class="image-preview-item" data-new-index="${index}">
+                            <span class="badge-new">جديد</span>
+                            <img src="${e.target.result}" alt="صورة جديدة">
+                            <div class="image-actions">
+                                <button type="button" class="btn btn-sm btn-info" onclick="viewImage('${e.target.result}')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-danger" onclick="removeNewImage(${index})">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                `;
-                    container.append(previewHtml);
+                    `;
+                    container.append(html);
                 };
                 reader.readAsDataURL(file);
             });
@@ -2527,115 +1717,35 @@
             new bootstrap.Modal(document.getElementById('imageViewModal')).show();
         }
 
-        function viewNewMainImage() {
-            const src = $('#newMainImagePreviewImg').attr('src');
-            if (src) {
-                $('#viewedImage').attr('src', src);
-                new bootstrap.Modal(document.getElementById('imageViewModal')).show();
-            }
-        }
-
         function removeCurrentMainImage() {
-            Swal.fire({
-                title: 'هل أنت متأكد؟',
-                text: 'سيتم إزالة الصورة الرئيسية الحالية',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'نعم، احذف',
-                cancelButtonText: 'إلغاء'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Set remove flag
-                    $('#remove_main_image').val('1');
-
-                    // Hide current image
-                    $('#currentMainImageContainer').slideUp();
-
-                    // Show message
-                    $('.preview-image').attr('src', 'https://via.placeholder.com/100x100?text=No+Image');
-
-                    // Show notification
-                    Swal.fire('تم الحذف!', 'سيتم إزالة الصورة الرئيسية بعد حفظ التعديلات', 'success');
-                }
-            });
+            $('#remove_main_image').val('1');
+            $('#currentMainImageContainer').slideUp();
+            $('.preview-image').attr('src', 'https://via.placeholder.com/80x80?text=No+Image');
         }
 
         function removeNewMainImage() {
-            Swal.fire({
-                title: 'هل أنت متأكد؟',
-                text: 'سيتم إلغاء اختيار الصورة الجديدة',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'نعم، ألغِ',
-                cancelButtonText: 'إلغاء'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Hide preview
-                    $('#newMainImagePreview').hide();
-
-                    // Clear file input
-                    $('#image').val('');
-
-                    // Reset product preview if there's no current image
-                    if ($('#remove_main_image').val() === '1' || !$('#currentMainImageContainer').is(':visible')) {
-                        $('.preview-image').attr('src', 'https://via.placeholder.com/100x100?text=No+Image');
-                    } else {
-                        // Reset to current image
-                        const currentImg = $('#currentMainImageContainer img').attr('src');
-                        $('.preview-image').attr('src', currentImg);
-                    }
-
-                    Swal.fire('تم الإلغاء!', 'تم إلغاء اختيار الصورة الجديدة', 'success');
-                }
-            });
+            $('#newMainImagePreview').hide().empty();
+            $('#image').val('');
+            if ($('#remove_main_image').val() === '1') {
+                $('.preview-image').attr('src', 'https://via.placeholder.com/80x80?text=No+Image');
+            }
         }
 
         function removeAdditionalImage(imageId) {
-            Swal.fire({
-                title: 'هل أنت متأكد؟',
-                text: 'سيتم إزالة هذه الصورة',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'نعم، احذف',
-                cancelButtonText: 'إلغاء'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    removedImages.push(imageId);
-                    $('#removed_images').val(removedImages.join(','));
-                    $(`.image-preview-item[data-id="${imageId}"]`).remove();
-                    Swal.fire('تم الحذف!', 'تم إزالة الصورة', 'success');
-                }
-            });
+            removedImages.push(imageId);
+            $('#removed_images').val(removedImages.join(','));
+            $(`.image-preview-item[data-id="${imageId}"]`).remove();
         }
 
         function removeNewImage(index) {
             $(`.image-preview-item[data-new-index="${index}"]`).remove();
-
-            // Remove file from input
-            const files = Array.from($('#additional_images')[0].files);
-            files.splice(index, 1);
-
-            const dt = new DataTransfer();
-            files.forEach(file => dt.items.add(file));
-            $('#additional_images')[0].files = dt.files;
         }
 
         function setAsPrimary(imageId) {
             $('#primary_image_id').val(imageId);
-
-            // Update UI
-            $('.primary-badge').text('رئيسية');
-            $(`.image-preview-item[data-id="${imageId}"] .primary-badge`).text('رئيسية');
-
             Swal.fire({
                 icon: 'success',
-                title: 'تم التحديث',
+                title: 'تم',
                 text: 'تم تعيين الصورة كرئيسية',
                 timer: 1500,
                 showConfirmButton: false
@@ -2651,938 +1761,9 @@
             $('#images_order').val(order.join(','));
         }
 
-        // Dynamic Fields Functions
-        function addMaterialField() {
-            const template = $('#materialFieldTemplate').html();
-            const newField = $(template);
-
-            // Update indices
-            newField.find('[name]').each(function() {
-                const name = $(this).attr('name');
-                $(this).attr('name', name.replace('[]', `[${materialCounter}]`));
-            });
-
-            // Initialize select2 for material select
-            newField.find('.material-select').select2({
-                placeholder: 'اختر المادة'
-            });
-
-            $('#materialsContainer').append(newField);
-            materialCounter++;
-        }
-
-        function addFeatureField() {
-            const template = $('#featureFieldTemplate').html();
-            const newField = $(template);
-
-            // Update indices
-            newField.find('[name]').each(function() {
-                const name = $(this).attr('name');
-                $(this).attr('name', name.replace('[]', `[${featureCounter}]`));
-            });
-
-            $('#featuresContainer').append(newField);
-            featureCounter++;
-        }
-
-        function addProductOptionField() {
-            const template = $('#productOptionFieldTemplate').html();
-            const newField = $(template);
-
-            // Update indices
-            const optionIndex = optionCounter;
-            newField.attr('data-index', optionIndex);
-            newField.find('[name]').each(function() {
-                const name = $(this).attr('name');
-                $(this).attr('name', name.replace('[]', `[${optionIndex}]`));
-            });
-
-            // Initialize dependency select
-            newField.find('.dependency-option-select').select2({
-                placeholder: 'اختر الخيار الرئيسي'
-            });
-
-            $('#productOptionsContainer').append(newField);
-            optionCounter++;
-            
-            // Initialize quantity tier counter for this option
-            quantityTierCounters[optionIndex] = 0;
-            
-            // Reinitialize sortable
-            initializeOptionsSortable();
-        }
-
-        function addSizeTierField() {
-            const template = $('#sizeTierFieldTemplate').html();
-            const newField = $(template);
-
-            // Update indices
-            newField.find('[name]').each(function() {
-                const name = $(this).attr('name');
-                $(this).attr('name', name.replace('[]', `[${sizeTierCounter}]`));
-            });
-
-            $('#sizeTiersContainer').append(newField);
-            sizeTierCounter++;
-        }
-
-        function removeField(button) {
-            const field = $(button).closest('.dynamic-field');
-            const index = field.data('index');
-            
-            // Remove from selected options
-            if (selectedOptions.has(index)) {
-                selectedOptions.delete(index);
-                updateSelectedCount();
-                showBulkActions();
-            }
-            
-            field.remove();
-            
-            // If it was an option, update option indices
-            if (field.hasClass('selectable-option')) {
-                updateOptionIndices();
-            }
-        }
-
-        function removeMaterial(button) {
-            $(button).closest('.material-item').remove();
-        }
-
-        function removeTier(button) {
-            $(button).closest('.tier-item').remove();
-        }
-
-        // Dependency Management Functions
-        function updateDependencyConditions(select, optionIndex) {
-            const optionId = $(select).val();
-            const optionField = $(select).closest('.selectable-option');
-            const conditionSelect = optionField.find('.dependency-condition-select');
-            const valueInput = optionField.find('input[name*="[dependency_value]"]');
-            
-            if (optionId) {
-                // Enable condition select and value input
-                conditionSelect.prop('disabled', false);
-                valueInput.prop('disabled', false);
-                
-                // Get the selected option value
-                const selectedOption = $(select).find('option:selected');
-                const optionText = selectedOption.text();
-                
-                // Extract value from option text (format: "اسم الخيار (القيمة)")
-                const match = optionText.match(/\(([^)]+)\)/);
-                if (match) {
-                    valueInput.val(match[1].trim());
-                }
-                
-                // Update UI to show dependency
-                optionField.removeClass('main-option').addClass('option-with-dependency');
-                optionField.find('.dynamic-field-title .badge').removeClass('bg-primary').addClass('bg-warning').text('معتمد');
-                optionField.find('.dependency-indicator').removeClass('no-dependency').addClass('has-dependency');
-            } else {
-                // Disable condition select and value input
-                conditionSelect.prop('disabled', true).val('');
-                valueInput.prop('disabled', true).val('');
-                
-                // Update UI to show main option
-                optionField.removeClass('option-with-dependency').addClass('main-option');
-                optionField.find('.dynamic-field-title .badge').removeClass('bg-warning').addClass('bg-primary').text('رئيسي');
-                optionField.find('.dependency-indicator').removeClass('has-dependency').addClass('no-dependency');
-            }
-        }
-
-        // Quantity Tiers Management
-        function addQuantityTier(optionIndex) {
-            const template = $('#quantityTierTemplate').html();
-            const newTier = $(template);
-            
-            // Get current tier count for this option
-            if (!quantityTierCounters[optionIndex]) {
-                quantityTierCounters[optionIndex] = 0;
-            }
-            
-            const tierIndex = quantityTierCounters[optionIndex];
-            
-            // Update names
-            newTier.find('[name="quantity"]').attr('name', `product_options[${optionIndex}][quantity_tiers][${tierIndex}][quantity]`);
-            newTier.find('[name="price_per_unit"]').attr('name', `product_options[${optionIndex}][quantity_tiers][${tierIndex}][price_per_unit]`);
-            newTier.find('[name="tier_name"]').attr('name', `product_options[${optionIndex}][quantity_tiers][${tierIndex}][tier_name]`);
-            
-            // Append to container
-            const container = $(`#quantityTiersContainer_${optionIndex}`);
-            if (container.length === 0) {
-                // Create container if it doesn't exist
-                const optionField = $(`.selectable-option[data-index="${optionIndex}"]`);
-                optionField.append(`
-                    <div class="size-tier-section mt-3">
-                        <h6 class="mb-3"><i class="fas fa-layer-group me-2"></i>شرائح التسعير حسب الكمية</h6>
-                        <div id="quantityTiersContainer_${optionIndex}"></div>
-                        <button type="button" class="btn btn-sm btn-outline-primary mt-2" onclick="addQuantityTier(${optionIndex})">
-                            <i class="fas fa-plus me-1"></i>إضافة شريحة كمية
-                        </button>
-                    </div>
-                `);
-            }
-            
-            $(`#quantityTiersContainer_${optionIndex}`).append(newTier);
-            
-            // Increment counter
-            quantityTierCounters[optionIndex]++;
-        }
-
-        // Drag & Drop and Multi-Select Functions
-        function initializeOptionsSortable() {
-            const container = document.getElementById('productOptionsContainer');
-            
-            if (sortableInstance) {
-                sortableInstance.destroy();
-            }
-            
-            sortableInstance = Sortable.create(container, {
-                animation: 150,
-                handle: '.option-drag-handle',
-                ghostClass: 'sortable-ghost',
-                chosenClass: 'sortable-chosen',
-                dragClass: 'sortable-drag',
-                onStart: function() {
-                    currentDragging = true;
-                },
-                onEnd: function() {
-                    currentDragging = false;
-                    updateOptionIndices();
-                }
-            });
-        }
-
-        // Toggle option selection
-        function toggleOptionSelection(index, event) {
-            // Prevent selection during drag
-            if (currentDragging) return;
-            
-            const option = $(`.selectable-option[data-index="${index}"]`);
-            const checkbox = option.find('.option-select-checkbox');
-            
-            // Check if Ctrl/Cmd is pressed for multi-select
-            if (event.ctrlKey || event.metaKey || event.shiftKey) {
-                if (selectedOptions.has(index)) {
-                    selectedOptions.delete(index);
-                    option.removeClass('selected');
-                    checkbox.removeClass('checked');
-                } else {
-                    selectedOptions.add(index);
-                    option.addClass('selected');
-                    checkbox.addClass('checked');
-                }
-            } else {
-                // Single selection - clear others
-                selectedOptions.clear();
-                $('.selectable-option').removeClass('selected');
-                $('.option-select-checkbox').removeClass('checked');
-                
-                selectedOptions.add(index);
-                option.addClass('selected');
-                checkbox.addClass('checked');
-            }
-            
-            updateSelectedCount();
-            showBulkActions();
-        }
-
-        // Update option indices after drag and drop
-        function updateOptionIndices() {
-            const options = $('#productOptionsContainer .selectable-option');
-            const newOrder = [];
-            
-            options.each(function(newIndex) {
-                const oldIndex = $(this).data('index');
-                newOrder[oldIndex] = newIndex;
-                
-                // Update data-index attribute
-                $(this).data('index', newIndex);
-                
-                // Update all inputs within this option
-                $(this).find('[name]').each(function() {
-                    const name = $(this).attr('name');
-                    const newName = name.replace(/product_options\[\d+\]/, `product_options[${newIndex}]`);
-                    $(this).attr('name', newName);
-                });
-                
-                // Update IDs
-                $(this).find('[id]').each(function() {
-                    const id = $(this).attr('id');
-                    if (id.includes('_')) {
-                        const newId = id.replace(/_\d+/, `_${newIndex}`);
-                        $(this).attr('id', newId);
-                        $(this).next('label').attr('for', newId);
-                    }
-                });
-            });
-            
-            // Update selected options indices
-            const newSelected = new Set();
-            selectedOptions.forEach(oldIndex => {
-                if (newOrder[oldIndex] !== undefined) {
-                    newSelected.add(newOrder[oldIndex]);
-                }
-            });
-            selectedOptions = newSelected;
-            
-            // Update quantity tier container IDs
-            options.each(function(newIndex) {
-                const oldContainer = $(this).find('[id^="quantityTiersContainer_"]');
-                if (oldContainer.length > 0) {
-                    oldContainer.attr('id', `quantityTiersContainer_${newIndex}`);
-                }
-            });
-        }
-
-        // Update selected count
-        function updateSelectedCount() {
-            $('#selectedCount').text(`${selectedOptions.size} مختار`);
-        }
-
-        // Show/hide bulk actions bar
-        function showBulkActions() {
-            const bar = $('#bulkActionsBar');
-            if (selectedOptions.size > 0) {
-                bar.addClass('active');
-            } else {
-                bar.removeClass('active');
-            }
-        }
-
-        // Clear all selections
-        function clearSelection() {
-            selectedOptions.clear();
-            $('.selectable-option').removeClass('selected');
-            $('.option-select-checkbox').removeClass('checked');
-            updateSelectedCount();
-            showBulkActions();
-        }
-
-        // Bulk Actions
-        function setAsRequired() {
-            selectedOptions.forEach(index => {
-                $(`.selectable-option[data-index="${index}"]`)
-                    .find('[name$="[is_required]"]')
-                    .prop('checked', true);
-            });
-            Swal.fire('تم!', 'تم تعيين الخيارات المحددة كمطلوبة', 'success');
-        }
-
-        function setAsQuantityType() {
-            selectedOptions.forEach(index => {
-                $(`.selectable-option[data-index="${index}"]`)
-                    .find('[name$="[option_type]"]')
-                    .val('quantity');
-                
-                // Add quantity tiers section if not exists
-                const option = $(`.selectable-option[data-index="${index}"]`);
-                if (!option.find('.size-tier-section').length) {
-                    option.append(`
-                        <div class="size-tier-section mt-3">
-                            <h6 class="mb-3"><i class="fas fa-layer-group me-2"></i>شرائح التسعير حسب الكمية</h6>
-                            <div id="quantityTiersContainer_${index}"></div>
-                            <button type="button" class="btn btn-sm btn-outline-primary mt-2" 
-                                    onclick="addQuantityTier(${index})">
-                                <i class="fas fa-plus me-1"></i>إضافة شريحة كمية
-                            </button>
-                        </div>
-                    `);
-                }
-            });
-            Swal.fire('تم!', 'تم تعيين الخيارات المحددة كنوع كمية', 'success');
-        }
-
-        function deleteSelected() {
-            Swal.fire({
-                title: 'هل أنت متأكد؟',
-                text: `سيتم حذف ${selectedOptions.size} خيار`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'نعم، احذف',
-                cancelButtonText: 'إلغاء'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const indicesToRemove = Array.from(selectedOptions).sort((a, b) => b - a);
-                    
-                    indicesToRemove.forEach(index => {
-                        $(`.selectable-option[data-index="${index}"]`).remove();
-                    });
-                    
-                    // Update indices after deletion
-                    setTimeout(() => updateOptionIndices(), 100);
-                    
-                    selectedOptions.clear();
-                    updateSelectedCount();
-                    showBulkActions();
-                    
-                    Swal.fire('تم الحذف!', 'تم حذف الخيارات المحددة', 'success');
-                }
-            });
-        }
-
-        // Multiple options functionality
-        function addMultipleOptions() {
-            $('#multipleOptionsForm').slideDown();
-        }
-
-        function saveMultipleOptions() {
-            const optionName = $('#multipleOptionName').val();
-            const values = $('#multipleOptionValues').val().split(',').map(v => v.trim()).filter(v => v);
-            const price = $('#multipleOptionPrice').val() || 0;
-            const type = $('#multipleOptionType').val();
-            
-            if (!optionName || values.length === 0) {
-                Swal.fire('خطأ!', 'يرجى إدخال اسم الخيار والقيم', 'error');
-                return;
-            }
-            
-            values.forEach((value, i) => {
-                const index = optionCounter + i;
-                const template = $('#productOptionFieldTemplate').html();
-                const newOption = $(template);
-                
-                // Update the option
-                newOption.attr('data-index', index);
-                newOption.find('.dynamic-field-title').html(`
-                    ${optionName}
-                    <span class="option-type-badge option-type-${type}">
-                        ${getOptionTypeLabel(type)}
-                    </span>
-                    <span class="badge bg-primary ms-2">رئيسي</span>
-                `);
-                newOption.find('[name$="[option_name]"]').val(optionName);
-                newOption.find('[name$="[option_value]"]').val(value);
-                newOption.find('[name$="[additional_price]"]').val(price);
-                newOption.find('[name$="[option_type]"]').val(type);
-                
-                // Update names
-                newOption.find('[name]').each(function() {
-                    const name = $(this).attr('name');
-                    $(this).attr('name', name.replace('[]', `[${index}]`));
-                });
-                
-                $('#productOptionsContainer').append(newOption);
-            });
-            
-            optionCounter += values.length;
-            
-            // Reset form
-            $('#multipleOptionName').val('');
-            $('#multipleOptionValues').val('');
-            $('#multipleOptionPrice').val('');
-            $('#multipleOptionsForm').slideUp();
-            
-            // Reinitialize sortable
-            initializeOptionsSortable();
-            
-            Swal.fire('تم!', `تم إضافة ${values.length} قيمة للخيار`, 'success');
-        }
-
-        function cancelMultipleOptions() {
-            $('#multipleOptionsForm').slideUp();
-        }
-
-        // Option groups
-        function createOptionGroup() {
-            const groupName = $('#optionGroupName').val();
-            if (!groupName) {
-                Swal.fire('خطأ!', 'يرجى إدخال اسم المجموعة', 'error');
-                return;
-            }
-            
-            const groupId = 'group_' + Date.now();
-            const group = {
-                id: groupId,
-                name: groupName,
-                options: Array.from(selectedOptions)
-            };
-            
-            optionGroups.push(group);
-            renderOptionGroup(group);
-            
-            // Mark grouped options
-            selectedOptions.forEach(index => {
-                $(`.selectable-option[data-index="${index}"]`).addClass('grouped');
-            });
-            
-            $('#optionGroupName').val('');
-            clearSelection();
-            
-            Swal.fire('تم!', 'تم إنشاء مجموعة الخيارات', 'success');
-        }
-
-        function renderOptionGroup(group) {
-            const container = $('#optionGroupsContainer');
-            const groupHtml = `
-                <div class="group-option-item" data-group-id="${group.id}">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <strong>${group.name}</strong>
-                            <small class="text-muted ms-2">(${group.options.length} خيار)</small>
-                        </div>
-                        <div class="btn-group btn-group-sm">
-                            <button type="button" class="btn btn-outline-info" 
-                                    onclick="expandGroup('${group.id}')">
-                                <i class="fas fa-expand"></i>
-                            </button>
-                            <button type="button" class="btn btn-outline-danger" 
-                                    onclick="removeGroup('${group.id}')">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            container.append(groupHtml);
-        }
-
-        // View option values
-        function viewOptionValues(index) {
-            const option = $(`.selectable-option[data-index="${index}"]`);
-            const optionName = option.find('[name$="[option_name]"]').val();
-            const optionValue = option.find('[name$="[option_value]"]').val();
-            const optionType = option.find('[name$="[option_type]"]').val();
-            
-            $('#selectedOptionValues').empty();
-            
-            // If it's a quantity option, show tiers
-            if (optionType === 'quantity') {
-                const tiersContainer = option.find('.tier-item');
-                if (tiersContainer.length > 0) {
-                    tiersContainer.each(function() {
-                        const quantity = $(this).find('[name$="[quantity]"]').val();
-                        const price = $(this).find('[name$="[price_per_unit]"]').val();
-                        const tierName = $(this).find('[name$="[tier_name]"]').val() || `شريحة ${$(this).index() + 1}`;
-                        
-                        $('#selectedOptionValues').append(`
-                            <div class="option-value-item">
-                                <div class="small">${tierName}</div>
-                                <div class="fw-bold">${quantity} قطعة</div>
-                                <div class="text-success">${price} ج.م</div>
-                            </div>
-                        `);
-                    });
-                } else {
-                    $('#selectedOptionValues').append(`
-                        <div class="option-value-item">
-                            <div class="fw-bold">${optionValue}</div>
-                            <small>${optionName}</small>
-                            <div class="text-muted small">لا توجد شرائح كمية مضافة</div>
-                        </div>
-                    `);
-                }
-            } else {
-                // Show single value
-                $('#selectedOptionValues').append(`
-                    <div class="option-value-item selected-value">
-                        <div class="fw-bold">${optionValue}</div>
-                        <small>${optionName}</small>
-                    </div>
-                `);
-            }
-            
-            $('#optionValuesPreview').slideDown();
-        }
-
-        // Duplicate option
-        function duplicateOption(index) {
-            const originalOption = $(`.selectable-option[data-index="${index}"]`);
-            const clone = originalOption.clone();
-            
-            // Update index
-            const newIndex = optionCounter;
-            clone.data('index', newIndex);
-            
-            // Update all names and IDs
-            clone.find('[name]').each(function() {
-                const name = $(this).attr('name');
-                const newName = name.replace(/product_options\[\d+\]/, `product_options[${newIndex}]`);
-                $(this).attr('name', newName);
-            });
-            
-            clone.find('[id]').each(function() {
-                const id = $(this).attr('id');
-                if (id.includes('_')) {
-                    const newId = id.replace(/_\d+/, `_${newIndex}`);
-                    $(this).attr('id', newId);
-                }
-            });
-            
-            // Update quantity tiers container ID
-            const tiersContainer = clone.find('[id^="quantityTiersContainer_"]');
-            if (tiersContainer.length > 0) {
-                tiersContainer.attr('id', `quantityTiersContainer_${newIndex}`);
-            }
-            
-            // Clear selection checkbox
-            clone.find('.option-select-checkbox').removeClass('checked');
-            clone.removeClass('selected');
-            
-            // Add "نسخة" to option name
-            const nameInput = clone.find('[name$="[option_name]"]');
-            nameInput.val(nameInput.val() + ' (نسخة)');
-            
-            // Update option preview
-            updateOptionPreview(newIndex);
-            
-            // Insert after original
-            originalOption.after(clone);
-            
-            optionCounter++;
-            updateOptionIndices();
-            
-            Swal.fire('تم!', 'تم نسخ الخيار بنجاح', 'success');
-        }
-
-        // Helper functions
-        function getOptionTypeLabel(type) {
-            const labels = {
-                'regular': 'عادي',
-                'quantity': 'كمية',
-                'size': 'مقاس',
-                'color': 'لون'
-            };
-            return labels[type] || 'عادي';
-        }
-
-        function updateOptionPreview(index) {
-            const option = $(`.selectable-option[data-index="${index}"]`);
-            const name = option.find('[name$="[option_name]"]').val();
-            const type = option.find('[name$="[option_type]"]').val();
-            
-            option.find('.dynamic-field-title').html(`
-                ${name}
-                <span class="option-type-badge option-type-${type}">
-                    ${getOptionTypeLabel(type)}
-                </span>
-                ${option.find('.badge.bg-primary').length ? '<span class="badge bg-primary ms-2">رئيسي</span>' : ''}
-                ${option.find('.badge.bg-warning').length ? '<span class="badge bg-warning ms-2">معتمد</span>' : ''}
-                ${option.find('.badge.bg-success').length ? '<span class="badge bg-success ms-1">كمية</span>' : ''}
-                ${option.find('[name$="[is_required]"]').is(':checked') ? '<span class="badge bg-danger ms-1">مطلوب</span>' : ''}
-            `);
-        }
-
-        function updateOptionType(index, type) {
-            const option = $(`.selectable-option[data-index="${index}"]`);
-            const badge = option.find('.option-type-badge');
-            
-            badge.removeClass('option-type-regular option-type-quantity option-type-size option-type-color')
-                 .addClass(`option-type-${type}`)
-                 .text(getOptionTypeLabel(type));
-            
-            updateOptionPreview(index);
-        }
-
-        // Color Management Functions
-        function addColor(element) {
-            const colorId = $(element).data('id');
-            const colorName = $(element).data('name');
-            const colorHex = $(element).data('hex');
-
-            // Check if color already selected
-            if ($(`#selectedColorsContainer .color-swatch[data-id="${colorId}"]`).length > 0) {
-                return;
-            }
-
-            // Create color swatch
-            const template = $('#colorSwatchTemplate').html();
-            const swatchHtml = template
-                .replace(/{id}/g, colorId)
-                .replace(/{name}/g, colorName)
-                .replace(/{hex}/g, colorHex);
-
-            $('#selectedColorsContainer').append(swatchHtml);
-            $(element).remove();
-        }
-
-        function removeColor(colorId) {
-            $(`.color-swatch[data-id="${colorId}"]`).remove();
-
-            // Add color back to available colors
-            const colorName = $(`.color-swatch[data-id="${colorId}"] span`).text();
-            const colorHex = $(`.color-swatch[data-id="${colorId}"] .color-preview`).css('background-color');
-
-            const colorItem = `
-            <div class="color-item" 
-                 style="background-color: ${colorHex};"
-                 data-id="${colorId}"
-                 data-name="${colorName}"
-                 data-hex="${colorHex}"
-                 onclick="addColor(this)">
-            </div>
-        `;
-            $('#availableColorsGrid').append(colorItem);
-        }
-
-        // Quick Add Modal Functions
-        function openQuickAddModal(type) {
-            currentQuickAddType = type;
-
-            let title = '';
-            let formContent = '';
-
-            switch (type) {
-                case 'category':
-                    title = 'إضافة قسم جديد';
-                    formContent = `
-                    <div class="mb-3">
-                        <label class="form-label">اسم القسم</label>
-                        <input type="text" class="form-control" id="category_name" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">القسم الرئيسي</label>
-                        <select class="form-control" id="parent_category_id">
-                            <option value="">بدون قسم رئيسي</option>
-                            @foreach ($categories as $category)
-                                @if ($category->isParent())
-                                    <option value="{{ $category->id }}">{{ $category->name }}</option>
-                                @endif
-                            @endforeach
-                        </select>
-                    </div>
-                `;
-                    break;
-
-                case 'color':
-                    title = 'إضافة لون جديد';
-                    formContent = `
-                    <div class="mb-3">
-                        <label class="form-label">اسم اللون</label>
-                        <input type="text" class="form-control" id="color_name" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">الكود اللوني</label>
-                        <div class="color-picker-input">
-                            <input type="color" id="color_hex" value="#696cff">
-                            <input type="text" class="form-control" id="color_hex_code" value="#696cff" readonly>
-                        </div>
-                    </div>
-                `;
-                    break;
-
-                case 'material':
-                    title = 'إضافة مادة جديدة';
-                    formContent = `
-                    <div class="mb-3">
-                        <label class="form-label">اسم المادة</label>
-                        <input type="text" class="form-control" id="material_name" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">الوصف</label>
-                        <textarea class="form-control" id="material_description" rows="3"></textarea>
-                    </div>
-                `;
-                    break;
-
-                case 'printing_method':
-                    title = 'إضافة طريقة طباعة جديدة';
-                    formContent = `
-                    <div class="mb-3">
-                        <label class="form-label">الاسم</label>
-                        <input type="text" class="form-control" id="printing_method_name" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">الوصف</label>
-                        <textarea class="form-control" id="printing_method_description" rows="3"></textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">السعر الأساسي</label>
-                        <input type="number" class="form-control" id="printing_method_price" step="0.01" min="0" required>
-                    </div>
-                `;
-                    break;
-
-                case 'print_location':
-                    title = 'إضافة مكان طباعة جديد';
-                    formContent = `
-                    <div class="mb-3">
-                        <label class="form-label">الاسم</label>
-                        <input type="text" class="form-control" id="print_location_name" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">النوع</label>
-                        <select class="form-control" id="print_location_type">
-                            <option value="front">أمامي</option>
-                            <option value="back">خلفي</option>
-                            <option value="side">جانبي</option>
-                            <option value="sleeve">كم</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">السعر الإضافي</label>
-                                        <input type="number" class="form-control" id="print_location_price" step="0.01" min="0" required>
-                                    </div>
-                                `;
-                    break;
-
-                case 'offer':
-                    title = 'إضافة عرض جديد';
-                    formContent = `
-                    <div class="mb-3">
-                        <label class="form-label">اسم العرض</label>
-                        <input type="text" class="form-control" id="offer_name" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">الصورة</label>
-                        <input type="file" class="form-control" id="offer_image" accept="image/*">
-                    </div>
-                `;
-                    break;
-            }
-
-            $('#quickAddModalTitle').text(title);
-            $('#quickAddFormContent').html(formContent);
-
-            // Initialize color picker
-            if (type === 'color') {
-                $('#color_hex').change(function() {
-                    $('#color_hex_code').val($(this).val());
-                });
-            }
-
-            new bootstrap.Modal(document.getElementById('quickAddModal')).show();
-        }
-
-        async function saveQuickAdd() {
-            const formData = new FormData();
-
-            switch (currentQuickAddType) {
-                case 'category':
-                    formData.append('name', $('#category_name').val());
-                    formData.append('parent_id', $('#parent_category_id').val());
-                    break;
-
-                case 'color':
-                    formData.append('name', $('#color_name').val());
-                    formData.append('hex_code', $('#color_hex_code').val());
-                    break;
-
-                case 'material':
-                    formData.append('name', $('#material_name').val());
-                    formData.append('description', $('#material_description').val());
-                    break;
-
-                case 'printing_method':
-                    formData.append('name', $('#printing_method_name').val());
-                    formData.append('description', $('#printing_method_description').val());
-                    formData.append('base_price', $('#printing_method_price').val());
-                    break;
-
-                case 'print_location':
-                    formData.append('name', $('#print_location_name').val());
-                    formData.append('type', $('#print_location_type').val());
-                    formData.append('additional_price', $('#print_location_price').val());
-                    break;
-
-                case 'offer':
-                    formData.append('name', $('#offer_name').val());
-                    if ($('#offer_image')[0].files[0]) {
-                        formData.append('image', $('#offer_image')[0].files[0]);
-                    }
-                    break;
-            }
-
-            try {
-                const response = await fetch(`/admin/quick-add/${currentQuickAddType}`, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Accept': 'application/json'
-                    },
-                    body: formData
-                });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    // Close modal
-                    bootstrap.Modal.getInstance(document.getElementById('quickAddModal')).hide();
-
-                    // Show success message
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'تمت الإضافة',
-                        text: data.message || 'تم الإضافة بنجاح'
-                    });
-
-                    // Update UI based on type
-                    updateUIAfterQuickAdd(data);
-
-                } else {
-                    throw new Error(data.message || 'حدث خطأ أثناء الإضافة');
-                }
-
-            } catch (error) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'خطأ',
-                    text: error.message
-                });
-            }
-        }
-
-        function updateUIAfterQuickAdd(data) {
-            switch (currentQuickAddType) {
-                case 'category':
-                    // Add new option to category select
-                    const option = new Option(data.item.name, data.item.id);
-                    $('#category_id').append(option).val(data.item.id).trigger('change');
-                    break;
-
-                case 'color':
-                    // Add color to available colors grid
-                    const colorItem = `
-                    <div class="color-item" 
-                         style="background-color: ${data.item.hex_code};"
-                         data-id="${data.item.id}"
-                         data-name="${data.item.name}"
-                         data-hex="${data.item.hex_code}"
-                         onclick="addColor(this)">
-                    </div>
-                `;
-                    $('#availableColorsGrid').append(colorItem);
-                    break;
-
-                case 'material':
-                    // Add option to material select in all material fields
-                    $('.material-select').each(function() {
-                        const option = new Option(data.item.name, data.item.id);
-                        $(this).append(option);
-                    });
-                    break;
-
-                case 'printing_method':
-                    // Add option to printing methods select
-                    const printingOption = new Option(
-                        `${data.item.name} - ${data.item.base_price} ج.م`,
-                        data.item.id
-                    );
-                    $('#printingMethodsSelect').append(printingOption);
-                    break;
-
-                case 'print_location':
-                    // Add option to print locations select
-                    const locationOption = new Option(
-                        `${data.item.name} (${data.item.type}) - ${data.item.additional_price} ج.م`,
-                        data.item.id
-                    );
-                    $('#printLocationsSelect').append(locationOption);
-                    break;
-
-                case 'offer':
-                    // Add option to offers select
-                    const offerOption = new Option(data.item.name, data.item.id);
-                    $('#offersSelect').append(offerOption);
-                    break;
-            }
-        }
-
-        // Slug Generation
+        // ============================================
+        // ⭐ SEO & UTILITIES
+        // ============================================
         function generateSlug() {
             const name = $('#name').val();
             if (!name) return;
@@ -3594,22 +1775,18 @@
                 .replace(/--+/g, '-')
                 .trim();
 
-            // Add product ID to ensure uniqueness
             slug += '-' + {{ $product->id }};
-
             $('#slug').val(slug);
         }
 
-        // Form Submission
         function saveAndContinue() {
-            // Submit form via AJAX
             const formData = new FormData(document.getElementById('editProductForm'));
 
             fetch('{{ route('admin.products.update', $product->id) }}', {
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Accept': 'application/json'
+                        'Accept': 'application/json',
                     },
                     body: formData
                 })
@@ -3623,11 +1800,10 @@
                             timer: 1500,
                             showConfirmButton: false
                         }).then(() => {
-                            // Reload page to show updated data
                             window.location.reload();
                         });
                     } else {
-                        throw new Error(data.message || 'حدث خطأ أثناء الحفظ');
+                        throw new Error(data.message || 'حدث خطأ');
                     }
                 })
                 .catch(error => {
@@ -3639,37 +1815,8 @@
                 });
         }
 
-        // Form Validation
-        document.getElementById('editProductForm').addEventListener('submit', function(e) {
-            // Basic validation
-            const name = $('#name').val();
-            const price = $('#price').val();
-            const stock = $('#stock').val();
-
-            if (!name || !price || !stock) {
-                e.preventDefault();
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'بيانات ناقصة',
-                    text: 'يرجى ملء جميع الحقول المطلوبة',
-                    confirmButtonColor: '#3085d6'
-                });
-            }
-
-            // Validate discount
-            if ($('#has_discount').is(':checked')) {
-                const discountValue = $('#discount_value').val();
-                if (!discountValue || discountValue <= 0) {
-                    e.preventDefault();
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'قيمة خصم غير صالحة',
-                        text: 'يرجى إدخال قيمة خصم صحيحة',
-                        confirmButtonColor: '#3085d6'
-                    });
-                    return;
-                }
-            }
-        });
+        function confirmDelete() {
+            new bootstrap.Modal(document.getElementById('deleteModal')).show();
+        }
     </script>
 @endsection
