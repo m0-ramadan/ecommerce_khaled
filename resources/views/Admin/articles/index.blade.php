@@ -739,11 +739,11 @@
                                                             class="btn btn-sm btn-warning" title="تعديل">
                                                             <i class="fas fa-edit"></i>
                                                         </a>
-                                                        <a href="{{ route('articles.show', $article->slug) }}"
+                                                        {{-- <a href="{{ route('articles.show', $article->slug) }}"
                                                             class="btn btn-sm btn-success" target="_blank"
                                                             title="عرض في الموقع">
                                                             <i class="fas fa-external-link-alt"></i>
-                                                        </a>
+                                                        </a> --}}
                                                         <button type="button"
                                                             class="btn btn-sm {{ $article->is_active ? 'btn-secondary' : 'btn-success' }} toggle-status-btn"
                                                             data-id="{{ $article->id }}"
