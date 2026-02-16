@@ -28,7 +28,7 @@ class GenerateSitemap extends Command
         // المنتجات
         $products = Product::all();
         foreach ($products as $product) {
-            $sitemap->add(Url::create($domain . "/product/{$product->sku}")
+            $sitemap->add(Url::create($domain . "/product/{$product->slug}")
                 ->setLastModificationDate($product->updated_at));
         }
 
