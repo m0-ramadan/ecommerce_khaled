@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Admin;
 use App\Models\Article;
 use App\Models\ArticleCategory;
 use App\Models\Tag;
@@ -74,7 +75,7 @@ class ArticleController extends Controller
 
         $articles = $query->paginate(15);
         $categories = ArticleCategory::active()->get();
-        $authors = User::all();
+        $authors = Admin::all();
 
         // الإحصائيات
         $stats = [
@@ -98,9 +99,7 @@ class ArticleController extends Controller
     {
         $categories = ArticleCategory::active()->get();
         $tags = Tag::all();
-        $authors = User::whereHas('roles', function ($q) {
-            $q->whereIn('name', ['admin', 'author', 'editor']);
-        })->get();
+        $authors = Admin::all();
 
         return view('Admin.articles.create', compact('categories', 'tags', 'authors'));
     }
@@ -168,9 +167,7 @@ class ArticleController extends Controller
     {
         $categories = ArticleCategory::active()->get();
         $tags = Tag::all();
-        $authors = User::whereHas('roles', function ($q) {
-            $q->whereIn('name', ['admin', 'author', 'editor']);
-        })->get();
+        $authors = Admin::all();
         $article->load('tags');
 
         return view('Admin.articles.edit', compact('article', 'categories', 'tags', 'authors'));
