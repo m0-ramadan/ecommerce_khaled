@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Resources\Website\UserAddressResource;
 use App\Http\Requests\Website\StoreUserAddressRequest;
 use App\Http\Requests\Website\UpdateUserAddressRequest;
-
+use App\Models\Place;
 
 class UserAddressController extends Controller
 {
@@ -53,5 +53,11 @@ class UserAddressController extends Controller
 
         $address->delete();
         return $this->success(null, 'تم حذف العنوان بنجاح');
+    }
+
+    public function getPlaces()
+    {
+        $places = Place::select('id', 'name','label')->get();
+        return $this->success($places, 'تم جلب الأماكن بنجاح');
     }
 }
