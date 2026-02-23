@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers\Api\Website;
 
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Website\StoreUserAddressRequest;
+use App\Http\Requests\Website\UpdateUserAddressRequest;
+use App\Http\Resources\Website\UserAddressResource;
+use App\Http\Resources\Wesite\PlaceResource;
+use App\Models\Place;
 use App\Models\UserAddress;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Resources\Website\UserAddressResource;
-use App\Http\Requests\Website\StoreUserAddressRequest;
-use App\Http\Requests\Website\UpdateUserAddressRequest;
-use App\Models\Place;
 
 class UserAddressController extends Controller
 {
@@ -57,7 +58,7 @@ class UserAddressController extends Controller
 
     public function getPlaces()
     {
-        $places = Place::select('id', 'name','label')->get();
-        return $this->success($places, 'تم جلب الأماكن بنجاح');
+        $places = Place::all();
+        return $this->success(PlaceResource::collection($places), 'تم جلب الأماكن بنجاح');
     }
 }
