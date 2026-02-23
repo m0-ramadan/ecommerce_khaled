@@ -69,11 +69,6 @@ class Category extends Model
     public function categoryBanners()
     {
         return $this->hasMany(BannerItem::class, 'category_id')
-            ->whereHas('banner', function ($q) {
-                $q->whereHas('type', function ($q2) {
-                    $q2->where('name', 'category_slider');
-                });
-            })
             ->where('is_active', true);
     }
 
