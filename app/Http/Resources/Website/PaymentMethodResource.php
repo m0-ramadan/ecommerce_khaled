@@ -13,6 +13,7 @@ class PaymentMethodResource extends JsonResource
             'id'        => $this->id,
             'name'      => $this->name,
             'icon'      => $this->icon,
+            'image'     => $this->image ? asset($this->image) : null,
             'is_active' => $this->is_active,
         ];
     }

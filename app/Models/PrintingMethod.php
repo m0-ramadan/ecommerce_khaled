@@ -11,7 +11,7 @@ class PrintingMethod extends Model
     protected $fillable = [
         'name',
         'description',
-        'base_price',
+        'base_price','image'
     ];
     public $table = 'printing_methods';
     public function products()
