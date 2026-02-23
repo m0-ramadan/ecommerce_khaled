@@ -5,7 +5,6 @@
 @section('css')
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
-
     <style>
         :root {
             --primary-color: #696cff;
@@ -62,66 +61,46 @@
             gap: 10px;
         }
 
-        .image-upload-box {
-            border: 2px dashed rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            padding: 30px;
+        .category-options {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .category-option {
+            flex: 1;
             text-align: center;
+            padding: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
             cursor: pointer;
             transition: all 0.3s ease;
             background: rgba(255, 255, 255, 0.05);
         }
 
-        .image-upload-box:hover {
+        .category-option:hover {
             border-color: var(--primary-color);
             background: rgba(105, 108, 255, 0.1);
         }
 
-        .image-upload-box i {
-            font-size: 48px;
-            color: var(--text-muted);
-            margin-bottom: 15px;
+        .category-option.active {
+            border-color: var(--primary-color);
+            background: rgba(105, 108, 255, 0.2);
         }
 
-        .image-upload-box input {
+        .category-option i {
+            font-size: 24px;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .category-select {
             display: none;
         }
 
-        .image-preview {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            border-radius: 10px;
-            margin-top: 15px;
-            display: none;
-            border: 2px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .mobile-image-preview {
-            width: 150px;
-            height: 100px;
-            object-fit: cover;
-            border-radius: 8px;
-            margin-top: 10px;
-            border: 2px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .badge-custom {
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            display: inline-block;
-        }
-
-        .badge-active {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-            color: white;
-        }
-
-        .badge-inactive {
-            background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);
-            color: white;
+        .category-select.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
         }
 
         .type-card {
@@ -203,6 +182,24 @@
             transform: translateX(24px);
         }
 
+        .badge-custom {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .badge-active {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+
+        .badge-inactive {
+            background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);
+            color: white;
+        }
+
         .date-input-group {
             position: relative;
         }
@@ -229,112 +226,7 @@
             z-index: 4;
         }
 
-        .preview-container {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            padding: 20px;
-            margin-top: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .preview-item {
-            width: 100%;
-            height: 150px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-            overflow: hidden;
-            margin-bottom: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .preview-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .items-container {
-            margin-top: 30px;
-        }
-
-        .item-card {
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 15px;
-            background: rgba(255, 255, 255, 0.05);
-            transition: all 0.3s ease;
-        }
-
-        .item-card:hover {
-            border-color: var(--primary-color);
-            background: rgba(105, 108, 255, 0.1);
-        }
-
-        .item-image {
-            width: 80px;
-            height: 60px;
-            object-fit: cover;
-            border-radius: 8px;
-            border: 2px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .item-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        .btn-action {
-            width: 32px;
-            height: 32px;
-            padding: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 8px;
-        }
-
-        .empty-items {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--text-muted);
-        }
-
-        .empty-items i {
-            font-size: 48px;
-            margin-bottom: 15px;
-            color: rgba(255, 255, 255, 0.1);
-        }
-
-        .select2-container--default .select2-selection--multiple,
-        .select2-container--default .select2-selection--single {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 0.375rem;
-            min-height: 38px;
-            color: #fff;
-        }
-
-        .select2-container--default .select2-selection--multiple .select2-selection__choice {
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 15px;
-            padding: 2px 10px;
-        }
-
-        .select2-container--default .select2-selection__rendered {
-            color: #fff !important;
-        }
-
-        .grid-settings {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 20px;
-            border: 2px dashed rgba(255, 255, 255, 0.1);
-        }
-
+        .grid-settings,
         .slider-settings {
             background: rgba(255, 255, 255, 0.05);
             padding: 20px;
@@ -378,20 +270,6 @@
             color: #fff;
         }
 
-        .form-check-input {
-            background-color: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.3);
-        }
-
-        .form-check-input:checked {
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
-        }
-
-        .form-check-label {
-            color: #fff;
-        }
-
         .btn-primary {
             background: var(--primary-gradient);
             border: none;
@@ -414,16 +292,6 @@
             border-color: rgba(255, 255, 255, 0.3);
         }
 
-        .btn-outline-primary {
-            color: var(--primary-color);
-            border-color: var(--primary-color);
-        }
-
-        .btn-outline-primary:hover {
-            background: var(--primary-color);
-            color: white;
-        }
-
         .breadcrumb {
             background: rgba(255, 255, 255, 0.05);
             border-radius: 10px;
@@ -439,95 +307,11 @@
             color: rgba(255, 255, 255, 0.7);
         }
 
-        @media (max-width: 768px) {
-            .type-card {
-                margin-bottom: 15px;
-            }
-
-            .item-card {
-                flex-direction: column;
-            }
-
-            .item-image {
-                margin-bottom: 15px;
-            }
-
-            .item-actions {
-                justify-content: center;
-            }
-        }
-
-        /* Modal Styles */
-        .modal-content {
-            background: var(--dark-card);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .modal-header {
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .modal-title {
-            color: #fff;
-        }
-
-        .btn-close {
-            filter: invert(1) grayscale(100%) brightness(200%);
-        }
-
-        .modal-footer {
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        /* Category Options */
-        .category-options {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        .category-option {
-            flex: 1;
-            text-align: center;
-            padding: 15px;
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .category-option:hover {
-            border-color: var(--primary-color);
-            background: rgba(105, 108, 255, 0.1);
-        }
-
-        .category-option.active {
-            border-color: var(--primary-color);
-            background: rgba(105, 108, 255, 0.2);
-        }
-
-        .category-option i {
-            font-size: 24px;
-            color: var(--primary-color);
-            margin-bottom: 10px;
-        }
-
-        .category-select {
-            display: none;
-        }
-
-        .category-select.show {
-            display: block;
-            animation: fadeIn 0.3s ease;
-        }
-
         @keyframes fadeIn {
             from {
                 opacity: 0;
                 transform: translateY(-10px);
             }
-
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -697,7 +481,7 @@
                                 value="{{ old('banner_type_id', $banner->banner_type_id ?? '') }}">
                         </div>
 
-                        <!-- إعدادات الشبكة (تظهر فقط للنوع grid) -->
+                        <!-- إعدادات الشبكة -->
                         <div class="grid-settings" id="gridSettings" style="display: none;">
                             <h6><i class="fas fa-cog me-2"></i>إعدادات الشبكة</h6>
 
@@ -708,7 +492,6 @@
                                         name="desktop_columns"
                                         value="{{ old('desktop_columns', $banner->gridLayout->desktop_columns ?? 3) }}"
                                         min="1" max="6">
-                                    <span class="help-text">عدد الأعمدة في شاشات الكمبيوتر</span>
                                 </div>
 
                                 <div class="col-md-3 mb-3">
@@ -716,7 +499,6 @@
                                     <input type="number" class="form-control" id="tablet_columns" name="tablet_columns"
                                         value="{{ old('tablet_columns', $banner->gridLayout->tablet_columns ?? 2) }}"
                                         min="1" max="4">
-                                    <span class="help-text">عدد الأعمدة في شاشات التابلت</span>
                                 </div>
 
                                 <div class="col-md-3 mb-3">
@@ -724,7 +506,6 @@
                                     <input type="number" class="form-control" id="mobile_columns" name="mobile_columns"
                                         value="{{ old('mobile_columns', $banner->gridLayout->mobile_columns ?? 1) }}"
                                         min="1" max="2">
-                                    <span class="help-text">عدد الأعمدة في شاشات الموبايل</span>
                                 </div>
 
                                 <div class="col-md-3 mb-3">
@@ -737,7 +518,6 @@
                                             {{ old('grid_type', $banner->gridLayout->grid_type ?? '') == 'fixed' ? 'selected' : '' }}>
                                             ثابت</option>
                                     </select>
-                                    <span class="help-text">المتجاوب يناسب جميع الشاشات</span>
                                 </div>
                             </div>
 
@@ -750,7 +530,6 @@
                                             min="0" max="100">
                                         <span class="input-group-text">بكسل</span>
                                     </div>
-                                    <span class="help-text">المسافة الرأسية بين العناصر</span>
                                 </div>
 
                                 <div class="col-md-6 mb-3">
@@ -761,12 +540,11 @@
                                             min="0" max="100">
                                         <span class="input-group-text">بكسل</span>
                                     </div>
-                                    <span class="help-text">المسافة الأفقية بين العناصر</span>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- إعدادات السلايدر (تظهر فقط للنوع slider) -->
+                        <!-- إعدادات السلايدر -->
                         <div class="slider-settings" id="sliderSettings" style="display: none;">
                             <h6><i class="fas fa-cog me-2"></i>إعدادات السلايدر</h6>
 
@@ -779,7 +557,6 @@
                                             {{ old('autoplay', $banner->sliderSetting->autoplay ?? true) ? 'checked' : '' }}>
                                         <label class="form-check-label" for="autoplay">التشغيل التلقائي</label>
                                     </div>
-                                    <span class="help-text">التقدم التلقائي بين الشرائح</span>
                                 </div>
 
                                 <div class="col-md-3 mb-3">
@@ -790,7 +567,6 @@
                                             {{ old('arrows', $banner->sliderSetting->arrows ?? true) ? 'checked' : '' }}>
                                         <label class="form-check-label" for="arrows">أزرار التنقل</label>
                                     </div>
-                                    <span class="help-text">عرض أزرار التالي والسابق</span>
                                 </div>
 
                                 <div class="col-md-3 mb-3">
@@ -801,7 +577,6 @@
                                             {{ old('dots', $banner->sliderSetting->dots ?? true) ? 'checked' : '' }}>
                                         <label class="form-check-label" for="dots">النقاط</label>
                                     </div>
-                                    <span class="help-text">عرض نقاط التنقل أسفل السلايدر</span>
                                 </div>
 
                                 <div class="col-md-3 mb-3">
@@ -812,7 +587,6 @@
                                             {{ old('infinite', $banner->sliderSetting->infinite ?? true) ? 'checked' : '' }}>
                                         <label class="form-check-label" for="infinite">لانهائي</label>
                                     </div>
-                                    <span class="help-text">التنقل اللانهائي بين الشرائح</span>
                                 </div>
                             </div>
 
@@ -826,7 +600,6 @@
                                             min="1000" max="10000" step="500">
                                         <span class="input-group-text">ملي ثانية</span>
                                     </div>
-                                    <span class="help-text">المدة بين الشرائح (3000 = 3 ثواني)</span>
                                 </div>
                             </div>
                         </div>
@@ -848,7 +621,6 @@
                                     @error('start_date')
                                         <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
-                                    <span class="help-text">تاريخ بدء عرض البانر (اختياري)</span>
                                 </div>
 
                                 <div class="col-md-6 mb-3">
@@ -863,7 +635,6 @@
                                     @error('end_date')
                                         <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
-                                    <span class="help-text">تاريخ إيقاف عرض البانر (اختياري)</span>
                                 </div>
                             </div>
 
@@ -878,60 +649,6 @@
                             </div>
                         </div>
 
-                        <!-- العناصر (للأنواع التي تدعم عناصر متعددة) -->
-                        <div class="form-section" id="itemsSection">
-                            <h5><i class="fas fa-layer-group me-2"></i>عناصر البانر</h5>
-
-                            <div id="itemsContainer" class="items-container">
-                                @if (isset($banner) && $banner->items->count() > 0)
-                                    @foreach ($banner->items->sortBy('item_order') as $item)
-                                        <div class="item-card d-flex align-items-center justify-content-between">
-                                            <div class="d-flex align-items-center">
-                                                @if ($item->image_url)
-                                                    <img src="{{ get_user_image($item->image_url) }}"
-                                                        alt="{{ $item->image_alt }}" class="item-image me-3">
-                                                @endif
-                                                <div>
-                                                    <h6 class="mb-1">{{ $item->image_alt ?? 'بدون عنوان' }}</h6>
-                                                    <small class="text-muted">
-                                                        الترتيب: {{ $item->item_order }} |
-                                                        {{ $item->is_active ? 'نشط' : 'غير نشط' }}
-                                                    </small>
-                                                </div>
-                                            </div>
-                                            <div class="item-actions">
-                                                <button type="button" class="btn btn-action btn-warning edit-item"
-                                                    data-id="{{ $item->id }}">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-                                                <button type="button" class="btn btn-action btn-danger delete-item"
-                                                    data-id="{{ $item->id }}">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                @else
-                                    <div class="empty-items">
-                                        <i class="fas fa-image"></i>
-                                        <p>لا توجد عناصر مضافة</p>
-                                        <small class="help-text">يمكنك إضافة عناصر بعد حفظ البانر</small>
-                                    </div>
-                                @endif
-                            </div>
-
-                            @if (isset($banner))
-                                <button type="button" class="btn btn-primary mt-3" id="addItemBtn">
-                                    <i class="fas fa-plus me-2"></i>إضافة عنصر جديد
-                                </button>
-                            @else
-                                <div class="alert alert-info mt-3">
-                                    <i class="fas fa-info-circle me-2"></i>
-                                    يمكنك إضافة عناصر البانر بعد حفظ البانر أولاً
-                                </div>
-                            @endif
-                        </div>
-
                         <!-- أزرار التحكم -->
                         <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
                             <div>
@@ -939,7 +656,6 @@
                                     <i class="fas fa-times me-2"></i>إلغاء
                                 </a>
                             </div>
-
                             <div>
                                 <button type="submit" class="btn btn-primary">
                                     <i class="fas fa-save me-2"></i>{{ isset($banner) ? 'تحديث' : 'حفظ' }}
@@ -947,169 +663,6 @@
                             </div>
                         </div>
                     </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- نافذة إضافة/تعديل العناصر -->
-    <div class="modal fade" id="itemModal" tabindex="-1" role="dialog" aria-labelledby="itemModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="itemModalLabel">إضافة عنصر جديد</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="إغلاق"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="itemForm">
-                        @csrf
-                        <input type="hidden" name="banner_id" value="{{ $banner->id ?? '' }}">
-                        <input type="hidden" name="item_id" id="item_id">
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="item_order" class="form-label required-field">ترتيب العنصر</label>
-                                <input type="number" class="form-control" id="item_order" name="item_order"
-                                    value="{{ old('item_order', isset($banner) ? $banner->items->count() + 1 : 1) }}"
-                                    required min="1">
-                                <span class="help-text">الترتيب في العرض</span>
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">حالة العنصر</label>
-                                <div class="d-flex align-items-center mt-2">
-                                    <label class="toggle-switch me-3">
-                                        <input type="hidden" name="is_active" value="0">
-                                        <input type="checkbox" name="is_active" id="item_is_active" value="1"
-                                            checked>
-                                        <span class="toggle-slider"></span>
-                                    </label>
-                                    <span class="badge-custom badge-active">نشط</span>
-                                </div>
-                                <span class="help-text">تفعيل أو تعطيل العنصر</span>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="image" class="form-label required-field">صورة العنصر</label>
-                                <div class="image-upload-box" id="imageUploadBox">
-                                    <i class="fas fa-cloud-upload-alt"></i>
-                                    <p>انقر لرفع صورة</p>
-                                    <p class="text-muted">الحجم المقترح: 1200x400 بكسل</p>
-                                    <img id="imagePreview" class="image-preview" alt="صورة المعاينة">
-                                    <input type="file" id="image" name="image" accept="image/*">
-                                </div>
-                                <span class="help-text">الصورة الأساسية للعرض على جميع الشاشات</span>
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label for="mobile_image" class="form-label">صورة الموبايل (اختياري)</label>
-                                <div class="image-upload-box" id="mobileImageUploadBox">
-                                    <i class="fas fa-mobile-alt"></i>
-                                    <p>انقر لرفع صورة للموبايل</p>
-                                    <p class="text-muted">الحجم المقترح: 600x200 بكسل</p>
-                                    <img id="mobileImagePreview" class="image-preview" alt="صورة الموبايل المعاينة">
-                                    <input type="file" id="mobile_image" name="mobile_image" accept="image/*">
-                                </div>
-                                <span class="help-text">صورة خاصة للعرض على الشاشات الصغيرة</span>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="image_alt" class="form-label">النص البديل للصورة</label>
-                                <input type="text" class="form-control" id="image_alt" name="image_alt"
-                                    placeholder="وصف مختصر للصورة">
-                                <span class="help-text">يظهر عند عدم تحميل الصورة</span>
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label for="link_url" class="form-label">رابط التوجيه (URL)</label>
-                                <input type="url" class="form-control" id="link_url" name="link_url"
-                                    placeholder="https://example.com">
-                                <span class="help-text">الرابط الذي سيتم توجيه المستخدم إليه عند النقر</span>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="link_target" class="form-label">فتح الرابط في</label>
-                                <select class="form-control" id="link_target" name="link_target">
-                                    <option value="_self">نفس النافذة</option>
-                                    <option value="_blank">نافذة جديدة</option>
-                                </select>
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <div class="form-check form-switch mt-4">
-                                    <input type="hidden" name="is_link_active" value="0">
-                                    <input class="form-check-input" type="checkbox" id="is_link_active"
-                                        name="is_link_active" value="1" checked>
-                                    <label class="form-check-label" for="is_link_active">تفعيل الرابط</label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="product_id" class="form-label">ربط بمنتج (اختياري)</label>
-                                <select class="form-control select2" id="product_id" name="product_id">
-                                    <option value="">-- اختر منتج --</option>
-                                    @foreach ($products as $product)
-                                        <option value="{{ $product->id }}">{{ $product->title }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label for="category_id_item" class="form-label">ربط بقسم (اختياري)</label>
-                                <select class="form-control select2" id="category_id_item" name="category_id">
-                                    <option value="">-- اختر قسم --</option>
-                                    @foreach ($categories as $category)
-                                        <option value="{{ $category->id }}">{{ $category->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-4 mb-3">
-                                <label for="tag_text" class="form-label">نص الوسم (اختياري)</label>
-                                <input type="text" class="form-control" id="tag_text" name="tag_text"
-                                    placeholder="مثال: جديد، مميز">
-                            </div>
-
-                            <div class="col-md-4 mb-3">
-                                <label for="tag_color" class="form-label">لون النص</label>
-                                <input type="color" class="form-control" id="tag_color" name="tag_color"
-                                    value="#ffffff">
-                            </div>
-
-                            <div class="col-md-4 mb-3">
-                                <label for="tag_bg_color" class="form-label">لون الخلفية</label>
-                                <input type="color" class="form-control" id="tag_bg_color" name="tag_bg_color"
-                                    value="#696cff">
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-12 mb-3">
-                                <label for="promo_codes" class="form-label">رموز التخفيض (اختياري)</label>
-                                <select class="form-control select2" id="promo_codes" name="promo_codes[]" multiple>
-                                    @foreach ($promoCodes as $promo)
-                                        <option value="{{ $promo->id }}">{{ $promo->code }} -
-                                            {{ $promo->discount_percentage }}%</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
-                    <button type="button" class="btn btn-primary" id="saveItemBtn">حفظ العنصر</button>
                 </div>
             </div>
         </div>
@@ -1122,725 +675,90 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script>
-        // ملف JavaScript منفصل لتفادي المشاكل
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('Banner form loaded - All local resources');
-
-            // تعطيل أي محاولات جلب من روابط خارجية
-            blockExternalRequests();
-
-            // تهيئة Select2 مع تأخير بسيط لضمان تحميل DOM
-            setTimeout(function() {
-                initSelect2();
-            }, 100);
-
-            // تهيئة الأحداث بعد التأكد من تحميل DOM
-            setTimeout(function() {
-                initEvents();
-                initPageState();
-            }, 200);
-        });
-
-        // دالة لحظر الطلبات الخارجية
-        function blockExternalRequests() {
-            if (typeof window.fetch === 'function') {
-                const originalFetch = window.fetch;
-                window.fetch = function() {
-                    const url = arguments[0];
-                    if (typeof url === 'string' && url.includes('seda.codeella.com')) {
-                        console.warn('Blocked external request to:', url);
-                        return Promise.reject(new Error('External requests are blocked'));
+        $(document).ready(function() {
+            // تهيئة Select2
+            $('.select2').select2({
+                placeholder: 'اختر من القائمة',
+                allowClear: true,
+                language: {
+                    noResults: function() {
+                        return "لا توجد نتائج";
                     }
-                    return originalFetch.apply(this, arguments);
-                };
-            }
-
-            // منع XMLHttpRequest كذلك
-            if (typeof XMLHttpRequest !== 'undefined') {
-                const originalOpen = XMLHttpRequest.prototype.open;
-                XMLHttpRequest.prototype.open = function() {
-                    const url = arguments[1];
-                    if (typeof url === 'string' && url.includes('seda.codeella.com')) {
-                        console.warn('Blocked XMLHttpRequest to:', url);
-                        throw new Error('External requests are blocked');
-                    }
-                    return originalOpen.apply(this, arguments);
-                };
-            }
-        }
-
-        // تهيئة Select2
-        function initSelect2() {
-            const select2Elements = document.querySelectorAll('.select2');
-            if (select2Elements.length && typeof $.fn.select2 !== 'undefined') {
-                select2Elements.forEach(function(element) {
-                    $(element).select2({
-                        placeholder: 'اختر من القائمة',
-                        allowClear: true,
-                        language: {
-                            noResults: function() {
-                                return "لا توجد نتائج";
-                            }
-                        },
-                        dropdownParent: $(element).closest('.modal').length ? $('#itemModal') : document
-                            .body
-                    });
-                });
-            }
-        }
-
-        // تهيئة الأحداث
-        function initEvents() {
-            // اختيار القسم - باستخدام event delegation
-            document.addEventListener('click', function(e) {
-                // اختيار القسم
-                if (e.target.closest('.category-option')) {
-                    const categoryOption = e.target.closest('.category-option');
-                    const categoryType = categoryOption.dataset.categoryType;
-                    handleCategorySelection(categoryType);
-                }
-
-                // اختيار نوع البانر
-                if (e.target.closest('.type-card')) {
-                    const typeCard = e.target.closest('.type-card');
-                    const typeId = typeCard.dataset.typeId;
-                    const typeName = typeCard.dataset.typeName;
-                    handleTypeSelection(typeId, typeName);
-                }
-
-                // معاينة الصور
-                if (e.target.closest('#imageUploadBox')) {
-                    document.getElementById('image').click();
-                }
-
-                if (e.target.closest('#mobileImageUploadBox')) {
-                    document.getElementById('mobile_image').click();
-                }
-
-                // إضافة عنصر جديد
-                if (e.target.id === 'addItemBtn' || e.target.closest('#addItemBtn')) {
-                    openItemModal();
-                }
-
-                // حفظ العنصر
-                if (e.target.id === 'saveItemBtn') {
-                    saveItem();
-                }
-
-                // تعديل العنصر
-                if (e.target.closest('.edit-item')) {
-                    const button = e.target.closest('.edit-item');
-                    const itemId = button.dataset.id;
-                    editItem(itemId);
-                }
-
-                // حذف العنصر
-                if (e.target.closest('.delete-item')) {
-                    const button = e.target.closest('.delete-item');
-                    const itemId = button.dataset.id;
-                    deleteItem(itemId);
                 }
             });
 
-            // تغييرات في الحقول
-            document.getElementById('permanent')?.addEventListener('change', handlePermanentChange);
-            document.querySelector('input[name="is_active"]')?.addEventListener('change', handleBannerStatusChange);
+            // اختيار القسم
+            $('.category-option').on('click', function() {
+                const categoryType = $(this).data('category-type');
+                
+                $('.category-option').removeClass('active');
+                $(this).addClass('active');
+                $('#category_type').val(categoryType);
 
-            // تغييرات في ملفات الصور
-            document.getElementById('image')?.addEventListener('change', function(e) {
-                previewImage(this, '#imagePreview');
-            });
-
-            document.getElementById('mobile_image')?.addEventListener('change', function(e) {
-                previewImage(this, '#mobileImagePreview');
-            });
-
-            // إرسال النموذج الرئيسي
-            const bannerForm = document.getElementById('bannerForm');
-            if (bannerForm) {
-                bannerForm.addEventListener('submit', handleBannerFormSubmit);
-            }
-
-            // إغلاق المودال
-            const itemModal = document.getElementById('itemModal');
-            if (itemModal) {
-                itemModal.addEventListener('hidden.bs.modal', function() {
-                    resetItemForm();
-                });
-            }
-        }
-
-        // معالجة اختيار القسم
-        function handleCategorySelection(categoryType) {
-            const options = document.querySelectorAll('.category-option');
-            const categoryTypeInput = document.getElementById('category_type');
-            const categorySelect = document.getElementById('specificCategorySelect');
-            const categoryIdSelect = document.getElementById('category_id');
-
-            options.forEach(option => option.classList.remove('active'));
-            event.target.closest('.category-option').classList.add('active');
-            categoryTypeInput.value = categoryType;
-
-            if (categoryType === 'specific') {
-                categorySelect.classList.add('show');
-                if (categoryIdSelect) categoryIdSelect.required = true;
-            } else {
-                categorySelect.classList.remove('show');
-                if (categoryIdSelect) {
-                    categoryIdSelect.required = false;
-                    categoryIdSelect.value = '';
-                }
-            }
-        }
-
-        // معالجة اختيار النوع
-        function handleTypeSelection(typeId, typeName) {
-            const typeCards = document.querySelectorAll('.type-card');
-            const typeInput = document.querySelector(`#type_${typeId}`);
-            const selectedTypeInput = document.getElementById('selected_type');
-            const gridSettings = document.getElementById('gridSettings');
-            const sliderSettings = document.getElementById('sliderSettings');
-
-            typeCards.forEach(card => card.classList.remove('active'));
-            event.target.closest('.type-card').classList.add('active');
-
-            if (typeInput) typeInput.checked = true;
-            if (selectedTypeInput) selectedTypeInput.value = typeId;
-
-            // إظهار/إخفاء الإعدادات حسب النوع
-            if (gridSettings) gridSettings.style.display = 'none';
-            if (sliderSettings) sliderSettings.style.display = 'none';
-
-            if (typeName === 'grid' && gridSettings) {
-                gridSettings.style.display = 'block';
-            } else if (typeName === 'slider' && sliderSettings) {
-                sliderSettings.style.display = 'block';
-            }
-        }
-
-        // معالجة تغيير الحالة الدائمة
-        function handlePermanentChange() {
-            const isPermanent = this.checked;
-            const startDate = document.getElementById('start_date');
-            const endDate = document.getElementById('end_date');
-
-            if (startDate) startDate.disabled = isPermanent;
-            if (endDate) endDate.disabled = isPermanent;
-
-            if (isPermanent) {
-                if (startDate) startDate.value = '';
-                if (endDate) endDate.value = '';
-            }
-        }
-
-        // معالجة تغيير حالة البانر
-        function handleBannerStatusChange() {
-            const isChecked = this.checked;
-            const badge = this.closest('.d-flex').querySelector('.badge-custom');
-
-            if (badge) {
-                badge.classList.remove(isChecked ? 'badge-inactive' : 'badge-active');
-                badge.classList.add(isChecked ? 'badge-active' : 'badge-inactive');
-                badge.textContent = isChecked ? 'نشط' : 'غير نشط';
-            }
-        }
-
-        // معاينة الصور
-        function previewImage(input, previewSelector) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const preview = document.querySelector(previewSelector);
-                    if (preview) {
-                        preview.src = e.target.result;
-                        preview.style.display = 'block';
-                    }
-                };
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-
-        // إرسال النموذج الرئيسي
-        function handleBannerFormSubmit(e) {
-            e.preventDefault();
-
-            // التحقق من الحقول المطلوبة
-            const title = document.getElementById('title')?.value.trim();
-            const categoryType = document.getElementById('category_type')?.value;
-            const categoryId = document.getElementById('category_id')?.value;
-
-            if (!title) {
-                showError('يرجى إدخال عنوان البانر');
-                document.getElementById('title')?.focus();
-                return false;
-            }
-
-            if (categoryType === 'specific' && !categoryId) {
-                showError('يرجى اختيار قسم للبانر');
-                return false;
-            }
-
-            // إظهار تحميل
-            Swal.fire({
-                title: 'جاري الحفظ...',
-                text: 'يرجى الانتظار',
-                allowOutsideClick: false,
-                didOpen: () => Swal.showLoading()
-            });
-
-            // إرسال النموذج باستخدام fetch بدلاً من jQuery
-            const formData = new FormData(this);
-
-            fetch(this.action, {
-                    method: this.method,
-                    body: formData,
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
-                        'Accept': 'application/json'
-                    }
-                })
-                .then(response => response.json().then(data => ({
-                    ok: response.ok,
-                    data
-                })))
-                .then(({
-                    ok,
-                    data
-                }) => {
-                    if (ok) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'تم!',
-                            text: data.message || 'تم حفظ البانر بنجاح',
-                            timer: 1500,
-                            showConfirmButton: false
-                        }).then(function() {
-                            if (data.redirect) {
-                                window.location.href = data.redirect;
-                            } else {
-                                window.location.href = window.bannerIndexUrl || '/admin/banners';
-                            }
-                        });
-                    } else {
-                        throw data;
-                    }
-                })
-                .catch(error => {
-                    let errorMessage = 'حدث خطأ أثناء الحفظ';
-
-                    if (error && error.errors) {
-                        errorMessage = '';
-                        for (const key in error.errors) {
-                            errorMessage += error.errors[key].join('<br>') + '<br>';
-                        }
-                    } else if (error && error.message) {
-                        errorMessage = error.message;
-                    }
-
-                    showError(errorMessage);
-                });
-        }
-
-        // فتح مودال العنصر
-        function openItemModal() {
-            const modalTitle = document.getElementById('itemModalLabel');
-            const itemForm = document.getElementById('itemForm');
-            const imagePreview = document.getElementById('imagePreview');
-            const mobileImagePreview = document.getElementById('mobileImagePreview');
-
-            if (modalTitle) modalTitle.textContent = 'إضافة عنصر جديد';
-            if (itemForm) itemForm.reset();
-
-            // إعادة تعيين الحقول المخفية
-            const itemIdInput = document.getElementById('item_id');
-            if (itemIdInput) itemIdInput.value = '';
-
-            // إعادة تعيين الـ hidden fields
-            const hiddenFields = itemForm.querySelectorAll('input[type="hidden"]');
-            hiddenFields.forEach(field => {
-                if (field.name === 'is_active' || field.name === 'is_link_active') {
-                    field.value = '0';
-                }
-            });
-
-            // إعادة تعيين checkboxes
-            const checkboxes = itemForm.querySelectorAll('input[type="checkbox"]');
-            checkboxes.forEach(checkbox => {
-                checkbox.checked = true;
-                if (checkbox.name === 'is_active' || checkbox.name === 'is_link_active') {
-                    checkbox.value = '1';
-                }
-            });
-
-            // إخفاء معاينات الصور
-            if (imagePreview) {
-                imagePreview.style.display = 'none';
-                imagePreview.src = '';
-            }
-            if (mobileImagePreview) {
-                mobileImagePreview.style.display = 'none';
-                mobileImagePreview.src = '';
-            }
-
-            // إعادة تعيين Select2
-            const select2Elements = document.querySelectorAll('#itemForm .select2');
-            select2Elements.forEach(element => {
-                if ($(element).data('select2')) {
-                    $(element).val(null).trigger('change');
-                }
-            });
-
-            // تعيين ترتيب العنصر
-            const itemOrderInput = document.getElementById('item_order');
-            if (itemOrderInput) {
-                const itemCount = parseInt(document.getElementById('itemsContainer')?.querySelectorAll('.item-card')
-                    .length) || 0;
-                itemOrderInput.value = itemCount + 1;
-            }
-
-            // فتح المودال باستخدام Bootstrap
-            const itemModal = new bootstrap.Modal(document.getElementById('itemModal'));
-            itemModal.show();
-        }
-
-        // حفظ العنصر
-        function saveItem() {
-            const formElement = document.getElementById('itemForm');
-            if (!formElement) return;
-
-            const formData = new FormData(formElement);
-            const itemId = document.getElementById('item_id')?.value;
-            const imageInput = document.getElementById('image');
-
-            // التحقق من الصورة (فقط عند الإضافة)
-            if (!itemId && (!imageInput || !imageInput.files || imageInput.files.length === 0)) {
-                showError('يرجى رفع صورة للعنصر');
-                return false;
-            }
-
-            Swal.fire({
-                title: 'جاري الحفظ...',
-                text: 'يرجى الانتظار',
-                allowOutsideClick: false,
-                didOpen: () => Swal.showLoading()
-            });
-
-            const url = itemId ?
-                window.itemUpdateUrl.replace(':id', itemId) :
-                window.itemStoreUrl;
-            const method = itemId ? 'PUT' : 'POST';
-
-            // إضافة method override للـ PUT
-            if (method === 'PUT') {
-                formData.append('_method', 'PUT');
-            }
-
-            fetch(url, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
-                        'Accept': 'application/json'
-                    }
-                })
-                .then(response => response.json().then(data => ({
-                    ok: response.ok,
-                    data
-                })))
-                .then(({
-                    ok,
-                    data
-                }) => {
-                    if (ok) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'نجاح',
-                            text: data.message || 'تم حفظ العنصر بنجاح',
-                            timer: 1500,
-                            showConfirmButton: false
-                        }).then(function() {
-                            const modal = bootstrap.Modal.getInstance(document.getElementById('itemModal'));
-                            if (modal) modal.hide();
-                            location.reload();
-                        });
-                    } else {
-                        throw data;
-                    }
-                })
-                .catch(error => {
-                    let errorMessage = 'حدث خطأ أثناء الحفظ';
-
-                    if (error && error.errors) {
-                        errorMessage = '';
-                        for (const key in error.errors) {
-                            errorMessage += error.errors[key].join('<br>') + '<br>';
-                        }
-                    } else if (error && error.message) {
-                        errorMessage = error.message;
-                    }
-
-                    showError(errorMessage);
-                });
-        }
-
-        // تعديل العنصر
-        function editItem(itemId) {
-            fetch(`/admin/banners/items/${itemId}`, {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
-                    }
-                })
-                .then(response => response.json())
-                .then(response => {
-                    const modalTitle = document.getElementById('itemModalLabel');
-                    if (modalTitle) modalTitle.textContent = 'تعديل العنصر';
-
-                    // تعبئة الحقول
-                    const fields = {
-                        'item_id': response.id,
-                        'item_order': response.item_order,
-                        'image_alt': response.image_alt,
-                        'link_url': response.link_url,
-                        'tag_text': response.tag_text,
-                        'tag_color': response.tag_color || '#ffffff',
-                        'tag_bg_color': response.tag_bg_color || '#696cff'
-                    };
-
-                    Object.keys(fields).forEach(fieldId => {
-                        const field = document.getElementById(fieldId);
-                        if (field) field.value = fields[fieldId];
-                    });
-
-                    // تعيين القيم المنطقية
-                    const itemIsActive = document.getElementById('item_is_active');
-                    if (itemIsActive) {
-                        itemIsActive.checked = response.is_active == 1;
-                        itemIsActive.value = response.is_active == 1 ? '1' : '0';
-                        // تعيين hidden field
-                        const isActiveHidden = document.querySelector('input[name="is_active"][type="hidden"]');
-                        if (isActiveHidden) {
-                            isActiveHidden.value = response.is_active == 1 ? '0' : '0';
-                        }
-                    }
-
-                    const linkTarget = document.getElementById('link_target');
-                    if (linkTarget) linkTarget.value = response.link_target || '_self';
-
-                    const isLinkActive = document.getElementById('is_link_active');
-                    if (isLinkActive) {
-                        isLinkActive.checked = response.is_link_active == 1;
-                        isLinkActive.value = response.is_link_active == 1 ? '1' : '0';
-                        // تعيين hidden field
-                        const isLinkActiveHidden = document.querySelector(
-                            'input[name="is_link_active"][type="hidden"]');
-                        if (isLinkActiveHidden) {
-                            isLinkActiveHidden.value = response.is_link_active == 1 ? '0' : '0';
-                        }
-                    }
-
-                    // تعيين Select2
-                    setTimeout(() => {
-                        const productSelect = document.getElementById('product_id');
-                        if (productSelect && response.product_id) {
-                            $(productSelect).val(response.product_id).trigger('change');
-                        }
-
-                        const categorySelect = document.getElementById('category_id_item');
-                        if (categorySelect && response.category_id) {
-                            $(categorySelect).val(response.category_id).trigger('change');
-                        }
-
-                        const promoSelect = document.getElementById('promo_codes');
-                        if (promoSelect && response.promo_codes) {
-                            const promoIds = Array.isArray(response.promo_codes) ? response.promo_codes : [
-                                response.promo_codes
-                            ];
-                            $(promoSelect).val(promoIds).trigger('change');
-                        }
-                    }, 100);
-
-                    // عرض الصور
-                    const imagePreview = document.getElementById('imagePreview');
-                    if (imagePreview && response.image_url) {
-                        imagePreview.src = response.image_url;
-                        imagePreview.style.display = 'block';
-                    }
-
-                    const mobileImagePreview = document.getElementById('mobileImagePreview');
-                    if (mobileImagePreview && response.mobile_image) {
-                        mobileImagePreview.src = response.mobile_image;
-                        mobileImagePreview.style.display = 'block';
-                    }
-
-                    // فتح المودال
-                    const itemModal = new bootstrap.Modal(document.getElementById('itemModal'));
-                    itemModal.show();
-                })
-                .catch(() => {
-                    showError('تعذر تحميل بيانات العنصر');
-                });
-        }
-
-        // حذف العنصر - حل CSRF token mismatch
-        function deleteItem(itemId) {
-            Swal.fire({
-                title: 'هل أنت متأكد؟',
-                text: 'سيتم حذف العنصر نهائياً',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'نعم، احذف',
-                cancelButtonText: 'إلغاء',
-                reverseButtons: true
-            }).then(function(result) {
-                if (result.isConfirmed) {
-                    // الحصول على CSRF token
-                    const token = document.querySelector('meta[name="csrf-token"]')?.content ||
-                        document.querySelector('input[name="_token"]')?.value ||
-                        '';
-
-                    // الطريقة الأولى: استخدام FormData (الأفضل)
-                    const formData = new FormData();
-                    formData.append('_method', 'DELETE');
-                    formData.append('_token', token);
-
-                    fetch(`/admin/banners/items/${itemId}`, {
-                            method: 'POST',
-                            headers: {
-                                'Accept': 'application/json',
-                                'X-CSRF-TOKEN': token // إضافة في الـ headers أيضاً
-                            },
-                            body: formData
-                        })
-                        .then(response => {
-                            // التحقق من حالة الرد
-                            if (!response.ok) {
-                                return response.json().then(err => {
-                                    throw err;
-                                });
-                            }
-                            return response.json();
-                        })
-                        .then(response => {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'تم الحذف',
-                                text: response.message || 'تم حذف العنصر بنجاح',
-                                timer: 1500,
-                                showConfirmButton: false
-                            }).then(function() {
-                                // تحديث القائمة دون إعادة تحميل الصفحة كاملة
-                                const itemElement = document.querySelector(
-                                    `.delete-item[data-id="${itemId}"]`)?.closest('.item-card');
-                                if (itemElement) {
-                                    itemElement.remove();
-
-                                    // إذا لم يتبق عناصر، إظهار رسالة فارغة
-                                    const itemsContainer = document.getElementById('itemsContainer');
-                                    if (itemsContainer.querySelectorAll('.item-card').length === 0) {
-                                        itemsContainer.innerHTML = `
-                                <div class="empty-items">
-                                    <i class="fas fa-image"></i>
-                                    <p>لا توجد عناصر مضافة</p>
-                                    <small class="help-text">يمكنك إضافة عناصر بعد حفظ البانر</small>
-                                </div>
-                            `;
-                                    }
-                                } else {
-                                    // إعادة تحميل الصفحة إذا لم نتمكن من إزالة العنصر ديناميكياً
-                                    location.reload();
-                                }
-                            });
-                        })
-                        .catch((error) => {
-                            console.error('Delete error:', error);
-                            let errorMessage = 'حدث خطأ أثناء حذف العنصر';
-
-                            if (error && error.message) {
-                                if (error.message.includes('CSRF token')) {
-                                    errorMessage =
-                                        'خطأ في التحقق من الأمان. يرجى تحديث الصفحة والمحاولة مرة أخرى.';
-                                } else {
-                                    errorMessage = error.message;
-                                }
-                            }
-
-                            showError(errorMessage);
-                        });
-                }
-            });
-        }
-
-
-        // إعادة تعيين نموذج العنصر
-        function resetItemForm() {
-            const form = document.getElementById('itemForm');
-            if (form) form.reset();
-
-            const previews = document.querySelectorAll('#imagePreview, #mobileImagePreview');
-            previews.forEach(preview => {
-                preview.style.display = 'none';
-                preview.src = '';
-            });
-
-            const select2Elements = document.querySelectorAll('#itemForm .select2');
-            select2Elements.forEach(element => {
-                if ($(element).data('select2')) {
-                    $(element).val(null).trigger('change');
-                }
-            });
-        }
-
-        // تهيئة حالة الصفحة
-        function initPageState() {
-            // Set initial category selection
-            const categoryType = document.getElementById('category_type')?.value || 'main';
-            const initialCategoryOption = document.querySelector(`.category-option[data-category-type="${categoryType}"]`);
-            if (initialCategoryOption) {
-                initialCategoryOption.classList.add('active');
                 if (categoryType === 'specific') {
-                    document.getElementById('specificCategorySelect')?.classList.add('show');
+                    $('#specificCategorySelect').addClass('show');
+                    $('#category_id').prop('required', true);
+                } else {
+                    $('#specificCategorySelect').removeClass('show');
+                    $('#category_id').prop('required', false).val('');
                 }
-            }
-
-            // Set initial type selection
-            const selectedType = document.getElementById('selected_type')?.value || 1;
-            const initialTypeCard = document.querySelector(`.type-card[data-type-id="${selectedType}"]`);
-            if (initialTypeCard) {
-                initialTypeCard.classList.add('active');
-                const typeName = initialTypeCard.dataset.typeName;
-
-                // إظهار الإعدادات المناسبة
-                if (typeName === 'grid') {
-                    document.getElementById('gridSettings').style.display = 'block';
-                } else if (typeName === 'slider') {
-                    document.getElementById('sliderSettings').style.display = 'block';
-                }
-            }
-
-            // Set initial permanent checkbox state
-            const permanentCheckbox = document.getElementById('permanent');
-            if (permanentCheckbox) {
-                permanentCheckbox.dispatchEvent(new Event('change'));
-            }
-        }
-
-        // وظيفة لعرض الأخطاء
-        function showError(message) {
-            Swal.fire({
-                icon: 'error',
-                title: 'خطأ',
-                html: message,
-                confirmButtonText: 'حسناً'
             });
-        }
 
-        // تهيئة المتغيرات العالمية
-        window.bannerIndexUrl = "{{ route('admin.banners.index') }}";
-        window.itemStoreUrl = "{{ route('admin.banners.items.store') }}";
-        window.itemUpdateUrl = "{{ route('admin.banners.items.update', ':id') }}";
+            // اختيار نوع البانر
+            $('.type-card').on('click', function() {
+                const typeId = $(this).data('type-id');
+                const typeName = $(this).data('type-name');
+                
+                $('.type-card').removeClass('active');
+                $(this).addClass('active');
+                $(`#type_${typeId}`).prop('checked', true);
+                $('#selected_type').val(typeId);
+
+                // إظهار/إخفاء الإعدادات حسب النوع
+                $('#gridSettings, #sliderSettings').hide();
+
+                if (typeName === 'grid') {
+                    $('#gridSettings').show();
+                } else if (typeName === 'slider') {
+                    $('#sliderSettings').show();
+                }
+            });
+
+            // تغيير حالة البانر
+            $('input[name="is_active"]').on('change', function() {
+                const isChecked = $(this).is(':checked');
+                const badge = $(this).closest('.d-flex').find('.badge-custom');
+                
+                if (badge.length) {
+                    badge.removeClass('badge-active badge-inactive')
+                          .addClass(isChecked ? 'badge-active' : 'badge-inactive')
+                          .text(isChecked ? 'نشط' : 'غير نشط');
+                }
+            });
+
+            // تغيير الحالة الدائمة
+            $('#permanent').on('change', function() {
+                const isPermanent = $(this).is(':checked');
+                $('#start_date, #end_date').prop('disabled', isPermanent);
+                
+                if (isPermanent) {
+                    $('#start_date, #end_date').val('');
+                }
+            }).trigger('change');
+
+            // معاينة حالة الصفحة
+            const selectedType = $('#selected_type').val();
+            if (selectedType) {
+                const typeCard = $(`.type-card[data-type-id="${selectedType}"]`);
+                if (typeCard.length) {
+                    typeCard.trigger('click');
+                }
+            }
+
+            const categoryType = $('#category_type').val();
+            if (categoryType === 'specific') {
+                $(`.category-option[data-category-type="specific"]`).trigger('click');
+            }
+        });
     </script>
 @endsection
