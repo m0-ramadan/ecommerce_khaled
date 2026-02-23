@@ -1,36 +1,37 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Admin\FaqController;
-use App\Http\Controllers\Admin\RoleController;
-use App\Http\Controllers\Admin\UserController;
-use App\Http\Controllers\Admin\AdminController;
-use App\Http\Controllers\Admin\ErrorController;
-use App\Http\Controllers\Admin\OrderController;
-use App\Http\Controllers\Admin\RolesController;
-use App\Http\Controllers\Admin\BannerController;
-use App\Http\Controllers\Admin\CouponController;
-use App\Http\Controllers\Admin\RegionController;
-use App\Http\Controllers\Admin\SliderController;
-use App\Http\Controllers\Admin\ArticleController;
-use App\Http\Controllers\Admin\ContactController;
-use App\Http\Controllers\Admin\CountryController;
-use App\Http\Controllers\Admin\ManagerController;
-use App\Http\Controllers\Admin\ProductController;
-use App\Http\Controllers\Admin\SettingController;
-use App\Http\Controllers\Admin\VisitorController;
-use App\Http\Controllers\Admin\CategoryController;
-use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\AdminAuthController;
-use App\Http\Controllers\Admin\ContactUsController;
-use App\Http\Controllers\Admin\SubscribeController;
+use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\AdsController;
+use App\Http\Controllers\Admin\ArticleController;
+use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\BannerItemController;
-use App\Http\Controllers\Admin\PermissionController;
-use App\Http\Controllers\Admin\StaticPageController;
-use App\Http\Controllers\Admin\PermissionsController;
-use App\Http\Controllers\Admin\SocialMediaController;
-use App\Http\Controllers\Admin\PaymentMethodController;
+use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\ContactController;
+use App\Http\Controllers\Admin\ContactUsController;
+use App\Http\Controllers\Admin\CountryController;
+use App\Http\Controllers\Admin\CouponController;
+use App\Http\Controllers\Admin\EmployeeController;
+use App\Http\Controllers\Admin\ErrorController;
+use App\Http\Controllers\Admin\FaqController;
 use App\Http\Controllers\Admin\LogisticServiceController;
+use App\Http\Controllers\Admin\ManagerController;
+use App\Http\Controllers\Admin\OrderController;
+use App\Http\Controllers\Admin\PaymentMethodController;
+use App\Http\Controllers\Admin\PermissionController;
+use App\Http\Controllers\Admin\PermissionsController;
+use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\RegionController;
+use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\RolesController;
+use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Admin\SliderController;
+use App\Http\Controllers\Admin\SocialMediaController;
+use App\Http\Controllers\Admin\StaticPageController;
+use App\Http\Controllers\Admin\SubscribeController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\VisitorController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -71,11 +72,23 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
         Route::post('update', [SettingController::class, 'update'])->name('update');
         Route::post('update-pages', [SettingController::class, 'updatepages'])->name('updatepages');
     });
-
+    // Ads Management Routes
+    Route::prefix('ads')->name('ads.')->group(function () {
+        Route::get('/', [AdsController::class, 'index'])->name('index');           // List all ads
+        Route::post('/', [AdsController::class, 'store'])->name('store');          // Store new ad
+        Route::get('/{id}', [AdsController::class, 'show'])->name('show');         // Show single ad (AJAX)
+        Route::put('/{id}', [AdsController::class, 'update'])->name('update');     // Update ad
+        Route::delete('/{id}', [AdsController::class, 'destroy'])->name('destroy'); // Delete ad
+        
+        // Optional: Additional useful routes
+        Route::get('/create', [AdsController::class, 'create'])->name('create');   // Show create form (if needed)
+        Route::get('/{id}/edit', [AdsController::class, 'edit'])->name('edit');    // Show edit form (if needed)
+    });
+    
     // Resource Routes
     Route::resources([
         'admins' => AdminController::class,
-        'permissions' => PermissionsController::class,
+       // 'permissions' => PermissionsController::class,
         'roles' => RolesController::class,
         'countries' => CountryController::class,
         'contactus' => ContactUsController::class,

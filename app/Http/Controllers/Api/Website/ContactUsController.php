@@ -19,7 +19,7 @@ class ContactUsController extends Controller
 
         $contact = ContactUs::create($request->validated());
 
-        Mail::to(env("EMAIL_RECIEVERED"))->send(new ContactUsNotification($contact));
+    //    Mail::to(env("EMAIL_RECIEVERED"))->send(new ContactUsNotification($contact));
 
         return $this->success( new ContactUsResource($contact), 'تم جلب بيانات بنجاح');
 
