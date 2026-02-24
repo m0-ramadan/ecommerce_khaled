@@ -7,15 +7,22 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sortable/0.8.0/css/sortable-theme-bootstrap.min.css">
     <style>
         :root {
+            --primary-color: #696cff;
             --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --success-gradient: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
-            --warning-gradient: linear-gradient(135deg, #fad0c4 0%, #ffd1ff 100%);
-            --danger-gradient: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
+            --success-gradient: #28a745;
+            --danger-gradient: #dc3545;
+            --warning-gradient: #ffc107;
+            --info-color: #17a2b8;
+            --light-bg: #f8f9fa;
+            --border-color: #e9ecef;
+            --text-muted: #6c757d;
+            --dark-bg: #1e1e2d;
+            --dark-card: #2b3b4c;
         }
 
         body {
             font-family: "Cairo", sans-serif !important;
-            background: #f8f9fa;
+            /* background: #f8f9fa; */
         }
 
         /* بطاقات الإحصائيات المتطورة */
@@ -27,7 +34,7 @@
         }
 
         .stat-card {
-            background: white;
+            /* background: white; */
             border-radius: 20px;
             padding: 20px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
@@ -89,7 +96,7 @@
 
         /* شريط الأدوات المتقدم */
         .advanced-toolbar {
-            background: white;
+            /* background: white; */
             border-radius: 15px;
             padding: 20px;
             margin-bottom: 25px;
@@ -113,7 +120,7 @@
             font-weight: 500;
             transition: all 0.3s ease;
             border: 1px solid #e9ecef;
-            background: white;
+            /* background: white; */
             color: #495057;
         }
 
@@ -143,7 +150,7 @@
             padding: 12px 20px 12px 45px;
             border-radius: 12px;
             border: 1px solid #e9ecef;
-            background: #f8f9fa;
+            /* background: #f8f9fa; */
             transition: all 0.3s ease;
         }
 
@@ -164,7 +171,7 @@
 
         /* فلاتر متقدمة */
         .filters-wrapper {
-            background: white;
+            /* background: white; */
             border-radius: 15px;
             padding: 15px 20px;
             margin-bottom: 20px;
@@ -210,7 +217,7 @@
 
         /* الجدول الرئيسي */
         .table-wrapper {
-            background: white;
+            /* background: white; */
             border-radius: 20px;
             overflow: hidden;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
@@ -221,7 +228,7 @@
         }
 
         .table thead th {
-            background: #f8f9fa;
+            /* background: #f8f9fa; */
             color: #495057;
             font-weight: 600;
             font-size: 13px;
@@ -550,21 +557,21 @@
             .stats-grid {
                 grid-template-columns: 1fr;
             }
-            
+
             .advanced-toolbar {
                 flex-direction: column;
                 align-items: stretch;
             }
-            
+
             .search-advanced {
                 min-width: auto;
             }
-            
+
             .banner-preview-cell {
                 flex-direction: column;
                 text-align: center;
             }
-            
+
             .action-buttons {
                 justify-content: center;
             }
@@ -576,6 +583,7 @@
                 opacity: 0;
                 transform: translateY(20px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -621,7 +629,7 @@
                     <i class="fas fa-images"></i>
                 </div>
             </div>
-            
+
             <div class="stat-card">
                 <div class="stat-info">
                     <h3>{{ $banners->where('is_active', true)->count() }}</h3>
@@ -631,13 +639,16 @@
                     <i class="fas fa-check-circle"></i>
                 </div>
             </div>
-            
+
             <div class="stat-card">
                 <div class="stat-info">
                     @php
-                        $categoriesCount = $banners->filter(function($banner) {
-                            return $banner->category_id || $banner->items->where('category_id', '!=', null)->count() > 0;
-                        })->count();
+                        $categoriesCount = $banners
+                            ->filter(function ($banner) {
+                                return $banner->category_id ||
+                                    $banner->items->where('category_id', '!=', null)->count() > 0;
+                            })
+                            ->count();
                     @endphp
                     <h3>{{ $categoriesCount }}</h3>
                     <p>مرتبطة بأقسام</p>
@@ -646,13 +657,15 @@
                     <i class="fas fa-tags"></i>
                 </div>
             </div>
-            
+
             <div class="stat-card">
                 <div class="stat-info">
                     @php
-                        $productsCount = $banners->filter(function($banner) {
-                            return $banner->items->where('product_id', '!=', null)->count() > 0;
-                        })->count();
+                        $productsCount = $banners
+                            ->filter(function ($banner) {
+                                return $banner->items->where('product_id', '!=', null)->count() > 0;
+                            })
+                            ->count();
                     @endphp
                     <h3>{{ $productsCount }}</h3>
                     <p>مرتبطة بمنتجات</p>
@@ -696,75 +709,75 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="search-advanced">
                 <i class="fas fa-search"></i>
-                <input type="text" id="searchInput" placeholder="بحث بالعنوان، النوع، القسم، المنتج..." 
-                       value="{{ request('search') }}">
+                <input type="text" id="searchInput" placeholder="بحث بالعنوان، النوع، القسم، المنتج..."
+                    value="{{ request('search') }}">
             </div>
         </div>
 
         <!-- الفلاتر المتقدمة -->
         <div class="filters-wrapper">
             <div class="filter-group">
-                <span class="filter-badge {{ !request('type') && !request('status') && !request('category') ? 'active' : '' }}"
-                      onclick="filterBy('all')">
+                <span
+                    class="filter-badge {{ !request('type') && !request('status') && !request('category') ? 'active' : '' }}"
+                    onclick="filterBy('all')">
                     <i class="fas fa-list"></i>
                     الكل
                 </span>
                 <span class="filter-badge {{ request('type') == 'slider' ? 'active' : '' }}"
-                      onclick="filterByType('slider')">
+                    onclick="filterByType('slider')">
                     <i class="fas fa-sliders-h"></i>
                     سلايدر
                 </span>
-                <span class="filter-badge {{ request('type') == 'grid' ? 'active' : '' }}"
-                      onclick="filterByType('grid')">
+                <span class="filter-badge {{ request('type') == 'grid' ? 'active' : '' }}" onclick="filterByType('grid')">
                     <i class="fas fa-th-large"></i>
                     شبكة
                 </span>
                 <span class="filter-badge {{ request('type') == 'static' ? 'active' : '' }}"
-                      onclick="filterByType('static')">
+                    onclick="filterByType('static')">
                     <i class="fas fa-image"></i>
                     ثابت
                 </span>
             </div>
-            
+
             <div class="filter-group">
                 <span class="filter-badge {{ request('status') == 'active' ? 'active' : '' }}"
-                      onclick="filterByStatus('active')">
+                    onclick="filterByStatus('active')">
                     <i class="fas fa-check-circle"></i>
                     نشط
                 </span>
                 <span class="filter-badge {{ request('status') == 'inactive' ? 'active' : '' }}"
-                      onclick="filterByStatus('inactive')">
+                    onclick="filterByStatus('inactive')">
                     <i class="fas fa-times-circle"></i>
                     غير نشط
                 </span>
                 <span class="filter-badge {{ request('status') == 'expired' ? 'active' : '' }}"
-                      onclick="filterByStatus('expired')">
+                    onclick="filterByStatus('expired')">
                     <i class="fas fa-clock"></i>
                     منتهي
                 </span>
                 <span class="filter-badge {{ request('status') == 'scheduled' ? 'active' : '' }}"
-                      onclick="filterByStatus('scheduled')">
+                    onclick="filterByStatus('scheduled')">
                     <i class="fas fa-calendar-alt"></i>
                     مجدول
                 </span>
             </div>
-            
+
             <div class="filter-group">
                 <span class="filter-badge {{ request('has_category') ? 'active' : '' }}"
-                      onclick="filterByRelation('has_category')">
+                    onclick="filterByRelation('has_category')">
                     <i class="fas fa-tag"></i>
                     مرتبط بأقسام
                 </span>
                 <span class="filter-badge {{ request('has_product') ? 'active' : '' }}"
-                      onclick="filterByRelation('has_product')">
+                    onclick="filterByRelation('has_product')">
                     <i class="fas fa-cube"></i>
                     مرتبط بمنتجات
                 </span>
                 <span class="filter-badge {{ request('has_promo') ? 'active' : '' }}"
-                      onclick="filterByRelation('has_promo')">
+                    onclick="filterByRelation('has_promo')">
                     <i class="fas fa-percent"></i>
                     مرتبط بكوبونات
                 </span>
@@ -792,7 +805,8 @@
                     @forelse($banners as $index => $banner)
                         <tr class="banner-row" data-id="{{ $banner->id }}" data-order="{{ $banner->section_order }}">
                             <td>
-                                <input type="checkbox" class="row-checkbox form-check-input" value="{{ $banner->id }}">
+                                <input type="checkbox" class="row-checkbox form-check-input"
+                                    value="{{ $banner->id }}">
                             </td>
                             <td>{{ $loop->iteration + $banners->perPage() * ($banners->currentPage() - 1) }}</td>
                             <td>
@@ -807,9 +821,9 @@
                                         @php
                                             $firstItem = $banner->items->sortBy('item_order')->first();
                                         @endphp
-                                        @if($firstItem && $firstItem->image_url)
-                                            <img src="{{ get_user_image($firstItem->image_url) }}" 
-                                                 alt="{{ $firstItem->image_alt }}">
+                                        @if ($firstItem && $firstItem->image_url)
+                                            <img src="{{ get_user_image($firstItem->image_url) }}"
+                                                alt="{{ $firstItem->image_alt }}">
                                         @else
                                             <div class="banner-thumb-placeholder">
                                                 <i class="fas fa-image"></i>
@@ -825,7 +839,7 @@
                                             </span>
                                             <span>
                                                 <i class="fas fa-clock"></i>
-                                                {{ $banner->created_at->diffForHumans() }}
+                                                {{ $banner->created_at }}
                                             </span>
                                         </div>
                                     </div>
@@ -835,7 +849,8 @@
                                 <div class="d-flex flex-column gap-2">
                                     <!-- نوع البانر -->
                                     <span class="type-badge {{ $banner->type ? $banner->type->name : 'static' }}">
-                                        <i class="fas 
+                                        <i
+                                            class="fas 
                                             {{ $banner->type && $banner->type->name == 'slider' ? 'fa-sliders-h' : '' }}
                                             {{ $banner->type && $banner->type->name == 'grid' ? 'fa-th-large' : '' }}
                                             {{ !$banner->type || $banner->type->name == 'static' ? 'fa-image' : '' }}">
@@ -844,7 +859,7 @@
                                     </span>
 
                                     <!-- ربط القسم الرئيسي للبانر -->
-                                    @if($banner->category_id)
+                                    @if ($banner->category_id)
                                         <div class="relation-card">
                                             <div class="relation-header">
                                                 <div class="relation-icon category">
@@ -854,15 +869,15 @@
                                             </div>
                                             <div class="relation-path">
                                                 <i class="fas fa-folder-open"></i>
-                                                @if($banner->category)
+                                                @if ($banner->category)
                                                     {{ $banner->category->name }}
-                                                    @if($banner->category->parent)
+                                                    @if ($banner->category->parent)
                                                         <i class="fas fa-chevron-left"></i>
                                                         {{ $banner->category->parent->name }}
                                                     @endif
                                                 @endif
                                             </div>
-                                            @if($banner->category && $banner->category->full_slug)
+                                            @if ($banner->category && $banner->category->full_slug)
                                                 <div class="category-path">
                                                     <i class="fas fa-link"></i>
                                                     {{ $banner->category->full_slug }}
@@ -873,29 +888,35 @@
 
                                     <!-- عرض العناصر المرتبطة المباشرة -->
                                     @php
-                                        $linkedCategories = $banner->items->where('category_id', '!=', null)->pluck('category')->filter();
-                                        $linkedProducts = $banner->items->where('product_id', '!=', null)->pluck('product')->filter();
+                                        $linkedCategories = $banner->items
+                                            ->where('category_id', '!=', null)
+                                            ->pluck('category')
+                                            ->filter();
+                                        $linkedProducts = $banner->items
+                                            ->where('product_id', '!=', null)
+                                            ->pluck('product')
+                                            ->filter();
                                     @endphp
 
-                                    @if($linkedCategories->count() > 0)
+                                    @if ($linkedCategories->count() > 0)
                                         <div class="relation-card">
                                             <div class="relation-header">
                                                 <div class="relation-icon category">
                                                     <i class="fas fa-tags"></i>
                                                 </div>
                                                 <div class="relation-title">
-                                                    أقسام مرتبطة 
+                                                    أقسام مرتبطة
                                                     <span class="count-badge">{{ $linkedCategories->count() }}</span>
                                                 </div>
                                             </div>
                                             <div class="d-flex flex-wrap gap-1">
-                                                @foreach($linkedCategories->take(2) as $category)
+                                                @foreach ($linkedCategories->take(2) as $category)
                                                     <span class="item-tag">
                                                         <i class="fas fa-tag"></i>
                                                         {{ $category->name }}
                                                     </span>
                                                 @endforeach
-                                                @if($linkedCategories->count() > 2)
+                                                @if ($linkedCategories->count() > 2)
                                                     <span class="item-tag">
                                                         +{{ $linkedCategories->count() - 2 }}
                                                     </span>
@@ -904,25 +925,25 @@
                                         </div>
                                     @endif
 
-                                    @if($linkedProducts->count() > 0)
+                                    @if ($linkedProducts->count() > 0)
                                         <div class="relation-card">
                                             <div class="relation-header">
                                                 <div class="relation-icon product">
                                                     <i class="fas fa-cube"></i>
                                                 </div>
                                                 <div class="relation-title">
-                                                    منتجات مرتبطة 
+                                                    منتجات مرتبطة
                                                     <span class="count-badge">{{ $linkedProducts->count() }}</span>
                                                 </div>
                                             </div>
                                             <div class="d-flex flex-wrap gap-1">
-                                                @foreach($linkedProducts->take(2) as $product)
+                                                @foreach ($linkedProducts->take(2) as $product)
                                                     <span class="item-tag">
                                                         <i class="fas fa-cube"></i>
                                                         {{ $product->name }}
                                                     </span>
                                                 @endforeach
-                                                @if($linkedProducts->count() > 2)
+                                                @if ($linkedProducts->count() > 2)
                                                     <span class="item-tag">
                                                         +{{ $linkedProducts->count() - 2 }}
                                                     </span>
@@ -938,28 +959,28 @@
                                         <i class="fas fa-layer-group"></i>
                                         {{ $banner->items->count() }}
                                     </span>
-                                    @if($banner->items->count() > 0)
-                                        <button class="btn btn-sm btn-outline-primary preview-items" 
-                                                data-banner-id="{{ $banner->id }}">
+                                    @if ($banner->items->count() > 0)
+                                        <button class="btn btn-sm btn-outline-primary preview-items"
+                                            data-banner-id="{{ $banner->id }}">
                                             <i class="fas fa-eye"></i>
                                         </button>
                                     @endif
                                 </div>
-                                
+
                                 <!-- عرض مختصر للعناصر -->
-                                @if($banner->items->count() > 0)
+                                @if ($banner->items->count() > 0)
                                     <div class="d-flex flex-column gap-1">
-                                        @foreach($banner->items->sortBy('item_order')->take(2) as $item)
+                                        @foreach ($banner->items->sortBy('item_order')->take(2) as $item)
                                             <div class="item-tag w-100 justify-content-between">
                                                 <span>
-                                                    @if($item->category_id)
+                                                    @if ($item->category_id)
                                                         <i class="fas fa-tag text-info"></i>
                                                     @elseif($item->product_id)
                                                         <i class="fas fa-cube text-success"></i>
                                                     @else
                                                         <i class="fas fa-image text-secondary"></i>
                                                     @endif
-                                                    @if($item->category)
+                                                    @if ($item->category)
                                                         {{ $item->category->name }}
                                                     @elseif($item->product)
                                                         {{ $item->product->name }}
@@ -970,7 +991,7 @@
                                                 <small class="text-muted">#{{ $item->item_order }}</small>
                                             </div>
                                         @endforeach
-                                        @if($banner->items->count() > 2)
+                                        @if ($banner->items->count() > 2)
                                             <small class="text-muted text-center">
                                                 +{{ $banner->items->count() - 2 }} عناصر أخرى
                                             </small>
@@ -986,7 +1007,7 @@
                                         $status = 'active';
                                         $statusClass = 'active';
                                         $statusText = 'نشط';
-                                        
+
                                         if (!$banner->is_active) {
                                             $status = 'inactive';
                                             $statusClass = 'inactive';
@@ -1001,9 +1022,10 @@
                                             $statusText = 'مجدول';
                                         }
                                     @endphp
-                                    
+
                                     <span class="status-badge {{ $statusClass }}">
-                                        <i class="fas 
+                                        <i
+                                            class="fas 
                                             {{ $status == 'active' ? 'fa-check-circle' : '' }}
                                             {{ $status == 'inactive' ? 'fa-times-circle' : '' }}
                                             {{ $status == 'expired' ? 'fa-clock' : '' }}
@@ -1014,15 +1036,15 @@
                                 </div>
 
                                 <!-- الفترة الزمنية -->
-                                @if($banner->start_date || $banner->end_date)
+                                @if ($banner->start_date || $banner->end_date)
                                     <div class="small">
-                                        @if($banner->start_date)
+                                        @if ($banner->start_date)
                                             <div class="text-muted">
                                                 <i class="fas fa-play"></i>
                                                 {{ $banner->start_date->format('Y-m-d') }}
                                             </div>
                                         @endif
-                                        @if($banner->end_date)
+                                        @if ($banner->end_date)
                                             <div class="text-muted">
                                                 <i class="fas fa-stop"></i>
                                                 {{ $banner->end_date->format('Y-m-d') }}
@@ -1038,26 +1060,20 @@
                             </td>
                             <td>
                                 <div class="action-buttons">
-                                    <a href="{{ route('admin.banners.show', $banner) }}" 
-                                       class="btn-icon btn-info" 
-                                       title="عرض التفاصيل">
+                                    <a href="{{ route('admin.banners.show', $banner) }}" class="btn-icon btn-info"
+                                        title="عرض التفاصيل">
                                         <i class="fas fa-eye"></i>
                                     </a>
-                                    <a href="{{ route('admin.banners.edit', $banner) }}" 
-                                       class="btn-icon btn-warning" 
-                                       title="تعديل">
+                                    <a href="{{ route('admin.banners.edit', $banner) }}" class="btn-icon btn-warning"
+                                        title="تعديل">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <button type="button" 
-                                            class="btn-icon btn-danger delete-btn" 
-                                            title="حذف"
-                                            data-id="{{ $banner->id }}"
-                                            data-title="{{ $banner->title }}">
+                                    <button type="button" class="btn-icon btn-danger delete-btn" title="حذف"
+                                        data-id="{{ $banner->id }}" data-title="{{ $banner->title }}">
                                         <i class="fas fa-trash"></i>
                                     </button>
-                                    <a href="{{ route('admin.banners.items.index', $banner) }}" 
-                                       class="btn-icon btn-success" 
-                                       title="إدارة العناصر">
+                                    {{-- <a href="{{ route('admin.banners.items.index', $banner->id) }}"  --}}
+                                    <a href="#" class="btn-icon btn-success" title="إدارة العناصر">
                                         <i class="fas fa-layer-group"></i>
                                     </a>
                                 </div>
@@ -1065,9 +1081,8 @@
                                 <!-- تبديل الحالة السريع -->
                                 <div class="mt-2 text-center">
                                     <label class="switch">
-                                        <input type="checkbox" class="status-toggle" 
-                                               data-id="{{ $banner->id }}"
-                                               {{ $banner->is_active ? 'checked' : '' }}>
+                                        <input type="checkbox" class="status-toggle" data-id="{{ $banner->id }}"
+                                            {{ $banner->is_active ? 'checked' : '' }}>
                                         <span class="slider round"></span>
                                     </label>
                                 </div>
@@ -1092,13 +1107,52 @@
                     @endforelse
                 </tbody>
             </table>
+            @if ($banners->hasPages())
+                <div class="m-3">
+                    <nav>
+                        <ul class="pagination">
+                            {{-- Previous Page Link --}}
+                            @if ($banners->onFirstPage())
+                                <li class="page-item disabled" aria-disabled="true">
+                                    <span class="page-link waves-effect" aria-hidden="true">‹</span>
+                                </li>
+                            @else
+                                <li class="page-item">
+                                    <a class="page-link waves-effect" href="{{ $banners->previousPageUrl() }}"
+                                        rel="prev">‹</a>
+                                </li>
+                            @endif
 
-            <!-- روابط الترقيم -->
-            @if($banners->hasPages())
-                <div class="p-3 border-top">
-                    {{ $banners->withQueryString()->links() }}
+                            {{-- Pagination Elements --}}
+                            @foreach ($banners->links()->elements[0] as $page => $url)
+                                @if ($page == $banners->currentPage())
+                                    <li class="page-item active" aria-current="page">
+                                        <span class="page-link waves-effect">{{ $page }}</span>
+                                    </li>
+                                @else
+                                    <li class="page-item">
+                                        <a class="page-link waves-effect"
+                                            href="{{ $url }}">{{ $page }}</a>
+                                    </li>
+                                @endif
+                            @endforeach
+
+                            {{-- Next Page Link --}}
+                            @if ($banners->hasMorePages())
+                                <li class="page-item">
+                                    <a class="page-link waves-effect" href="{{ $banners->nextPageUrl() }}"
+                                        rel="next">›</a>
+                                </li>
+                            @else
+                                <li class="page-item disabled" aria-disabled="true">
+                                    <span class="page-link waves-effect" aria-hidden="true">›</span>
+                                </li>
+                            @endif
+                        </ul>
+                    </nav>
                 </div>
             @endif
+
         </div>
     </div>
 
@@ -1185,7 +1239,9 @@
             $('#searchInput').on('keyup', function() {
                 clearTimeout(searchTimeout);
                 searchTimeout = setTimeout(() => {
-                    updateUrl({ search: $(this).val() });
+                    updateUrl({
+                        search: $(this).val()
+                    });
                 }, 500);
             });
 
@@ -1256,10 +1312,10 @@
             // عرض معاينة العناصر
             $('.preview-items').on('click', function() {
                 const bannerId = $(this).data('banner-id');
-                
+
                 $.get(`/admin/banners/${bannerId}`, function(response) {
                     let html = '<div class="list-group">';
-                    
+
                     response.item.forEach(item => {
                         html += `
                             <div class="list-group-item">
@@ -1279,7 +1335,7 @@
                             </div>
                         `;
                     });
-                    
+
                     html += '</div>';
                     $('#itemsPreviewContent').html(html);
                     $('#itemsPreviewModal').modal('show');
@@ -1315,8 +1371,8 @@
 
                 let confirmText = '';
                 let actionText = '';
-                
-                switch(action) {
+
+                switch (action) {
                     case 'activate':
                         confirmText = 'سيتم تفعيل البنرات المحددة';
                         actionText = 'تفعيل';
@@ -1364,15 +1420,33 @@
 
             // دوال التصفية
             window.filterBy = function(type) {
-                updateUrl({ type: null, status: null, has_category: null, has_product: null, has_promo: null });
+                updateUrl({
+                    type: null,
+                    status: null,
+                    has_category: null,
+                    has_product: null,
+                    has_promo: null
+                });
             };
 
             window.filterByType = function(type) {
-                updateUrl({ type: type, status: null, has_category: null, has_product: null, has_promo: null });
+                updateUrl({
+                    type: type,
+                    status: null,
+                    has_category: null,
+                    has_product: null,
+                    has_promo: null
+                });
             };
 
             window.filterByStatus = function(status) {
-                updateUrl({ type: null, status: status, has_category: null, has_product: null, has_promo: null });
+                updateUrl({
+                    type: null,
+                    status: status,
+                    has_category: null,
+                    has_product: null,
+                    has_promo: null
+                });
             };
 
             window.filterByRelation = function(relation) {
@@ -1437,11 +1511,11 @@
             transition: .4s;
         }
 
-        input:checked + .slider {
+        input:checked+.slider {
             background-color: #696cff;
         }
 
-        input:checked + .slider:before {
+        input:checked+.slider:before {
             transform: translateX(26px);
         }
 

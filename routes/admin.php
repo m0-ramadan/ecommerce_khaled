@@ -224,6 +224,9 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
         Route::put('/{banner}', [BannerController::class, 'update'])->name('update');
         Route::delete('/{banner}', [BannerController::class, 'destroy'])->name('destroy');
         Route::post('/{banner}/toggle-status', [BannerController::class, 'toggleStatus'])->name('toggle-status');
+        Route::post('/update-order', [BannerController::class, 'updateOrder'])->name('update-order');
+        Route::get('export', [BannerController::class, 'export'])->name('export');
+        Route::post('bulk-actions', [BannerController::class, 'bulkActions'])->name('bulk-actions');
 
         // Banner Items Routes - إضافة route للعرض
         Route::get('/items/{bannerItem}', [BannerItemController::class, 'show'])->name('items.show'); // أضف هذا السطر

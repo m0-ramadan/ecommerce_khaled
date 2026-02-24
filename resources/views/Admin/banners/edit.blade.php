@@ -1,6 +1,6 @@
 @extends('Admin.layout.master')
 
-@section('title', isset($banner) ? 'تعديل البانر' : 'إضافة بانر جديد')
+@section('title', 'تعديل البانر')
 
 @section('css')
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -330,7 +330,7 @@
                 <li class="breadcrumb-item">
                     <a href="{{ route('admin.banners.index') }}">البنرات</a>
                 </li>
-                <li class="breadcrumb-item active">{{ isset($banner) ? 'تعديل' : 'إضافة' }}</li>
+                <li class="breadcrumb-item active">تعديل البانر</li>
             </ol>
         </nav>
 
@@ -338,30 +338,26 @@
             <div class="col-12">
                 <div class="form-card">
                     <div class="form-header">
-                        <h4 class="mb-0">{{ isset($banner) ? 'تعديل البانر' : 'إضافة بانر جديد' }}</h4>
-                        <small>املأ النموذج {{ isset($banner) ? 'لتعديل البانر' : 'لإضافة بانر جديد' }} إلى النظام</small>
+                        <h4 class="mb-0">تعديل البانر: {{ $banner->title }}</h4>
+                        <small>قم بتحديث بيانات البانر</small>
                     </div>
 
-                    <form
-                        action="{{ isset($banner) ? route('admin.banners.update', $banner) : route('admin.banners.store') }}"
-                        method="POST" id="bannerForm" enctype="multipart/form-data">
+                    <form action="{{ route('admin.banners.update', $banner) }}" method="POST" id="bannerForm" enctype="multipart/form-data">
                         @csrf
-                        @if (isset($banner))
-                            @method('PUT')
-                        @endif
+                        @method('PUT')
 
                         <!-- القسم والموقع -->
                         <div class="form-section">
                             <h5><i class="fas fa-map-marker-alt me-2"></i>القسم والموقع</h5>
 
                             <div class="category-options">
-                                <div class="category-option {{ old('category_type', isset($banner) && $banner->category_id ? 'specific' : 'main') == 'main' ? 'active' : '' }}"
+                                <div class="category-option {{ old('category_type', $banner->category_id ? 'specific' : 'main') == 'main' ? 'active' : '' }}"
                                     data-category-type="main">
                                     <i class="fas fa-home"></i>
                                     <h6 class="mb-2">الرئيسية</h6>
                                     <p class="type-desc">عرض البانر في الصفحة الرئيسية</p>
                                 </div>
-                                <div class="category-option {{ old('category_type', isset($banner) && $banner->category_id ? 'specific' : 'main') == 'specific' ? 'active' : '' }}"
+                                <div class="category-option {{ old('category_type', $banner->category_id ? 'specific' : 'main') == 'specific' ? 'active' : '' }}"
                                     data-category-type="specific">
                                     <i class="fas fa-tag"></i>
                                     <h6 class="mb-2">قسم محدد</h6>
@@ -370,9 +366,9 @@
                             </div>
 
                             <input type="hidden" name="category_type" id="category_type"
-                                value="{{ old('category_type', isset($banner) && $banner->category_id ? 'specific' : 'main') }}">
+                                value="{{ old('category_type', $banner->category_id ? 'specific' : 'main') }}">
 
-                            <div class="category-select {{ old('category_type', isset($banner) && $banner->category_id ? 'specific' : 'main') == 'specific' ? 'show' : '' }}"
+                            <div class="category-select {{ old('category_type', $banner->category_id ? 'specific' : 'main') == 'specific' ? 'show' : '' }}"
                                 id="specificCategorySelect">
                                 <div class="row">
                                     <div class="col-md-6">
@@ -381,7 +377,7 @@
                                             <option value="">-- اختر قسم من القائمة --</option>
                                             @foreach ($categories as $category)
                                                 <option value="{{ $category->id }}"
-                                                    {{ old('category_id', $banner->category_id ?? '') == $category->id ? 'selected' : '' }}>
+                                                    {{ old('category_id', $banner->category_id) == $category->id ? 'selected' : '' }}>
                                                     {{ $category->name }}
                                                 </option>
                                             @endforeach
@@ -400,7 +396,7 @@
                                 <div class="col-md-6 mb-3">
                                     <label for="title" class="form-label required-field">عنوان البانر</label>
                                     <input type="text" class="form-control @error('title') is-invalid @enderror"
-                                        id="title" name="title" value="{{ old('title', $banner->title ?? '') }}"
+                                        id="title" name="title" value="{{ old('title', $banner->title) }}"
                                         required placeholder="أدخل عنوان واضح للبانر">
                                     @error('title')
                                         <div class="invalid-feedback d-block">{{ $message }}</div>
@@ -412,7 +408,7 @@
                                     <label for="section_order" class="form-label required-field">ترتيب العرض</label>
                                     <input type="number" class="form-control @error('section_order') is-invalid @enderror"
                                         id="section_order" name="section_order"
-                                        value="{{ old('section_order', $banner->section_order ?? 1) }}" required
+                                        value="{{ old('section_order', $banner->section_order) }}" required
                                         min="1">
                                     @error('section_order')
                                         <div class="invalid-feedback d-block">{{ $message }}</div>
@@ -426,12 +422,12 @@
                                         <label class="toggle-switch me-3">
                                             <input type="hidden" name="is_active" value="0">
                                             <input type="checkbox" name="is_active" value="1"
-                                                {{ old('is_active', $banner->is_active ?? true) ? 'checked' : '' }}>
+                                                {{ old('is_active', $banner->is_active) ? 'checked' : '' }}>
                                             <span class="toggle-slider"></span>
                                         </label>
                                         <span
-                                            class="badge-custom {{ old('is_active', $banner->is_active ?? true) ? 'badge-active' : 'badge-inactive' }}">
-                                            {{ old('is_active', $banner->is_active ?? true) ? 'نشط' : 'غير نشط' }}
+                                            class="badge-custom {{ old('is_active', $banner->is_active) ? 'badge-active' : 'badge-inactive' }}">
+                                            {{ old('is_active', $banner->is_active) ? 'نشط' : 'غير نشط' }}
                                         </span>
                                     </div>
                                     <span class="help-text">يمكنك تعطيل البانر لاحقاً</span>
@@ -462,7 +458,7 @@
                                     @endphp
 
                                     <div class="col-md-3 mb-3">
-                                        <div class="type-card {{ old('banner_type_id', $banner->banner_type_id ?? '') == $type->id ? 'active' : '' }}"
+                                        <div class="type-card {{ old('banner_type_id', $banner->banner_type_id) == $type->id ? 'active' : '' }}"
                                             data-type-id="{{ $type->id }}" data-type-name="{{ $type->name }}">
                                             <div class="type-icon">
                                                 <i class="fas {{ $typeIcons[$type->name] ?? 'fa-image' }}"></i>
@@ -472,13 +468,12 @@
                                         </div>
                                         <input type="radio" name="banner_type_id" value="{{ $type->id }}"
                                             id="type_{{ $type->id }}"
-                                            {{ old('banner_type_id', $banner->banner_type_id ?? '') == $type->id ? 'checked' : '' }}
+                                            {{ old('banner_type_id', $banner->banner_type_id) == $type->id ? 'checked' : '' }}
                                             class="d-none">
                                     </div>
                                 @endforeach
                             </div>
-                            <input type="hidden" id="selected_type"
-                                value="{{ old('banner_type_id', $banner->banner_type_id ?? '') }}">
+                            <input type="hidden" id="selected_type" value="{{ old('banner_type_id', $banner->banner_type_id) }}">
                         </div>
 
                         <!-- إعدادات الشبكة -->
@@ -616,7 +611,7 @@
                                         <input type="datetime-local"
                                             class="form-control @error('start_date') is-invalid @enderror" id="start_date"
                                             name="start_date"
-                                            value="{{ old('start_date', isset($banner->start_date) ? $banner->start_date->format('Y-m-d\TH:i') : '') }}">
+                                            value="{{ old('start_date', $banner->start_date ? $banner->start_date->format('Y-m-d\TH:i') : '') }}">
                                     </div>
                                     @error('start_date')
                                         <div class="invalid-feedback d-block">{{ $message }}</div>
@@ -630,7 +625,7 @@
                                         <input type="datetime-local"
                                             class="form-control @error('end_date') is-invalid @enderror" id="end_date"
                                             name="end_date"
-                                            value="{{ old('end_date', isset($banner->end_date) ? $banner->end_date->format('Y-m-d\TH:i') : '') }}">
+                                            value="{{ old('end_date', $banner->end_date ? $banner->end_date->format('Y-m-d\TH:i') : '') }}">
                                     </div>
                                     @error('end_date')
                                         <div class="invalid-feedback d-block">{{ $message }}</div>
@@ -642,7 +637,7 @@
                                 <input type="hidden" name="permanent" value="0">
                                 <input class="form-check-input" type="checkbox" id="permanent" name="permanent"
                                     value="1"
-                                    {{ old('permanent') || (!isset($banner->start_date) && !isset($banner->end_date)) ? 'checked' : '' }}>
+                                    {{ old('permanent', !$banner->start_date && !$banner->end_date) ? 'checked' : '' }}>
                                 <label class="form-check-label" for="permanent">
                                     دائم (بدون فترة محددة)
                                 </label>
@@ -658,7 +653,7 @@
                             </div>
                             <div>
                                 <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-save me-2"></i>{{ isset($banner) ? 'تحديث' : 'حفظ' }}
+                                    <i class="fas fa-save me-2"></i>تحديث
                                 </button>
                             </div>
                         </div>
@@ -746,7 +741,7 @@
                 }
             }).trigger('change');
 
-            // معاينة حالة الصفحة
+            // تفعيل النوع المحدد مسبقاً
             const selectedType = $('#selected_type').val();
             if (selectedType) {
                 const typeCard = $(`.type-card[data-type-id="${selectedType}"]`);
@@ -755,10 +750,38 @@
                 }
             }
 
+            // تفعيل القسم المحدد مسبقاً
             const categoryType = $('#category_type').val();
             if (categoryType === 'specific') {
                 $(`.category-option[data-category-type="specific"]`).trigger('click');
             }
+
+            // التحقق من صحة النموذج قبل الإرسال
+            $('#bannerForm').on('submit', function(e) {
+                const title = $('#title').val().trim();
+                const categoryType = $('#category_type').val();
+                const categoryId = $('#category_id').val();
+
+                if (!title) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'خطأ',
+                        text: 'يرجى إدخال عنوان البانر'
+                    });
+                    return false;
+                }
+
+                if (categoryType === 'specific' && !categoryId) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'خطأ',
+                        text: 'يرجى اختيار قسم للبانر'
+                    });
+                    return false;
+                }
+            });
         });
     </script>
 @endsection
