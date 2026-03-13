@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\AdsController;
 use App\Http\Controllers\Admin\ArticleController;
 use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\BannerItemController;
+use App\Http\Controllers\Admin\BannerItemV2Controller;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ContactController;
 use App\Http\Controllers\Admin\ContactUsController;
@@ -79,16 +80,16 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
         Route::get('/{id}', [AdsController::class, 'show'])->name('show');         // Show single ad (AJAX)
         Route::put('/{id}', [AdsController::class, 'update'])->name('update');     // Update ad
         Route::delete('/{id}', [AdsController::class, 'destroy'])->name('destroy'); // Delete ad
-        
+
         // Optional: Additional useful routes
         Route::get('/create', [AdsController::class, 'create'])->name('create');   // Show create form (if needed)
         Route::get('/{id}/edit', [AdsController::class, 'edit'])->name('edit');    // Show edit form (if needed)
     });
-    
+
     // Resource Routes
     Route::resources([
         'admins' => AdminController::class,
-       // 'permissions' => PermissionsController::class,
+        // 'permissions' => PermissionsController::class,
         'roles' => RolesController::class,
         'countries' => CountryController::class,
         'contactus' => ContactUsController::class,
@@ -229,14 +230,25 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
         Route::post('bulk-actions', [BannerController::class, 'bulkActions'])->name('bulk-actions');
 
         // Banner Items Routes - إضافة route للعرض
-        Route::get('/items/{bannerItem}', [BannerItemController::class, 'show'])->name('items.show'); // أضف هذا السطر
-        Route::post('/items', [BannerItemController::class, 'store'])->name('items.store');
-        Route::put('/items/{bannerItem}', [BannerItemController::class, 'update'])->name('items.update');
-        Route::delete('/items/{bannerItem}', [BannerItemController::class, 'destroy'])->name('items.destroy');
-        Route::post('/items/{bannerItem}/toggle-status', [BannerItemController::class, 'toggleStatus'])->name('items.toggle-status');
-        Route::post('/items/reorder', [BannerItemController::class, 'reorder'])->name('items.reorder');
+        // Route::get('/items/{bannerItem}', [BannerItemController::class, 'show'])->name('items.show'); // أضف هذا السطر
+        // Route::post('/items', [BannerItemController::class, 'store'])->name('items.store');
+        // Route::put('/items/{bannerItem}', [BannerItemController::class, 'update'])->name('items.update');
+        // Route::delete('/items/{bannerItem}', [BannerItemController::class, 'destroy'])->name('items.destroy');
+        // Route::post('/items/{bannerItem}/toggle-status', [BannerItemController::class, 'toggleStatus'])->name('items.toggle-status');
+        // Route::post('/items/reorder', [BannerItemController::class, 'reorder'])->name('items.reorder');
     });
-
+    // Banner Items Routes - إضافة جميع routes لعناصر البانر
+    Route::prefix('banners/items/resource')->name('banners.items.')->group(function () {
+        Route::get('/', [BannerItemV2Controller::class, 'index'])->name('index');
+        Route::get('/create', [BannerItemV2Controller::class, 'create'])->name('create');
+        Route::post('/', [BannerItemV2Controller::class, 'store'])->name('store');
+        Route::get('/{bannerItem}', [BannerItemV2Controller::class, 'show'])->name('show');
+        Route::get('/{bannerItem}/edit', [BannerItemV2Controller::class, 'edit'])->name('edit');
+        Route::put('/{bannerItem}', [BannerItemV2Controller::class, 'update'])->name('update');
+        Route::delete('/{bannerItem}', [BannerItemV2Controller::class, 'destroy'])->name('destroy');
+        Route::post('/{bannerItem}/toggle-status', [BannerItemV2Controller::class, 'toggleStatus'])->name('toggle-status');
+        Route::post('/reorder', [BannerItemV2Controller::class, 'reorder'])->name('reorder');
+    });
     // Orders
     Route::prefix('orders')->as('orders.')->group(function () {
         // Route::resource('/', OrderController::class);
