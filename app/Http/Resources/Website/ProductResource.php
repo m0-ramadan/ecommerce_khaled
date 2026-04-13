@@ -141,55 +141,17 @@ class ProductResource extends JsonResource
                 }),
 // ================== Options (TREE STRUCTURE) ==================
 'options' => $this->options
-    ->whereNull('depends_on_option_id') // Main options only
+    ->whereNull('depends_on_option_id')
     ->groupBy('option_name')
     ->map(function ($group) {
         return [
             'name' => $group->first()->option_name,
             'items' => $group->map(function ($option) {
-
-                $keywords = ['رفع', 'ملف', 'صورة'];
-                $hasFile = collect($keywords)->contains(
-                    fn ($word) => str_contains($option->option_value, $word)
-                );
-
-                return [
-                    'id'          => $option->id,
-                    'value'       => $option->option_value,
-                    'is_required' => (bool) $option->is_required,
-                    'has_file'    => $hasFile,
-                    'base_price'  => (float) $option->additional_price,
-
-                    // 👇 dependent options (مثل الكمية)
-                    'children' => $option->dependentOptions->map(function ($child) {
-
-                        $tiers = $child->getAvailableQuantityTiers();
-
-
-                        return [
-                            'id'          => $child->id,
-                            'name'        => $child->option_name,
-                            'value'       => $child->option_value,
-                            'base_price'  => (float) $child->additional_price,
-
-                            'tiers' => $tiers->map(function ($tier) {
-                                return [
-                                    'id'             => $tier->id,
-                                    'quantity'       => $tier->quantity,
-                                    'price_per_unit' => (float) $tier->price_per_unit,
-                                    'total_price'    => (float) ($tier->quantity * $tier->price_per_unit),
-                                ];
-                            })->values(),
-
-                            'has_multiple_prices' => $tiers->isNotEmpty(),
-                        ];
-                    })->values(),
-                ];
+                return $this->formatOptionTree($option);
             })->values(),
         ];
     })
     ->values(),
-
 
 
             // ================== Printing Methods ==================
@@ -231,5 +193,39 @@ class ProductResource extends JsonResource
                 'stock_class'       => $this->stock > 0 ? 'in-stock' : 'out-of-stock',
             ],
         ];
-    }
+    }private function formatOptionTree($option)
+{
+    $keywords = ['رفع', 'ملف', 'صورة'];
+    $hasFile = collect($keywords)->contains(
+        fn ($word) => str_contains($option->option_value, $word)
+    );
+
+    $tiers = method_exists($option, 'getAvailableQuantityTiers')
+        ? $option->getAvailableQuantityTiers()
+        : collect();
+
+    return [
+        'id' => $option->id,
+        'name' => $option->option_name,
+        'value' => $option->option_value,
+        'is_required' => (bool) $option->is_required,
+        'has_file' => $hasFile,
+        'base_price' => (float) $option->additional_price,
+
+        'tiers' => $tiers->map(function ($tier) {
+            return [
+                'id' => $tier->id,
+                'quantity' => $tier->quantity,
+                'price_per_unit' => (float) $tier->price_per_unit,
+                'total_price' => (float) ($tier->quantity * $tier->price_per_unit),
+            ];
+        })->values(),
+
+        'has_multiple_prices' => $tiers->isNotEmpty(),
+
+        'children' => $option->dependentOptions->map(function ($child) {
+            return $this->formatOptionTree($child);
+        })->values(),
+    ];
+}
 }

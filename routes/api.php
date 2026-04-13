@@ -174,7 +174,7 @@ Route::prefix('v1')->group(function () {
     Route::get('/public/track/{trackingNumber}', [OtoV2ShippingController::class, 'trackShipment'])
         ->name('shipping.track.public');
 
-
+       Route::get('testimonials', [HomeController::class, 'testimonials'])->name('testimonials'); 
     Route::get('payment/callback', [PaymentController::class, 'handlePaymobCallback'])
         ->name('payment.callback.paymob');
 });

@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers\Api\Website;
 
-use App\Models\Banner;
-
-use App\Models\Product;
-use App\Models\Category;
-use Illuminate\Http\Request;
-use App\Traits\ApiResponseTrait;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Website\BannerResource;
-use App\Http\Resources\Website\ProductResource;
 use App\Http\Resources\Website\CategoryResource;
 use App\Http\Resources\Website\CategoryWithProductResource;
+use App\Http\Resources\Website\ProductResource;
+use App\Http\Resources\Wesite\TestimonialResource;
+use App\Models\Banner;
+use App\Models\Category;
+use App\Models\Product;
+use App\Traits\ApiResponseTrait;
+use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
@@ -70,6 +70,20 @@ class HomeController extends Controller
             ], 'تم جلب بيانات الصفحة الرئيسية بنجاح');
         } catch (\Exception $e) {
             return $this->error('حدث خطأ أثناء تحميل البيانات', 500, [
+                'exception' => $e->getMessage(),
+            ]);
+        }
+    }
+    public function testimonials()
+    {
+        try {
+            $testimonials = \App\Models\Testimonial::where('is_active', true)
+                ->orderBy('sort_order', 'asc')
+                ->get();
+
+            return $this->success(TestimonialResource::collection($testimonials), 'تم جلب الشهادات بنجاح');
+        } catch (\Exception $e) {
+            return $this->error('حدث خطأ أثناء جلب الشهادات', 500, [
                 'exception' => $e->getMessage(),
             ]);
         }
