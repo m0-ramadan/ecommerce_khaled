@@ -1218,21 +1218,21 @@
                         <h6 class="mb-3" style="color: #17a2b8;"><i class="fas fa-layer-group me-2"></i>شرائح الكمية</h6>
                         <div id="tiersContainer_${index}">
                             ${option.quantity_tiers.map((tier, tierIndex) => `
-                                                                                    <div class="tier-item">
-                                                                                        <input type="number" class="form-control form-control-sm" 
-                                                                                               name="product_options[${index}][quantity_tiers][${tierIndex}][quantity]" 
-                                                                                               value="${tier.quantity}" placeholder="الكمية">
-                                                                                        <input type="number" class="form-control form-control-sm" 
-                                                                                               name="product_options[${index}][quantity_tiers][${tierIndex}][price_per_unit]" 
-                                                                                               value="${tier.price_per_unit}" placeholder="السعر للوحدة">
-                                                                                        <input type="text" class="form-control form-control-sm" 
-                                                                                               name="product_options[${index}][quantity_tiers][${tierIndex}][tier_name]" 
-                                                                                               value="${tier.tier_name || ''}" placeholder="اسم الشريحة">
-                                                                                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeTier(this)">
-                                                                                            <i class="fas fa-times"></i>
-                                                                                        </button>
-                                                                                    </div>
-                                                                                `).join('')}
+                                                                                        <div class="tier-item">
+                                                                                            <input type="number" class="form-control form-control-sm" 
+                                                                                                   name="product_options[${index}][quantity_tiers][${tierIndex}][quantity]" 
+                                                                                                   value="${tier.quantity}" placeholder="الكمية">
+                                                                                            <input type="number" class="form-control form-control-sm" 
+                                                                                                   name="product_options[${index}][quantity_tiers][${tierIndex}][price_per_unit]" 
+                                                                                                   value="${tier.price_per_unit}" placeholder="السعر للوحدة">
+                                                                                            <input type="text" class="form-control form-control-sm" 
+                                                                                                   name="product_options[${index}][quantity_tiers][${tierIndex}][tier_name]" 
+                                                                                                   value="${tier.tier_name || ''}" placeholder="اسم الشريحة">
+                                                                                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeTier(this)">
+                                                                                                <i class="fas fa-times"></i>
+                                                                                            </button>
+                                                                                        </div>
+                                                                                    `).join('')}
                         </div>
                         <button type="button" class="btn btn-sm btn-outline-info mt-2" onclick="addQuantityTier(${index})">
                             <i class="fas fa-plus me-1"></i> إضافة شريحة

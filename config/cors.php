@@ -16,6 +16,10 @@ return [
         'https://ecommerce-xo.vercel.app',
         'https://talaaljazeera.com',
         'https://www.talaaljazeera.com',
+        'https://www.flashy-card.com',
+        'https://flashy-card.com',
+
+
     ],
 
     // علشان Vercel preview
