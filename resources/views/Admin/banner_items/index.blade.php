@@ -355,10 +355,10 @@
                                 </td>
                                 <td>
                                     <div class="action-buttons">
-                                        <a href="{{ route('admin.banners.items.show', $item->id) }}"
+                                        {{-- <a href="{{ route('admin.banners.items.show', $item->id) }}"
                                             class="btn-icon btn-view" title="عرض">
                                             <i class="fas fa-eye"></i>
-                                        </a>
+                                        </a> --}}
 
                                         <a href="{{ route('admin.banners.items.edit', $item->id) }}"
                                             class="btn-icon btn-edit" title="تعديل">
