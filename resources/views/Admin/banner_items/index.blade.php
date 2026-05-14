@@ -318,7 +318,7 @@
                                 <td>
                                     <strong>{{ $item->banner?->name ?? '--' }}</strong>
                                     <br>
-                                    <small class="text-muted">{{ $item->banner?->type ?? '' }}</small>
+                                    <small class="text-muted">{{ $item->banner?->type?->name ?? '' }}</small>
                                 </td>
                                 <td>
                                     <span class="badge bg-info">{{ $item->item_order }}</span>
