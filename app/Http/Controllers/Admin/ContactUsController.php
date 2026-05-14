@@ -5,41 +5,30 @@ namespace App\Http\Controllers\Admin;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
  
-use App\Models\Branchs;
-use Flasher\Toastr\Laravel\Facade\Toastr;
 use App\Models\ContactUs;
 
 class ContactUsController extends Controller
 {
    
     public function index(){
-        $listcontactinfo= ContactUs::get();
+        $contacts= ContactUs::latest()->get();
         
-        return view('Admin.contactus.index',compact('listcontactinfo'));
+        return view('Admin.contact.index',compact('contacts'));
        
     }
 
-
-    public function create(){
-        $branchs = Branchs::all();         
-        return view('Admin.contactus.create', compact('branchs'));
-    }
-
     public function store(Request $request){
-        ContactUs::create([
-            'phone'                  => $request->phone,
-             'email'                 =>$request->email,
-            'address'                =>$request->address,
-            'name'                   =>$request->branch_name,
-       ]);
-         toastr()->success('success','sucessfully added');
-       return redirect()->route('admin.contactus.index');
-    }
+        ContactUs::create($request->only([
+            'first_name',
+            'last_name',
+            'phone',
+            'email',
+            'company',
+            'message',
+        ]));
 
-    public function edit($id){
-        $branchs = Branchs::all();
-        $contactus=ContactUs::find($id);
-         return view('Admin.contactus.edit',compact('contactus','branchs'));
+         toastr()->success('تمت الإضافة بنجاح');
+       return redirect()->route('admin.contactus.index');
     }
 
     public function update(Request $request){
@@ -48,13 +37,16 @@ class ContactUsController extends Controller
         $country= ContactUs::find($request->id);
         
         
-        $country->update([
-            'phone'                  => $request->phone,
-             'email'                 =>$request->email,
-            'address'                =>$request->address,
-            'name'                   =>$request->branch_name,
-           ]);
-           toastr()->success('success','sucessfully updated');
+        $country->update($request->only([
+            'first_name',
+            'last_name',
+            'phone',
+            'email',
+            'company',
+            'message',
+        ]));
+
+           toastr()->success('تم التعديل بنجاح');
        return redirect()->route('admin.contactus.index');
 
 
@@ -65,10 +57,10 @@ class ContactUsController extends Controller
         $country=ContactUs::find($id);
         if($country){
             $country->delete();
-          Toastr::addSuccess('Deleted successfully');
-            return redirect()->route('admin.contactus.index');
+
+            return redirect()->route('admin.contactus.index')->with('success','تم حذف الرسالة بنجاح');
         }
-            toastr()->success('not found');
+            toastr()->error('الرسالة غير موجودة');
             return redirect()->route('admin.contactus.index');
          
     }

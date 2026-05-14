@@ -829,6 +829,8 @@
     <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/lang/summernote-ar-AR.min.js"></script>
     <script>
         $(document).ready(function() {
+            const articlesBaseUrl = "{{ route('admin.articles.index') }}";
+
             // اختيار الكل
             $('#selectAll').on('change', function() {
                 $('.article-checkbox').prop('checked', this.checked);
@@ -849,7 +851,7 @@
                 const btn = $(this);
 
                 $.ajax({
-                    url: "{{ route('admin.articles.toggle-status', '') }}/" + articleId,
+                    url: `${articlesBaseUrl}/${articleId}/toggle-status`,
                     type: 'POST',
                     data: {
                         _token: "{{ csrf_token() }}",
@@ -897,7 +899,7 @@
                 const btn = $(this);
 
                 $.ajax({
-                    url: "{{ route('admin.articles.toggle-featured', '') }}/" + articleId,
+                    url: `${articlesBaseUrl}/${articleId}/toggle-featured`,
                     type: 'POST',
                     data: {
                         _token: "{{ csrf_token() }}",
@@ -958,7 +960,7 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({
-                            url: "{{ route('admin.articles.destroy', '') }}/" + articleId,
+                            url: `${articlesBaseUrl}/${articleId}`,
                             type: 'POST',
                             data: {
                                 _token: "{{ csrf_token() }}",

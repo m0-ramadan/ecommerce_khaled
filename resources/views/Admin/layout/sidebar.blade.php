@@ -58,8 +58,8 @@
             </a>
             <ul class="menu-sub">
 
-                <li class="menu-item ">
-                    <a href="#/admin/admins" class="menu-link">
+                <li class="menu-item {{ request()->routeIs('admin.admins.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.admins.index') }}" class="menu-link">
                         <div>مديرين الموقع</div>
                     </a>
                 </li>
@@ -157,7 +157,7 @@
 
 
         <li class="menu-item ">
-            <a href="#/admin/contact-us" class="menu-link">
+            <a href="{{ route('admin.contactus.index') }}" class="menu-link">
                 <i class="menu-icon ti ti-messages"></i>
                 <div>تواصل معنا</div>
             </a>

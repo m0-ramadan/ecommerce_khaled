@@ -24,13 +24,14 @@ class AdminController extends Controller
     //     $this->middleware('permission:حذف الإدمن', ['only' => ['destroy']]);
     // }
 
-    public function home()
-    {
-        $admins = Admin::all();
-
-        return view('Admin.index', compact('admins','topCustomers'));
-    }
     public function index()
+    {
+        $admins = Admin::with('roles')->get();
+        $roles = Role::orderBy('name')->get();
+
+        return view('Admin.admin.index', compact('admins', 'roles'));
+    }
+    public function home()
     {
         // ---------------------------------------
         // زيارات آخر 10 أيام
@@ -88,7 +89,7 @@ class AdminController extends Controller
       //  $branches = Branchs::all();
         $roles = Role::all();
 
-        return view('Admin.admin.create', compact('branches', 'roles'));
+        return view('Admin.admin.create', compact('roles'));
     }
 
 
@@ -133,10 +134,8 @@ class AdminController extends Controller
     }
     public function edit(Admin $admin)
     {
-       // $branches = Branchs::all();
         $roles = Role::all();
-
-        return view('Admin.admin.edit', compact('admin', 'branches', 'roles'));
+        return view('Admin.admin.edit', compact('admin',  'roles'));
     }
 
     public function update(Request $request, Admin $admin)

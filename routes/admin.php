@@ -61,7 +61,7 @@ Route::prefix('admin')->name('admin.')->middleware('guest:admin')->group(functio
 // Admin Routes (Authenticated)
 Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function () {
     // Dashboard
-    Route::get('/', [AdminController::class, 'index'])->name('index');
+    Route::get('/', [AdminController::class, 'home'])->name('index');
     Route::post('logout', [AdminAuthController::class, 'logout'])->name('logout');
     Route::get('/visitors/chart', [VisitorController::class, 'chartData'])
         ->name('visitors.chart');
@@ -86,9 +86,19 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
         Route::get('/{id}/edit', [AdsController::class, 'edit'])->name('edit');    // Show edit form (if needed)
     });
 
+    Route::prefix('admins')->name('admins.')->group(function () {
+        Route::get('/', [AdminController::class, 'index'])->name('index');
+        Route::get('/create', [AdminController::class, 'create'])->name('create');
+        Route::post('/', [AdminController::class, 'store'])->name('store');
+        Route::get('/{admin}/edit', [AdminController::class, 'edit'])->name('edit');
+        Route::put('/{admin}', [AdminController::class, 'update'])->name('update');
+        Route::delete('/{admin}', [AdminController::class, 'destroy'])->name('destroy');
+    });
+
+    // 'admins' => AdminController::class,
+
     // Resource Routes
     Route::resources([
-        'admins' => AdminController::class,
         // 'permissions' => PermissionsController::class,
         'roles' => RolesController::class,
         'countries' => CountryController::class,
@@ -183,9 +193,9 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
 
     // Contacts
     Route::prefix('contacts')->as('contact.')->group(function () {
-        Route::get('/', [ContactController::class, 'index'])->name('index');
-        Route::get('read/{id}', [ContactController::class, 'read'])->name('read');
-        Route::delete('delete/{id}', [ContactController::class, 'destroy'])->name('destroy');
+        Route::get('/', [ContactUsController::class, 'index'])->name('index');
+        Route::get('read/{id}', [ContactUsController::class, 'read'])->name('read');
+        Route::delete('delete/{id}', [ContactUsController::class, 'destroy'])->name('destroy');
     });
 
     // Subscriptions
@@ -290,7 +300,14 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
 
     Route::prefix('articles')->name('articles.')->group(function () {
         // مقالات
-        Route::resource('/', ArticleController::class);
+        // Route::resource('/', ArticleController::class);
+        Route::get('/', [ArticleController::class, 'index'])->name('index');
+        Route::get('/create', [ArticleController::class, 'create'])->name('create');
+        Route::post('/', [ArticleController::class, 'store'])->name('store');
+        Route::get('/{article}', [ArticleController::class, 'show'])->name('show');
+        Route::get('/{article}/edit', [ArticleController::class, 'edit'])->name('edit');
+        Route::put('/{article}', [ArticleController::class, 'update'])->name('update');
+        Route::delete('/{article}', [ArticleController::class, 'destroy'])->name('destroy');
         Route::post('/bulk-actions', [ArticleController::class, 'bulkActions'])->name('bulk-actions');
         Route::patch('/{article}/toggle-status', [ArticleController::class, 'toggleStatus'])->name('toggle-status');
         Route::patch('/{article}/toggle-featured', [ArticleController::class, 'toggleFeatured'])->name('toggle-featured');
