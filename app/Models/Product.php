@@ -84,6 +84,11 @@ class Product extends Model
         ]);
         return $slug;
     }
+    public function rootOptions()
+    {
+        return $this->hasMany(ProductOptions::class, 'product_id')
+            ->whereNull('depends_on_option_id');
+    }
 
     public function category()
     {
@@ -279,7 +284,7 @@ class Product extends Model
 
     public function options()
     {
-        return $this->hasMany(ProductOptions::class,'product_id');
+        return $this->hasMany(ProductOptions::class, 'product_id');
     }
 
     // public function primaryImage()

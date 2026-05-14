@@ -211,7 +211,7 @@ class ProductController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Bulk action error: '.$e->getMessage());
+            Log::error('Bulk action error: ' . $e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -241,14 +241,14 @@ class ProductController extends Controller
         $columns = $request->columns ?? ['id', 'name', 'category', 'price', 'stock', 'status', 'created_at'];
 
         if ($request->type === 'excel') {
-            return Excel::download(new ProductsExport($products, $columns), 'products_'.date('Y-m-d').'.xlsx');
+            return Excel::download(new ProductsExport($products, $columns), 'products_' . date('Y-m-d') . '.xlsx');
         } elseif ($request->type === 'csv') {
-            return Excel::download(new ProductsExport($products, $columns), 'products_'.date('Y-m-d').'.csv');
+            return Excel::download(new ProductsExport($products, $columns), 'products_' . date('Y-m-d') . '.csv');
         } else {
             // PDF export logic
             $pdf = PDF::loadView('admin.products.export-pdf', compact('products', 'columns'));
 
-            return $pdf->download('products_'.date('Y-m-d').'.pdf');
+            return $pdf->download('products_' . date('Y-m-d') . '.pdf');
         }
     }
 
@@ -300,7 +300,7 @@ class ProductController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error duplicating product: '.$e->getMessage());
+            Log::error('Error duplicating product: ' . $e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -491,7 +491,7 @@ class ProductController extends Controller
 
             return redirect()->back()
                 ->withInput()
-                ->with('error', 'حدث خطأ أثناء إضافة المنتج: '.$e->getMessage());
+                ->with('error', 'حدث خطأ أثناء إضافة المنتج: ' . $e->getMessage());
         }
     }
 
@@ -616,7 +616,7 @@ class ProductController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'حدث خطأ: '.$e->getMessage(),
+                'message' => 'حدث خطأ: ' . $e->getMessage(),
             ], 500);
         }
     }
@@ -792,8 +792,10 @@ class ProductController extends Controller
 
                         if ($createdOptionId && $dependsOnId) {
                             $product->options()->find($createdOptionId)
-                                ->update(['depends_on_option_id' => $dependsOnId,
-                                    'dependency_condition' => $optionData['dependency_condition'] ?? null]);
+                                ->update([
+                                    'depends_on_option_id' => $dependsOnId,
+                                    'dependency_condition' => $optionData['dependency_condition'] ?? null
+                                ]);
                         }
                     }
                 }
@@ -1096,13 +1098,13 @@ class ProductController extends Controller
             if ($request->expectsJson()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'حدث خطأ أثناء تحديث المنتج: '.$e->getMessage()
+                    'message' => 'حدث خطأ أثناء تحديث المنتج: ' . $e->getMessage()
                 ], 500);
             }
 
             return back()
                 ->withInput()
-                ->with('error', 'حدث خطأ أثناء تحديث المنتج: '.$e->getMessage());
+                ->with('error', 'حدث خطأ أثناء تحديث المنتج: ' . $e->getMessage());
         }
     }
 
@@ -1336,7 +1338,7 @@ class ProductController extends Controller
             $product->primary_image_id = $image->id;
             $product->save();
 
-            $imageUrl = asset('storage/'.$imagePath);
+            $imageUrl = asset('storage/' . $imagePath);
 
             \Log::info('Image updated successfully', [
                 'image_path' => $imagePath,
@@ -1358,7 +1360,7 @@ class ProductController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'فشل في تحديث الصورة: '.$e->getMessage(),
+                'message' => 'فشل في تحديث الصورة: ' . $e->getMessage(),
             ], 500);
         }
     }

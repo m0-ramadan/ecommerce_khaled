@@ -1185,7 +1185,7 @@
         function generateOptionHtml(option, index) {
             const isMain = !option.depends_on_option_id;
             const depth = getOptionDepth(option.id);
-            
+
             const mainBadge = isMain ?
                 '<span class="badge-main option-badge"><i class="fas fa-cube me-1"></i>رئيسي</span>' :
                 '<span class="badge-dependent option-badge"><i class="fas fa-link me-1"></i>معتمد</span>';
@@ -1193,8 +1193,8 @@
                 '<span class="badge-required option-badge"><i class="fas fa-check-circle me-1"></i>مطلوب</span>' : '';
             const typeClass = `type-${option.option_type}`;
             const typeLabel = getOptionTypeLabel(option.option_type);
-            
-            const depthIndicator = !isMain ? 
+
+            const depthIndicator = !isMain ?
                 `<span class="badge bg-info" style="position: absolute; right: 50px; top: 50%; transform: translateY(-50%); font-size: 10px;">
                     <i class="fas fa-level-down-alt me-1"></i>عمق ${depth}
                 </span>` : '';
@@ -1205,12 +1205,13 @@
                 const hierarchy = getOptionHierarchy(option.id);
                 let hierarchyHtml = '';
                 hierarchy.forEach((opt, idx) => {
-                    hierarchyHtml += `<span class="badge bg-secondary me-1">${opt.option_name} (${opt.option_value})</span>`;
+                    hierarchyHtml +=
+                        `<span class="badge bg-secondary me-1">${opt.option_name} (${opt.option_value})</span>`;
                     if (idx < hierarchy.length - 1) {
                         hierarchyHtml += ' <i class="fas fa-arrow-left text-muted mx-1"></i> ';
                     }
                 });
-                
+
                 dependencyHtml = `
                     <div class="dependency-section show">
                         <div class="row">
@@ -1236,21 +1237,21 @@
                         <h6 class="mb-3" style="color: #17a2b8;"><i class="fas fa-layer-group me-2"></i>شرائح الكمية</h6>
                         <div id="tiersContainer_${index}">
                             ${option.quantity_tiers.map((tier, tierIndex) => `
-                                <div class="tier-item">
-                                    <input type="number" class="form-control form-control-sm" 
-                                           name="product_options[${index}][quantity_tiers][${tierIndex}][quantity]" 
-                                           value="${tier.quantity}" placeholder="الكمية">
-                                    <input type="number" class="form-control form-control-sm" 
-                                           name="product_options[${index}][quantity_tiers][${tierIndex}][price_per_unit]" 
-                                           value="${tier.price_per_unit}" placeholder="السعر للوحدة">
-                                    <input type="text" class="form-control form-control-sm" 
-                                           name="product_options[${index}][quantity_tiers][${tierIndex}][tier_name]" 
-                                           value="${tier.tier_name || ''}" placeholder="اسم الشريحة">
-                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeTier(this)">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                </div>
-                            `).join('')}
+                                                                                        <div class="tier-item">
+                                                                                            <input type="number" class="form-control form-control-sm" 
+                                                                                                   name="product_options[${index}][quantity_tiers][${tierIndex}][quantity]" 
+                                                                                                   value="${tier.quantity}" placeholder="الكمية">
+                                                                                            <input type="number" class="form-control form-control-sm" 
+                                                                                                   name="product_options[${index}][quantity_tiers][${tierIndex}][price_per_unit]" 
+                                                                                                   value="${tier.price_per_unit}" placeholder="السعر للوحدة">
+                                                                                            <input type="text" class="form-control form-control-sm" 
+                                                                                                   name="product_options[${index}][quantity_tiers][${tierIndex}][tier_name]" 
+                                                                                                   value="${tier.tier_name || ''}" placeholder="اسم الشريحة">
+                                                                                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeTier(this)">
+                                                                                                <i class="fas fa-times"></i>
+                                                                                            </button>
+                                                                                        </div>
+                                                                                    `).join('')}
                         </div>
                         <button type="button" class="btn btn-sm btn-outline-info mt-2" onclick="addQuantityTier(${index})">
                             <i class="fas fa-plus me-1"></i> إضافة شريحة
@@ -1354,17 +1355,18 @@
          */
         function generateParentOptionsTree(currentIndex, selectedValue, level = 0, parentId = null) {
             let options = `<option value="">-- لا يعتمد (رئيسي) --</option>`;
-            
+
             // فلترة الخيارات الأساسية (التي لا تعتمد على أحد) في المستوى الأول
-            const mainOptions = existingOptions.filter((opt, idx) => 
+            const mainOptions = existingOptions.filter((opt, idx) =>
                 idx !== currentIndex && !opt.depends_on_option_id
             );
-            
+
             // إضافة كل خيار رئيسي وأبنائه بشكل متداخل
             mainOptions.forEach(opt => {
-                options += generateOptionWithChildren(opt, existingOptions.indexOf(opt), currentIndex, selectedValue, 0);
+                options += generateOptionWithChildren(opt, existingOptions.indexOf(opt), currentIndex,
+                    selectedValue, 0);
             });
-            
+
             return options;
         }
 
@@ -1375,22 +1377,22 @@
             const prefix = '─'.repeat(level * 2) + (level > 0 ? ' ' : '');
             const spacing = level > 0 ? '&nbsp;&nbsp;' + '&nbsp;&nbsp;'.repeat(level) : '';
             const selected = selectedValue == option.id ? 'selected' : '';
-            
+
             let html = `<option value="${option.id}" ${selected} style="padding-right: ${level * 20}px">
                 ${spacing}${prefix} ${option.option_name} (${option.option_value})
             </option>`;
-            
+
             // البحث عن أبناء هذا الخيار (الخيارات التي تعتمد عليه)
-            const children = existingOptions.filter((opt, idx) => 
+            const children = existingOptions.filter((opt, idx) =>
                 idx !== currentIndex && opt.depends_on_option_id == option.id
             );
-            
+
             // إضافة الأبناء بشكل متكرر
             children.forEach(child => {
                 const childIndex = existingOptions.indexOf(child);
                 html += generateOptionWithChildren(child, childIndex, currentIndex, selectedValue, level + 1);
             });
-            
+
             return html;
         }
 
@@ -1400,18 +1402,18 @@
         function getOptionDepth(optionId) {
             const option = existingOptions.find(opt => opt.id == optionId);
             if (!option || !option.depends_on_option_id) return 0;
-            
+
             let depth = 1;
             let currentId = option.depends_on_option_id;
-            
+
             while (currentId) {
                 const parent = existingOptions.find(opt => opt.id == currentId);
                 if (!parent) break;
-                
+
                 depth++;
                 currentId = parent.depends_on_option_id;
             }
-            
+
             return depth;
         }
 
@@ -1421,20 +1423,20 @@
         function getOptionHierarchy(optionId) {
             const hierarchy = [];
             let currentId = optionId;
-            
+
             while (currentId) {
                 const option = existingOptions.find(opt => opt.id == currentId);
                 if (!option) break;
-                
+
                 hierarchy.unshift({
                     id: option.id,
                     option_name: option.option_name,
                     option_value: option.option_value
                 });
-                
+
                 currentId = option.depends_on_option_id;
             }
-            
+
             return hierarchy;
         }
 
@@ -1451,13 +1453,13 @@
         function getAllDescendants(optionId) {
             const descendants = [];
             const directChildren = getDirectChildren(optionId);
-            
+
             directChildren.forEach(child => {
                 descendants.push(child);
                 const grandChildren = getAllDescendants(child.id);
                 descendants.push(...grandChildren);
             });
-            
+
             return descendants;
         }
 
@@ -1466,17 +1468,17 @@
          */
         function canDependOn(optionIndex, parentId) {
             if (!parentId) return true;
-            
+
             const option = existingOptions[optionIndex];
             if (!option.id) return true; // خيار جديد
-            
+
             // منع الاعتماد على النفس
             if (option.id == parentId) return false;
-            
+
             // منع الاعتماد الدائري (الأب يعتمد على الابن)
             const parentOption = existingOptions.find(opt => opt.id == parentId);
             if (!parentOption) return true;
-            
+
             // التحقق من أن الأب لا يعتمد على هذا الخيار بشكل غير مباشر
             let currentParentId = parentOption.depends_on_option_id;
             while (currentParentId) {
@@ -1484,7 +1486,7 @@
                 const grandParent = existingOptions.find(opt => opt.id == currentParentId);
                 currentParentId = grandParent ? grandParent.depends_on_option_id : null;
             }
-            
+
             return true;
         }
 
@@ -1495,7 +1497,7 @@
             const optionItem = $(select).closest('.option-item');
             const hasDependency = select.value !== '';
             const parentId = select.value;
-            
+
             // التحقق من صحة العلاقة الهرمية
             if (hasDependency && !canDependOn(index, parentId)) {
                 Swal.fire({
@@ -1506,24 +1508,25 @@
                 select.value = '';
                 return;
             }
-            
+
             if (hasDependency) {
                 // تغيير الشارة إلى معتمد
                 optionItem.find('.badge-main').removeClass('badge-main').addClass('badge-dependent');
                 optionItem.find('.badge-dependent').html('<i class="fas fa-link me-1"></i>معتمد');
-                
+
                 // إضافة معلومات عن الأب والتسلسل الهرمي
                 const parentOption = existingOptions.find(opt => opt.id == parentId);
                 if (parentOption) {
                     const hierarchy = getOptionHierarchy(parentId);
                     let hierarchyHtml = '';
                     hierarchy.forEach((opt, idx) => {
-                        hierarchyHtml += `<span class="badge bg-secondary me-1">${opt.option_name} (${opt.option_value})</span>`;
+                        hierarchyHtml +=
+                            `<span class="badge bg-secondary me-1">${opt.option_name} (${opt.option_value})</span>`;
                         if (idx < hierarchy.length - 1) {
                             hierarchyHtml += ' <i class="fas fa-arrow-left text-muted mx-1"></i> ';
                         }
                     });
-                    
+
                     let dependencyInfo = optionItem.find('.dependency-section');
                     if (dependencyInfo.length === 0) {
                         dependencyInfo = $(`
@@ -1540,7 +1543,7 @@
                         `);
                         optionItem.append(dependencyInfo);
                     }
-                    
+
                     optionItem.find('.dependency-section .row').html(`
                         <div class="col-md-12">
                             <div class="hierarchy-chain">
@@ -1678,17 +1681,18 @@
          */
         function deleteOption(index) {
             const option = existingOptions[index];
-            
+
             if (!option) return;
-            
+
             // البحث عن الأبناء الذين يعتمدون على هذا الخيار
             const descendants = option.id ? getAllDescendants(option.id) : [];
-            
+
             let warningMessage = 'سيتم حذف هذا الخيار';
             if (descendants.length > 0) {
-                warningMessage += ` بالإضافة إلى ${descendants.length} خيار${descendants.length > 1 ? 'ات' : ''} فرعي${descendants.length > 1 ? 'ة' : ''} تعتمد عليه`;
+                warningMessage +=
+                    ` بالإضافة إلى ${descendants.length} خيار${descendants.length > 1 ? 'ات' : ''} فرعي${descendants.length > 1 ? 'ة' : ''} تعتمد عليه`;
             }
-            
+
             Swal.fire({
                 title: 'هل أنت متأكد؟',
                 text: warningMessage,
@@ -1702,21 +1706,24 @@
                 if (result.isConfirmed) {
                     if (option.id) {
                         // حذف الخيار وجميع أبنائه
-                        const descendantIndices = descendants.map(d => existingOptions.indexOf(d)).filter(i => i !== -1);
-                        
+                        const descendantIndices = descendants.map(d => existingOptions.indexOf(d)).filter(i => i !==
+                            -1);
+
                         // حذف من الأكبر للأصغر (من الأسفل للأعلى)
                         descendantIndices.sort((a, b) => b - a);
                         descendantIndices.forEach(i => existingOptions.splice(i, 1));
                     }
-                    
+
                     // حذف الخيار الأصلي
                     const originalIndex = existingOptions.indexOf(option);
                     if (originalIndex !== -1) {
                         existingOptions.splice(originalIndex, 1);
                     }
-                    
+
                     refreshOptionsContainer();
-                    Swal.fire('تم الحذف!', `تم حذف الخيار${descendants.length > 0 ? ' وجميع الخيارات المرتبطة به' : ''} بنجاح`, 'success');
+                    Swal.fire('تم الحذف!',
+                        `تم حذف الخيار${descendants.length > 0 ? ' وجميع الخيارات المرتبطة به' : ''} بنجاح`,
+                        'success');
                 }
             });
         }
@@ -1727,12 +1734,12 @@
         function showHierarchyTree() {
             // إزالة أي شجرة موجودة
             $('.hierarchy-tree').remove();
-            
+
             const mainOptions = existingOptions.filter(opt => !opt.depends_on_option_id);
-            
+
             let treeHtml = '<div class="hierarchy-tree mt-4 p-3" style="background: rgba(0,0,0,0.2); border-radius: 8px;">';
             treeHtml += '<h6 class="mb-3"><i class="fas fa-sitemap me-2"></i> الشجرة الهرمية للخيارات</h6>';
-            
+
             if (mainOptions.length === 0) {
                 treeHtml += '<p class="text-muted">لا توجد خيارات رئيسية</p>';
             } else {
@@ -1742,9 +1749,9 @@
                 });
                 treeHtml += '</ul>';
             }
-            
+
             treeHtml += '</div>';
-            
+
             // إضافة الشجرة بعد حاوية الخيارات
             $('#optionsContainer').after(treeHtml);
         }
@@ -1755,7 +1762,7 @@
         function generateHierarchyTreeItem(option, index) {
             const children = existingOptions.filter(opt => opt.depends_on_option_id == option.id);
             const typeLabel = getOptionTypeLabel(option.option_type);
-            
+
             let html = `
                 <li style="margin-bottom: 8px;">
                     <div class="d-flex align-items-center gap-2" style="background: rgba(105, 108, 255, 0.1); padding: 8px; border-radius: 6px;">
@@ -1768,7 +1775,7 @@
                         ${option.id ? `<span class="badge bg-info">ID: ${option.id}</span>` : ''}
                     </div>
             `;
-            
+
             if (children.length > 0) {
                 html += '<ul class="list-unstyled" style="margin-right: 30px; margin-top: 8px;">';
                 children.forEach(child => {
@@ -1776,7 +1783,7 @@
                 });
                 html += '</ul>';
             }
-            
+
             html += '</li>';
             return html;
         }

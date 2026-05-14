@@ -100,6 +100,7 @@ class ProductOptions extends Model
         return is_array($this->extra_data) ? $this->extra_data : [];
     }
 
+
     // Helpers
     public function getSizeTiers()
     {
