@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use Carbon\Carbon;
 use App\Models\Admin;
-use App\Models\Branchs;
 use App\Models\Visitor;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
@@ -23,6 +22,41 @@ class AdminController extends Controller
     //     $this->middleware('permission:تعديل الإدمن', ['only' => ['edit', 'update']]);
     //     $this->middleware('permission:حذف الإدمن', ['only' => ['destroy']]);
     // }
+
+    /**
+     * Get validation rules for admin creation/update
+     */
+    protected function getValidationRules($adminId = null)
+    {
+        $emailRule = 'required|string|email|max:255|unique:admins,email';
+        if ($adminId) {
+            $emailRule .= ',' . $adminId;
+        }
+
+        return [
+            'name' => 'required|string|max:255',
+            'email' => $emailRule,
+            'password' => $adminId ? 'nullable|string|min:6' : 'required|string|min:6',
+            'role' => 'required|exists:roles,name',
+        ];
+    }
+
+    /**
+     * Get validation error messages in Arabic
+     */
+    protected function getValidationMessages()
+    {
+        return [
+            'name.required' => 'الاسم مطلوب.',
+            'email.required' => 'البريد الإلكتروني مطلوب.',
+            'email.unique' => 'البريد الإلكتروني مستخدم بالفعل.',
+            'email.email' => 'البريد الإلكتروني غير صحيح.',
+            'password.required' => 'كلمة المرور مطلوبة.',
+            'password.min' => 'كلمة المرور يجب أن تكون 6 أحرف على الأقل.',
+            'role.required' => 'الدور مطلوب.',
+            'role.exists' => 'الدور المحدد غير موجود.',
+        ];
+    }
 
     public function index()
     {
@@ -96,32 +130,17 @@ class AdminController extends Controller
     public function store(Request $request)
     {
         try {
-            // التحقق من البيانات
-            $validated = $request->validate([
-                'name' => 'required|string|max:255',
-                'branch_id' => 'nullable|exists:branchss,id', // Adjust table name if needed
-                'email' => 'required|string|email|max:255|unique:admins,email',
-                'password' => 'required|string|min:6',
-                'role' => 'required',
-            ], [
-                'name.required' => 'الاسم مطلوب.',
-                'email.required' => 'البريد الإلكتروني مطلوب.',
-                'email.unique' => 'البريد الإلكتروني مستخدم بالفعل.',
-                'password.required' => 'كلمة المرور مطلوبة.',
-                'password.min' => 'كلمة المرور يجب أن تكون 6 أحرف على الأقل.',
-                'role.required' => 'الدور مطلوب.',
-                'role.exists' => 'الدور المحدد غير موجود.',
-            ]);
+            $validated = $request->validate(
+                $this->getValidationRules(),
+                $this->getValidationMessages()
+            );
 
-            // إنشاء المسؤول
             $admin = Admin::create([
                 'name' => $validated['name'],
                 'email' => $validated['email'],
-                'branch_id' => $validated['branch_id'],
-                'password' => $validated['password'], // Handled by setPasswordAttribute
+                'password' => $validated['password'],
             ]);
 
-            // Assign the role using Spatie
             $admin->assignRole($validated['role']);
 
             Log::info('Admin created:', ['admin_id' => $admin->id, 'role' => $validated['role']]);
@@ -141,29 +160,18 @@ class AdminController extends Controller
     public function update(Request $request, Admin $admin)
     {
         try {
-            $validated = $request->validate([
-                'name' => 'required|string|max:255',
-                'branch_id' => 'nullable|exists:branchss,id', // Adjust table name if needed
-                'email' => 'required|string|email|max:255|unique:admins,email,' . $admin->id,
-                'password' => 'nullable|string|min:6',
-                'role' => 'required|exists:roles,name',
-            ], [
-                'name.required' => 'الاسم مطلوب.',
-                'email.required' => 'البريد الإلكتروني مطلوب.',
-                'email.unique' => 'البريد الإلكتروني مستخدم بالفعل.',
-                'password.min' => 'كلمة المرور يجب أن تكون 6 أحرف على الأقل.',
-                'role.required' => 'الدور مطلوب.',
-                'role.exists' => 'الدور المحدد غير موجود.',
-            ]);
+            $validated = $request->validate(
+                $this->getValidationRules($admin->id),
+                $this->getValidationMessages()
+            );
 
             $updateData = [
                 'name' => $validated['name'],
                 'email' => $validated['email'],
-                'branch_id' => $validated['branch_id'],
             ];
 
             if (!empty($validated['password'])) {
-                $updateData['password'] = $validated['password']; // Handled by setPasswordAttribute
+                $updateData['password'] = $validated['password'];
             }
 
             $admin->update($updateData);
