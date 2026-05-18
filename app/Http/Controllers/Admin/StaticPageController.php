@@ -96,24 +96,28 @@ class StaticPageController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(StaticPage $staticPage)
+    public function show($staticPage)
     {
+        $staticPage = StaticPage::findOrFail($staticPage);
         return view('Admin.static-pages.show', compact('staticPage'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(StaticPage $staticPage)
+    public function edit($staticPage)
     {
+        $staticPage = StaticPage::findOrFail($staticPage);
         return view('Admin.static-pages.edit', compact('staticPage'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, StaticPage $staticPage)
+    public function update(Request $request, $staticPage)
     {
+        $staticPage = StaticPage::findOrFail($staticPage);
+
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
             'content' => 'required|string',

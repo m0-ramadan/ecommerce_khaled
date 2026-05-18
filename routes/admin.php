@@ -321,7 +321,13 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
         Route::post('/', [RoleController::class, 'assignRoles'])->name('assign.store');
     });
     Route::prefix('static-pages')->name('static-pages.')->group(function () {
-        Route::resource('/', StaticPageController::class);
+        Route::get('/', [StaticPageController::class, 'index'])->name('index');
+        Route::get('/create', [StaticPageController::class, 'create'])->name('create');
+        Route::post('/', [StaticPageController::class, 'store'])->name('store');
+        Route::get('/{staticPage}', [StaticPageController::class, 'show'])->name('show');
+        Route::get('/{staticPage}/edit', [StaticPageController::class, 'edit'])->name('edit');
+        Route::put('/{staticPage}', [StaticPageController::class, 'update'])->name('update');
+        Route::delete('/{staticPage}', [StaticPageController::class, 'destroy'])->name('destroy');
         Route::post('/bulk-action', [StaticPageController::class, 'bulkAction'])
             ->name('bulk-action');
     });

@@ -248,7 +248,7 @@
                                     </button>
                                 </li>
                                 <li class="nav-item" role="presentation">
-                                    <button class="nav-link" id="content-tab" data-bs-toggle="tab" data-bs-target="#content"
+                                    <button class="nav-link" id="content-tab" data-bs-toggle="tab" data-bs-target="#content-pane"
                                         type="button" role="tab">
                                         <i class="fas fa-edit me-2"></i>المحتوى
                                     </button>
@@ -344,13 +344,13 @@
                                 </div>
 
                                 <!-- Content Tab -->
-                                <div class="tab-pane fade" id="content" role="tabpanel">
+                                <div class="tab-pane fade" id="content-pane" role="tabpanel">
                                     <div class="mb-3" bis_skin_checked="1">
-                                        <label for="content" class="form-label">
+                                        <label for="contentEditor" class="form-label">
                                             <i class="fas fa-edit me-2"></i>محتوى الصفحة
                                         </label>
-                                        <textarea class="form-control @error('content') is-invalid @enderror" id="content" name="content" rows="12"
-                                            placeholder="أدخل محتوى الصفحة هنا..." required>{{ old('content') }}</textarea>
+                                        <textarea class="form-control @error('content') is-invalid @enderror" id="contentEditor" name="content" rows="12"
+                                            placeholder="أدخل محتوى الصفحة هنا...">{{ old('content') }}</textarea>
                                         @error('content')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
@@ -496,7 +496,7 @@
     <script>
         $(document).ready(function() {
             // تهيئة Summernote
-            $('#content').summernote({
+            $('#contentEditor').summernote({
                 height: 300,
                 lang: 'ar-AR',
                 toolbar: [
@@ -579,16 +579,16 @@
             // أزرار التنسيق
             $('.format-btn').on('click', function() {
                 const format = $(this).data('format');
-                $('#content').summernote('editor.saveRange');
-                $('#content').summernote('editor.restoreRange');
-                $('#content').summernote('editor.focus');
-                $('#content').summernote('editor.pasteHTML', format);
+                $('#contentEditor').summernote('editor.saveRange');
+                $('#contentEditor').summernote('editor.restoreRange');
+                $('#contentEditor').summernote('editor.focus');
+                $('#contentEditor').summernote('editor.pasteHTML', format);
             });
 
             // التحقق من النموذج
             $('#createPageForm').on('submit', function(e) {
                 const title = $('#title').val();
-                const content = $('#content').val();
+                const content = $('#contentEditor').summernote('code');
 
                 if (!title.trim()) {
                     e.preventDefault();
@@ -601,7 +601,7 @@
                     return false;
                 }
 
-                if (!content.trim()) {
+                if ($('#contentEditor').summernote('isEmpty')) {
                     e.preventDefault();
                     Swal.fire({
                         icon: 'error',
@@ -612,6 +612,7 @@
                     return false;
                 }
 
+                $('#contentEditor').val(content);
                 return true;
             });
         });
@@ -664,7 +665,7 @@
 
         function updatePreview() {
             const title = $('#title').val() || 'عنوان الصفحة';
-            const content = $('#content').val() || 'محتوى الصفحة...';
+            const content = $('#contentEditor').summernote('code') || 'محتوى الصفحة...';
             const slug = $('#slug').val() || 'slug';
             const status = $('#status').val();
             const metaTitle = $('#meta_title').val() || title;
@@ -746,7 +747,7 @@
                     break;
             }
 
-            $('#content').summernote('code', content);
+            $('#contentEditor').summernote('code', content);
             updateCharCount('content', content);
         }
 
@@ -764,7 +765,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $('#createPageForm')[0].reset();
-                    $('#content').summernote('code', '');
+                    $('#contentEditor').summernote('code', '');
                     updateSlugPreview('');
                     updatePreview();
                     updateCharCount('meta_title', '');

@@ -275,7 +275,7 @@
                                     </button>
                                 </li>
                                 <li class="nav-item" role="presentation">
-                                    <button class="nav-link" id="content-tab" data-bs-toggle="tab" data-bs-target="#content"
+                                    <button class="nav-link" id="content-tab" data-bs-toggle="tab" data-bs-target="#content-pane"
                                         type="button" role="tab">
                                         <i class="fas fa-edit me-2"></i>المحتوى
                                     </button>
@@ -359,12 +359,12 @@
                                 </div>
 
                                 <!-- Content Tab -->
-                                <div class="tab-pane fade" id="content" role="tabpanel">
+                                <div class="tab-pane fade" id="content-pane" role="tabpanel">
                                     <div class="mb-3" bis_skin_checked="1">
-                                        <label for="content" class="form-label">
+                                        <label for="contentEditor" class="form-label">
                                             <i class="fas fa-edit me-2"></i>محتوى الصفحة
                                         </label>
-                                        <textarea class="form-control @error('content') is-invalid @enderror" id="content" name="content" rows="12">{{ old('content', $staticPage->content) }}</textarea>
+                                        <textarea class="form-control @error('content') is-invalid @enderror" id="contentEditor" name="content" rows="12">{{ old('content', $staticPage->content) }}</textarea>
                                         @error('content')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
@@ -604,7 +604,7 @@
     <script>
         $(document).ready(function() {
             // تهيئة Summernote
-            $('#content').summernote({
+            $('#contentEditor').summernote({
                 height: 300,
                 lang: 'ar-AR',
                 toolbar: [
@@ -636,16 +636,17 @@
             // أزرار التنسيق
             $('.format-btn').on('click', function() {
                 const format = $(this).data('format');
-                $('#content').summernote('editor.saveRange');
-                $('#content').summernote('editor.restoreRange');
-                $('#content').summernote('editor.focus');
-                $('#content').summernote('editor.pasteHTML', format);
+                $('#contentEditor').summernote('editor.saveRange');
+                $('#contentEditor').summernote('editor.restoreRange');
+                $('#contentEditor').summernote('editor.focus');
+                $('#contentEditor').summernote('editor.pasteHTML', format);
             });
 
             // التحقق من النموذج
             $('#editPageForm').on('submit', function(e) {
                 const title = $('#title').val();
                 const slug = $('#slug').val();
+                const content = $('#contentEditor').summernote('code');
 
                 if (!title.trim()) {
                     e.preventDefault();
@@ -669,6 +670,18 @@
                     return false;
                 }
 
+                if ($('#contentEditor').summernote('isEmpty')) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'خطأ',
+                        text: 'الرجاء إدخال محتوى الصفحة',
+                        confirmButtonText: 'حسناً'
+                    });
+                    return false;
+                }
+
+                $('#contentEditor').val(content);
                 return true;
             });
         });
@@ -706,7 +719,7 @@
 
         function updatePreview() {
             const title = $('#title').val() || '{{ $staticPage->title }}';
-            const content = $('#content').val() || '{{ addslashes($staticPage->content) }}';
+            const content = $('#contentEditor').summernote('code') || '{{ addslashes($staticPage->content) }}';
             const slug = $('#slug').val() || '{{ $staticPage->slug }}';
             const status = $('#status').val();
             const metaTitle = $('#meta_title').val() || '{{ addslashes($staticPage->meta_title ?: $staticPage->title) }}';
@@ -743,7 +756,7 @@
                     $('#meta_title').val('{{ addslashes($staticPage->meta_title) }}');
                     $('#meta_description').val('{{ addslashes($staticPage->meta_description) }}');
                     $('#meta_keywords').val('{{ addslashes($staticPage->meta_keywords) }}');
-                    $('#content').summernote('code', `{!! addslashes($staticPage->content) !!}`);
+                    $('#contentEditor').summernote('code', `{!! addslashes($staticPage->content) !!}`);
 
                     updatePreview();
                     updateCharCount('meta_title', '{{ $staticPage->meta_title ?: $staticPage->title }}');
@@ -762,7 +775,7 @@
         }
 
         function copyContent() {
-            const content = $('#content').val();
+            const content = $('#contentEditor').summernote('code');
             navigator.clipboard.writeText(content).then(() => {
                 Swal.fire({
                     icon: 'success',
@@ -803,7 +816,7 @@
                 <body>
                     <div class="container">
                         <h1>${$('#title').val()}</h1>
-                        ${$('#content').val()}
+                        ${$('#contentEditor').summernote('code')}
                         <hr>
                         <p style="color: #999; font-size: 12px; text-align: center;">
                             هذه معاينة للتغييرات - الصفحة غير محفوظة بعد
