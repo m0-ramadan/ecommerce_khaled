@@ -2,32 +2,33 @@
 
 namespace App\Http\Controllers\Api\Website;
 
-use App\Models\Cart;
-use App\Models\Order;
-use App\Models\Coupon;
-use App\Models\Address;
-use App\Models\OrderItem;
-use App\Models\UserAddress;
-use Illuminate\Http\Request;
-use App\Models\PaymentMethod;
-use App\Traits\ApiResponseTrait;
-use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
-use App\Services\OtoShippingService;
-use App\Traits\HandlesPaymobPayment;
-use App\Services\Payment\PaymentService;
-use App\Http\Resources\Website\OrderResource;
 use App\Http\Requests\Website\ApplyCouponRequest;
 use App\Http\Requests\Website\CreateOrderRequest;
 use App\Http\Resources\Website\OrderDetailsResource;
+use App\Http\Resources\Website\OrderResource;
 use App\Http\Resources\Website\PaymentMethodResource;
+use App\Models\Cart;
+use App\Models\Coupon;
+use App\Models\Order;
+use App\Models\OrderItem;
+use App\Models\PaymentMethod;
+use App\Models\UserAddress;
+use App\Services\OtoShippingService;
+use App\Services\Payment\PaymentService;
+use App\Traits\ApiResponseTrait;
+use App\Traits\HandlesPaymobPayment;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
     use ApiResponseTrait, HandlesPaymobPayment;
 
     private PaymentService $paymentService;
+
     private OtoShippingService $shippingServices;
+
     public function __construct(PaymentService $paymentService, OtoShippingService $shippingServices)
     {
         $this->paymentService = $paymentService;
@@ -41,7 +42,7 @@ class OrderController extends Controller
     {
         $user = auth('sanctum')->user();
 
-        if (!$user) {
+        if (! $user) {
             return $this->errorResponse('يجب تسجيل الدخول لعرض الطلبات', 401);
         }
 
@@ -87,7 +88,7 @@ class OrderController extends Controller
                 $coupon = Coupon::where('code', strtoupper($request->coupon_code))
                     ->first();
 
-                if (!$coupon || !$coupon->isValidForOrder($cart->total, $user?->id, session()->getId())) {
+                if (! $coupon || ! $coupon->isValidForOrder($cart->total, $user?->id, session()->getId())) {
                     return $this->errorResponse('كوبون الخصم غير صالح أو منتهي الصلاحية', 400);
                 }
 
@@ -101,45 +102,45 @@ class OrderController extends Controller
 
             // إنشاء الطلب
             $order = Order::create([
-                'user_id'           => $user?->id,
-                'order_number'      => $this->generateUniqueOrderNumber(),
-                'address_id'        => $address?->id,
-                'customer_name'     => $request->customer_name ?? $user?->name,
-                'customer_phone'    => $request->customer_phone ?? $user?->phone,
-                'customer_email'    => $request->customer_email ?? $user?->email,
-                'shipping_address'  => $request->shipping_address,
-                'subtotal'          => $cart->subtotal,
-                'shipping_amount'   => $shippingPrice,
-                'discount_amount'   => $discountAmount,
-                'tax_amount'        => $taxAmount,
-                'total_amount'      => $totalAmount,
-                'payment_method'    => $request->payment_method,
-                'status'            => 'pending',
-                'notes'             => $request->notes,
-                'coupon_id'         => $coupon?->id,
+                'user_id' => $user?->id,
+                'order_number' => $this->generateUniqueOrderNumber(),
+                'address_id' => $address?->id,
+                'customer_name' => $request->customer_name ?? $user?->name,
+                'customer_phone' => $request->customer_phone ?? $user?->phone,
+                'customer_email' => $request->customer_email ?? $user?->email,
+                'shipping_address' => $request->shipping_address,
+                'subtotal' => $cart->subtotal,
+                'shipping_amount' => $shippingPrice,
+                'discount_amount' => $discountAmount,
+                'tax_amount' => $taxAmount,
+                'total_amount' => $totalAmount,
+                'payment_method' => $request->payment_method,
+                'status' => 'pending',
+                'notes' => $request->notes,
+                'coupon_id' => $coupon?->id,
                 'shipping_method_name' => $request->deliveryOptionName,
-                'oto_order_id'      => $request->orderId,
+                'oto_order_id' => $request->orderId,
             ]);
 
             // نقل العناصر من السلة إلى الطلب
             foreach ($cart->items as $item) {
                 OrderItem::create([
-                    'order_id'              => $order->id,
-                    'product_id'            => $item->product_id,
-                    'size_id'               => $item->size_id,
-                    'color_id'              => $item->color_id,
-                    'printing_method_id'    => $item->printing_method_id,
-                    'print_locations'       => $item->print_locations,
-                    'embroider_locations'   => $item->embroider_locations,
-                    'selected_options'      => $item->selected_options,
-                    'design_service_id'     => $item->design_service_id,
-                    'quantity'              => $item->quantity,
-                    'price_per_unit'        => $item->price_per_unit,
-                    'total_price'           => $item->line_total ?? $item->price_per_unit * $item->quantity,
-                    'is_sample'             => $item->is_sample,
-                    'note'                  => $item->note,
-                    'quantity_id'           => $item->quantity_id,
-                    'image_design'          => $item->image_design,
+                    'order_id' => $order->id,
+                    'product_id' => $item->product_id,
+                    'size_id' => $item->size_id,
+                    'color_id' => $item->color_id,
+                    'printing_method_id' => $item->printing_method_id,
+                    'print_locations' => $item->print_locations,
+                    'embroider_locations' => $item->embroider_locations,
+                    'selected_options' => $item->selected_options,
+                    'design_service_id' => $item->design_service_id,
+                    'quantity' => $item->quantity,
+                    'price_per_unit' => $item->price_per_unit,
+                    'total_price' => $item->line_total ?? $item->price_per_unit * $item->quantity,
+                    'is_sample' => $item->is_sample,
+                    'note' => $item->note,
+                    'quantity_id' => $item->quantity_id,
+                    'image_design' => $item->image_design,
                 ]);
             }
 
@@ -169,19 +170,17 @@ class OrderController extends Controller
                     );
                 }
 
-
-                if (!$result['success']) {
+                if (! $result['success']) {
                     return $this->errorResponse($result['message'], 400);
                 }
 
                 return $this->successResponse([
-                    'payment_url'  => $result['payment_url'],
-                    'shorten_url'  => $result['shorten_url'],
+                    'payment_url' => $result['payment_url'],
+                    'shorten_url' => $result['shorten_url'],
                     'order_number' => $order->order_number,
-                    'message'      => 'جاري توجيهك إلى بوابة الدفع الآمنة...'
+                    'message' => 'جاري توجيهك إلى بوابة الدفع الآمنة...',
                 ]);
             }
-
 
             return $this->successResponse(
                 new OrderDetailsResource($order->load(['items.product', 'items.size', 'items.color', 'address'])),
@@ -205,11 +204,11 @@ class OrderController extends Controller
             return $this->errorResponse('غير مصرح لك بإلغاء هذا الطلب', 403);
         }
 
-        if (!$user && !$this->guestCanAccessOrder($order)) {
+        if (! $user && ! $this->guestCanAccessOrder($order)) {
             return $this->errorResponse('رقم الهاتف مطلوب لإلغاء الطلب', 403);
         }
 
-        if (!in_array($order->status, ['pending', 'processing'])) {
+        if (! in_array($order->status, ['pending', 'processing'])) {
             return $this->errorResponse('لا يمكن إلغاء الطلب في هذه الحالة', 400);
         }
 
@@ -253,14 +252,15 @@ class OrderController extends Controller
 
     /**
      * Summary of show
-     * @param mixed $orderID
+     *
+     * @param  mixed  $orderID
      * @return \Illuminate\Http\JsonResponse
      */
     public function show($orderID)
     {
         $user = auth('sanctum')->user();
 
-        if (!$user) {
+        if (! $user) {
             return $this->errorResponse('يجب تسجيل الدخول لعرض تفاصيل الطلب', 401);
         }
 
@@ -288,7 +288,7 @@ class OrderController extends Controller
 
         $coupon = Coupon::where('code', strtoupper($request->coupon_code))->first();
 
-        if (!$coupon || !$coupon->isValidForOrder($cart->total, $user?->id, session()->getId())) {
+        if (! $coupon || ! $coupon->isValidForOrder($cart->total, $user?->id, session()->getId())) {
             return $this->errorResponse('كوبون الخصم غير صالح أو منتهي الصلاحية', 400);
         }
 
@@ -296,9 +296,9 @@ class OrderController extends Controller
 
         return $this->successResponse(
             [
-                'coupon_id'       => $coupon->id,
+                'coupon_id' => $coupon->id,
                 'discount_amount' => $discountAmount,
-                'new_total'       => $cart->total - $discountAmount,
+                'new_total' => $cart->total - $discountAmount,
             ],
             'تم تطبيق الكوبون بنجاح'
         );
@@ -311,7 +311,7 @@ class OrderController extends Controller
         $receivedHmac = $request->header('X-Paymob-Hmac-Signature')
             ?? $request->input('hmac');
 
-        if (!$receivedHmac || empty($hmacSecret)) {
+        if (! $receivedHmac || empty($hmacSecret)) {
             return response('Unauthorized', 401);
         }
 
@@ -319,24 +319,27 @@ class OrderController extends Controller
         $concatenated = collect($obj)->flatten()->implode('');
         $calculatedHmac = hash_hmac('sha512', $concatenated, $hmacSecret);
 
-        if (!hash_equals($calculatedHmac, $receivedHmac)) {
+        if (! hash_equals($calculatedHmac, $receivedHmac)) {
             \Illuminate\Support\Facades\Log::warning('PayMob Webhook HMAC Invalid', ['ip' => $request->ip()]);
+
             return response('Invalid HMAC', 400);
         }
 
         if ($request->input('type') === 'TRANSACTION' && $obj['success'] && $obj['is_capture']) {
             $orderNumber = $obj['merchant_reference'] ?? null;
 
-            if (!$orderNumber) return response('No reference', 400);
+            if (! $orderNumber) {
+                return response('No reference', 400);
+            }
 
             $order = Order::where('order_number', $orderNumber)->first();
 
             if ($order && $order->status === 'pending') {
                 $order->update([
-                    'status'         => 'paid',
+                    'status' => 'paid',
                     'payment_method' => 'paymob',
                     'transaction_id' => $obj['id'],
-                    'paid_at'        => now(),
+                    'paid_at' => now(),
                 ]);
 
                 // تفريغ السلة دلوقتي (آمن لأن الدفع تم)
@@ -356,17 +359,21 @@ class OrderController extends Controller
     public function paymentMethods(Request $request)
     {
 
-
         $isPayment = filter_var(
             $request->input('is_payment'),
             FILTER_VALIDATE_BOOLEAN,
             FILTER_NULL_ON_FAILURE
         );
-
-        $paymentMethods = PaymentMethod::query()
-            ->where('is_active', true)
-            ->where('is_payment', $isPayment)
-            ->get();
+        if ($isPayment) {
+            $paymentMethods = PaymentMethod::query()
+                ->where('is_active', true)
+                ->where('is_payment', $isPayment)
+                ->get();
+        } else {
+            $paymentMethods = PaymentMethod::query()
+                ->where('is_active', true)
+                ->get();
+        }
 
         return $this->successResponse(
             PaymentMethodResource::collection($paymentMethods),
@@ -374,13 +381,12 @@ class OrderController extends Controller
         );
     }
 
-
     public function paymentStatus(Request $request)
     {
         $status = $request->query('status'); // success | failed
         $orderId = $request->query('orderId');
 
-        if (!$status || !$orderId) {
+        if (! $status || ! $orderId) {
             return $this->errorResponse('بيانات غير مكتملة', 400);
         }
 
@@ -388,16 +394,16 @@ class OrderController extends Controller
             ->orWhere('id', $orderId)
             ->first();
 
-        if (!$order) {
+        if (! $order) {
             return $this->errorResponse('الطلب غير موجود', 404);
         }
 
         return $this->successResponse([
-            'order_id'     => $order->id,
+            'order_id' => $order->id,
             'order_number' => $order->order_number,
-            'status'       => $status,
+            'status' => $status,
             'order_status' => $order->status, // paid / pending / cancelled
-            'total'        => $order->total_amount,
+            'total' => $order->total_amount,
         ], 'تم جلب حالة الدفع');
     }
 
@@ -417,7 +423,7 @@ class OrderController extends Controller
     private function generateUniqueOrderNumber(): string
     {
         do {
-            $number = 'ORD-' . strtoupper(substr(bin2hex(random_bytes(5)), 0, 10));
+            $number = 'ORD-'.strtoupper(substr(bin2hex(random_bytes(5)), 0, 10));
         } while (Order::where('order_number', $number)->exists());
 
         return $number;
@@ -426,6 +432,7 @@ class OrderController extends Controller
     private function guestCanAccessOrder(Order $order): bool
     {
         $phone = request()->input('phone');
+
         return $phone && $order->customer_phone === $phone;
     }
 }
