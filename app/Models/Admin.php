@@ -64,4 +64,15 @@ class Admin extends Authenticatable
             ];
         });
     }
+       /**
+     * Get avatar URL
+     */
+    public function getAvatarUrlAttribute()
+    {
+        if ($this->avatar) {
+            return asset('storage/' . $this->avatar);
+        }
+        
+        return asset('assets/images/default-avatar.png');
+    }
 }

@@ -165,7 +165,7 @@
                                     <th style="text-align: center;">الاسم</th>
                                     <th style="text-align: center;">الإيميل</th>
                                     <th style="text-align: center;">الرتب</th>
-                                    <th style="text-align: center;">الفرع</th>
+
                                     <th style="text-align: center;">العمليات</th>
                                 </tr>
                             </thead>
@@ -182,9 +182,7 @@
                                                 <span class="text-muted">بدون رتب</span>
                                             @endforelse
                                         </td>
-                                        <td style="text-align: center;">
-                                            {{ $admin->branch ? $admin->branch->name : 'لا يوجد فرع' }}
-                                        </td>
+          
                                         <td class="d-flex gap-1 justify-content-center">
                                             @if (!auth()->user()->role || auth()->user()->hasPermissionTo('تعديل الإدمن'))
                                                 <a href="{{ route('admin.admins.edit', $admin) }}" class="btn btn-success btn-icon">
