@@ -199,3 +199,34 @@ if (!function_exists('permission_badge_class')) {
         return \App\Helpers\PermissionHelper::getPermissionBadgeClass($permissionName);
     }
 }
+
+
+if (!function_exists('getRatingText')) {
+    function getRatingText($rating)
+    {
+        $texts = [
+            5 => 'ممتاز! 🌟',
+            4 => 'جيد جداً 👍',
+            3 => 'متوسط 🙂',
+            2 => 'مقبول 😐',
+            1 => 'ضعيف 😞',
+        ];
+
+        return $texts[$rating] ?? '';
+    }
+}
+
+if (!function_exists('getRatingClass')) {
+    function getRatingClass($rating)
+    {
+        $classes = [
+            5 => 'excellent',
+            4 => 'good',
+            3 => 'average',
+            2 => 'poor',
+            1 => 'bad',
+        ];
+
+        return $classes[$rating] ?? '';
+    }
+}

@@ -8,7 +8,6 @@ use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\BannerItemController;
 use App\Http\Controllers\Admin\BannerItemV2Controller;
 use App\Http\Controllers\Admin\CategoryController;
-use App\Http\Controllers\Admin\ContactController;
 use App\Http\Controllers\Admin\ContactUsController;
 use App\Http\Controllers\Admin\CountryController;
 use App\Http\Controllers\Admin\CouponController;
@@ -26,10 +25,10 @@ use App\Http\Controllers\Admin\RegionController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\RolesController;
 use App\Http\Controllers\Admin\SettingController;
-use App\Http\Controllers\Admin\SliderController;
 use App\Http\Controllers\Admin\SocialMediaController;
 use App\Http\Controllers\Admin\StaticPageController;
 use App\Http\Controllers\Admin\SubscribeController;
+use App\Http\Controllers\Admin\TestimonialController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\VisitorController;
 use Illuminate\Support\Facades\Route;
@@ -103,12 +102,69 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
         'roles' => RolesController::class,
         'countries' => CountryController::class,
         'contactus' => ContactUsController::class,
-        'faqs' => FaqController::class,
+        // 'faqs' => FaqController::class,
         'logistic-services' => LogisticServiceController::class,
         'employees' => EmployeeController::class,
         'managers' => ManagerController::class,
         'regions' => RegionController::class,
     ]);
+
+    // Testimonials
+    Route::prefix('testimonials')->name('testimonials.')->group(function () {
+        // Listing & CRUD
+        Route::get('/', [TestimonialController::class, 'index'])->name('index');
+        Route::get('/create', [TestimonialController::class, 'create'])->name('create');
+        Route::post('/', [TestimonialController::class, 'store'])->name('store');
+        Route::get('/{testimonial}', [TestimonialController::class, 'show'])->name('show');
+        Route::get('/{testimonial}/edit', [TestimonialController::class, 'edit'])->name('edit');
+        Route::put('/{testimonial}', [TestimonialController::class, 'update'])->name('update');
+        Route::delete('/{testimonial}', [TestimonialController::class, 'destroy'])->name('destroy');
+
+        // Bulk Actions
+        Route::post('/bulk-action', [TestimonialController::class, 'bulkAction'])->name('bulk-action');
+
+        // Duplicate
+        Route::post('/{testimonial}/duplicate', [TestimonialController::class, 'duplicate'])->name('duplicate');
+
+        // Export CSV
+        Route::get('/export', [TestimonialController::class, 'export'])->name('export');
+
+        // AJAX Actions
+        Route::patch('/{testimonial}/toggle-status', [TestimonialController::class, 'toggleStatus'])->name('toggle-status');
+        Route::post('/update-order', [TestimonialController::class, 'updateOrder'])->name('update-order');
+
+        // Search (AJAX Autocomplete)
+        Route::get('/search', [TestimonialController::class, 'search'])->name('search');
+    });
+
+    // Faqs
+    Route::prefix('faqs')->name('faqs.')->group(function () {
+        // Listing & CRUD
+        Route::get('/', [FaqController::class, 'index'])->name('index');
+        Route::get('/create', [FaqController::class, 'create'])->name('create');
+        Route::post('/', [FaqController::class, 'store'])->name('store');
+
+        // Bulk Actions
+        Route::post('/bulk-action', [FaqController::class, 'bulkAction'])->name('bulk-action');
+
+        // Export CSV
+        Route::get('/export', [FaqController::class, 'export'])->name('export');
+
+        // AJAX Actions
+        Route::post('/update-order', [FaqController::class, 'updateOrder'])->name('update-order');
+
+        // Search (AJAX Autocomplete)
+        Route::get('/search', [FaqController::class, 'search'])->name('search');
+
+        Route::get('/{faq}', [FaqController::class, 'show'])->name('show');
+        Route::get('/{faq}/edit', [FaqController::class, 'edit'])->name('edit');
+        Route::put('/{faq}', [FaqController::class, 'update'])->name('update');
+        Route::delete('/{faq}', [FaqController::class, 'destroy'])->name('destroy');
+
+        // Duplicate
+        Route::post('/{faq}/duplicate', [FaqController::class, 'duplicate'])->name('duplicate');
+        Route::patch('/{faq}/toggle-status', [FaqController::class, 'toggleStatus'])->name('toggle-status');
+    });
 
     // coupons
     Route::prefix('coupons')->name('coupons.')->group(function () {
@@ -190,7 +246,6 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
     });
     Route::post('products/update/{id}', [ProductController::class, 'update'])->name('products.update');
 
-
     // Contacts
     Route::prefix('contacts')->as('contact.')->group(function () {
         Route::get('/', [ContactUsController::class, 'index'])->name('index');
@@ -223,7 +278,6 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
         Route::get('/{user}/favourites', [UserController::class, 'favourites'])->name('favourites');
         Route::get('/{user}/activities', [UserController::class, 'activities'])->name('activities');
     });
-
 
     // Banner Routes
     Route::prefix('banners')->name('banners.')->group(function () {
@@ -331,7 +385,6 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
         Route::post('/bulk-action', [StaticPageController::class, 'bulkAction'])
             ->name('bulk-action');
     });
-
 
     Route::get('order/statistics', [OrderController::class, 'statistics'])->name('orders.statistics');
 });

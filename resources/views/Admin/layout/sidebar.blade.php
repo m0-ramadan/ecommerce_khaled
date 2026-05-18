@@ -174,12 +174,12 @@
                 <div> بنارات المنتجات والاقسام</div>
             </a>
         </li>
-        {{-- <li class="menu-item ">
-            <a href="#/admin/order-reports" class="menu-link">
-                <i class="menu-icon ti ti-message-report"></i>
-                <div>الشكاوي</div>
+        <li class="menu-item ">
+            <a href="{{ route('admin.testimonials.index') }}" class="menu-link">
+                <i class="menu-icon ti ti-quote"></i>
+                <div>الاراء</div>
             </a>
-        </li> --}}
+        </li>
 
 
         <li class="menu-item ">
@@ -195,6 +195,13 @@
                         <i class="menu-icon ti ti-file-description"></i>
                         <div> الصفحات الثابته
                         </div>
+                    </a>
+                </li>
+
+                <li class="menu-item ">
+                    <a href="{{ route('admin.faqs.index') }}" class="menu-link">
+                        <i class="menu-icon ti ti-file-description"></i>
+                        <div> الأسئلة الشائعة </div>
                     </a>
                 </li>
             </ul>
