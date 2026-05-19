@@ -299,7 +299,7 @@
                         <i class="fas fa-money-bill-wave"></i>
                     </div>
                     <div class="stats-number" bis_skin_checked="1">
-                        {{ number_format($totalAmount, 2) }} ج.م
+                        {{ number_format($totalAmount, 2) }} ر.س
                     </div>
                     <div class="stats-label" bis_skin_checked="1">إجمالي القيمة</div>
                 </div>
@@ -385,7 +385,7 @@
                                     <div class="detail-item" bis_skin_checked="1">
                                         <span class="detail-label">القيمة:</span>
                                         <span class="detail-value">
-                                            {{ number_format($order->total_amount, 2) }} ج.م
+                                            {{ number_format($order->total_amount, 2) }} ر.س
                                         </span>
                                     </div>
 

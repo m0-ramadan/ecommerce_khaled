@@ -816,7 +816,7 @@
                     <div class="col-md-6 mb-3">
                         <label for="price" class="form-label required">السعر الأساسي</label>
                         <div class="input-group">
-                            <span class="input-group-text">ج.م</span>
+                            <span class="input-group-text">ر.س</span>
                             <input type="number" class="form-control" id="price" name="price" step="0.01"
                                 value="{{ old('price') }}" placeholder="0.00" required>
                         </div>
@@ -1057,7 +1057,7 @@
                     </div>
                     <div class="summary-row">
                         <span class="summary-label">السعر الأساسي:</span>
-                        <span class="summary-value" id="summary_price">- ج.م</span>
+                        <span class="summary-value" id="summary_price">- ر.س</span>
                     </div>
                     <div class="summary-row">
                         <span class="summary-label">الكمية:</span>
@@ -1853,7 +1853,7 @@
 
         function updateSummary() {
             $('#summary_name').text($('#name').val() || '-');
-            $('#summary_price').text(($('#price').val() || '0') + ' ج.م');
+            $('#summary_price').text(($('#price').val() || '0') + ' ر.س');
             $('#summary_stock').text($('#stock').val() || '0');
             $('#summary_options').text(productOptions.length);
 

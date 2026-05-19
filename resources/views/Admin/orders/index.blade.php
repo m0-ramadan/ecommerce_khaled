@@ -455,7 +455,7 @@
                         <i class="fas fa-money-bill-wave"></i>
                     </div>
                     <div class="stats-number" bis_skin_checked="1">
-                        {{ number_format($stats['total_revenue'], 2) }} ج.م
+                        {{ number_format($stats['total_revenue'], 2) }} ر.س
                     </div>
                     <div class="stats-label" bis_skin_checked="1">إجمالي الإيرادات</div>
                 </div>
@@ -652,7 +652,7 @@
                                         <div class="detail-item" bis_skin_checked="1">
                                             <span class="detail-label">المبلغ:</span>
                                             <span class="detail-value">
-                                                {{ number_format($order->total_amount, 2) }} ج.م
+                                                {{ number_format($order->total_amount, 2) }} ر.س
                                             </span>
                                         </div>
 

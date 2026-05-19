@@ -13,7 +13,7 @@ class OrderItemResource extends JsonResource
             'quantity'          => $this->quantity,
             'price_per_unit'    => $this->price_per_unit,
             'total_price'       => $this->total_price,
-            'formatted_price'   => number_format($this->total_price, 2) . ' ج.م',
+            'formatted_price'   => number_format($this->total_price, 2) . ' ر.س',
             'is_sample'         => $this->is_sample,
             'note'              => $this->note,
             'image_design'      => $this->image_design ? asset('storage/' . $this->image_design) : null,

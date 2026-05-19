@@ -19,7 +19,7 @@ public function toArray($request)
         'name'             => $this->name,
         'additional_price' => (float) $this->additional_price,
         'formatted_price'  => $this->additional_price > 0 
-            ? '+' . number_format($this->additional_price, 2) . ' ج.م' 
+            ? '+' . number_format($this->additional_price, 2) . ' ر.س' 
             : 'مجانًا',
     ];
 }

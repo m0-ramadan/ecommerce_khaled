@@ -74,7 +74,7 @@ class OrderItem extends Model
     // ملحقات مفيدة
     public function getFormattedTotalAttribute()
     {
-        return number_format($this->total_price, 2) . ' ج.م';
+        return number_format($this->total_price, 2) . ' ر.س';
     }
 
     public function getPrintLocationsNamesAttribute()

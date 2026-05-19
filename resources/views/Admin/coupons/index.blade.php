@@ -94,7 +94,7 @@
     }
 
     .coupon-value.type-fixed::before {
-        content: 'ج.م';
+        content: 'ر.س';
         font-size: 14px;
         margin-left: 5px;
     }
@@ -653,7 +653,7 @@
                                     
                                     @if ($coupon->min_order_amount)
                                         <div class="text-center text-muted small mb-2">
-                                            الحد الأدنى: {{ number_format($coupon->min_order_amount, 2) }} ج.م
+                                            الحد الأدنى: {{ number_format($coupon->min_order_amount, 2) }} ر.س
                                         </div>
                                     @endif
                                     
@@ -823,12 +823,12 @@
                                     <td>
                                         <strong class="text-success">
                                             {{ number_format($coupon->value, $coupon->type === 'percentage' ? 0 : 2) }}
-                                            {{ $coupon->type === 'percentage' ? '%' : 'ج.م' }}
+                                            {{ $coupon->type === 'percentage' ? '%' : 'ر.س' }}
                                         </strong>
                                         @if ($coupon->min_order_amount)
                                             <br>
                                             <small class="text-muted">
-                                                حد أدنى: {{ number_format($coupon->min_order_amount, 2) }} ج.م
+                                                حد أدنى: {{ number_format($coupon->min_order_amount, 2) }} ر.س
                                             </small>
                                         @endif
                                     </td>

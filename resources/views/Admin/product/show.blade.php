@@ -624,21 +624,21 @@
                                 <div class="product-price-section" bis_skin_checked="1">
                                     @if ($product->has_discount && $product->discount)
                                         <div class="original-price" bis_skin_checked="1">
-                                            {{ number_format($product->price, 2) }} ج.م
+                                            {{ number_format($product->price, 2) }} ر.س
                                         </div>
                                         <div class="current-price" bis_skin_checked="1">
-                                            {{ number_format($product->final_price, 2) }} ج.م
+                                            {{ number_format($product->final_price, 2) }} ر.س
                                         </div>
                                         <div class="discount-badge" bis_skin_checked="1">
                                             @if ($product->discount->discount_type === 'percentage')
                                                 خصم {{ $product->discount->discount_value }}%
                                             @else
-                                                خصم {{ number_format($product->discount->discount_value, 2) }} ج.م
+                                                خصم {{ number_format($product->discount->discount_value, 2) }} ر.س
                                             @endif
                                         </div>
                                     @else
                                         <div class="current-price" bis_skin_checked="1">
-                                            {{ number_format($product->price, 2) }} ج.م
+                                            {{ number_format($product->price, 2) }} ر.س
                                         </div>
                                     @endif
                                 </div>
@@ -773,7 +773,7 @@
                                                     @if ($detail->additional_price > 0)
                                                         <span
                                                             class="detail-price">+{{ number_format($detail->additional_price, 2) }}
-                                                            ج.م</span>
+                                                            ر.س</span>
                                                     @endif
                                                 </div>
                                             @endforeach
@@ -829,7 +829,7 @@
                                                     @if ($detail->additional_price > 0)
                                                         <span
                                                             class="detail-price">+{{ number_format($detail->additional_price, 2) }}
-                                                            ج.م</span>
+                                                            ر.س</span>
                                                     @endif
                                                 </div>
                                             @endforeach
@@ -952,7 +952,7 @@
                                                         <span>{{ $detail->option_value }}</span>
                                                         @if ($detail->additional_price > 0)
                                                             <small class="text-success">+{{ $detail->additional_price }}
-                                                                ج.م</small>
+                                                                ر.س</small>
                                                         @endif
                                                     </div>
                                                 @elseif($catKey === 'material')
@@ -961,7 +961,7 @@
                                                         <span>{{ $detail->option_value }}</span>
                                                         @if ($detail->additional_price > 0)
                                                             <small class="text-success">+{{ $detail->additional_price }}
-                                                                ج.م</small>
+                                                                ر.س</small>
                                                         @endif
                                                     </div>
                                                 @else
@@ -970,7 +970,7 @@
                                                         {{ $detail->option_value }}
                                                         @if ($detail->additional_price > 0)
                                                             <small class="text-success">+{{ $detail->additional_price }}
-                                                                ج.م</small>
+                                                                ر.س</small>
                                                         @endif
                                                     </div>
                                                 @endif

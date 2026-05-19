@@ -412,7 +412,7 @@
                         <div class="info-row" bis_skin_checked="1">
                             <div class="info-label" bis_skin_checked="1">المجموع الإجمالي:</div>
                             <div class="info-value" bis_skin_checked="1">
-                                {{ number_format($order->total_amount, 2) }} ج.م
+                                {{ number_format($order->total_amount, 2) }} ر.س
                             </div>
                         </div>
                     </div>
@@ -523,8 +523,8 @@
                                                             </div>
                                                         </td>
                                                         <td>{{ $item->quantity }}</td>
-                                                        <td>{{ number_format($item->price_per_unit, 2) }} ج.م</td>
-                                                        <td>{{ number_format($item->total_price, 2) }} ج.م</td>
+                                                        <td>{{ number_format($item->price_per_unit, 2) }} ر.س</td>
+                                                        <td>{{ number_format($item->total_price, 2) }} ر.س</td>
                                                     </tr>
                                                 @endforeach
                                             </tbody>
@@ -605,7 +605,7 @@
                                             <input type="number" class="form-control" id="subtotal" name="subtotal"
                                                 value="{{ old('subtotal', $order->subtotal) }}" step="0.01"
                                                 min="0" required>
-                                            <span class="input-group-text">ج.م</span>
+                                            <span class="input-group-text">ر.س</span>
                                         </div>
                                     </div>
 
@@ -617,7 +617,7 @@
                                                 name="shipping_amount"
                                                 value="{{ old('shipping_amount', $order->shipping_amount) }}"
                                                 step="0.01" min="0">
-                                            <span class="input-group-text">ج.م</span>
+                                            <span class="input-group-text">ر.س</span>
                                         </div>
                                     </div>
 
@@ -629,7 +629,7 @@
                                                 name="discount_amount"
                                                 value="{{ old('discount_amount', $order->discount_amount) }}"
                                                 step="0.01" min="0">
-                                            <span class="input-group-text">ج.م</span>
+                                            <span class="input-group-text">ر.س</span>
                                         </div>
                                     </div>
 
@@ -640,7 +640,7 @@
                                             <input type="number" class="form-control" id="tax_amount" name="tax_amount"
                                                 value="{{ old('tax_amount', $order->tax_amount) }}" step="0.01"
                                                 min="0">
-                                            <span class="input-group-text">ج.م</span>
+                                            <span class="input-group-text">ر.س</span>
                                         </div>
                                     </div>
 
@@ -652,7 +652,7 @@
                                                 name="total_amount"
                                                 value="{{ old('total_amount', $order->total_amount) }}" step="0.01"
                                                 min="0" required>
-                                            <span class="input-group-text">ج.م</span>
+                                            <span class="input-group-text">ر.س</span>
                                         </div>
                                     </div>
                                 </div>

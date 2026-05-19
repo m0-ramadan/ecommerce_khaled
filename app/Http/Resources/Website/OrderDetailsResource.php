@@ -20,7 +20,7 @@ class OrderDetailsResource extends JsonResource
             'status'           => $this->status,
             'status_label'     => __('order.status.' . $this->status),
             'total_amount'     => $this->total_amount,
-            'formatted_total'  => number_format($this->total_amount, 2) . ' ج.م',
+            'formatted_total'  => number_format($this->total_amount, 2) . ' ر.س',
             'customer_name'    => $this->customer_name,
             'customer_phone'   => $this->customer_phone,
             'shipping_address' => $this->shipping_address,

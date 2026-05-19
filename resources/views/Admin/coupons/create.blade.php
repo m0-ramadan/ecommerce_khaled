@@ -142,7 +142,7 @@
                                 <input type="number" class="form-control" id="min_order_amount" 
                                        name="min_order_amount" value="{{ old('min_order_amount') }}" 
                                        step="0.01" min="0" placeholder="0.00">
-                                <span class="input-group-text">ج.م</span>
+                                <span class="input-group-text">ر.س</span>
                             </div>
                             <div class="form-text">اتركه فارغاً إذا كنت لا تريد تحديد حد أدنى</div>
                         </div>
@@ -330,7 +330,7 @@ $('#summary_text_ads').text(textAds.join(', ') || 'لا يوجد');
         }
 
         function updateValueSuffix(type) {
-            const suffix = type === 'percentage' ? '%' : 'ج.م';
+            const suffix = type === 'percentage' ? '%' : 'ر.س';
             $('#valueSuffix').text(suffix);
         }
 
@@ -341,7 +341,7 @@ $('#summary_text_ads').text(textAds.join(', ') || 'لا يوجد');
             if (type === 'percentage') {
                 preview = value + '%';
             } else {
-                preview = numberFormat(value) + ' ج.م';
+                preview = numberFormat(value) + ' ر.س';
             }
             
             $('#previewValue').text(preview);

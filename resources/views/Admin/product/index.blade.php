@@ -837,11 +837,11 @@
 
                                     <div class="product-price">
                                         <span class="current-price">
-                                            {{ number_format($product->final_price, 2) }} ج.م
+                                            {{ number_format($product->final_price, 2) }} ر.س
                                         </span>
                                         @if ($product->has_discount && $product->price > $product->final_price)
                                             <span class="old-price">
-                                                {{ number_format($product->price, 2) }} ج.م
+                                                {{ number_format($product->price, 2) }} ر.س
                                             </span>
                                         @endif
                                     </div>
@@ -997,11 +997,11 @@
                                         <td>
                                             <div bis_skin_checked="1">
                                                 <strong class="text-success">{{ number_format($product->final_price, 2) }}
-                                                    ج.م</strong>
+                                                    ر.س</strong>
                                                 @if ($product->has_discount && $product->price > $product->final_price)
                                                     <br>
                                                     <small class="text-muted text-decoration-line-through">
-                                                        {{ number_format($product->price, 2) }} ج.م
+                                                        {{ number_format($product->price, 2) }} ر.س
                                                     </small>
                                                 @endif
                                             </div>

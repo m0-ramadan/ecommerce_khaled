@@ -471,7 +471,7 @@
                                                 <div class="mb-1" bis_skin_checked="1">
                                                     <span class="badge bg-info">{{ $order->status_label }}</span>
                                                     <span class="ms-2">{{ number_format($order->total_amount, 2) }}
-                                                        ج.م</span>
+                                                        ر.س</span>
                                                 </div>
                                                 <small class="text-muted">
                                                     {{ $order->items->count() }} منتج

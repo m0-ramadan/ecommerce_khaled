@@ -147,7 +147,7 @@
                                     <input type="number" class="form-control" id="value" name="value" 
                                            value="{{ old('value', $coupon->value) }}" step="0.01" min="0" required>
                                     <span class="input-group-text" id="valueSuffix">
-                                        {{ $coupon->type == 'percentage' ? '%' : 'ج.م' }}
+                                        {{ $coupon->type == 'percentage' ? '%' : 'ر.س' }}
                                     </span>
                                 </div>
                             </div>
@@ -160,7 +160,7 @@
                                 <input type="number" class="form-control" id="min_order_amount" 
                                        name="min_order_amount" value="{{ old('min_order_amount', $coupon->min_order_amount) }}" 
                                        step="0.01" min="0">
-                                <span class="input-group-text">ج.م</span>
+                                <span class="input-group-text">ر.س</span>
                             </div>
                         </div>
 
@@ -233,7 +233,7 @@
                         <div class="coupon-preview-code" id="previewCode">{{ $coupon->code }}</div>
                         <div class="coupon-preview-value" id="previewValue">
                             {{ number_format($coupon->value, $coupon->type == 'percentage' ? 0 : 2) }}
-                            {{ $coupon->type == 'percentage' ? '%' : 'ج.م' }}
+                            {{ $coupon->type == 'percentage' ? '%' : 'ر.س' }}
                         </div>
                         <div class="coupon-preview-dates" id="previewDates">
                             <div>يبدأ: {{ $coupon->starts_at ? $coupon->starts_at->format('Y/m/d') : 'فوراً' }}</div>
@@ -363,7 +363,7 @@
         }
 
         function updateValueSuffix(type) {
-            const suffix = type === 'percentage' ? '%' : 'ج.م';
+            const suffix = type === 'percentage' ? '%' : 'ر.س';
             $('#valueSuffix').text(suffix);
         }
 
@@ -375,7 +375,7 @@
             if (type === 'percentage') {
                 preview = value + '%';
             } else {
-                preview = numberFormat(value) + ' ج.م';
+                preview = numberFormat(value) + ' ر.س';
             }
             
             $('#previewValue').text(preview);

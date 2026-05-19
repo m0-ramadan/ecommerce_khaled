@@ -411,7 +411,7 @@
                         <i class="fas fa-money-bill-wave"></i>
                     </div>
                     <div class="stats-number" id="totalRevenue">
-                        {{ number_format($stats['total_revenue'], 2) }} ج.م
+                        {{ number_format($stats['total_revenue'], 2) }} ر.س
                     </div>
                     <div class="stats-label">إجمالي الإيرادات</div>
                     <div class="stats-change change-up">
@@ -427,7 +427,7 @@
                         <i class="fas fa-chart-line"></i>
                     </div>
                     <div class="stats-number" id="averageOrder">
-                        {{ number_format($stats['average_order_value'], 2) }} ج.م
+                        {{ number_format($stats['average_order_value'], 2) }} ر.س
                     </div>
                     <div class="stats-label">متوسط قيمة الطلب</div>
                     <div class="stats-change change-up">
@@ -675,7 +675,7 @@
             const revenueData = {
                 labels: ['1', '5', '10', '15', '20', '25', '30'],
                 datasets: [{
-                    label: 'الإيرادات (ج.م)',
+                    label: 'الإيرادات (ر.س)',
                     data: [1200, 1900, 3000, 2500, 2200, 3000, 4000],
                     backgroundColor: 'rgba(105, 108, 255, 0.2)',
                     borderColor: 'rgba(105, 108, 255, 1)',
@@ -744,7 +744,7 @@
                             },
                             callbacks: {
                                 label: function(context) {
-                                    return context.formattedValue + ' ج.م';
+                                    return context.formattedValue + ' ر.س';
                                 }
                             }
                         }
@@ -754,7 +754,7 @@
                             beginAtZero: true,
                             ticks: {
                                 callback: function(value) {
-                                    return value + ' ج.م';
+                                    return value + ' ر.س';
                                 }
                             }
                         }

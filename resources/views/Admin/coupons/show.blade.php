@@ -193,13 +193,13 @@
                                     <span class="info-label">قيمة الخصم:</span>
                                     <span class="info-value">
                                         {{ number_format($coupon->value, $coupon->type === 'percentage' ? 0 : 2) }}
-                                        {{ $coupon->type === 'percentage' ? '%' : 'ج.م' }}
+                                        {{ $coupon->type === 'percentage' ? '%' : 'ر.س' }}
                                     </span>
                                 </div>
                                 <div class="info-item" bis_skin_checked="1">
                                     <span class="info-label">الحد الأدنى للطلب:</span>
                                     <span class="info-value">
-                                        {{ $coupon->min_order_amount ? number_format($coupon->min_order_amount, 2) . ' ج.م' : 'لا يوجد' }}
+                                        {{ $coupon->min_order_amount ? number_format($coupon->min_order_amount, 2) . ' ر.س' : 'لا يوجد' }}
                                     </span>
                                 </div>
                                 <div class="info-item" bis_skin_checked="1">
@@ -493,14 +493,14 @@
                                             #{{ $usage->order->id }}
                                         </a>
                                         <br>
-                                        <small class="text-muted">{{ number_format($usage->order->total, 2) }} ج.م</small>
+                                        <small class="text-muted">{{ number_format($usage->order->total, 2) }} ر.س</small>
                                     @else
                                         <span class="text-muted">-</span>
                                     @endif
                                 </td>
                                 <td>
                                     <span class="fw-bold text-success">
-                                        {{ number_format($usage->discount_amount ?? 0, 2) }} ج.م
+                                        {{ number_format($usage->discount_amount ?? 0, 2) }} ر.س
                                     </span>
                                 </td>
                                 <td>

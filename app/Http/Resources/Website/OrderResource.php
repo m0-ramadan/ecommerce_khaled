@@ -14,7 +14,7 @@ class OrderResource extends JsonResource
             'status'           => $this->status,
             'status_label'     => $this->getStatusLabelAttribute(), // أو __('order.status.' . $this->status)
             'total_amount'     => $this->total_amount,
-            'formatted_total'  => number_format($this->total_amount, 2) . ' ج.م',
+            'formatted_total'  => number_format($this->total_amount, 2) . ' ر.س',
             'items_count'      => $this->orderItems?->sum('quantity'),
             'created_at'       => $this->created_at->format('Y-m-d H:i'),
             'can_cancel'       => in_array($this->status, ['pending', 'processing']),

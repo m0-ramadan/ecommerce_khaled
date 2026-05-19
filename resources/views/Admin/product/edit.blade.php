@@ -547,9 +547,9 @@
                         </div>
                     </div>
                     <div class="text-start">
-                        <span class="preview-price">{{ number_format($product->final_price, 2) }} ج.م</span>
+                        <span class="preview-price">{{ number_format($product->final_price, 2) }} ر.س</span>
                         @if ($product->has_discount && $product->price > $product->final_price)
-                            <div class="text-muted"><del>{{ number_format($product->price, 2) }} ج.م</del></div>
+                            <div class="text-muted"><del>{{ number_format($product->price, 2) }} ر.س</del></div>
                         @endif
                     </div>
                 </div>
@@ -747,7 +747,7 @@
                     <div class="col-md-6 mb-3">
                         <label for="price" class="form-label required">السعر الأساسي</label>
                         <div class="input-group">
-                            <span class="input-group-text">ج.م</span>
+                            <span class="input-group-text">ر.س</span>
                             <input type="number" class="form-control" id="price" name="price" step="0.01"
                                 value="{{ old('price', $product->price) }}" required>
                         </div>
@@ -1771,7 +1771,7 @@
                         <span class="text-muted">(${option.option_value})</span>
                         <span class="type-badge type-${option.option_type}">${typeLabel}</span>
                         ${option.is_required ? '<span class="badge bg-danger">مطلوب</span>' : ''}
-                        ${option.additional_price > 0 ? `<span class="badge bg-success">+${option.additional_price} ج.م</span>` : ''}
+                        ${option.additional_price > 0 ? `<span class="badge bg-success">+${option.additional_price} ر.س</span>` : ''}
                         ${option.id ? `<span class="badge bg-info">ID: ${option.id}</span>` : ''}
                     </div>
             `;

@@ -443,7 +443,7 @@
 
                                     <div class="summary-row" bis_skin_checked="1">
                                         <span class="summary-label">المجموع الجزئي:</span>
-                                        <span class="summary-value" id="subtotalDisplay">0.00 ج.م</span>
+                                        <span class="summary-value" id="subtotalDisplay">0.00 ر.س</span>
                                         <input type="hidden" id="subtotal" name="subtotal" value="0">
                                     </div>
 
@@ -454,7 +454,7 @@
                                             <input type="number" class="form-control" id="shipping_amount"
                                                 name="shipping_amount" value="{{ old('shipping_amount', 0) }}"
                                                 step="0.01" min="0">
-                                            <span class="input-group-text">ج.م</span>
+                                            <span class="input-group-text">ر.س</span>
                                         </div>
                                     </div>
 
@@ -465,7 +465,7 @@
                                             <input type="number" class="form-control" id="discount_amount"
                                                 name="discount_amount" value="{{ old('discount_amount', 0) }}"
                                                 step="0.01" min="0">
-                                            <span class="input-group-text">ج.م</span>
+                                            <span class="input-group-text">ر.س</span>
                                         </div>
                                     </div>
 
@@ -475,13 +475,13 @@
                                             bis_skin_checked="1">
                                             <input type="number" class="form-control" id="tax_amount" name="tax_amount"
                                                 value="{{ old('tax_amount', 0) }}" step="0.01" min="0">
-                                            <span class="input-group-text">ج.م</span>
+                                            <span class="input-group-text">ر.س</span>
                                         </div>
                                     </div>
 
                                     <div class="summary-row total-row" bis_skin_checked="1">
                                         <span class="summary-label">الإجمالي:</span>
-                                        <span class="summary-value" id="totalDisplay">0.00 ج.م</span>
+                                        <span class="summary-value" id="totalDisplay">0.00 ر.س</span>
                                         <input type="hidden" id="total_amount" name="total_amount" value="0">
                                     </div>
                                 </div>
@@ -539,11 +539,11 @@
                 <div class="input-group" bis_skin_checked="1">
                     <input type="number" class="form-control price-input" name="items[{index}][price_per_unit]"
                         value="{price}" step="0.01" min="0" onchange="updateItem(this)">
-                    <span class="input-group-text">ج.م</span>
+                    <span class="input-group-text">ر.س</span>
                 </div>
             </td>
             <td>
-                <span class="item-total">{total} ج.م</span>
+                <span class="item-total">{total} ر.س</span>
             </td>
             <td>
                 <i class="fas fa-times remove-item" onclick="removeItem(this)"></i>
@@ -596,7 +596,7 @@
                                 <img src="${product.image}" alt="${product.name}" class="product-image">
                                 <div class="product-details">
                                     <h6>${product.name}</h6>
-                                    <p>السعر: ${product.final_price} ج.م | المخزون: ${product.stock}</p>
+                                    <p>السعر: ${product.final_price} ر.س | المخزون: ${product.stock}</p>
                                 </div>
                             </div>
                         </div>
@@ -690,7 +690,7 @@
             const price = row.find('.price-input').val();
             const total = (quantity * price).toFixed(2);
 
-            row.find('.item-total').text(total + ' ج.م');
+            row.find('.item-total').text(total + ' ر.س');
             updateSummary();
         }
 
@@ -724,9 +724,9 @@
             const total = subtotal + shipping - discount + tax;
 
             // تحديث العرض
-            $('#subtotalDisplay').text(subtotal.toFixed(2) + ' ج.م');
+            $('#subtotalDisplay').text(subtotal.toFixed(2) + ' ر.س');
             $('#subtotal').val(subtotal.toFixed(2));
-            $('#totalDisplay').text(total.toFixed(2) + ' ج.م');
+            $('#totalDisplay').text(total.toFixed(2) + ' ر.س');
             $('#total_amount').val(total.toFixed(2));
         }
 
@@ -752,9 +752,9 @@
                     itemIndex = 0;
 
                     // إعادة تعيين الإجماليات
-                    $('#subtotalDisplay').text('0.00 ج.م');
+                    $('#subtotalDisplay').text('0.00 ر.س');
                     $('#subtotal').val('0');
-                    $('#totalDisplay').text('0.00 ج.م');
+                    $('#totalDisplay').text('0.00 ر.س');
                     $('#total_amount').val('0');
 
                     Swal.fire({

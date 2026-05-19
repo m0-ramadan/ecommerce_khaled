@@ -441,7 +441,7 @@
                             </div>
                             <div class="text-white opacity-75" bis_skin_checked="1">
                                 <i class="fas fa-money-bill-wave me-2"></i>
-                                {{ number_format($order->total_amount, 2) }} ج.م
+                                {{ number_format($order->total_amount, 2) }} ر.س
                             </div>
                         </div>
                     </div>
@@ -512,7 +512,7 @@
                                                     {{ $item->product->name ?? 'منتج محذوف' }}
                                                 </div>
                                                 <div class="product-price" bis_skin_checked="1">
-                                                    {{ number_format($item->total_price, 2) }} ج.م
+                                                    {{ number_format($item->total_price, 2) }} ر.س
                                                 </div>
                                             </div>
 
@@ -526,7 +526,7 @@
                                                     <span class="detail-label">السعر للوحدة:</span>
                                                     <span
                                                         class="detail-value">{{ number_format($item->price_per_unit, 2) }}
-                                                        ج.م</span>
+                                                        ر.س</span>
                                                 </div>
 
                                                 @if ($item->color)
@@ -580,14 +580,14 @@
                                     <div class="summary-row" bis_skin_checked="1">
                                         <span class="summary-label">المجموع الجزئي:</span>
                                         <span class="summary-value">
-                                            {{ number_format($order->subtotal, 2) }} ج.م
+                                            {{ number_format($order->subtotal, 2) }} ر.س
                                         </span>
                                     </div>
 
                                     <div class="summary-row" bis_skin_checked="1">
                                         <span class="summary-label">الشحن:</span>
                                         <span class="summary-value">
-                                            {{ number_format($order->shipping_amount, 2) }} ج.م
+                                            {{ number_format($order->shipping_amount, 2) }} ر.س
                                         </span>
                                     </div>
 
@@ -595,7 +595,7 @@
                                         <div class="summary-row" bis_skin_checked="1">
                                             <span class="summary-label">الخصم:</span>
                                             <span class="summary-value text-danger">
-                                                -{{ number_format($order->discount_amount, 2) }} ج.م
+                                                -{{ number_format($order->discount_amount, 2) }} ر.س
                                             </span>
                                         </div>
                                     @endif
@@ -604,7 +604,7 @@
                                         <div class="summary-row" bis_skin_checked="1">
                                             <span class="summary-label">الضريبة:</span>
                                             <span class="summary-value">
-                                                {{ number_format($order->tax_amount, 2) }} ج.م
+                                                {{ number_format($order->tax_amount, 2) }} ر.س
                                             </span>
                                         </div>
                                     @endif
@@ -612,7 +612,7 @@
                                     <div class="summary-row total-row" bis_skin_checked="1">
                                         <span class="summary-label">الإجمالي:</span>
                                         <span class="summary-value">
-                                            {{ number_format($order->total_amount, 2) }} ج.م
+                                            {{ number_format($order->total_amount, 2) }} ر.س
                                         </span>
                                     </div>
 
