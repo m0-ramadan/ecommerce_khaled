@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Website;
 
+use App\Support\SaudiPhone;
 use Illuminate\Foundation\Http\FormRequest;
 
 class RegisterRequest extends FormRequest
@@ -16,12 +17,20 @@ class RegisterRequest extends FormRequest
         return [
             'name'        => 'required|string|max:255',
             'email'       => 'required|string|email|max:255|unique:users',
+            'phone'       => ['required', 'string', 'regex:/^05[03456789][0-9]{7}$/', 'unique:users,phone'],
             'password'    => 'nullable|string|min:6|confirmed',
             'google_id'   => 'nullable|string',
             'facebook_id' => 'nullable|string',
             'apple_id'    => 'nullable|string',
             'image'       => 'nullable|string',
         ];
+    }
+
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'phone' => SaudiPhone::normalize($this->input('phone')),
+        ]);
     }
 
     public function messages(): array
@@ -36,6 +45,10 @@ class RegisterRequest extends FormRequest
             'email.email'       => 'يرجى إدخال بريد إلكتروني صالح.',
             'email.max'         => 'البريد الإلكتروني لا يجب أن يتجاوز 255 حرفًا.',
             'email.unique'      => 'هذا البريد الإلكتروني مستخدم بالفعل.',
+
+            'phone.required'    => 'رقم الجوال مطلوب.',
+            'phone.regex'       => 'يرجى إدخال رقم جوال سعودي صالح.',
+            'phone.unique'      => 'رقم الجوال مستخدم بالفعل.',
 
             'password.string'   => 'كلمة المرور يجب أن تكون نصًا.',
             'password.min'      => 'كلمة المرور يجب ألا تقل عن 6 أحرف.',

@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Mail\Website\OtpMail;
 use App\Models\OtpVerification;
+use App\Support\SaudiPhone;
 
 use App\Traits\ApiResponseTrait;
 
@@ -41,6 +42,7 @@ class AuthController extends Controller
             $user = User::create([
                 'name'        => $request->name,
                 'email'       => $request->email,
+                'phone'       => $request->phone,
                 'password'    => Hash::make($request->password),
                 'google_id'   => $request->google_id,
                 'facebook_id' => $request->facebook_id,
@@ -64,7 +66,7 @@ class AuthController extends Controller
     public function login(LoginRequest $request)
     {
         try {
-            $user = User::where('email', $request->email)->first();
+            $user = User::whereIn('phone', SaudiPhone::variants($request->phone))->first();
 
             if (!$user || !Hash::check($request->password, $user->password)) {
                 return $this->error('بيانات الدخول غير صحيحة', 401);

@@ -32,11 +32,12 @@ class ProductController extends Controller
                 'offers',
                 'materials'
             ])->where('status_id', 1);
+            $perPage = min(max((int) $request->get('per_page', 8), 1), 24);
             $products = $query
                 ->filtered($request)
                 ->searched($request->get('search'))
                 ->sorted($request)
-                ->paginate($request->get('per_page', 10));
+                ->paginate($perPage);
 
             return $this->paginated(
                 ProductResource::collection($products),

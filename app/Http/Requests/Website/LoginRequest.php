@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Website;
 
+use App\Support\SaudiPhone;
 use Illuminate\Foundation\Http\FormRequest;
 
 class LoginRequest extends FormRequest
@@ -14,17 +15,24 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email'    => 'required|email',
-            'password' => 'nullable|min:6',
+            'phone'    => ['required', 'string', 'regex:/^05[03456789][0-9]{7}$/'],
+            'password' => ['required', 'string', 'min:6'],
         ];
+    }
+
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'phone' => SaudiPhone::normalize($this->input('phone')),
+        ]);
     }
 
     public function messages(): array
     {
         return [
-            'email.required' => 'البريد الإلكتروني مطلوب.',
-            'email.email'    => 'يرجى إدخال بريد إلكتروني صالح.',
-
+            'phone.required' => 'رقم الجوال مطلوب.',
+            'phone.regex'    => 'يرجى إدخال رقم جوال سعودي صالح.',
+            'password.required' => 'كلمة المرور مطلوبة.',
             'password.min'   => 'كلمة المرور يجب ألا تقل عن 6 أحرف.',
         ];
     }

@@ -4,13 +4,10 @@ namespace App\Http\Controllers\Api\Website;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Website\BannerResource;
-use App\Http\Resources\Website\CategoryResource;
-use App\Http\Resources\Website\CategoryWithProductResource;
-use App\Http\Resources\Website\ProductResource;
+use App\Http\Resources\Website\HomeCategoryResource;
 use App\Http\Resources\Wesite\TestimonialResource;
 use App\Models\Banner;
 use App\Models\Category;
-use App\Models\Product;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Http\Request;
 
@@ -25,7 +22,8 @@ class HomeController extends Controller
     {
         try {
 
-            $subCategoriesLimit = $request->input('categories_limit', 5);
+            $subCategoriesLimit = min(max((int) $request->input('categories_limit', 4), 1), 8);
+            $productsLimit = min(max((int) $request->input('products_limit', 6), 1), 12);
 
             $sub_categories = Category::where('status_id', 1)
                 ->whereHas('products', function ($q) {
@@ -34,11 +32,26 @@ class HomeController extends Controller
                 ->orderBy('order', 'asc')
                 ->paginate($subCategoriesLimit);
 
+            $sub_categories->getCollection()->each(function (Category $category) use ($productsLimit) {
+                $products = $category->products()
+                    ->select(['id', 'category_id', 'name', 'slug', 'price', 'price_text', 'has_discount', 'stock', 'status_id'])
+                    ->with(['primaryImage', 'discount', 'adsText'])
+                    ->withCount('reviews')
+                    ->withAvg('reviews', 'rating')
+                    ->withMin('sizeTiers as lowest_price', 'price_per_unit')
+                    ->latest('id')
+                    ->limit($productsLimit)
+                    ->get();
+
+                $category->setRelation('products', $products);
+                $category->load('categoryBanners');
+            });
+
 
             // ============================
             // 🎯 جلب السلايدر
             // ============================
-            $banners = Banner::with([
+            $banners = $request->boolean('include_sliders') ? Banner::with([
                 'type',
                 'items',
                 'sliderSetting',
@@ -53,9 +66,9 @@ class HomeController extends Controller
                     $q->whereNull('end_date')->orWhere('end_date', '>=', now());
                 })
                 ->orderBy('section_order')
-                ->first();
+                ->first() : null;
             return $this->success([
-                'sub_categories' => CategoryWithProductResource::collection($sub_categories),
+                'sub_categories' => HomeCategoryResource::collection($sub_categories),
 
                 'sub_categories_pagination' => [
                     'current_page' => $sub_categories->currentPage(),
@@ -66,7 +79,7 @@ class HomeController extends Controller
                     'prev_page'    => $sub_categories->previousPageUrl(),
                 ],
 
-                'sliders'    => new BannerResource($banners)
+                'sliders' => $banners ? new BannerResource($banners) : null,
             ], 'تم جلب بيانات الصفحة الرئيسية بنجاح');
         } catch (\Exception $e) {
             return $this->error('حدث خطأ أثناء تحميل البيانات', 500, [
