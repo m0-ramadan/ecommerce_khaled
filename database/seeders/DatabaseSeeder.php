@@ -39,6 +39,9 @@ class DatabaseSeeder extends Seeder
             // ProductTextAdSeeder::class,
             // ProductPriceTextSeeder::class,
 
+            // إعادة هيكلة الأقسام وتوزيع المنتجات على الأقسام العشرة المعتمدة
+            CategoryRestructureSeeder::class,
+
             ArticleCategorySeeder::class,
             TagSeeder::class,
             ArticleSeeder::class,
