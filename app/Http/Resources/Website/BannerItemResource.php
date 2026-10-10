@@ -20,6 +20,7 @@ class BannerItemResource extends JsonResource
             'alt'           => $this->image_alt,
 
             // روابط
+            'url'           => $this->link_url,
             'link_url'      => $this->link_url,
             'link_target'   => $this->link_target,
             'is_link_active'=> $this->is_link_active,

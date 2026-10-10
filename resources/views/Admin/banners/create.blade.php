@@ -23,10 +23,7 @@
             --dark-card: #2b3b4c;
         }
 
-        body {
-            background: var(--dark-bg);
-            color: #fff;
-        }
+
 
         .form-card {
             background: var(--dark-card);
@@ -436,6 +433,20 @@
                 <h6>العناصر</h6>
                 <p>أضف الصور والعناصر المطلوبة للبانر</p>
             </div>
+        </div>
+
+        <!-- تنبيه الانتقال للسلايدر الرئيسي المخصص -->
+        <div class="alert alert-primary d-flex flex-wrap align-items-center justify-content-between p-3 mb-4 rounded-3 shadow-sm border-0">
+            <div class="d-flex align-items-center gap-3">
+                <i class="ti ti-slideshow fs-2 text-primary"></i>
+                <div>
+                    <h6 class="mb-0 fw-bold">هل تريد إضافة شريحة إلى السلايدر الرئيسي للمتجر؟</h6>
+                    <small>تم إنشاء قسم مخصص ومباشر لرفع وإدارة شرائح السلايدر بسهولة وبدون تعقيد.</small>
+                </div>
+            </div>
+            <a href="{{ route('admin.sliders.create') }}" class="btn btn-primary btn-sm px-3 mt-2 mt-md-0">
+                <i class="ti ti-plus me-1"></i> إضافة شريحة سلايدر مباشرة
+            </a>
         </div>
 
         <!-- تنبيه المعلومات -->

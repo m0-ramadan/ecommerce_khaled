@@ -25,6 +25,7 @@ use App\Http\Controllers\Admin\RegionController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\RolesController;
 use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Admin\SliderController;
 use App\Http\Controllers\Admin\SocialMediaController;
 use App\Http\Controllers\Admin\StaticPageController;
 use App\Http\Controllers\Admin\SubscribeController;
@@ -277,6 +278,18 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
         Route::get('/{user}/reviews', [UserController::class, 'reviews'])->name('reviews');
         Route::get('/{user}/favourites', [UserController::class, 'favourites'])->name('favourites');
         Route::get('/{user}/activities', [UserController::class, 'activities'])->name('activities');
+    });
+
+    // Slider Routes (السلايدر الرئيسي)
+    Route::prefix('sliders')->name('sliders.')->group(function () {
+        Route::get('/', [SliderController::class, 'index'])->name('index');
+        Route::get('/create', [SliderController::class, 'create'])->name('create');
+        Route::post('/', [SliderController::class, 'store'])->name('store');
+        Route::get('/{item}/edit', [SliderController::class, 'edit'])->name('edit');
+        Route::put('/{item}', [SliderController::class, 'update'])->name('update');
+        Route::delete('/{item}', [SliderController::class, 'destroy'])->name('destroy');
+        Route::post('/{item}/toggle-status', [SliderController::class, 'toggleStatus'])->name('toggle-status');
+        Route::post('/reorder', [SliderController::class, 'reorder'])->name('reorder');
     });
 
     // Banner Routes

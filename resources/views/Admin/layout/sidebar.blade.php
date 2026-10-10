@@ -118,6 +118,13 @@
             </a>
         </li>
 
+        <li class="menu-item {{ request()->routeIs('admin.sliders.*') ? 'active' : '' }}">
+            <a href="{{ route('admin.sliders.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons ti ti-slideshow"></i>
+                <div>السلايدر الرئيسي</div>
+            </a>
+        </li>
+
         <li class="menu-item">
             <a href="{{ route('admin.banners.index') }}" class="menu-link">
                 <i class="menua-icon ti ti-photo"></i>

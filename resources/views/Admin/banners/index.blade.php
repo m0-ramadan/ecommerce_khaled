@@ -679,6 +679,10 @@
         <!-- شريط الأدوات المتقدم -->
         <div class="advanced-toolbar">
             <div class="toolbar-actions">
+                <a href="{{ route('admin.sliders.index') }}" class="btn-toolbar" style="background: #e8fadf; color: #28c76f; border: 1px solid #71dd37; font-weight: 600;">
+                    <i class="ti ti-slideshow me-1"></i>
+                    إدارة السلايدر الرئيسي
+                </a>
                 <a href="{{ route('admin.banners.create') }}" class="btn-toolbar primary">
                     <i class="fas fa-plus me-2"></i>
                     إضافة بانر جديد
