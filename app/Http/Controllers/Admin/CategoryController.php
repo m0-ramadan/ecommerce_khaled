@@ -4,13 +4,14 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\Banner;
+use App\Models\BannerItem;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Spatie\ImageOptimizer\OptimizerChainFactory;
 
 class CategoryController extends Controller
 {
@@ -112,6 +113,7 @@ class CategoryController extends Controller
             $this->fillCategoryData($category, $validated, $request);
 
             $category->save();
+            $this->handleCategoryBanners($category, $request);
 
             DB::commit();
 
@@ -121,7 +123,7 @@ class CategoryController extends Controller
                 return response()->json([
                     'success' => true,
                     'message' => $message,
-                    'data' => $category->load(['parent', 'children'])
+                    'data' => $category->load(['parent', 'children', 'categoryBanners'])
                 ], 201);
             }
 
@@ -156,7 +158,8 @@ class CategoryController extends Controller
             'children' => function ($query) {
                 $query->orderBy('order')
                     ->withCount('products');
-            }
+            },
+            'categoryBanners'
         ]);
 
         // Load counts
@@ -168,12 +171,12 @@ class CategoryController extends Controller
     /**
      * Show the form for editing the specified category.
      *
-     * @param  \App\Models\Category  $category
+     * @param  int  $id
      * @return \Illuminate\View\View
      */
     public function edit($id)
     {
-        $category = Category::findOrFail($id);
+        $category = Category::with('categoryBanners')->findOrFail($id);
         $parentCategories = Category::whereNull('parent_id')
             ->where('id', '!=', $category->id)
             ->orderBy('order')
@@ -204,6 +207,7 @@ class CategoryController extends Controller
             $this->fillCategoryData($category, $validated, $request);
 
             $category->save();
+            $this->handleCategoryBanners($category, $request);
 
             DB::commit();
 
@@ -355,9 +359,84 @@ class CategoryController extends Controller
             'parent_id' => 'nullable|exists:categories,id',
             'order' => 'nullable|integer|min:0',
             'status_id' => 'required|integer|exists:statuses,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
-            'sub_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048'
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:4096',
+            'sub_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:4096',
+            'banner_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:4096',
+            'mobile_banner_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:4096',
+            'delete_banner' => 'nullable',
+            'delete_desktop_banner' => 'nullable',
+            'delete_mobile_banner' => 'nullable'
         ]);
+    }
+
+    /**
+     * Handle category banner uploads and deletions (Desktop & Mobile)
+     */
+    private function handleCategoryBanners(Category $category, Request $request): void
+    {
+        $hasUpload = $request->hasFile('banner_image') || $request->hasFile('mobile_banner_image');
+        $hasDelete = $request->has('delete_banner') || $request->has('delete_desktop_banner') || $request->has('delete_mobile_banner');
+
+        if (!$hasUpload && !$hasDelete) {
+            return;
+        }
+
+        $parentBanner = Banner::firstOrCreate(
+            ['title' => 'بنرات الأقسام', 'banner_type_id' => 3],
+            ['section_order' => 1, 'is_active' => true]
+        );
+
+        $bannerItem = BannerItem::firstOrNew(['category_id' => $category->id]);
+        $bannerItem->banner_id = $parentBanner->id;
+        $bannerItem->is_active = true;
+        $bannerItem->item_order = $bannerItem->item_order ?? 1;
+        $bannerItem->image_alt = "بنر قسم {$category->name}";
+        $bannerItem->link_url = "/category/{$category->slug}";
+        $bannerItem->link_target = '_self';
+        $bannerItem->is_link_active = true;
+
+        if ($request->has('delete_banner')) {
+            if ($bannerItem->image_url && Storage::disk('public')->exists($bannerItem->image_url)) {
+                Storage::disk('public')->delete($bannerItem->image_url);
+            }
+            if ($bannerItem->mobile_image_url && Storage::disk('public')->exists($bannerItem->mobile_image_url)) {
+                Storage::disk('public')->delete($bannerItem->mobile_image_url);
+            }
+            if ($bannerItem->exists) {
+                $bannerItem->delete();
+            }
+            return;
+        }
+
+        if ($request->has('delete_desktop_banner') && $bannerItem->image_url) {
+            if (Storage::disk('public')->exists($bannerItem->image_url)) {
+                Storage::disk('public')->delete($bannerItem->image_url);
+            }
+            $bannerItem->image_url = null;
+        }
+
+        if ($request->has('delete_mobile_banner') && $bannerItem->mobile_image_url) {
+            if (Storage::disk('public')->exists($bannerItem->mobile_image_url)) {
+                Storage::disk('public')->delete($bannerItem->mobile_image_url);
+            }
+            $bannerItem->mobile_image_url = null;
+        }
+
+        if ($request->hasFile('banner_image')) {
+            $bannerItem->image_url = $this->uploadImage($request->file('banner_image'), 'banners/categories', $bannerItem->image_url);
+        }
+
+        if ($request->hasFile('mobile_banner_image')) {
+            $bannerItem->mobile_image_url = $this->uploadImage($request->file('mobile_banner_image'), 'banners/categories', $bannerItem->mobile_image_url);
+        }
+
+        if (empty($bannerItem->image_url) && empty($bannerItem->mobile_image_url)) {
+            if ($bannerItem->exists) {
+                $bannerItem->delete();
+            }
+        } else {
+            $bannerItem->save();
+        }
     }
 
     /**
@@ -407,28 +486,51 @@ class CategoryController extends Controller
     //     $path = $file->store($folder, 'public');
     //     return $path;
     // }
-private function uploadImage($file,$directory,?string $oldImage = null) {
+    /**
+     * Upload an image, convert to WebP using GD if possible, and store in public storage.
+     *
+     * @param  \Illuminate\Http\UploadedFile  $file
+     * @param  string  $directory
+     * @param  string|null  $oldImage
+     * @return string
+     */
+    private function uploadImage($file, string $directory, ?string $oldImage = null): string
+    {
+        // Delete old image if exists
+        if ($oldImage && Storage::disk('public')->exists($oldImage)) {
+            Storage::disk('public')->delete($oldImage);
+        }
 
-    // Delete old image
-    if ($oldImage && Storage::disk('public')->exists($oldImage)) {
-        Storage::disk('public')->delete($oldImage);
+        // Try converting to WebP using GD
+        try {
+            $filename = Str::uuid() . '.webp';
+            $path = $directory . '/' . $filename;
+            $fullPath = Storage::disk('public')->path($path);
+
+            $dir = dirname($fullPath);
+            if (!is_dir($dir)) {
+                mkdir($dir, 0755, true);
+            }
+
+            $imageContent = file_get_contents($file->getRealPath());
+            $image = @imagecreatefromstring($imageContent);
+            if ($image !== false) {
+                imagepalettetotruecolor($image);
+                imagealphablending($image, true);
+                imagesavealpha($image, true);
+                imagewebp($image, $fullPath, 85);
+                imagedestroy($image);
+                return $path;
+            }
+        } catch (\Throwable $e) {
+            Log::warning('GD WebP conversion failed, falling back to direct upload: ' . $e->getMessage());
+        }
+
+        // Fallback: store original file
+        $extension = $file->getClientOriginalExtension() ?: 'webp';
+        $fallbackFilename = Str::uuid() . '.' . $extension;
+        return $file->storeAs($directory, $fallbackFilename, 'public');
     }
-
-    // Generate webp filename
-    $filename = Str::uuid() . '.webp';
-    $path = $directory . '/' . $filename;
-
-    // Store file
-    Storage::disk('public')->put($path, file_get_contents($file));
-
-    // Optimize + convert
-    $optimizer = OptimizerChainFactory::create();
-    $optimizer->optimize(
-        Storage::disk('public')->path($path)
-    );
-
-    return $path;
-}
     /**
      * Delete category images.
      *

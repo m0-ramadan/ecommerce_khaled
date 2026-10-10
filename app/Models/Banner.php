@@ -40,4 +40,9 @@ class Banner extends Model
     {
         return $this->hasOne(BannerGridLayout::class);
     }
+
+    public function getNameAttribute()
+    {
+        return $this->title;
+    }
 }

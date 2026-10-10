@@ -25,6 +25,21 @@
             transform: scale(1.02);
         }
 
+        .category-banner-preview {
+            width: 100%;
+            max-width: 450px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 10px;
+            padding: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .category-banner-preview:hover {
+            transform: scale(1.02);
+        }
+
         .image-upload-container {
             position: relative;
             display: inline-block;
@@ -390,7 +405,103 @@
                                             @endif
                                         </div>
                                     </div>
+
+                                    @php
+                                        $catBanner = $category->categoryBanners->first();
+                                    @endphp
+                                    <div class="col-md-6 mt-4" bis_skin_checked="1">
+                                        <div class="form-section" bis_skin_checked="1">
+                                            <h5>
+                                                <i class="fas fa-panorama me-2"></i>بنر القسم (سطح المكتب - Desktop)
+                                            </h5>
+                                            
+                                            <div class="text-center mb-3" bis_skin_checked="1">
+                                                <div class="image-upload-container w-100" bis_skin_checked="1">
+                                                    @if($catBanner && $catBanner->image_url)
+                                                        <img src="{{ get_user_image($catBanner->image_url) }}" 
+                                                             alt="{{ $category->name }} - بنر سطح المكتب" 
+                                                             class="category-banner-preview" 
+                                                             id="bannerImagePreview">
+                                                    @else
+                                                        <img src="https://via.placeholder.com/800x200?text=بنر+سطح+المكتب" 
+                                                             alt="بنر سطح المكتب" 
+                                                             class="category-banner-preview" 
+                                                             id="bannerImagePreview">
+                                                    @endif
+                                                    <div class="image-overlay" bis_skin_checked="1">
+                                                        <i class="fas fa-camera"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="mb-3" bis_skin_checked="1">
+                                                <label for="banner_image" class="form-label">تغيير بنر سطح المكتب</label>
+                                                <input type="file" class="form-control" id="banner_image" name="banner_image" 
+                                                       accept="image/*" onchange="previewImage(this, 'bannerImagePreview')">
+                                            </div>
+                                            
+                                            @if($catBanner && $catBanner->image_url)
+                                            <div class="form-check mb-3" bis_skin_checked="1">
+                                                <input class="form-check-input" type="checkbox" id="delete_desktop_banner" name="delete_desktop_banner">
+                                                <label class="form-check-label text-danger" for="delete_desktop_banner">
+                                                    <i class="fas fa-trash-alt me-1"></i> حذف بنر سطح المكتب الحالي
+                                                </label>
+                                            </div>
+                                            @endif
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6 mt-4" bis_skin_checked="1">
+                                        <div class="form-section" bis_skin_checked="1">
+                                            <h5>
+                                                <i class="fas fa-mobile-screen me-2"></i>بنر القسم (الجوال - Mobile)
+                                            </h5>
+                                            
+                                            <div class="text-center mb-3" bis_skin_checked="1">
+                                                <div class="image-upload-container w-100" bis_skin_checked="1">
+                                                    @if($catBanner && $catBanner->mobile_image_url)
+                                                        <img src="{{ get_user_image($catBanner->mobile_image_url) }}" 
+                                                             alt="{{ $category->name }} - بنر الجوال" 
+                                                             class="category-banner-preview" 
+                                                             id="mobileBannerImagePreview">
+                                                    @else
+                                                        <img src="https://via.placeholder.com/600x300?text=بنر+الجوال" 
+                                                             alt="بنر الجوال" 
+                                                             class="category-banner-preview" 
+                                                             id="mobileBannerImagePreview">
+                                                    @endif
+                                                    <div class="image-overlay" bis_skin_checked="1">
+                                                        <i class="fas fa-camera"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="mb-3" bis_skin_checked="1">
+                                                <label for="mobile_banner_image" class="form-label">تغيير بنر الجوال</label>
+                                                <input type="file" class="form-control" id="mobile_banner_image" name="mobile_banner_image" 
+                                                       accept="image/*" onchange="previewImage(this, 'mobileBannerImagePreview')">
+                                            </div>
+
+                                            @if($catBanner && $catBanner->mobile_image_url)
+                                            <div class="form-check mb-3" bis_skin_checked="1">
+                                                <input class="form-check-input" type="checkbox" id="delete_mobile_banner" name="delete_mobile_banner">
+                                                <label class="form-check-label text-danger" for="delete_mobile_banner">
+                                                    <i class="fas fa-trash-alt me-1"></i> حذف بنر الجوال الحالي
+                                                </label>
+                                            </div>
+                                            @endif
+                                        </div>
+                                    </div>
                                 </div>
+
+                                @if($catBanner)
+                                <div class="d-flex justify-content-between align-items-center mt-3 p-3 bg-light rounded" bis_skin_checked="1">
+                                    <span><i class="fas fa-info-circle text-primary me-1"></i> هذا البنر مسجل ومربوط في جدول عناصر البانرات (Banner Items)</span>
+                                    <a href="{{ route('admin.banners.items.edit', $catBanner->id) }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                                        <i class="fas fa-external-link-alt me-1"></i> إعدادات البنر المتقدمة (الترتيب، البروموكود)
+                                    </a>
+                                </div>
+                                @endif
                                 
                                 <div class="alert alert-info mt-3" bis_skin_checked="1">
                                     <i class="fas fa-info-circle me-2"></i>

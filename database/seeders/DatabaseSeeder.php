@@ -41,6 +41,8 @@ class DatabaseSeeder extends Seeder
 
             // إعادة هيكلة الأقسام وتوزيع المنتجات على الأقسام العشرة المعتمدة
             CategoryRestructureSeeder::class,
+            CategoryImagesSeeder::class,
+            CategoryBannersSeeder::class,
 
             ArticleCategorySeeder::class,
             TagSeeder::class,

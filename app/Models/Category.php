@@ -7,7 +7,6 @@ use App\Models\BannerItem;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
-use Spatie\ImageOptimizer\OptimizerChainFactory;
 
 class Category extends Model
 {
@@ -90,17 +89,9 @@ class Category extends Model
     {
         return $this->sub_image ? asset('storage/' . $this->sub_image) : null;
     }
+
     public function setCoverImageAttribute($value)
     {
         $this->attributes['cover_image'] = $value;
-
-        if (!$value) return;
-
-        $path = Storage::disk('public')->path($value);
-
-        if (!file_exists($path)) return;
-
-        $optimizer = OptimizerChainFactory::create();
-        $optimizer->optimize($path);
     }
 }

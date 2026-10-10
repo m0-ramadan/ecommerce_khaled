@@ -28,16 +28,16 @@ class CategoryRestructureSeeder extends Seeder
      | الأقسام العشرة النهائية
      * ---------------------------------------------------------------- */
     public const TARGETS = [
-        ['name' => 'بوكسات',          'slug' => 'boksat',           'receives' => true],
-        ['name' => 'اكياس',           'slug' => 'akyas',            'receives' => true],
-        ['name' => 'اكواب',           'slug' => 'akoab',            'receives' => true],
-        ['name' => 'ملصقات',          'slug' => 'mlskat',           'receives' => true],
-        ['name' => 'كراتين شحن',      'slug' => 'kratyn-shhn',      'receives' => true],
-        ['name' => 'عروض ومناسبات',   'slug' => 'orod-o-mnasbat',   'receives' => true],
-        ['name' => 'منتجات جاهزه',    'slug' => 'mntgat-jahzh',     'receives' => false],
-        ['name' => 'دعايه وإعلام',    'slug' => 'daaayh-o-aelam',   'receives' => true],
-        ['name' => 'هدايه دعائيه',    'slug' => 'hdayh-daaayyh',    'receives' => true],
-        ['name' => 'قرطاسيه',         'slug' => 'krtasyh',          'receives' => false],
+        ['name' => 'بوكسات',          'slug' => 'boksat',           'receives' => true,  'image' => 'categories/boksat.webp'],
+        ['name' => 'اكياس',           'slug' => 'akyas',            'receives' => true,  'image' => 'categories/akyas.webp'],
+        ['name' => 'اكواب',           'slug' => 'akoab',            'receives' => true,  'image' => 'categories/akoab.webp'],
+        ['name' => 'ملصقات',          'slug' => 'mlskat',           'receives' => true,  'image' => 'categories/mlskat.webp'],
+        ['name' => 'كراتين شحن',      'slug' => 'kratyn-shhn',      'receives' => true,  'image' => 'categories/kratyn-shhn.webp'],
+        ['name' => 'عروض ومناسبات',   'slug' => 'orod-o-mnasbat',   'receives' => true,  'image' => 'categories/orod-o-mnasbat.webp'],
+        ['name' => 'منتجات جاهزه',    'slug' => 'mntgat-jahzh',     'receives' => false, 'image' => 'categories/mntgat-jahzh.webp'],
+        ['name' => 'دعايه وإعلام',    'slug' => 'daaayh-o-aelam',   'receives' => true,  'image' => 'categories/daaayh-o-aelam.webp'],
+        ['name' => 'هدايه دعائيه',    'slug' => 'hdayh-daaayyh',    'receives' => true,  'image' => 'categories/hdayh-daaayyh.webp'],
+        ['name' => 'قرطاسيه',         'slug' => 'krtasyh',          'receives' => false, 'image' => 'categories/krtasyh.webp'],
     ];
 
     /* ------------------------------------------------------------------
@@ -224,9 +224,12 @@ class CategoryRestructureSeeder extends Seeder
                 $category->order       = $order++;
                 $category->status_id   = 1;
 
-                if (! $category->exists) {
-                    $category->image     = 'https://i.ibb.co/rffyqbmk/1.png';
-                    $category->sub_image = 'https://i.ibb.co/20wDxXg9/3.png';
+                $defaultImage = $target['image'] ?? 'https://i.ibb.co/rffyqbmk/1.png';
+                $defaultSubImage = $target['image'] ?? 'https://i.ibb.co/20wDxXg9/3.png';
+
+                if (! $category->exists || empty($category->image) || str_contains($category->image, 'ibb.co')) {
+                    $category->image     = $defaultImage;
+                    $category->sub_image = $defaultSubImage;
                 }
 
                 $category->save();

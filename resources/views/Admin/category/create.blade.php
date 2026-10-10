@@ -25,6 +25,21 @@
             transform: scale(1.02);
         }
 
+        .category-banner-preview {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 8px;
+            padding: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .category-banner-preview:hover {
+            border-color: #696cff;
+            transform: scale(1.01);
+        }
+
         .image-upload-container {
             position: relative;
             display: inline-block;
@@ -429,6 +444,61 @@
                                                 <input type="file" class="form-control" id="sub_image" name="sub_image" 
                                                        accept="image/*" onchange="previewImage(this, 'subImagePreview')">
                                                 <small class="text-muted">الحجم الأمثل: 800×800 بكسل. الحد الأقصى: 2MB</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mt-4" bis_skin_checked="1">
+                                        <div class="form-section" bis_skin_checked="1">
+                                            <h5>
+                                                <i class="fas fa-panorama me-2"></i>بنر القسم (سطح المكتب - Desktop)
+                                                <span class="badge bg-secondary">اختياري</span>
+                                            </h5>
+                                            
+                                            <div class="text-center mb-3" bis_skin_checked="1">
+                                                <div class="image-upload-container w-100" bis_skin_checked="1">
+                                                    <img src="https://via.placeholder.com/800x200?text=بنر+سطح+المكتب" 
+                                                         alt="بنر سطح المكتب" 
+                                                         class="category-banner-preview" 
+                                                         id="bannerImagePreview">
+                                                    <div class="image-overlay" bis_skin_checked="1">
+                                                        <i class="fas fa-camera"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="mb-3" bis_skin_checked="1">
+                                                <label for="banner_image" class="form-label">اختر بنر سطح المكتب</label>
+                                                <input type="file" class="form-control" id="banner_image" name="banner_image" 
+                                                       accept="image/*" onchange="previewImage(this, 'bannerImagePreview')">
+                                                <small class="text-muted">النسبة المثالية: 3:1 (مثلاً 1200×400 بكسل)</small>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6 mt-4" bis_skin_checked="1">
+                                        <div class="form-section" bis_skin_checked="1">
+                                            <h5>
+                                                <i class="fas fa-mobile-screen me-2"></i>بنر القسم (الجوال - Mobile)
+                                                <span class="badge bg-secondary">اختياري</span>
+                                            </h5>
+                                            
+                                            <div class="text-center mb-3" bis_skin_checked="1">
+                                                <div class="image-upload-container w-100" bis_skin_checked="1">
+                                                    <img src="https://via.placeholder.com/600x300?text=بنر+الجوال" 
+                                                         alt="بنر الجوال" 
+                                                         class="category-banner-preview" 
+                                                         id="mobileBannerImagePreview">
+                                                    <div class="image-overlay" bis_skin_checked="1">
+                                                        <i class="fas fa-camera"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="mb-3" bis_skin_checked="1">
+                                                <label for="mobile_banner_image" class="form-label">اختر بنر الجوال</label>
+                                                <input type="file" class="form-control" id="mobile_banner_image" name="mobile_banner_image" 
+                                                       accept="image/*" onchange="previewImage(this, 'mobileBannerImagePreview')">
+                                                <small class="text-muted">النسبة المثالية: 2:1 (مثلاً 800×400 بكسل)</small>
                                             </div>
                                         </div>
                                     </div>
