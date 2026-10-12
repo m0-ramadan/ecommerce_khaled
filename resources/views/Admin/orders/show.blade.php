@@ -559,6 +559,54 @@
                                                 @endif
                                             </div>
 
+                                            @php
+                                                $options = is_array($item->selected_options) ? $item->selected_options : json_decode($item->selected_options, true);
+                                                $filesJson = null;
+                                                if (is_array($options)) {
+                                                    foreach ($options as $opt) {
+                                                        if (isset($opt['option_name']) && $opt['option_name'] === 'تفاصيل ملفات الطباعة') {
+                                                            $filesJson = json_decode($opt['option_value'] ?? '[]', true);
+                                                        }
+                                                    }
+                                                }
+                                            @endphp
+
+                                            @if (!empty($filesJson) && is_array($filesJson))
+                                                <div class="mt-3 p-3 bg-light rounded border">
+                                                    <div class="fw-bold mb-2 text-primary d-flex align-items-center gap-1">
+                                                        <i class="fas fa-print me-1"></i>ملفات الطباعة والقرطاسية المرفقة ({{ count($filesJson) }} ملفات):
+                                                    </div>
+                                                    <div class="d-flex flex-column gap-2">
+                                                        @foreach ($filesJson as $file)
+                                                            <div class="d-flex justify-content-between align-items-center p-2 bg-white rounded border flex-wrap gap-2">
+                                                                <div>
+                                                                    <i class="fas fa-file-alt text-primary me-1"></i>
+                                                                    <strong>{{ $file['file_name'] ?? 'ملف' }}</strong>
+                                                                    <span class="badge bg-secondary ms-1">{{ $file['paper_size'] ?? 'A4' }}</span>
+                                                                    <span class="badge {{ ($file['color_type'] ?? '') === 'color' ? 'bg-primary' : 'bg-dark' }}">
+                                                                        {{ ($file['color_type'] ?? '') === 'color' ? 'ألوان' : 'أبيض وأسود' }}
+                                                                    </span>
+                                                                    <span class="badge bg-info ms-1">{{ $file['orientation_name'] ?? 'طولي' }}</span>
+                                                                    <span class="badge bg-light text-dark border ms-1">{{ $file['side_type_name'] ?? 'وجه واحد' }}</span>
+                                                                    <span class="text-muted ms-2 small">({{ $file['pages_count'] ?? 1 }} ص × {{ $file['copies'] ?? 1 }} نسخ)</span>
+                                                                </div>
+                                                                @if (!empty($file['file_url']))
+                                                                    <a href="{{ $file['file_url'] }}" target="_blank" download class="btn btn-sm btn-primary d-flex align-items-center gap-1">
+                                                                        <i class="fas fa-download"></i>تحميل للطباعة
+                                                                    </a>
+                                                                @endif
+                                                            </div>
+                                                        @endforeach
+                                                    </div>
+                                                </div>
+                                            @elseif ($item->image_design)
+                                                <div class="mt-2">
+                                                    <a href="{{ asset('storage/' . $item->image_design) }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                                        <i class="fas fa-download me-1"></i>تحميل التصميم المرفق
+                                                    </a>
+                                                </div>
+                                            @endif
+
                                             @if ($item->product)
                                                 <div class="mt-2" bis_skin_checked="1">
                                                     <a href="{{ route('admin.products.show', $item->product->id) }}"

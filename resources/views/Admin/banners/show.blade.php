@@ -520,8 +520,18 @@
                                             <div class="row">
                                                 <div class="col-md-3">
                                                     @if ($item->image_url)
-                                                        <img src="{{ Storage::url($item->image_url) }}"
-                                                            alt="{{ $item->image_alt }}" class="item-image">
+                                                        <div class="mb-2">
+                                                            <span class="badge bg-secondary mb-1"><i class="fas fa-desktop me-1"></i>سطح المكتب</span>
+                                                            <img src="{{ Storage::url($item->image_url) }}"
+                                                                alt="{{ $item->image_alt }}" class="item-image">
+                                                        </div>
+                                                    @endif
+                                                    @if ($item->mobile_image_url)
+                                                        <div>
+                                                            <span class="badge bg-info mb-1"><i class="fas fa-mobile-alt me-1"></i>الجوال</span>
+                                                            <img src="{{ Storage::url($item->mobile_image_url) }}"
+                                                                alt="{{ $item->image_alt }}" class="item-mobile-image" style="max-height: 80px; width: 100%; object-fit: cover; border-radius: 6px;">
+                                                        </div>
                                                     @endif
                                                 </div>
                                                 <div class="col-md-9">
@@ -594,14 +604,6 @@
                                                         </div>
 
                                                         <div class="col-md-6">
-                                                            @if ($item->mobile_image_url)
-                                                                <div class="d-flex align-items-center">
-                                                                    <small class="text-muted me-2">صورة الموبايل:</small>
-                                                                    <img src="{{ Storage::url($item->mobile_image_url) }}"
-                                                                        alt="{{ $item->image_alt }}"
-                                                                        class="item-mobile-image">
-                                                                </div>
-                                                            @endif
 
                                                             <p class="mb-1">
                                                                 <i class="fas fa-eye text-muted me-2"></i>

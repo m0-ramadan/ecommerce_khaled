@@ -224,13 +224,13 @@
 
                     <!-- Images -->
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">الصورة الأساسية</label>
+                        <label class="form-label fw-bold">الصورة الأساسية (سطح المكتب - Desktop) <span class="text-danger">*</span></label>
                         <input type="file" name="image_url" class="form-control @error('image_url') is-invalid @enderror"
                             accept="image/*" onchange="previewImage(this, 'desktop-preview')">
                         <div class="image-preview" id="desktop-preview">
                             <div class="placeholder">
-                                <i class="fas fa-image fa-2x mb-2"></i>
-                                <p>معاينة الصورة</p>
+                                <i class="fas fa-desktop fa-2x mb-2"></i>
+                                <p>معاينة صورة سطح المكتب</p>
                             </div>
                         </div>
                         <small class="text-muted">الصيغ المسموحة: jpeg, png, jpg, gif, svg, webp - الحد الأقصى: 2MB</small>
@@ -240,14 +240,14 @@
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">صورة الموبايل</label>
+                        <label class="form-label fw-bold">صورة الموبايل (الجوال - Mobile) <span class="text-muted fw-normal">(اختياري)</span></label>
                         <input type="file" name="mobile_image_url"
                             class="form-control @error('mobile_image_url') is-invalid @enderror" accept="image/*"
                             onchange="previewImage(this, 'mobile-preview')">
                         <div class="image-preview" id="mobile-preview">
                             <div class="placeholder">
                                 <i class="fas fa-mobile-alt fa-2x mb-2"></i>
-                                <p>معاينة الصورة</p>
+                                <p>معاينة صورة الموبايل</p>
                             </div>
                         </div>
                         <small class="text-muted">الصيغ المسموحة: jpeg, png, jpg, gif, svg, webp - الحد الأقصى: 2MB</small>

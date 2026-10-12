@@ -195,7 +195,12 @@ class BannerItemV2Controller extends Controller
             $data['image_url'] = $this->uploadImage($request->file('image_url'), 'banners/items');
         }
 
-        if ($request->hasFile('mobile_image_url')) {
+        if ($request->boolean('remove_mobile_image')) {
+            if ($bannerItem->mobile_image_url) {
+                Storage::disk('public')->delete($bannerItem->mobile_image_url);
+            }
+            $data['mobile_image_url'] = null;
+        } elseif ($request->hasFile('mobile_image_url')) {
             // Delete old image
             if ($bannerItem->mobile_image_url) {
                 Storage::disk('public')->delete($bannerItem->mobile_image_url);

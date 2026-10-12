@@ -400,6 +400,13 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
     });
 
     Route::get('order/statistics', [OrderController::class, 'statistics'])->name('orders.statistics');
+
+    // Stationery / Printing Services
+    Route::prefix('stationery')->name('stationery.')->group(function () {
+        Route::get('/prices', [\App\Http\Controllers\Admin\StationeryPriceController::class, 'index'])->name('index');
+        Route::put('/prices', [\App\Http\Controllers\Admin\StationeryPriceController::class, 'update'])->name('update');
+        Route::get('/orders', [\App\Http\Controllers\Admin\StationeryPriceController::class, 'orders'])->name('orders');
+    });
 });
 
 // Visitor stats route (outside admin group)

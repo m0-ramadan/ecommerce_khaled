@@ -140,6 +140,25 @@
             </a>
         </li>
 
+        <li class="menu-item {{ request()->routeIs('admin.stationery.*') ? 'active open' : '' }}">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="menu-icon ti ti-printer"></i>
+                <div>خدمات القرطاسية</div>
+            </a>
+            <ul class="menu-sub">
+                <li class="menu-item {{ request()->routeIs('admin.stationery.index') ? 'active' : '' }}">
+                    <a href="{{ route('admin.stationery.index') }}" class="menu-link">
+                        <div>إدارة الأسعار والمقاسات</div>
+                    </a>
+                </li>
+                <li class="menu-item {{ request()->routeIs('admin.stationery.orders') ? 'active' : '' }}">
+                    <a href="{{ route('admin.stationery.orders') }}" class="menu-link">
+                        <div>طلبات القرطاسية المرفوعة</div>
+                    </a>
+                </li>
+            </ul>
+        </li>
+
 
 
         {{-- <li class="menu-item ">

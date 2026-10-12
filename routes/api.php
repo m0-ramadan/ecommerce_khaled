@@ -174,7 +174,14 @@ Route::prefix('v1')->group(function () {
     Route::get('/public/track/{trackingNumber}', [OtoV2ShippingController::class, 'trackShipment'])
         ->name('shipping.track.public');
 
-       Route::get('testimonials', [HomeController::class, 'testimonials'])->name('testimonials'); 
+    Route::get('testimonials', [HomeController::class, 'testimonials'])->name('testimonials'); 
     Route::get('payment/callback', [PaymentController::class, 'handlePaymobCallback'])
         ->name('payment.callback.paymob');
+
+    // خدمات القرطاسية والطباعة الفورية
+    Route::prefix('stationery')->name('stationery.')->group(function () {
+        Route::get('prices', [\App\Http\Controllers\Api\Website\StationeryController::class, 'getPrices']);
+        Route::post('upload', [\App\Http\Controllers\Api\Website\StationeryController::class, 'uploadFile']);
+        Route::post('add-to-cart', [\App\Http\Controllers\Api\Website\StationeryController::class, 'addToCart']);
+    });
 });

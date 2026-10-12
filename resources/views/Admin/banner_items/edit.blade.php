@@ -226,15 +226,7 @@
 
                     <!-- Images -->
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">الصورة الأساسية</label>
-
-                        @if ($bannerItem->image_url)
-                            <div class="current-image d-flex align-items-center">
-                                <img src="{{ Storage::url($bannerItem->image_url) }}" alt="Current Image">
-                                <span class="text-muted">الصورة الحالية</span>
-                            </div>
-                        @endif
-
+                        <label class="form-label fw-bold">الصورة الأساسية (سطح المكتب - Desktop)</label>
                         <input type="file" name="image_url" class="form-control @error('image_url') is-invalid @enderror"
                             accept="image/*" onchange="previewImage(this, 'desktop-preview')">
                         <div class="image-preview" id="desktop-preview">
@@ -247,22 +239,14 @@
                                 </div>
                             @endif
                         </div>
-                        <small class="text-muted">اتركه فارغاً للاحتفاظ بالصورة الحالية</small>
+                        <small class="text-muted d-block mt-1">اتركه فارغاً للاحتفاظ بالصورة الحالية</small>
                         @error('image_url')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">صورة الموبايل</label>
-
-                        @if ($bannerItem->mobile_image_url)
-                            <div class="current-image d-flex align-items-center">
-                                <img src="{{ Storage::url($bannerItem->mobile_image_url) }}" alt="Current Mobile Image">
-                                <span class="text-muted">الصورة الحالية</span>
-                            </div>
-                        @endif
-
+                        <label class="form-label fw-bold">صورة الموبايل (الجوال - Mobile)</label>
                         <input type="file" name="mobile_image_url"
                             class="form-control @error('mobile_image_url') is-invalid @enderror" accept="image/*"
                             onchange="previewImage(this, 'mobile-preview')">
@@ -276,7 +260,15 @@
                                 </div>
                             @endif
                         </div>
-                        <small class="text-muted">اتركه فارغاً للاحتفاظ بالصورة الحالية</small>
+                        <small class="text-muted d-block mt-1">اتركه فارغاً للاحتفاظ بالصورة الحالية</small>
+                        @if ($bannerItem->mobile_image_url)
+                            <div class="form-check mt-2">
+                                <input class="form-check-input" type="checkbox" name="remove_mobile_image" value="1" id="remove_mobile_image">
+                                <label class="form-check-label text-danger small" for="remove_mobile_image">
+                                    <i class="fas fa-trash-alt me-1"></i> حذف صورة الموبايل واستخدام صورة سطح المكتب فقط
+                                </label>
+                            </div>
+                        @endif
                         @error('mobile_image_url')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror

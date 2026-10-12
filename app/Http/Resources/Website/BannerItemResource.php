@@ -10,13 +10,27 @@ class BannerItemResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
+        $desktopImage = $this->image_url ? get_user_image($this->image_url) : null;
+        $mobileImage = $this->mobile_image_url ? get_user_image($this->mobile_image_url) : null;
+
+        // Determine if request explicitly asks for mobile or comes from mobile device
+        $isMobileRequest = $request->input('device') === 'mobile'
+            || $request->header('X-Device-Type') === 'mobile'
+            || ($request->header('User-Agent') && preg_match('/Mobile|Android|iPhone|iPad/i', $request->header('User-Agent')));
+
+        // Primary image field: adaptive based on device context
+        $primaryImage = $isMobileRequest
+            ? ($mobileImage ?? $desktopImage)
+            : ($desktopImage ?? $mobileImage);
+
         return [
             'id'            => $this->id,
             'order'         => $this->item_order,
 
             // 🟢 روابط الصور باستخدام الهيلبر
-            'image'         => $this->image_url ? get_user_image($this->image_url) : null,
-            'mobile_image'  => $this->mobile_image_url ? get_user_image($this->mobile_image_url) : null,
+            'image'         => $primaryImage,
+            'desktop_image' => $desktopImage,
+            'mobile_image'  => $mobileImage,
             'alt'           => $this->image_alt,
 
             // روابط
