@@ -181,6 +181,7 @@ Route::prefix('v1')->group(function () {
     // خدمات القرطاسية والطباعة الفورية
     Route::prefix('stationery')->name('stationery.')->group(function () {
         Route::get('prices', [\App\Http\Controllers\Api\Website\StationeryController::class, 'getPrices']);
+        Route::get('delivery-options', [\App\Http\Controllers\Api\Website\StationeryController::class, 'getDeliveryOptions']);
         Route::post('upload', [\App\Http\Controllers\Api\Website\StationeryController::class, 'uploadFile']);
         Route::post('add-to-cart', [\App\Http\Controllers\Api\Website\StationeryController::class, 'addToCart']);
     });

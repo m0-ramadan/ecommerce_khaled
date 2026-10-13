@@ -43,9 +43,12 @@
             <h4 class="fw-bold mb-1">
                 <i class="ti ti-printer text-warning me-2"></i>خدمات القرطاسية والطباعة الفورية
             </h4>
-            <p class="text-muted mb-0">تحكم كامل في أسعار طباعة المستندات والصور لجميع المقاسات (A0 - A5)</p>
+            <p class="text-muted mb-0">كل تركيبة من نوع الخدمة والورق والمقاس والوجه والاتجاه لها سعر مستقل</p>
         </div>
         <div class="d-flex gap-2">
+            <a href="{{ route('admin.stationery.paper-types.index') }}" class="btn btn-outline-warning d-flex align-items-center gap-1 shadow-sm">
+                <i class="ti ti-file-plus me-1"></i>أنواع الورق
+            </a>
             <a href="{{ route('admin.stationery.orders') }}" class="btn btn-outline-primary d-flex align-items-center gap-1 shadow-sm">
                 <i class="ti ti-receipt me-1"></i>
                 طلبات القرطاسية
@@ -79,14 +82,14 @@
                         <button type="button" class="nav-link active d-flex align-items-center gap-2" data-bs-toggle="tab" data-bs-target="#documents-tab">
                             <i class="ti ti-file-text fs-5"></i>
                             <span>طباعة المستندات (Documents)</span>
-                            <span class="badge bg-label-primary rounded-pill">{{ $documentPrices->count() }} مقاسات</span>
+                            <span class="badge bg-label-primary rounded-pill">{{ $documentPrices->count() }} تركيبة سعر</span>
                         </button>
                     </li>
                     <li class="nav-item">
                         <button type="button" class="nav-link d-flex align-items-center gap-2" data-bs-toggle="tab" data-bs-target="#photos-tab">
                             <i class="ti ti-photo fs-5"></i>
                             <span>طباعة الصور (Photos)</span>
-                            <span class="badge bg-label-info rounded-pill">{{ $photoPrices->count() }} مقاسات</span>
+                            <span class="badge bg-label-info rounded-pill">{{ $photoPrices->count() }} تركيبة سعر</span>
                         </button>
                     </li>
                 </ul>
@@ -100,7 +103,7 @@
                             <i class="ti ti-info-circle fs-3 me-2 text-primary"></i>
                             <div>
                                 <strong>طباعة المستندات والملفات (PDF / Word):</strong>
-                                يمكنك تحديد <strong>سعر الورقة الواحدة (المفردة)</strong> بشكل منفصل عن <strong>سعر الورقة داخل ملف كامل</strong> لكل مقاس ورق (A0 - A5)، مع خيار إضافة تكلفة طباعة الوجهين.
+                                يمكنك تحديد سعر مستقل لكل نوع ورق ومقاس واتجاه وعدد أوجه، مع فصل سعر الورقة المفردة عن سعر الصفحة داخل الملف.
                             </div>
                         </div>
 
@@ -108,14 +111,16 @@
                             <table class="table table-bordered table-hover align-middle">
                                 <thead class="table-light">
                                     <tr>
-                                        <th rowspan="2" class="align-middle text-center" style="width: 14%">المقاس والأبعاد</th>
+                                        <th rowspan="2" class="align-middle text-center">نوع الورق</th>
+                                        <th rowspan="2" class="align-middle text-center">المقاس والأبعاد</th>
+                                        <th rowspan="2" class="align-middle text-center">الأوجه</th>
+                                        <th rowspan="2" class="align-middle text-center">الاتجاه</th>
                                         <th colspan="2" class="text-center bg-primary-subtle text-primary border-bottom py-2 fw-bold" style="width: 32%">
                                             <i class="ti ti-file me-1"></i> طباعة الورقة الواحدة (ورقة مفردة)
                                         </th>
                                         <th colspan="2" class="text-center bg-info-subtle text-info border-bottom py-2 fw-bold" style="width: 32%">
                                             <i class="ti ti-folders me-1"></i> طباعة ملف كامل (سعر الورقة فيه)
                                         </th>
-                                        <th rowspan="2" class="text-center align-middle" style="width: 14%">إضافة وجهين</th>
                                         <th rowspan="2" class="text-center align-middle" style="width: 8%">الحالة</th>
                                     </tr>
                                     <tr class="text-center">
@@ -128,6 +133,7 @@
                                 <tbody>
                                     @foreach ($documentPrices as $price)
                                         <tr>
+                                            <td class="text-center fw-bold">{{ $paperTypes['document'][$price->paper_type] ?? $price->paper_type }}</td>
                                             <td class="text-center">
                                                 <div class="d-flex align-items-center justify-content-center gap-2">
                                                     <span class="badge bg-label-primary badge-size">{{ $price->paper_size }}</span>
@@ -137,6 +143,8 @@
                                                     </div>
                                                 </div>
                                             </td>
+                                            <td class="text-center"><span class="badge bg-label-secondary">{{ $sideTypes[$price->side_type] ?? $price->side_type }}</span></td>
+                                            <td class="text-center"><span class="badge bg-label-warning">{{ $orientations[$price->orientation] ?? $price->orientation }}</span></td>
                                             {{-- سعر الورقة لوحدها: أبيض وأسود --}}
                                             <td>
                                                 <div class="input-group input-group-sm price-input-group">
@@ -177,16 +185,6 @@
                                                     <span class="input-group-text">ر.س</span>
                                                 </div>
                                             </td>
-                                            {{-- طباعة وجهين --}}
-                                            <td>
-                                                <div class="input-group input-group-sm price-input-group">
-                                                    <input type="number" step="0.05" min="0" 
-                                                           name="prices[{{ $price->id }}][double_sided_price]" 
-                                                           value="{{ $price->double_sided_price }}" 
-                                                           class="form-control fw-bold text-center text-secondary">
-                                                    <span class="input-group-text">ر.س إضافي</span>
-                                                </div>
-                                            </td>
                                             {{-- الحالة --}}
                                             <td class="text-center">
                                                 <div class="form-check form-switch d-inline-block">
@@ -208,7 +206,7 @@
                             <i class="ti ti-info-circle fs-3 me-2 text-info"></i>
                             <div>
                                 <strong>طباعة الصور وتصاميم الجرافيك:</strong>
-                                خيارات طباعة الصور على ورق صور لامع أو مطفي بجودة عالية. حدد سعر الصورة المفردة وسعر الصورة في ملف صور مجمع لكل مقاس.
+                                حدد سعر كل نوع ورق صور ومقاس واتجاه وعدد أوجه، للصورة المفردة أو الصفحة داخل ملف صور.
                             </div>
                         </div>
 
@@ -216,7 +214,10 @@
                             <table class="table table-bordered table-hover align-middle">
                                 <thead class="table-light">
                                     <tr>
-                                        <th rowspan="2" class="align-middle text-center" style="width: 16%">المقاس والأبعاد</th>
+                                        <th rowspan="2" class="align-middle text-center">نوع الورق</th>
+                                        <th rowspan="2" class="align-middle text-center">المقاس والأبعاد</th>
+                                        <th rowspan="2" class="align-middle text-center">الأوجه</th>
+                                        <th rowspan="2" class="align-middle text-center">الاتجاه</th>
                                         <th colspan="2" class="text-center bg-info-subtle text-info border-bottom py-2 fw-bold" style="width: 36%">
                                             <i class="ti ti-photo me-1"></i> الصورة الواحدة (مفردة)
                                         </th>
@@ -235,6 +236,7 @@
                                 <tbody>
                                     @foreach ($photoPrices as $price)
                                         <tr>
+                                            <td class="text-center fw-bold">{{ $paperTypes['photo'][$price->paper_type] ?? $price->paper_type }}</td>
                                             <td class="text-center">
                                                 <div class="d-flex align-items-center justify-content-center gap-2">
                                                     <span class="badge bg-label-info badge-size">{{ $price->paper_size }}</span>
@@ -244,6 +246,8 @@
                                                     </div>
                                                 </div>
                                             </td>
+                                            <td class="text-center"><span class="badge bg-label-secondary">{{ $sideTypes[$price->side_type] ?? $price->side_type }}</span></td>
+                                            <td class="text-center"><span class="badge bg-label-warning">{{ $orientations[$price->orientation] ?? $price->orientation }}</span></td>
                                             {{-- الصورة المفردة: أبيض وأسود --}}
                                             <td>
                                                 <div class="input-group input-group-sm price-input-group">
@@ -310,6 +314,7 @@
             </div>
         </div>
     </form>
+
 </div>
 @endsection
 

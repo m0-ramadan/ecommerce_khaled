@@ -7,6 +7,7 @@ use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Product;
 use App\Models\StationeryPrice;
+use App\Models\StationeryDeliveryArea;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -35,8 +36,27 @@ class StationeryController extends Controller
                 'product_id' => $product ? $product->id : 366,
                 'sizes' => StationeryPrice::defaultSizes(),
                 'size_dimensions' => StationeryPrice::sizeDimensions(),
+                'paper_types' => StationeryPrice::paperTypes(),
                 'prices' => $prices,
                 'min_order_price' => 0.50,
+            ],
+        ]);
+    }
+
+    public function getDeliveryOptions()
+    {
+        return response()->json([
+            'status' => true,
+            'data' => [
+                'pickup' => [
+                    'id' => 'pickup',
+                    'name' => 'استلام من الفرع',
+                    'price' => 0,
+                ],
+                'areas' => StationeryDeliveryArea::where('is_active', true)
+                    ->orderBy('sort_order')
+                    ->orderBy('name')
+                    ->get(['id', 'name', 'price']),
             ],
         ]);
     }
@@ -99,6 +119,7 @@ class StationeryController extends Controller
             'files.*.file_name' => 'required|string',
             'files.*.service_type' => 'required|in:document,photo',
             'files.*.paper_size' => 'required|string',
+            'files.*.paper_type' => 'required|string',
             'files.*.color_type' => 'required|in:bw,color',
             'files.*.pages_count' => 'required|integer|min:1',
             'files.*.copies' => 'required|integer|min:1',
@@ -131,7 +152,13 @@ class StationeryController extends Controller
 
         // جلب الأسعار المعتمدة من الداشبورد لحساب التكلفة السيرفرية بدقة
         $prices = StationeryPrice::where('is_active', true)->get()->keyBy(function ($item) {
-            return $item->service_type . '_' . strtoupper($item->paper_size);
+            return implode('_', [
+                $item->service_type,
+                $item->paper_type,
+                strtoupper($item->paper_size),
+                $item->side_type,
+                $item->orientation,
+            ]);
         });
 
         $processedFiles = [];
@@ -142,6 +169,7 @@ class StationeryController extends Controller
         foreach ($request->files_input ?? $request->input('files') as $fileItem) {
             $serviceType = $fileItem['service_type'];
             $paperSize = strtoupper($fileItem['paper_size']);
+            $paperType = $fileItem['paper_type'];
             $colorType = $fileItem['color_type'];
             $pagesCount = (int) $fileItem['pages_count'];
             $copies = (int) $fileItem['copies'];
@@ -155,22 +183,22 @@ class StationeryController extends Controller
             }
 
             // سعر الصفحة من الداشبورد
-            $key = $serviceType . '_' . $paperSize;
+            $key = implode('_', [$serviceType, $paperType, $paperSize, $sideType, $orientation]);
             $priceRow = $prices->get($key);
 
-            $pagePrice = 0.50; // fallback
-            if ($priceRow) {
-                if ($isSingleSheet) {
-                    $pagePrice = ($colorType === 'color') ? (float) $priceRow->color_price : (float) $priceRow->bw_price;
-                } else {
-                    $fileBw = $priceRow->file_bw_price ?? $priceRow->bw_price;
-                    $fileColor = $priceRow->file_color_price ?? $priceRow->color_price;
-                    $pagePrice = ($colorType === 'color') ? (float) $fileColor : (float) $fileBw;
-                }
+            if (!$priceRow) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'تركيبة الطباعة المختارة غير متاحة حالياً. يرجى تحديث الصفحة واختيار الخيارات المتاحة.',
+                ], 422);
+            }
 
-                if ($sideType === 'double' && $priceRow->double_sided_price > 0) {
-                    $pagePrice += (float) $priceRow->double_sided_price;
-                }
+            if ($isSingleSheet) {
+                $pagePrice = ($colorType === 'color') ? (float) $priceRow->color_price : (float) $priceRow->bw_price;
+            } else {
+                $fileBw = $priceRow->file_bw_price ?? $priceRow->bw_price;
+                $fileColor = $priceRow->file_color_price ?? $priceRow->color_price;
+                $pagePrice = ($colorType === 'color') ? (float) $fileColor : (float) $fileBw;
             }
 
             $fileTotal = round($pagesCount * $pagePrice * $copies, 2);
@@ -188,6 +216,8 @@ class StationeryController extends Controller
                 'service_type' => $serviceType,
                 'service_type_name' => $serviceType === 'photo' ? 'طباعة صور' : 'طباعة مستندات',
                 'paper_size' => $paperSize,
+                'paper_type' => $paperType,
+                'paper_type_name' => StationeryPrice::paperTypes()[$serviceType][$paperType] ?? $paperType,
                 'color_type' => $colorType,
                 'color_type_name' => $colorType === 'color' ? 'ألوان' : 'أبيض وأسود',
                 'orientation' => $orientation,

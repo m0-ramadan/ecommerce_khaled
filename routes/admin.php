@@ -405,6 +405,14 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
     Route::prefix('stationery')->name('stationery.')->group(function () {
         Route::get('/prices', [\App\Http\Controllers\Admin\StationeryPriceController::class, 'index'])->name('index');
         Route::put('/prices', [\App\Http\Controllers\Admin\StationeryPriceController::class, 'update'])->name('update');
+        Route::get('/delivery-areas', [\App\Http\Controllers\Admin\StationeryPriceController::class, 'deliveryAreas'])->name('delivery-areas.index');
+        Route::get('/paper-types', [\App\Http\Controllers\Admin\StationeryPriceController::class, 'paperTypes'])->name('paper-types.index');
+        Route::post('/paper-types', [\App\Http\Controllers\Admin\StationeryPriceController::class, 'storePaperType'])->name('paper-types.store');
+        Route::put('/paper-types', [\App\Http\Controllers\Admin\StationeryPriceController::class, 'updatePaperTypes'])->name('paper-types.update');
+        Route::delete('/paper-types/{paperType}', [\App\Http\Controllers\Admin\StationeryPriceController::class, 'destroyPaperType'])->name('paper-types.destroy');
+        Route::post('/delivery-areas', [\App\Http\Controllers\Admin\StationeryPriceController::class, 'storeDeliveryArea'])->name('delivery-areas.store');
+        Route::put('/delivery-areas', [\App\Http\Controllers\Admin\StationeryPriceController::class, 'updateDeliveryAreas'])->name('delivery-areas.update');
+        Route::delete('/delivery-areas/{deliveryArea}', [\App\Http\Controllers\Admin\StationeryPriceController::class, 'destroyDeliveryArea'])->name('delivery-areas.destroy');
         Route::get('/orders', [\App\Http\Controllers\Admin\StationeryPriceController::class, 'orders'])->name('orders');
     });
 });

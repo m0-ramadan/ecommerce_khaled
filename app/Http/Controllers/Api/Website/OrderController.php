@@ -13,6 +13,7 @@ use App\Models\Coupon;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\PaymentMethod;
+use App\Models\StationeryDeliveryArea;
 use App\Models\UserAddress;
 use App\Services\OtoShippingService;
 use App\Services\Payment\PaymentService;
@@ -70,7 +71,16 @@ class OrderController extends Controller
             return $this->errorResponse('السلة فارغة، لا يمكن إنشاء طلب', 400);
         }
 
-        return DB::transaction(function () use ($request, $user, $cart) {
+        $cart->load('items.product');
+        $stationeryItems = $cart->items->filter(fn ($item) => $item->product?->slug === 'stationery-print-service');
+        $hasStationery = $stationeryItems->isNotEmpty();
+        $hasRegularProducts = $cart->items->contains(fn ($item) => $item->product?->slug !== 'stationery-print-service');
+
+        if ($hasStationery && $hasRegularProducts) {
+            return $this->errorResponse('طلبات الطباعة يجب إتمامها في طلب منفصل عن منتجات المتجر.', 422);
+        }
+
+        return DB::transaction(function () use ($request, $user, $cart, $hasStationery) {
 
             // تحديد العنوان
             $address = null;
@@ -94,7 +104,38 @@ class OrderController extends Controller
 
                 $discountAmount = $coupon->calculateDiscount($cart->total);
             }
-            $shippingPrice = $request->input('shippingPrice', 0);
+            $shippingPrice = max(0, (float) $request->input('shippingPrice', 0));
+            $shippingMethodName = $request->deliveryOptionName;
+            $shippingAddress = $request->shipping_address;
+            $shouldCreateShipment = true;
+
+            if ($hasStationery) {
+                $deliveryType = $request->input('stationery_delivery_type');
+                if (! in_array($deliveryType, ['pickup', 'home_delivery'], true)) {
+                    return $this->errorResponse('يرجى اختيار الاستلام من الفرع أو التوصيل للبيت.', 422);
+                }
+
+                $shouldCreateShipment = false;
+                if ($deliveryType === 'pickup') {
+                    $shippingPrice = 0;
+                    $shippingMethodName = 'استلام من الفرع';
+                    $shippingAddress = 'استلام من الفرع';
+                    $address = null;
+                } else {
+                    $deliveryArea = StationeryDeliveryArea::where('is_active', true)
+                        ->find($request->input('stationery_delivery_area_id'));
+
+                    if (! $deliveryArea) {
+                        return $this->errorResponse('منطقة توصيل الطباعة المختارة غير متاحة.', 422);
+                    }
+                    if (! $address) {
+                        return $this->errorResponse('يرجى اختيار عنوان للتوصيل للبيت.', 422);
+                    }
+
+                    $shippingPrice = (float) $deliveryArea->price;
+                    $shippingMethodName = 'توصيل للبيت - ' . $deliveryArea->name;
+                }
+            }
 
             $totalAmount = ($cart->total - $discountAmount) + $shippingPrice;
             $taxRate = 0.15;
@@ -108,7 +149,7 @@ class OrderController extends Controller
                 'customer_name' => $request->customer_name ?? $user?->name,
                 'customer_phone' => $request->customer_phone ?? $user?->phone,
                 'customer_email' => $request->customer_email ?? $user?->email,
-                'shipping_address' => $request->shipping_address,
+                'shipping_address' => $shippingAddress,
                 'subtotal' => $cart->subtotal,
                 'shipping_amount' => $shippingPrice,
                 'discount_amount' => $discountAmount,
@@ -118,8 +159,8 @@ class OrderController extends Controller
                 'status' => 'pending',
                 'notes' => $request->notes,
                 'coupon_id' => $coupon?->id,
-                'shipping_method_name' => $request->deliveryOptionName,
-                'oto_order_id' => $request->orderId,
+                'shipping_method_name' => $shippingMethodName,
+                'oto_order_id' => $hasStationery ? null : $request->orderId,
             ]);
 
             // نقل العناصر من السلة إلى الطلب
@@ -150,7 +191,7 @@ class OrderController extends Controller
             // إذا كان الدفع ليس نقداً (payment_method !== 1)
 
             $paymentMethod = PaymentMethod::find($request->payment_method);
-            if ($request->filled('orderId') && $request->filled('deliveryOptionId')) {
+            if ($shouldCreateShipment && $request->filled('orderId') && $request->filled('deliveryOptionId')) {
                 $this->shippingServices->createShipment($request->orderId, $request->deliveryOptionId, $request->shippingPrice);
             }
 

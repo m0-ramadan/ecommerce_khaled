@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Schema;
 
 class StationeryPrice extends Model
 {
@@ -13,7 +14,10 @@ class StationeryPrice extends Model
 
     protected $fillable = [
         'service_type',
+        'paper_type',
         'paper_size',
+        'side_type',
+        'orientation',
         'bw_price',
         'color_price',
         'file_bw_price',
@@ -48,6 +52,46 @@ class StationeryPrice extends Model
             'A4' => '21.0 × 29.7 cm',
             'A5' => '14.8 × 21.0 cm',
         ];
+    }
+
+    public static function paperTypes(bool $onlyActive = true): array
+    {
+        if (Schema::hasTable('stationery_paper_types')) {
+            $query = StationeryPaperType::query();
+            if ($onlyActive) {
+                $query->where('is_active', true);
+            }
+
+            return $query
+                ->orderBy('sort_order')
+                ->orderBy('name')
+                ->get()
+                ->groupBy('service_type')
+                ->map(fn ($types) => $types->pluck('name', 'key')->all())
+                ->all();
+        }
+
+        return [
+            'document' => [
+                'plain' => 'ورق عادي',
+                'coated' => 'ورق كوشيه',
+                'cardstock' => 'ورق مقوّى',
+            ],
+            'photo' => [
+                'glossy' => 'ورق صور لامع',
+                'matte' => 'ورق صور مطفي',
+            ],
+        ];
+    }
+
+    public static function orientations(): array
+    {
+        return ['portrait' => 'طولي', 'landscape' => 'عرضي'];
+    }
+
+    public static function sideTypes(): array
+    {
+        return ['single' => 'وجه واحد', 'double' => 'وجهين'];
     }
 }
 

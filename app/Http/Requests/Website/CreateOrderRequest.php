@@ -78,6 +78,8 @@ class CreateOrderRequest extends FormRequest
             'deliveryOptionId'  => 'nullable',
             'shippingPrice'     => 'nullable|numeric',
             'deliveryOptionName'=> 'nullable|string',
+            'stationery_delivery_type' => 'nullable|in:pickup,home_delivery',
+            'stationery_delivery_area_id' => 'nullable|integer|exists:stationery_delivery_areas,id',
         ];
     }
 

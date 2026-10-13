@@ -151,6 +151,16 @@
                         <div>إدارة الأسعار والمقاسات</div>
                     </a>
                 </li>
+                <li class="menu-item {{ request()->routeIs('admin.stationery.delivery-areas.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.stationery.delivery-areas.index') }}" class="menu-link">
+                        <div>مناطق وأسعار التوصيل</div>
+                    </a>
+                </li>
+                <li class="menu-item {{ request()->routeIs('admin.stationery.paper-types.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.stationery.paper-types.index') }}" class="menu-link">
+                        <div>أنواع الورق</div>
+                    </a>
+                </li>
                 <li class="menu-item {{ request()->routeIs('admin.stationery.orders') ? 'active' : '' }}">
                     <a href="{{ route('admin.stationery.orders') }}" class="menu-link">
                         <div>طلبات القرطاسية المرفوعة</div>
