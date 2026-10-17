@@ -5,6 +5,7 @@ namespace App\Services\Payment\Gateways;
 use Carbon\Carbon;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\User;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 use App\Services\Payment\Gateways\BaseGateway;
@@ -110,9 +111,11 @@ class TamaraGateway extends BaseGateway
         }
     }
 
-    private function prepareCheckoutData(): array
+    private function prepareCheckoutData(array $data): array
     {
-        $order = Order::where('user_id', auth()->id())->latest()->firstOrFail();
+        $order = Order::with(['user', 'address', 'orderItems.product'])
+            ->where('order_number', $data['order_id'])
+            ->firstOrFail();
         $user  = $order->user;
         $address = $order->address;
         $items = $order->orderItems;
@@ -156,13 +159,20 @@ class TamaraGateway extends BaseGateway
         $taxAmount = (float) $order->tax_amount;
         $discountAmount = (float) $order->discount_amount;
 
-        $riskAssessment = $this->prepareRiskAssessment($user);
+        $riskAssessment = $this->prepareRiskAssessment($user, $order);
+        $customerName = $order->customer_name ?? $user?->name ?? 'Customer';
+        $customerEmail = $order->customer_email ?? $user?->email;
+        $customerPhone = $order->customer_phone ?? $user?->phone ?? '+966500000000';
+        $addressLine = $address?->address_details ?? $order->shipping_address ?? 'N/A';
+        $city = $address?->city ?? 'Riyadh';
+        $region = $address?->area ?? $city;
 
         return [
             'order_reference_id' => (string) $order->id,
             'order_number' => $order->order_number,
             'total_amount' => [
-                'amount' => $totalAmount + $shippingAmount,
+                // total_amount في Order يحتوي بالفعل على رسوم الشحن والخصم.
+                'amount' => $totalAmount,
                 'currency' => $this->currency,
             ],
             'shipping_amount' => [
@@ -175,11 +185,11 @@ class TamaraGateway extends BaseGateway
             ],
             'items' => $orderItems,
             'consumer' => [
-                'first_name' => $user->name,
+                'first_name' => $customerName,
                 'last_name' => '',
-                'email' => $user->email,
-                'phone_number' => $this->formatPhoneNumber($user->phone ?? '+966500000000'),
-                'is_first_order' => $user->orders()->count() === 1,
+                'email' => $customerEmail,
+                'phone_number' => $this->formatPhoneNumber($customerPhone),
+                'is_first_order' => $user ? $user->orders()->count() === 1 : true,
             ],
             'country_code' => 'SA',
             'description' => 'Order #' . $order->order_number,
@@ -190,24 +200,24 @@ class TamaraGateway extends BaseGateway
                 'notification' => route('payment.tamara.webhook'),
             ],
             'shipping_address' => [
-                'first_name' => $user->name,
+                'first_name' => $customerName,
                 'last_name' => '',
-                'line1' => $address?->address ?? 'N/A',
+                'line1' => $addressLine,
                 'line2' => '',
-                'city' => $address?->city ?? 'Riyadh',
+                'city' => $city,
                 'country_code' => 'SA',
-                'region' => $address?->region ?? 'Riyadh',
-                'phone_number' => $this->formatPhoneNumber($user->phone ?? '+966500000000'),
+                'region' => $region,
+                'phone_number' => $this->formatPhoneNumber($customerPhone),
             ],
             'billing_address' => [
-                'first_name' => $user->name,
+                'first_name' => $customerName,
                 'last_name' => '',
-                'line1' => $address?->address ?? 'N/A',
+                'line1' => $addressLine,
                 'line2' => '',
-                'city' => $address?->city ?? 'Riyadh',
+                'city' => $city,
                 'country_code' => 'SA',
-                'region' => $address?->region ?? 'Riyadh',
-                'phone_number' => $this->formatPhoneNumber($user->phone ?? '+966500000000'),
+                'region' => $region,
+                'phone_number' => $this->formatPhoneNumber($customerPhone),
             ],
             'platform' => 'API',
             'locale' => 'ar_SA',
@@ -232,36 +242,38 @@ class TamaraGateway extends BaseGateway
             return now();
         }
     }
-    private function prepareRiskAssessment(array $customer): array
+    private function prepareRiskAssessment(?User $customer, Order $currentOrder): array
     {
-        // إذا كان created_at موجود، parse وإلا استخدم سنة مضت
-        //  $createdAt = isset($customer['created_at']) ? $this->safeParseDate($customer['created_at']) : now()->subYear();
-
-        // دالة مساعدة لتحويل أي تاريخ إلى string Y-m-d
-        //$toDate = fn($date, $default = null) => $this->safeParseDateString($date ?? $default ?? $createdAt);
+        $orders = $customer?->orders()->whereKeyNot($currentOrder->id);
+        $orderCount = $orders ? (clone $orders)->count() : 0;
+        $completedOrders = $orders
+            ? (clone $orders)->whereIn('status', ['completed', 'delivered'])->count()
+            : 0;
+        $totalSpent = $orders
+            ? (float) (clone $orders)->whereIn('status', ['completed', 'delivered'])->sum('total_amount')
+            : 0.0;
+        $recentOrders = $orders
+            ? (clone $orders)->where('created_at', '>=', now()->subMonths(3))
+            : null;
+        $lastOrder = $orders ? (clone $orders)->latest()->first() : null;
 
         return [
-            'customer_age' => (int) ($customer['age'] ?? 25),
-            // 'customer_dob' => $toDate($customer['date_of_birth'], '1990-01-01'),
-            'customer_gender' => $customer['gender'] ?? 'Male',
+            'customer_age' => (int) ($customer?->age ?? 25),
+            'customer_gender' => $customer?->gender ?? 'Male',
             'customer_nationality' => 'SA',
             'is_premium_customer' => false,
-            'is_existing_customer' => ($customer['order_count'] ?? 0) > 0,
-            'is_guest_user' => false,
-            // 'account_creation_date' => $toDate($customer['created_at']),
-            // 'platform_account_creation_date' => $toDate($customer['created_at']),
-            // 'date_of_first_transaction' => $toDate($customer['first_order_date']),
+            'is_existing_customer' => $orderCount > 0,
+            'is_guest_user' => $customer === null,
             'is_card_on_file' => false,
             'is_COD_customer' => false,
-            'has_delivered_order' => ($customer['completed_order_count'] ?? 0) > 0,
-            'is_phone_verified' => true,
+            'has_delivered_order' => $completedOrders > 0,
+            'is_phone_verified' => !empty($customer?->phone),
             'is_fraudulent_customer' => false,
-            'total_ltv' => (float) ($customer['total_spent'] ?? 0),
-            'total_order_count' => (int) ($customer['order_count'] ?? 0),
-            'order_amount_last3months' => (float) ($customer['last_3months_spent'] ?? 0),
-            'order_count_last3months' => (int) ($customer['last_3months_orders'] ?? 0),
-            //  'last_order_date' => $toDate($customer['last_order_date']),
-            'last_order_amount' => (float) ($customer['last_order_amount'] ?? 0),
+            'total_ltv' => $totalSpent,
+            'total_order_count' => $orderCount,
+            'order_amount_last3months' => $recentOrders ? (float) (clone $recentOrders)->sum('total_amount') : 0.0,
+            'order_count_last3months' => $recentOrders ? (clone $recentOrders)->count() : 0,
+            'last_order_amount' => (float) ($lastOrder?->total_amount ?? 0),
             'reward_program_enrolled' => false,
             'reward_program_points' => 0,
         ];

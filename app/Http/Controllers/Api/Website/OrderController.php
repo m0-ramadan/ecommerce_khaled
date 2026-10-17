@@ -228,7 +228,11 @@ class OrderController extends Controller
                 }
 
                 if (! $result['success']) {
-                    return $this->errorResponse($result['message'], 400);
+                    // طرح الاستثناء يضمن تراجع DB::transaction، فلا يُحفظ طلب ناقص
+                    // ولا تُفرغ السلة عندما ترفض بوابة الدفع إنشاء الجلسة.
+                    throw \Illuminate\Validation\ValidationException::withMessages([
+                        'payment_method' => [$result['message'] ?? 'تعذر بدء عملية الدفع. يرجى المحاولة مرة أخرى.'],
+                    ]);
                 }
 
                 return $this->successResponse([
