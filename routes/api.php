@@ -65,7 +65,7 @@ Route::prefix('v1')->group(function () {
             Route::post('cancel/{codeOrder}', [OrderController::class, 'cancelled'])->name('cancel');
             Route::get('/payment-status', [OrderController::class, 'paymentStatus']);
         });
-        Route::get('/shippings-options', [ShippingController::class, 'getDeliveryOptions']);
+        Route::match(['get', 'post'], '/shippings-options', [ShippingController::class, 'getDeliveryOptions']);
 
 
         Route::post('coupon/apply', [OrderController::class, 'applyCoupon']);
@@ -174,7 +174,7 @@ Route::prefix('v1')->group(function () {
     Route::get('/public/track/{trackingNumber}', [OtoV2ShippingController::class, 'trackShipment'])
         ->name('shipping.track.public');
 
-    Route::get('testimonials', [HomeController::class, 'testimonials'])->name('testimonials'); 
+    Route::get('testimonials', [HomeController::class, 'testimonials'])->name('testimonials');
     Route::get('payment/callback', [PaymentController::class, 'handlePaymobCallback'])
         ->name('payment.callback.paymob');
 

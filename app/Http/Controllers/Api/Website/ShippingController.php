@@ -23,17 +23,22 @@ class ShippingController extends Controller
         $this->shippingService = $shippingService;
     }
     /**
-     * الحصول على خيارات التوصيل
+     * الحصول على خيارات التوصيل بناء على العنوان المختار والمدينة
      */
-    public function getDeliveryOptions()
+    public function getDeliveryOptions(Request $request)
     {
         try {
-            $options = $this->shippingService->getDeliveryOptions();
+            $addressId = $request->input('address_id');
+            $cityName = $request->input('city');
+
+            $options = $this->shippingService->getDeliveryOptions($addressId, $cityName);
 
             return $this->success([
                 'deliveryFees' => $options['deliveryFees'],
                 'orderId'      => $options['orderId'],
             ]);
+        } catch (\InvalidArgumentException $e) {
+            return $this->error($e->getMessage(), 400);
         } catch (\Throwable $e) {
             Log::error('Delivery options failed', [
                 'error' => $e->getMessage()

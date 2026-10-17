@@ -7,6 +7,7 @@ use App\Models\Shipment;
 use App\Models\ShippingOrder;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 
 class OtoShippingService
 {
@@ -41,18 +42,161 @@ class OtoShippingService
         return $response->json();
     }
 
-    public function handleDataOrder(array $orderData, string $token)
+    /**
+     * حساب الأوزان والأبعاد الفعلية وحجم الطرد بناء على المنتجات وكميات الباتش
+     */
+    public function calculateCartPackageMetrics($cart): array
+    {
+        $totalWeight = 0.0;
+        $totalPiecesCount = 0;
+
+        foreach ($cart->items as $item) {
+            $product = $item->product;
+            $quantity = max(1, (int) $item->quantity);
+
+            // استخراج كمية الباتش (Batch Multiplier) من selected_options (مثل 100 حبة، 500 حبة، 1000 حبة)
+            $batchMultiplier = 1;
+            if (!empty($item->selected_options)) {
+                $options = is_array($item->selected_options)
+                    ? $item->selected_options
+                    : (json_decode($item->selected_options, true) ?: []);
+
+                foreach ($options as $opt) {
+                    $optName = $opt['option_name'] ?? '';
+                    $optVal = $opt['option_value'] ?? '';
+                    if (str_contains($optName, 'الكمية') || str_contains($optName, 'العدد') || str_contains($optName, 'كمية')) {
+                        if (preg_match('/(\d+)\s*(حبة|حبات|حبه|قطعة|قطع|شيت|كرتون|علبة|كيس)/u', $optVal, $matches)) {
+                            $batchMultiplier = max(1, (int) $matches[1]);
+                        } elseif (preg_match('/^(\d+)/', trim($optVal), $matches)) {
+                            $batchMultiplier = max(1, (int) $matches[1]);
+                        }
+                    }
+                }
+            }
+
+            $effectivePieces = $quantity * $batchMultiplier;
+            $totalPiecesCount += $effectivePieces;
+
+            // تحديد وزن القطعة بالكيلوجرام بناء على الفئة ونوع المنتج
+            if (!empty($product?->weight) && (float) $product->weight > 0) {
+                $unitWeight = (float) $product->weight;
+                if ($batchMultiplier > 1 && $unitWeight > 1.0) {
+                    $itemWeight = $unitWeight * $quantity;
+                } else {
+                    $itemWeight = $unitWeight * $effectivePieces;
+                }
+            } else {
+                $categorySlug = $product?->category?->slug ?? '';
+                $productName = $product?->name ?? '';
+
+                if (str_contains($productName, 'رول اب') || str_contains($productName, 'استاند') || $categorySlug === 'daaayh-o-aelam') {
+                    $unitWeight = 3.5;
+                    $itemWeight = $unitWeight * $quantity;
+                } elseif (str_contains($productName, 'كرتون') || $categorySlug === 'kratyn-shhn') {
+                    $unitWeight = 0.35;
+                    $itemWeight = $unitWeight * $effectivePieces;
+                } elseif (str_contains($productName, 'كوب') || str_contains($productName, 'اكواب') || $categorySlug === 'akoab') {
+                    $unitWeight = 0.25;
+                    $itemWeight = $unitWeight * $effectivePieces;
+                } elseif (str_contains($productName, 'بوكس') || $categorySlug === 'boksat') {
+                    $unitWeight = 0.15;
+                    $itemWeight = $unitWeight * $effectivePieces;
+                } elseif (str_contains($productName, 'كيس') || $categorySlug === 'akyas') {
+                    $unitWeight = 0.04;
+                    $itemWeight = $unitWeight * $effectivePieces;
+                } elseif (str_contains($productName, 'ملصق') || str_contains($productName, 'ستيكر') || $categorySlug === 'mlskat') {
+                    $unitWeight = 0.015;
+                    $itemWeight = $unitWeight * $effectivePieces;
+                } elseif (str_contains($productName, 'شماسة')) {
+                    $unitWeight = 0.35;
+                    $itemWeight = $unitWeight * $quantity;
+                } else {
+                    $unitWeight = (float) config('services.oto.default_item_weight', 0.5);
+                    $itemWeight = $unitWeight * $quantity;
+                }
+            }
+
+            $totalWeight += $itemWeight;
+        }
+
+        $totalWeight = max(0.5, round($totalWeight, 2));
+
+        // حساب الأبعاد وحجم الطرد وفق معايير شركات الشحن (Volumetric & Weight Tiers)
+        if ($totalWeight <= 2.0) {
+            $packageSize = 'small';
+            $boxLength = 20;
+            $boxWidth = 15;
+            $boxHeight = 10;
+            $packageCount = 1;
+        } elseif ($totalWeight <= 8.0) {
+            $packageSize = 'medium';
+            $boxLength = 35;
+            $boxWidth = 25;
+            $boxHeight = 20;
+            $packageCount = 1;
+        } elseif ($totalWeight <= 20.0) {
+            $packageSize = 'large';
+            $boxLength = 50;
+            $boxWidth = 40;
+            $boxHeight = 30;
+            $packageCount = 1;
+        } else {
+            $packageSize = 'large';
+            $packageCount = max(1, (int) ceil($totalWeight / 20));
+            $boxLength = 60;
+            $boxWidth = 45;
+            $boxHeight = 40;
+        }
+
+        return [
+            'weight' => $totalWeight,
+            'packageSize' => $packageSize,
+            'packageCount' => $packageCount,
+            'boxWidth' => $boxWidth,
+            'boxLength' => $boxLength,
+            'boxHeight' => $boxHeight,
+            'totalPiecesCount' => $totalPiecesCount,
+        ];
+    }
+
+    public function normalizeCityName(?string $city): string
+    {
+        if (empty($city)) {
+            return 'Riyadh';
+        }
+
+        $trimmed = trim($city);
+        return $trimmed ?: 'Riyadh';
+    }
+
+    public function handleDataOrder(array $orderData, string $token, $addressId = null, $cityName = null)
     {
         $user = auth()->user();
 
-        $cart = $user->cart()->with(['items.product'])->firstOrFail();
+        $cart = $user->cart()->with(['items.product.category'])->firstOrFail();
 
-        $defaultAddress = $user->userAddresses()
-            ->where('selected_address', true)
-            ->first();
-        if (empty($defaultAddress)) {
-          $defaultAddress = $user->userAddresses()->first();
+        if ($cart->items->isEmpty()) {
+            throw new \InvalidArgumentException('السلة فارغة');
         }
+
+        // 1. تحديد العنوان والموقع
+        $address = null;
+        if (!empty($addressId)) {
+            $address = $user->userAddresses()->find($addressId);
+        }
+        if (!$address) {
+            $address = $user->userAddresses()
+                ->where('selected_address', true)
+                ->first() ?: $user->userAddresses()->latest()->first();
+        }
+
+        $customerCity = $this->normalizeCityName($cityName ?: optional($address)->city);
+        $customerAddress = optional($address)->address_details ?: $customerCity;
+        $customerDistrict = optional($address)->area ?: 'الوسطى';
+        $customerPhone = (string) (optional($address)->phone ?: ($user->phone ?: '0500000000'));
+
+        // 2. الحساب الديناميكي للوزن والأبعاد وحجم الطرد
+        $metrics = $this->calculateCartPackageMetrics($cart);
 
         // 🟢 استخدم ID الطلب الحقيقي + suffix
         $shippingOrderId = $orderData['id'] . rand(40, 1000000);
@@ -70,17 +214,13 @@ class OtoShippingService
             'currency' => 'SAR',
             'shippingNotes' => $orderData['notes'] ?? null,
 
-            'packageSize' => 'small',
-            'packageCount' => max(1, (int) $cart->items->sum('quantity')),
-            'packageWeight' => max(0.1, (float) $cart->items->sum(function ($item) {
-                $unitWeight = (float) ($item->product?->weight ?: config('services.oto.default_item_weight', 0.5));
+            'packageSize' => $metrics['packageSize'],
+            'packageCount' => $metrics['packageCount'],
+            'packageWeight' => $metrics['weight'],
 
-                return $unitWeight * max(1, (int) $item->quantity);
-            })),
-
-            'boxWidth' => 10,
-            'boxLength' => 10,
-            'boxHeight' => 10,
+            'boxWidth' => $metrics['boxWidth'],
+            'boxLength' => $metrics['boxLength'],
+            'boxHeight' => $metrics['boxHeight'],
 
             'orderDate' => now()->format('d/m/Y H:i'),
             'deliverySlotDate' => now()->addDay()->format('d/m/Y'),
@@ -109,11 +249,12 @@ class OtoShippingService
             /* ================= Customer ================= */
 
             'customer' => [
-                'name' => $user->name ?? '',
-                'email' => $user->email,
-                'mobile' => (string) ($user->phone ?? '0500000000'),
-                'address' => optional($defaultAddress)->address_details ?? '',
-                'city' => optional($defaultAddress)->city ?? '',
+                'name' => $user->name ?: 'عميل متجر تالا',
+                'email' => $user->email ?: 'customer@talaaljazeera.com',
+                'mobile' => $customerPhone,
+                'address' => $customerAddress,
+                'district' => $customerDistrict,
+                'city' => $customerCity,
                 'country' => 'SA',
                 'refID' => (string) $user->id,
             ],
@@ -202,9 +343,9 @@ class OtoShippingService
     }
 
     /**
-     * الحصول على خيارات التوصيل المتاحة
+     * الحصول على خيارات التوصيل المتاحة مع تحديد العنوان والمدينة
      */
-    public function getDeliveryOptions(): array
+    public function getDeliveryOptions($addressId = null, $cityName = null): array
     {
         $tokenResponse = $this->refreshToken();
 
@@ -221,7 +362,7 @@ class OtoShippingService
             throw new \Exception('No warehouses found');
         }
 
-        $orderId = $this->handleDataOrder($warehouse, $accessToken);
+        $orderId = $this->handleDataOrder($warehouse, $accessToken, $addressId, $cityName);
 
         $deliveryFeesResponse = $this->getDeliveryFee($orderId, $accessToken);
 
@@ -260,7 +401,14 @@ class OtoShippingService
         }
 
         $price = $this->firstNumericValue($option, [
-            'price', 'amount', 'cost', 'fee', 'deliveryFee', 'shippingCost', 'total', 'totalAmount',
+            'price',
+            'amount',
+            'cost',
+            'fee',
+            'deliveryFee',
+            'shippingCost',
+            'total',
+            'totalAmount',
         ]);
 
         if ($price === null || $price < 0) {
@@ -323,12 +471,25 @@ class OtoShippingService
 
         $selectedOption = $this->resolveDeliveryOption((string) $orderId, $deliveryOptionId);
 
-        $shippingOrder->update([
+        $updateData = [
             'shipping_cost' => max(0, (float) $shippingPrice),
             'shipping_service_id' => is_numeric($deliveryOptionId) ? (int) $deliveryOptionId : null,
+        ];
+
+        if (Schema::hasColumn('shipping_orders', 'delivery_company')) {
+            $updateData['delivery_company'] = $selectedOption['name'];
+        }
+        if (Schema::hasColumn('shipping_orders', 'service_type')) {
+            $updateData['service_type'] = $selectedOption['service_type'];
+        }
+
+        $otoResponse = is_array($shippingOrder->oto_response) ? $shippingOrder->oto_response : [];
+        $updateData['oto_response'] = array_merge($otoResponse, [
             'delivery_company' => $selectedOption['name'],
             'service_type' => $selectedOption['service_type'],
         ]);
+
+        $shippingOrder->update($updateData);
 
         // التحقق من وجود Access Token
         if (!$shippingOrder->accessToken) {
