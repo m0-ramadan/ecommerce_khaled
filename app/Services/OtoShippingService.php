@@ -166,7 +166,159 @@ class OtoShippingService
         }
 
         $trimmed = trim($city);
-        return $trimmed ?: 'Riyadh';
+        $clean = mb_strtolower($trimmed, 'UTF-8');
+        $normalized = str_replace(['أ', 'إ', 'آ', 'ة', 'ى'], ['ا', 'ا', 'ا', 'ه', 'ي'], $clean);
+
+        if (str_contains($normalized, 'مكه') || str_contains($normalized, 'makkah') || str_contains($normalized, 'mecca')) {
+            return 'Makkah';
+        }
+        if (str_contains($normalized, 'جده') || str_contains($normalized, 'jeddah')) {
+            return 'Jeddah';
+        }
+        if (str_contains($normalized, 'رياض') || str_contains($normalized, 'riyadh')) {
+            return 'Riyadh';
+        }
+        if (str_contains($normalized, 'دمام') || str_contains($normalized, 'dammam')) {
+            return 'Dammam';
+        }
+        if (str_contains($normalized, 'خبر') || str_contains($normalized, 'khobar')) {
+            return 'Khobar';
+        }
+        if (str_contains($normalized, 'مدينه') || str_contains($normalized, 'medina') || str_contains($normalized, 'madinah')) {
+            return 'Madinah';
+        }
+        if (str_contains($normalized, 'ابها') || str_contains($normalized, 'abha')) {
+            return 'Abha';
+        }
+        if (str_contains($normalized, 'تبوك') || str_contains($normalized, 'tabuk')) {
+            return 'Tabuk';
+        }
+        if (str_contains($normalized, 'خميس') || str_contains($normalized, 'khamis')) {
+            return 'Khamis Mushait';
+        }
+        if (str_contains($normalized, 'جازان') || str_contains($normalized, 'جيزان') || str_contains($normalized, 'jazan')) {
+            return 'Jazan';
+        }
+        if (str_contains($normalized, 'طائف') || str_contains($normalized, 'taif')) {
+            return 'Taif';
+        }
+        if (str_contains($normalized, 'بريده') || str_contains($normalized, 'buraidah') || str_contains($normalized, 'buraydah')) {
+            return 'Buraidah';
+        }
+        if (str_contains($normalized, 'عنيزه') || str_contains($normalized, 'unaizah')) {
+            return 'Unaizah';
+        }
+        if (str_contains($normalized, 'احسا') || str_contains($normalized, 'ahsa') || str_contains($normalized, 'hofuf')) {
+            return 'Al Ahsa';
+        }
+        if (str_contains($normalized, 'جبيل') || str_contains($normalized, 'jubail')) {
+            return 'Jubail';
+        }
+        if (str_contains($normalized, 'حائل') || str_contains($normalized, 'hail')) {
+            return 'Hail';
+        }
+        if (str_contains($normalized, 'نجران') || str_contains($normalized, 'najran')) {
+            return 'Najran';
+        }
+        if (str_contains($normalized, 'ينبع') || str_contains($normalized, 'yanbu')) {
+            return 'Yanbu';
+        }
+        if (str_contains($normalized, 'خرج') || str_contains($normalized, 'kharj')) {
+            return 'Al Kharj';
+        }
+
+        return $trimmed;
+    }
+
+    /**
+     * حساب فرق تكلفة الشحن الإقليمي بناء على المدينة ومسافتها عن مستودع الرياض
+     */
+    public function getCityZoneSurcharge(?string $cityName): float
+    {
+        if (empty($cityName)) {
+            return 0.0;
+        }
+
+        $clean = mb_strtolower(trim($cityName), 'UTF-8');
+        $normalized = str_replace(
+            ['أ', 'إ', 'آ', 'ة', 'ى'],
+            ['ا', 'ا', 'ا', 'ه', 'ي'],
+            $clean
+        );
+
+        // 1. نفس المدينة (الرياض والدرعية) -> بدون أي رسوم إضافية
+        if (
+            str_contains($normalized, 'رياض') ||
+            str_contains($normalized, 'riyadh') ||
+            str_contains($normalized, 'درعيه') ||
+            str_contains($normalized, 'diriyah')
+        ) {
+            return 0.0;
+        }
+
+        // 2. ضواحي الرياض القريبة (الخرج، المزاحمية، ضرما...) -> +5 ر.س
+        if (
+            str_contains($normalized, 'خرج') ||
+            str_contains($normalized, 'kharj') ||
+            str_contains($normalized, 'مزاحميه') ||
+            str_contains($normalized, 'muzahmiyah') ||
+            str_contains($normalized, 'ضرما') ||
+            str_contains($normalized, 'حريملاء')
+        ) {
+            return 5.0;
+        }
+
+        // 3. المنطقة الشرقية والقصيم (الدمام، الخبر، الأحساء، الجبيل، بريدة، عنيزة...) -> +10 ر.س
+        if (
+            str_contains($normalized, 'دمام') || str_contains($normalized, 'dammam') ||
+            str_contains($normalized, 'خبر') || str_contains($normalized, 'khobar') ||
+            str_contains($normalized, 'احسا') || str_contains($normalized, 'ahsa') || str_contains($normalized, 'hofuf') ||
+            str_contains($normalized, 'جبيل') || str_contains($normalized, 'jubail') ||
+            str_contains($normalized, 'ظهران') || str_contains($normalized, 'dhahran') ||
+            str_contains($normalized, 'قطيف') || str_contains($normalized, 'qatif') ||
+            str_contains($normalized, 'بريده') || str_contains($normalized, 'buraidah') || str_contains($normalized, 'buraydah') ||
+            str_contains($normalized, 'عنيزه') || str_contains($normalized, 'unaizah') ||
+            str_contains($normalized, 'رس') || str_contains($normalized, 'rass') ||
+            str_contains($normalized, 'قصيم') || str_contains($normalized, 'qassim') ||
+            str_contains($normalized, 'مجمعه') || str_contains($normalized, 'majmaah') ||
+            str_contains($normalized, 'شقراء') || str_contains($normalized, 'دوادمي')
+        ) {
+            return 10.0;
+        }
+
+        // 4. المنطقة الغربية (مكة، جدة، المدينة، الطائف، ينبع...) -> +15 ر.س
+        if (
+            str_contains($normalized, 'مكه') || str_contains($normalized, 'makkah') || str_contains($normalized, 'mecca') ||
+            str_contains($normalized, 'جده') || str_contains($normalized, 'jeddah') ||
+            str_contains($normalized, 'مدينه') || str_contains($normalized, 'medina') || str_contains($normalized, 'madinah') ||
+            str_contains($normalized, 'طائف') || str_contains($normalized, 'taif') ||
+            str_contains($normalized, 'ينبع') || str_contains($normalized, 'yanbu') ||
+            str_contains($normalized, 'رابغ') || str_contains($normalized, 'rabigh')
+        ) {
+            return 15.0;
+        }
+
+        // 5. المناطق الجنوبية والشمالية والحدودية البعيدة -> +20 ر.س
+        if (
+            str_contains($normalized, 'ابها') || str_contains($normalized, 'abha') ||
+            str_contains($normalized, 'خميس مشيط') || str_contains($normalized, 'khamis') ||
+            str_contains($normalized, 'جازان') || str_contains($normalized, 'جيزان') || str_contains($normalized, 'jazan') || str_contains($normalized, 'jizan') ||
+            str_contains($normalized, 'نجران') || str_contains($normalized, 'najran') ||
+            str_contains($normalized, 'تبوك') || str_contains($normalized, 'tabuk') ||
+            str_contains($normalized, 'حائل') || str_contains($normalized, 'hail') ||
+            str_contains($normalized, 'عرعر') || str_contains($normalized, 'arar') ||
+            str_contains($normalized, 'سكاكا') || str_contains($normalized, 'sakaka') || str_contains($normalized, 'jouf') ||
+            str_contains($normalized, 'حفر الباطن') || str_contains($normalized, 'hafr') ||
+            str_contains($normalized, 'قريات') || str_contains($normalized, 'qurayyat') ||
+            str_contains($normalized, 'بيشه') || str_contains($normalized, 'bisha') ||
+            str_contains($normalized, 'شروره') || str_contains($normalized, 'sharurah') ||
+            str_contains($normalized, 'صبيا') || str_contains($normalized, 'ابو عريش')
+        ) {
+            return 20.0;
+        }
+
+        // أي مدينة أخرى خارج الرياض افتراضياً
+        return 15.0;
     }
 
     public function handleDataOrder(array $orderData, string $token, $addressId = null, $cityName = null)
@@ -182,7 +334,7 @@ class OtoShippingService
         // 1. تحديد العنوان والموقع
         $address = null;
         if (!empty($addressId)) {
-            $address = $user->userAddresses()->find($addressId);
+            $address = $user->userAddresses()->find($addressId) ?: \App\Models\UserAddress::find($addressId);
         }
         if (!$address) {
             $address = $user->userAddresses()
@@ -190,7 +342,8 @@ class OtoShippingService
                 ->first() ?: $user->userAddresses()->latest()->first();
         }
 
-        $customerCity = $this->normalizeCityName($cityName ?: optional($address)->city);
+        $rawCity = $cityName ?: optional($address)->city;
+        $customerCity = $this->normalizeCityName($rawCity);
         $customerAddress = optional($address)->address_details ?: $customerCity;
         $customerDistrict = optional($address)->area ?: 'الوسطى';
         $customerPhone = (string) (optional($address)->phone ?: ($user->phone ?: '0500000000'));
@@ -372,14 +525,40 @@ class OtoShippingService
 
         $deliveryFees = $deliveryFeesResponse->json();
         $shippingOrder = ShippingOrder::where('order_id', $orderId)->latest()->firstOrFail();
+
+        // حساب وإضافة فرق تكلفة الشحن الإقليمي بناء على المدينة المستهدفة ومسافتها عن الرياض
+        $targetCity = $cityName ?: ($shippingOrder->receiver_city ?: null);
+        $surcharge = $this->getCityZoneSurcharge($targetCity);
+
+        if ($surcharge > 0 && isset($deliveryFees['deliveryCompany']) && is_array($deliveryFees['deliveryCompany'])) {
+            foreach ($deliveryFees['deliveryCompany'] as &$option) {
+                if (isset($option['price']) && is_numeric($option['price'])) {
+                    $option['price'] = round((float) $option['price'] + $surcharge, 2);
+                }
+                if (isset($option['deliveryFee']) && is_numeric($option['deliveryFee'])) {
+                    $option['deliveryFee'] = round((float) $option['deliveryFee'] + $surcharge, 2);
+                }
+                if (isset($option['total']) && is_numeric($option['total'])) {
+                    $option['total'] = round((float) $option['total'] + $surcharge, 2);
+                }
+            }
+            unset($option);
+        }
+
         $otoResponse = is_array($shippingOrder->oto_response) ? $shippingOrder->oto_response : [];
         $shippingOrder->update([
-            'oto_response' => array_merge($otoResponse, ['delivery_fees' => $deliveryFees]),
+            'oto_response' => array_merge($otoResponse, [
+                'delivery_fees' => $deliveryFees,
+                'city_zone_surcharge' => $surcharge,
+                'target_city' => $targetCity,
+            ]),
         ]);
 
         return [
             'deliveryFees' => $deliveryFees,
             'orderId'      => $orderId,
+            'surcharge'    => $surcharge,
+            'city'         => $targetCity,
         ];
     }
 
