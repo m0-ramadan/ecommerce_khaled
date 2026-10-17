@@ -11,6 +11,7 @@ return [
 
     'allowed_origins' => [
         'http://localhost:3000',
+        'http://127.0.0.1:3000',
         'http://72.62.25.136:3000',
         'https://www.talaaljazeera.com',
         'https://ecommerce-xo.vercel.app',
@@ -22,9 +23,9 @@ return [
 
     ],
 
-    // علشان Vercel preview
     'allowed_origins_patterns' => [
-        '#^https://.*\.vercel\.app$#'
+        '#^https://.*\.vercel\.app$#',
+        '#^http://(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+)(:\d+)?$#'
     ],
 
     'allowed_headers' => ['*'],

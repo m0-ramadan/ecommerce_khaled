@@ -18,7 +18,11 @@ if (!function_exists('get_user_image')) {
             return $image;
         }
         // الرابط نسبي في قاعدة البيانات
-        return asset('storage/' . $image);
+        $clean = ltrim($image, '/');
+        if (\Illuminate\Support\Facades\Storage::disk('public')->exists($clean)) {
+            return asset('storage/' . $clean);
+        }
+        return 'https://dashboard.talaaljazeera.com/storage/' . $clean;
     }
 }
 
@@ -45,8 +49,12 @@ if (!function_exists('get_product_image')) {
             return $image;
         }
 
-        // صورة مخزنة محليًا
-        return asset('storage/' . ltrim($image, '/'));
+        // صورة مخزنة محليًا أو من السيرفر الحي إذا لم تكن موجودة محلياً
+        $clean = ltrim($image, '/');
+        if (\Illuminate\Support\Facades\Storage::disk('public')->exists($clean)) {
+            return asset('storage/' . $clean);
+        }
+        return 'https://dashboard.talaaljazeera.com/storage/' . $clean;
     }
 }
 

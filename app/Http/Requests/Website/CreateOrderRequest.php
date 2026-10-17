@@ -75,8 +75,9 @@ class CreateOrderRequest extends FormRequest
 
             // Shipping OTO Fields
             'orderId'           => 'nullable|string',
-            'deliveryOptionId'  => 'nullable',
-            'shippingPrice'     => 'nullable|numeric',
+            'deliveryOptionId'  => 'nullable|string|max:255',
+            // للتوافق مع الواجهة القديمة فقط؛ السعر المعتمد يُقرأ من عرض OTO المحفوظ على السيرفر.
+            'shippingPrice'     => 'nullable|numeric|min:0',
             'deliveryOptionName'=> 'nullable|string',
             'stationery_delivery_type' => 'nullable|in:pickup,home_delivery',
             'stationery_delivery_area_id' => 'nullable|integer|exists:stationery_delivery_areas,id',

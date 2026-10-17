@@ -79,13 +79,47 @@ class OrderItem extends Model
 
     public function getPrintLocationsNamesAttribute()
     {
-        if (!$this->print_locations) return [];
-        return PrintLocation::whereIn('id', $this->print_locations)->pluck('name')->toArray();
+        $locationIds = $this->normalizeLocationIds($this->print_locations);
+
+        if ($locationIds === []) return [];
+
+        return PrintLocation::whereIn('id', $locationIds)->pluck('name')->toArray();
     }
 
     public function getEmbroiderLocationsNamesAttribute()
     {
-        if (!$this->embroider_locations) return [];
-        return PrintLocation::whereIn('id', $this->embroider_locations)->pluck('name')->toArray();
+        $locationIds = $this->normalizeLocationIds($this->embroider_locations);
+
+        if ($locationIds === []) return [];
+
+        return PrintLocation::whereIn('id', $locationIds)->pluck('name')->toArray();
+    }
+
+    private function normalizeLocationIds(mixed $locations): array
+    {
+        // بعض السجلات القديمة تحتوي JSON مشفّرًا مرتين مثل "[]".
+        for ($attempt = 0; $attempt < 2 && is_string($locations); $attempt++) {
+            $decoded = json_decode($locations, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                break;
+            }
+            $locations = $decoded;
+        }
+
+        if ($locations === null || $locations === '' || $locations === false) {
+            return [];
+        }
+
+        if (!is_array($locations)) {
+            $locations = [$locations];
+        }
+
+        return collect($locations)
+            ->flatten()
+            ->filter(fn ($id) => is_numeric($id))
+            ->map(fn ($id) => (int) $id)
+            ->unique()
+            ->values()
+            ->all();
     }
 }

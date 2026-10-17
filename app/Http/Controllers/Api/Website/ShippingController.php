@@ -39,7 +39,7 @@ class ShippingController extends Controller
                 'error' => $e->getMessage()
             ]);
 
-            return $this->error('Failed to get delivery options' . $e->getMessage());
+            return $this->error('تعذر جلب شركات الشحن المتاحة حاليًا. يرجى المحاولة مرة أخرى.');
         }
     }
 }

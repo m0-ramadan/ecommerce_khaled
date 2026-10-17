@@ -124,7 +124,16 @@
             color: rgba(255, 255, 255, 0.9);
             font-weight: 500;
             flex-grow: 1;
+            overflow-wrap: anywhere;
         }
+
+        .details-list {
+            margin: 10px 0 0;
+            padding-right: 20px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .details-list li { margin-bottom: 6px; }
 
         .product-item {
             background: rgba(255, 255, 255, 0.05);
@@ -486,9 +495,32 @@
                                     <div class="info-row" bis_skin_checked="1">
                                         <div class="info-label" bis_skin_checked="1">عنوان الشحن:</div>
                                         <div class="info-value" bis_skin_checked="1">
-                                            {{ $order->shipping_address }}
+                                            {{ $order->shipping_address ?: 'غير محدد' }}
                                         </div>
                                     </div>
+
+                                    @if ($order->address)
+                                        <div class="info-row">
+                                            <div class="info-label">تفاصيل العنوان:</div>
+                                            <div class="info-value">
+                                                {{ trim($order->address->first_name . ' ' . $order->address->last_name) }}
+                                                @if ($order->address->label) — {{ $order->address->label }} @endif
+                                                <br>
+                                                {{ collect([$order->address->city, $order->address->area, $order->address->address_details])->filter()->implode('، ') }}
+                                                @if ($order->address->apartment_number)
+                                                    <br>رقم الشقة: {{ $order->address->apartment_number }}
+                                                @endif
+                                                @if ($order->address->phone)
+                                                    <br>هاتف العنوان: <a href="tel:{{ $order->address->phone }}">{{ $order->address->phone }}</a>
+                                                @endif
+                                                @if ($order->address->latitude && $order->address->longitude)
+                                                    <br><a href="https://www.google.com/maps?q={{ $order->address->latitude }},{{ $order->address->longitude }}" target="_blank" rel="noopener">
+                                                        <i class="fas fa-map-marker-alt me-1"></i>عرض الموقع على الخريطة
+                                                    </a>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    @endif
 
                                     @if ($order->notes)
                                         <div class="info-row" bis_skin_checked="1">
@@ -551,6 +583,25 @@
                                                     </div>
                                                 @endif
 
+                                                @if ($item->designService)
+                                                    <div class="detail-item">
+                                                        <span class="detail-label">خدمة التصميم:</span>
+                                                        <span class="detail-value">{{ $item->designService->name }}</span>
+                                                    </div>
+                                                @endif
+
+                                                <div class="detail-item">
+                                                    <span class="detail-label">نوع الطلب:</span>
+                                                    <span class="detail-value">{{ $item->is_sample ? 'عينة' : 'طلب عادي' }}</span>
+                                                </div>
+
+                                                @if ($item->quantity_id)
+                                                    <div class="detail-item">
+                                                        <span class="detail-label">معرّف فئة الكمية:</span>
+                                                        <span class="detail-value">{{ $item->quantity_id }}</span>
+                                                    </div>
+                                                @endif
+
                                                 @if ($item->note)
                                                     <div class="detail-item" bis_skin_checked="1">
                                                         <span class="detail-label">ملاحظة:</span>
@@ -570,6 +621,41 @@
                                                     }
                                                 }
                                             @endphp
+
+                                            @if (!empty($item->print_locations_names))
+                                                <div class="mt-3">
+                                                    <strong><i class="fas fa-print me-1"></i>مواقع الطباعة:</strong>
+                                                    {{ implode('، ', $item->print_locations_names) }}
+                                                </div>
+                                            @endif
+
+                                            @if (!empty($item->embroider_locations_names))
+                                                <div class="mt-2">
+                                                    <strong><i class="fas fa-cut me-1"></i>مواقع التطريز:</strong>
+                                                    {{ implode('، ', $item->embroider_locations_names) }}
+                                                </div>
+                                            @endif
+
+                                            @if (!empty($options) && is_array($options))
+                                                <div class="mt-3">
+                                                    <strong><i class="fas fa-list-check me-1"></i>الخيارات المختارة:</strong>
+                                                    <ul class="details-list">
+                                                        @foreach ($options as $key => $option)
+                                                            @php
+                                                                $optionName = is_array($option) ? ($option['option_name'] ?? $option['name'] ?? (is_string($key) ? $key : 'خيار')) : (is_string($key) ? $key : 'خيار');
+                                                                $optionValue = is_array($option) ? ($option['option_value'] ?? $option['value'] ?? null) : $option;
+                                                                $isFilesOption = $optionName === 'تفاصيل ملفات الطباعة';
+                                                                if (is_array($optionValue)) {
+                                                                    $optionValue = collect($optionValue)->flatten()->filter(fn ($value) => is_scalar($value))->implode('، ');
+                                                                }
+                                                            @endphp
+                                                            @if (!$isFilesOption && filled($optionValue))
+                                                                <li><strong>{{ $optionName }}:</strong> {{ $optionValue }}</li>
+                                                            @endif
+                                                        @endforeach
+                                                    </ul>
+                                                </div>
+                                            @endif
 
                                             @if (!empty($filesJson) && is_array($filesJson))
                                                 <div class="mt-3 p-3 bg-light rounded border">
@@ -599,7 +685,9 @@
                                                         @endforeach
                                                     </div>
                                                 </div>
-                                            @elseif ($item->image_design)
+                                            @endif
+
+                                            @if ($item->image_design)
                                                 <div class="mt-2">
                                                     <a href="{{ asset('storage/' . $item->image_design) }}" target="_blank" class="btn btn-sm btn-outline-primary">
                                                         <i class="fas fa-download me-1"></i>تحميل التصميم المرفق
@@ -666,7 +754,19 @@
 
                                     <div class="summary-row" bis_skin_checked="1">
                                         <span class="summary-label">طريقة الدفع:</span>
-                                        <span class="summary-value">{{ $order->payment_method }}</span>
+                                        <span class="summary-value">{{ $order->payment_method_label ?: ($order->payment_method ?: 'غير محددة') }}</span>
+                                    </div>
+
+                                    <div class="summary-row">
+                                        <span class="summary-label">حالة الدفع:</span>
+                                        <span class="summary-value">
+                                            {{ match ($order->status_payment) {
+                                                'paid' => 'مدفوع',
+                                                'failed' => 'فشل الدفع',
+                                                'refunded' => 'تم الاسترداد',
+                                                default => 'قيد الانتظار',
+                                            } }}
+                                        </span>
                                     </div>
 
                                     @if ($order->transaction_id)
@@ -675,7 +775,85 @@
                                             <span class="summary-value">{{ $order->transaction_id }}</span>
                                         </div>
                                     @endif
+
+                                    @if ($order->coupon)
+                                        <div class="summary-row">
+                                            <span class="summary-label">كوبون الخصم:</span>
+                                            <span class="summary-value">{{ $order->coupon->code }} ({{ $order->coupon->name }})</span>
+                                        </div>
+                                    @endif
+
+                                    @if ($order->shipping_method_name)
+                                        <div class="summary-row">
+                                            <span class="summary-label">طريقة الشحن:</span>
+                                            <span class="summary-value">{{ $order->shipping_method_name }}</span>
+                                        </div>
+                                    @endif
+
+                                    @if ($order->oto_order_id)
+                                        <div class="summary-row">
+                                            <span class="summary-label">رقم طلب OTO:</span>
+                                            <span class="summary-value">{{ $order->oto_order_id }}</span>
+                                        </div>
+                                    @endif
+
+                                    <div class="summary-row">
+                                        <span class="summary-label">آخر تحديث:</span>
+                                        <span class="summary-value">{{ $order->updated_at->translatedFormat('d M Y - h:i A') }}</span>
+                                    </div>
                                 </div>
+
+                                @if ($order->shipments->isNotEmpty())
+                                    <div class="info-section mt-4">
+                                        <h6><i class="fas fa-truck me-2"></i>بيانات الشحن ({{ $order->shipments->count() }})</h6>
+                                        @foreach ($order->shipments as $shipment)
+                                            <div class="mb-3 pb-3 border-bottom">
+                                                <div class="info-row"><div class="info-label">الحالة:</div><div class="info-value">{{ $shipment->status_label }}</div></div>
+                                                @if ($shipment->tracking_number)
+                                                    <div class="info-row"><div class="info-label">رقم التتبع:</div><div class="info-value">{{ $shipment->tracking_number }}</div></div>
+                                                @endif
+                                                @if ($shipment->external_shipment_id)
+                                                    <div class="info-row"><div class="info-label">رقم الشحنة الخارجي:</div><div class="info-value">{{ $shipment->external_shipment_id }}</div></div>
+                                                @endif
+                                                @if ($shipment->carrier || $shipment->service_type)
+                                                    <div class="info-row"><div class="info-label">شركة/خدمة الشحن:</div><div class="info-value">{{ collect([$shipment->carrier, $shipment->service_type, $shipment->delivery_option_name])->filter()->implode(' — ') }}</div></div>
+                                                @endif
+                                                @if ($shipment->estimated_delivery_date)
+                                                    <div class="info-row"><div class="info-label">التسليم المتوقع:</div><div class="info-value">{{ $shipment->estimated_delivery_date->translatedFormat('d M Y - h:i A') }}</div></div>
+                                                @endif
+                                                @if ($shipment->pickup_date || $shipment->actual_delivery_date)
+                                                    <div class="info-row"><div class="info-label">مواعيد الشحنة:</div><div class="info-value">
+                                                        @if ($shipment->pickup_date) الاستلام: {{ $shipment->pickup_date->translatedFormat('d M Y - h:i A') }} @endif
+                                                        @if ($shipment->actual_delivery_date) — التسليم الفعلي: {{ $shipment->actual_delivery_date->translatedFormat('d M Y - h:i A') }} @endif
+                                                    </div></div>
+                                                @endif
+                                                @if ($shipment->weight || $shipment->length || $shipment->width || $shipment->height)
+                                                    <div class="info-row"><div class="info-label">الشحنة:</div><div class="info-value">
+                                                        @if ($shipment->weight) الوزن: {{ $shipment->weight }} كجم @endif
+                                                        @if ($shipment->length || $shipment->width || $shipment->height) — الأبعاد: {{ $shipment->package_dimensions }} @endif
+                                                        — عدد الطرود: {{ $shipment->package_count }}
+                                                    </div></div>
+                                                @endif
+                                                @if ($shipment->shipping_cost > 0 || $shipment->insurance_amount > 0 || $shipment->customs_value)
+                                                    <div class="info-row"><div class="info-label">تكلفة الشحنة:</div><div class="info-value">
+                                                        الشحن: {{ number_format($shipment->shipping_cost, 2) }} ر.س
+                                                        @if ($shipment->insurance_amount > 0) — التأمين: {{ number_format($shipment->insurance_amount, 2) }} ر.س @endif
+                                                        @if ($shipment->customs_value) — القيمة الجمركية: {{ number_format($shipment->customs_value, 2) }} {{ $shipment->customs_currency }} @endif
+                                                    </div></div>
+                                                @endif
+                                                @if ($shipment->tracking_url)
+                                                    <a class="btn btn-sm btn-outline-primary" href="{{ $shipment->tracking_url }}" target="_blank" rel="noopener"><i class="fas fa-location-arrow me-1"></i>تتبع الشحنة</a>
+                                                @endif
+                                                @if ($shipment->shipping_label_url)
+                                                    <a class="btn btn-sm btn-outline-primary" href="{{ $shipment->shipping_label_url }}" target="_blank" rel="noopener"><i class="fas fa-file-pdf me-1"></i>بوليصة الشحن</a>
+                                                @endif
+                                                @if ($shipment->notes || $shipment->failure_reason || $shipment->return_reason)
+                                                    <div class="mt-2 text-white-50">{{ collect([$shipment->notes, $shipment->failure_reason, $shipment->return_reason])->filter()->implode(' — ') }}</div>
+                                                @endif
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @endif
 
                                 <!-- تغيير حالة الطلب -->
                                 <div class="info-section mt-4" bis_skin_checked="1">

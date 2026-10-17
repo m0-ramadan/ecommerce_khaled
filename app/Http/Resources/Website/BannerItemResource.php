@@ -10,8 +10,21 @@ class BannerItemResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
-        $desktopImage = $this->image_url ? get_user_image($this->image_url) : null;
-        $mobileImage = $this->mobile_image_url ? get_user_image($this->mobile_image_url) : null;
+        $resolveImage = function (?string $path) {
+            if (!$path) {
+                return null;
+            }
+            if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+                return $path;
+            }
+            if (\Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
+                return asset('storage/' . $path);
+            }
+            return null;
+        };
+
+        $desktopImage = $resolveImage($this->image_url);
+        $mobileImage = $resolveImage($this->mobile_image_url);
 
         // Determine if request explicitly asks for mobile or comes from mobile device
         $isMobileRequest = $request->input('device') === 'mobile'

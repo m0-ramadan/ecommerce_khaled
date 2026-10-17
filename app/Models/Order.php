@@ -73,6 +73,11 @@ class Order extends Model
         return $this->belongsTo(UserAddress::class); // جدول addresses
     }
 
+    public function coupon()
+    {
+        return $this->belongsTo(Coupon::class);
+    }
+
     public function items()
     {
         return $this->hasMany(OrderItem::class);
@@ -95,6 +100,7 @@ class Order extends Model
         return match ($this->status) {
             'pending'     => 'قيد الانتظار',
             'processing'  => 'تحت المعالجة',
+            'completed'   => 'مكتمل',
             'shipped'     => 'تم الشحن',
             'delivered'   => 'تم التسليم',
             'cancelled'   => 'ملغي',

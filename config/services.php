@@ -125,6 +125,7 @@ return [
     'sender_city' => env('OTO_SENDER_CITY', 'Riyadh'),
     'sender_phone' => env('OTO_SENDER_PHONE'),
     'sender_email' => env('OTO_SENDER_EMAIL'),
+    'default_item_weight' => (float) env('OTO_DEFAULT_ITEM_WEIGHT', 0.5),
 ],
 
 ];

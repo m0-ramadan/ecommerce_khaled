@@ -30,7 +30,7 @@ class PaymentService
         string $gateway,
         string $paymentMethod,
         array $cartItems = [],
-        int $shippingPrice = null
+        ?float $shippingPrice = null
     ): array {
         DB::beginTransaction();
 

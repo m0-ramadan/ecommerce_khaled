@@ -152,8 +152,18 @@ class OrderController extends Controller
 
     public function show($order)
     {
-        $order = Order::find($order);
-        $order->load(['user', 'items.product', 'items.color', 'items.size', 'items.printingMethod']);
+        $order = Order::with([
+            'user',
+            'address',
+            'coupon',
+            'paymentMethod',
+            'items.product',
+            'items.color',
+            'items.size',
+            'items.printingMethod',
+            'items.designService',
+            'shipments',
+        ])->findOrFail($order);
 
         return view('Admin.orders.show', compact('order'));
     }

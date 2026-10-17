@@ -71,8 +71,12 @@ class OtoShippingService
             'shippingNotes' => $orderData['notes'] ?? null,
 
             'packageSize' => 'small',
-            'packageCount' => $cart->items->count(),
-            'packageWeight' => 1,
+            'packageCount' => max(1, (int) $cart->items->sum('quantity')),
+            'packageWeight' => max(0.1, (float) $cart->items->sum(function ($item) {
+                $unitWeight = (float) ($item->product?->weight ?: config('services.oto.default_item_weight', 0.5));
+
+                return $unitWeight * max(1, (int) $item->quantity);
+            })),
 
             'boxWidth' => 10,
             'boxLength' => 10,
@@ -221,10 +225,88 @@ class OtoShippingService
 
         $deliveryFeesResponse = $this->getDeliveryFee($orderId, $accessToken);
 
+        if (!$deliveryFeesResponse->successful()) {
+            throw new \RuntimeException('OTO delivery fee request failed: ' . $deliveryFeesResponse->body());
+        }
+
+        $deliveryFees = $deliveryFeesResponse->json();
+        $shippingOrder = ShippingOrder::where('order_id', $orderId)->latest()->firstOrFail();
+        $otoResponse = is_array($shippingOrder->oto_response) ? $shippingOrder->oto_response : [];
+        $shippingOrder->update([
+            'oto_response' => array_merge($otoResponse, ['delivery_fees' => $deliveryFees]),
+        ]);
+
         return [
-            'deliveryFees' => $deliveryFeesResponse->json(),
+            'deliveryFees' => $deliveryFees,
             'orderId'      => $orderId,
         ];
+    }
+
+    /**
+     * Resolve the selected option from the server-side quote saved for this OTO order.
+     */
+    public function resolveDeliveryOption(string $orderId, string $deliveryOptionId): array
+    {
+        $shippingOrder = ShippingOrder::where('order_id', $orderId)->latest()->first();
+        $fees = data_get($shippingOrder?->oto_response, 'delivery_fees');
+
+        if (!is_array($fees)) {
+            throw new \InvalidArgumentException('عرض الشحن غير موجود أو منتهي. يرجى إعادة تحميل شركات الشحن.');
+        }
+
+        $option = $this->findDeliveryOption($fees, $deliveryOptionId);
+        if (!$option) {
+            throw new \InvalidArgumentException('شركة الشحن المختارة ليست ضمن العرض الحالي.');
+        }
+
+        $price = $this->firstNumericValue($option, [
+            'price', 'amount', 'cost', 'fee', 'deliveryFee', 'shippingCost', 'total', 'totalAmount',
+        ]);
+
+        if ($price === null || $price < 0) {
+            throw new \InvalidArgumentException('تعذر التحقق من تكلفة شركة الشحن المختارة.');
+        }
+
+        return [
+            'id' => $deliveryOptionId,
+            'price' => $price,
+            'name' => $option['name'] ?? $option['deliveryOptionName'] ?? $option['companyName']
+                ?? $option['carrierName'] ?? $option['company'] ?? 'شركة شحن',
+            'service_type' => $option['serviceType'] ?? $option['service_type'] ?? null,
+        ];
+    }
+
+    private function findDeliveryOption(array $data, string $deliveryOptionId): ?array
+    {
+        foreach ($data as $value) {
+            if (!is_array($value)) {
+                continue;
+            }
+
+            $id = $value['deliveryOptionId'] ?? $value['optionId'] ?? $value['id'] ?? null;
+            if ($id !== null && (string) $id === $deliveryOptionId) {
+                return $value;
+            }
+
+            $found = $this->findDeliveryOption($value, $deliveryOptionId);
+            if ($found) {
+                return $found;
+            }
+        }
+
+        return null;
+    }
+
+    private function firstNumericValue(array $option, array $keys): ?float
+    {
+        foreach ($keys as $key) {
+            $value = data_get($option, $key);
+            if (is_numeric($value)) {
+                return (float) $value;
+            }
+        }
+
+        return null;
     }
 
     public function createShipment($orderId, string $deliveryOptionId, $shippingPrice)
@@ -235,11 +317,18 @@ class OtoShippingService
             ->first();
 
         // تحديث تكلفة الشحن إذا موجودة
-        if (isset($shippingOrder->shipping_amount)) {
-            $shippingOrder->update([
-                'shipping_cost' => $shippingPrice,
-            ]);
+        if (!$shippingOrder) {
+            throw new \InvalidArgumentException("Shipping order not found for order {$orderId}");
         }
+
+        $selectedOption = $this->resolveDeliveryOption((string) $orderId, $deliveryOptionId);
+
+        $shippingOrder->update([
+            'shipping_cost' => max(0, (float) $shippingPrice),
+            'shipping_service_id' => is_numeric($deliveryOptionId) ? (int) $deliveryOptionId : null,
+            'delivery_company' => $selectedOption['name'],
+            'service_type' => $selectedOption['service_type'],
+        ]);
 
         // التحقق من وجود Access Token
         if (!$shippingOrder->accessToken) {
@@ -261,7 +350,16 @@ class OtoShippingService
             throw new \Exception('Failed to create shipment: ' . $response->body());
         }
 
+        $result = $response->json();
+        $otoResponse = is_array($shippingOrder->oto_response) ? $shippingOrder->oto_response : [];
+        $shippingOrder->update([
+            'status' => 'shipment_created',
+            'oto_tracking_number' => $result['trackingNumber'] ?? $result['tracking_number'] ?? $result['awb'] ?? null,
+            'oto_labels' => $result['labels'] ?? (!empty($result['labelUrl']) ? [$result['labelUrl']] : null),
+            'oto_response' => array_merge($otoResponse, ['create_shipment' => $result]),
+        ]);
+
         // ارجع الـ response JSON
-        return $response->json();
+        return $result;
     }
 }

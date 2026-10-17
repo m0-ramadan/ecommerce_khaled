@@ -104,8 +104,8 @@ class OrderController extends Controller
 
                 $discountAmount = $coupon->calculateDiscount($cart->total);
             }
-            $shippingPrice = max(0, (float) $request->input('shippingPrice', 0));
-            $shippingMethodName = $request->deliveryOptionName;
+            $shippingPrice = 0.0;
+            $shippingMethodName = null;
             $shippingAddress = $request->shipping_address;
             $shouldCreateShipment = true;
 
@@ -135,6 +135,22 @@ class OrderController extends Controller
                     $shippingPrice = (float) $deliveryArea->price;
                     $shippingMethodName = 'توصيل للبيت - ' . $deliveryArea->name;
                 }
+            } else {
+                if (!$request->filled('orderId') || !$request->filled('deliveryOptionId')) {
+                    return $this->errorResponse('يرجى اختيار شركة شحن متاحة قبل إتمام الطلب.', 422);
+                }
+
+                try {
+                    $shippingQuote = $this->shippingServices->resolveDeliveryOption(
+                        (string) $request->orderId,
+                        (string) $request->deliveryOptionId
+                    );
+                } catch (\InvalidArgumentException $e) {
+                    return $this->errorResponse($e->getMessage(), 422);
+                }
+
+                $shippingPrice = $shippingQuote['price'];
+                $shippingMethodName = $shippingQuote['name'];
             }
 
             $totalAmount = ($cart->total - $discountAmount) + $shippingPrice;
@@ -192,7 +208,7 @@ class OrderController extends Controller
 
             $paymentMethod = PaymentMethod::find($request->payment_method);
             if ($shouldCreateShipment && $request->filled('orderId') && $request->filled('deliveryOptionId')) {
-                $this->shippingServices->createShipment($request->orderId, $request->deliveryOptionId, $request->shippingPrice);
+                $this->shippingServices->createShipment($request->orderId, $request->deliveryOptionId, $shippingPrice);
             }
 
             if ($paymentMethod && $paymentMethod->key !== 'cash') {
@@ -207,7 +223,7 @@ class OrderController extends Controller
                         $gateway,
                         $paymentMethod->key,
                         $cart->items->toArray(),
-                        $request->shippingPrice
+                        $shippingPrice
                     );
                 }
 

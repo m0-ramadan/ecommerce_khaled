@@ -21,8 +21,17 @@ class BannerResource extends JsonResource
             'slider_settings' => new SliderSettingsResource($this->whenLoaded('sliderSettings')),
             'grid_layout'     => new GridLayoutResource($this->whenLoaded('gridLayout')),
 
-            // Items
-            'items' => BannerItemResource::collection($this->whenLoaded('items')),
+            // Items (only return items with valid existing images)
+            'items' => BannerItemResource::collection(
+                $this->whenLoaded('items', function () {
+                    return $this->items->filter(function ($item) {
+                        if ($item->is_active === false || $item->is_active === 0) return false;
+                        $hasImg = $item->image_url && (str_starts_with($item->image_url, 'http') || \Illuminate\Support\Facades\Storage::disk('public')->exists($item->image_url));
+                        $hasMob = $item->mobile_image_url && (str_starts_with($item->mobile_image_url, 'http') || \Illuminate\Support\Facades\Storage::disk('public')->exists($item->mobile_image_url));
+                        return $hasImg || $hasMob;
+                    });
+                })
+            ),
 
             'dates' => [
                 'start' => $this->start_date,
