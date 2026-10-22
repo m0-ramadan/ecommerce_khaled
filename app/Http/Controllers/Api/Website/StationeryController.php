@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\StationeryPrice;
 use App\Models\StationeryDeliveryArea;
 use App\Models\StationeryService;
+use App\Services\StationeryPricingService;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -43,10 +44,13 @@ class StationeryController extends Controller
                 'services' => StationeryService::where('is_active', true)
                     ->orderBy('sort_order')
                     ->get(['id', 'key', 'name', 'price']),
-                'min_paper_sheets' => [
-                    'A0' => 500,
-                    'A1' => 500,
-                    'A2' => 500,
+                'pricing_rules' => [
+                    'A4' => ['multiplier' => 1],
+                    'A3' => ['multiplier' => 1.75],
+                    'A5' => ['multiplier' => 0.75],
+                    'A2' => ['independent_price' => true, 'minimum_total' => 400, 'minimum_sheets' => 100],
+                    'A1' => ['independent_price' => true, 'minimum_total' => 500, 'minimum_sheets' => 100],
+                    'cardstock_multiplier' => 1.20,
                 ],
                 'min_order_price' => 0.50,
             ],
@@ -383,14 +387,12 @@ class StationeryController extends Controller
             $sideType = $fileItem['side_type'] ?? 'single';
             $orientation = $fileItem['orientation'] ?? 'portrait';
 
-            // المقاسات الكبيرة A0/A1/A2 تتطلب 500 ورقة على الأقل،
-            // وعدد الورق = عدد صفحات الملف × عدد النسخ.
             $sheetsCount = $pagesCount * $copies;
-            if (in_array($paperSize, ['A0', 'A1', 'A2'], true) && $sheetsCount < 500) {
+            if (in_array($paperSize, ['A1', 'A2'], true) && $sheetsCount < 100) {
                 return response()->json([
                     'status' => false,
-                    'message' => "المقاس {$paperSize} يتطلب حدًا أدنى 500 ورقة. "
-                        . "عدد الورق الحالي = {$pagesCount} صفحة × {$copies} نسخة = {$sheetsCount} ورقة.",
+                    'message' => "المقاس {$paperSize} يتطلب حدًا أدنى 100 ورقة. "
+                        . "عدد الورق الحالي = {$sheetsCount} ورقة.",
                 ], 422);
             }
 
@@ -400,8 +402,11 @@ class StationeryController extends Controller
                 $isSingleSheet = ($fileItem['print_mode'] === 'single');
             }
 
-            // سعر الصفحة من الداشبورد
-            $key = implode('_', [$serviceType, $paperType, $paperSize, $sideType, $orientation]);
+            // A4 هو أساس A3 وA5، أما A1 وA2 فأسعارهما مستقلة في الداشبورد.
+            // الورق المقوى مشتق من سعر الورق العادي مع زيادة 20%.
+            $basePaperType = $paperType === 'cardstock' ? 'plain' : $paperType;
+            $baseSize = in_array($paperSize, ['A1', 'A2'], true) ? $paperSize : 'A4';
+            $key = implode('_', [$serviceType, $basePaperType, $baseSize, $sideType, $orientation]);
             $priceRow = $prices->get($key);
 
             if (!$priceRow) {
@@ -412,14 +417,16 @@ class StationeryController extends Controller
             }
 
             if ($isSingleSheet) {
-                $pagePrice = ($colorType === 'color') ? (float) $priceRow->color_price : (float) $priceRow->bw_price;
+                $basePrice = ($colorType === 'color') ? (float) $priceRow->color_price : (float) $priceRow->bw_price;
             } else {
                 $fileBw = $priceRow->file_bw_price ?? $priceRow->bw_price;
                 $fileColor = $priceRow->file_color_price ?? $priceRow->color_price;
-                $pagePrice = ($colorType === 'color') ? (float) $fileColor : (float) $fileBw;
+                $basePrice = ($colorType === 'color') ? (float) $fileColor : (float) $fileBw;
             }
 
-            $fileTotal = round($pagesCount * $pagePrice * $copies, 2);
+            $pricing = app(StationeryPricingService::class);
+            $pagePrice = $pricing->pagePrice($basePrice, $paperSize, $paperType);
+            $fileTotal = $pricing->total($basePrice, $paperSize, $paperType, $sheetsCount);
             $totalJobPrice += $fileTotal;
             $totalJobPages += ($pagesCount * $copies);
 

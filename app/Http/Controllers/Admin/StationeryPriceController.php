@@ -22,10 +22,13 @@ class StationeryPriceController extends Controller
     public function index()
     {
         $documentPrices = StationeryPrice::where('service_type', 'document')
+            ->whereIn('paper_size', ['A4', 'A2', 'A1'])
+            ->where('paper_type', '!=', 'cardstock')
             ->orderBy('paper_type')->orderBy('sort_order')->orderBy('side_type')->orderBy('orientation')
             ->get();
 
         $photoPrices = StationeryPrice::where('service_type', 'photo')
+            ->whereIn('paper_size', ['A4', 'A2', 'A1'])
             ->orderBy('paper_type')->orderBy('sort_order')->orderBy('side_type')->orderBy('orientation')
             ->get();
 

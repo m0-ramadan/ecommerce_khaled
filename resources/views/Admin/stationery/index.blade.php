@@ -107,6 +107,12 @@
                             </div>
                         </div>
 
+                        <div class="alert alert-primary bg-primary-subtle border-0 mb-4">
+                            <strong>قواعد التسعير:</strong>
+                            عدّل سعر A4 وسعري A1 وA2 المستقلين؛ A3 = 1.75×A4، وA5 = 0.75×A4، والمقوّى = السعر الأساسي +20%.
+                            الحد الأدنى لـA1 وA2 هو 100 ورقة: تكلفة أول 100 هي 500 ر.س لـA1 و400 ر.س لـA2،
+                            ثم تُضاف كل ورقة زائدة بالسعر المسجل للمقاس.
+                        </div>
                         <div class="table-responsive text-nowrap">
                             <table class="table table-bordered table-hover align-middle">
                                 <thead class="table-light">

@@ -39,7 +39,7 @@ class StationeryPrice extends Model
 
     public static function defaultSizes(): array
     {
-        return ['A4', 'A3', 'A5', 'A2', 'A1', 'A0'];
+        return ['A4', 'A3', 'A5', 'A2', 'A1'];
     }
 
     public static function sizeDimensions(): array
