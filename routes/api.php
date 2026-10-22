@@ -115,6 +115,7 @@ Route::prefix('v1')->group(function () {
 
     Route::prefix('categories')->group(function () {
         Route::get('/', [CategoryController::class, 'index']);
+        Route::get('/{id}/products', [CategoryController::class, 'products']);
         Route::get('/{id}', [CategoryController::class, 'show']);
     });
 
@@ -122,6 +123,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/', [ProductController::class, 'index']);
         Route::get('/color', [ProductController::class, 'getColor']);
         Route::get('/material', [ProductController::class, 'getMaterial']);
+        Route::get('/{id}/related', [ProductController::class, 'related']);
         Route::get('/{id}', [ProductController::class, 'show']);
     });
 

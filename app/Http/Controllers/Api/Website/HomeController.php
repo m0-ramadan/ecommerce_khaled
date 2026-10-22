@@ -30,7 +30,8 @@ class HomeController extends Controller
                     $q->where('status_id', 1);
                 })
                 ->orderBy('order', 'asc')
-                ->paginate($subCategoriesLimit);
+                ->paginate($subCategoriesLimit)
+                ->withQueryString();
 
             $sub_categories->getCollection()->each(function (Category $category) use ($productsLimit) {
                 $products = $category->products()

@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Api\Website;
 
 use App\Http\Resources\Website\ColorResource;
+use App\Models\Category;
 use App\Models\Material;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Traits\ApiResponseTrait;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Website\MaterialResource;
+use App\Http\Resources\Website\ProductListResource;
 use App\Http\Resources\Website\ProductResource;
 use App\Models\Color;
 
@@ -83,6 +85,67 @@ class ProductController extends Controller
             ]);
         }
     }
+    /**
+     * منتجات مشابهة (منتجات قد تعجبك) مع Pagination.
+     */
+    public function related(Request $request, $identifier)
+    {
+        try {
+            $product = Product::select(['id', 'category_id'])
+                ->where(function ($query) use ($identifier) {
+                    $query->where('id', $identifier)
+                          ->orWhere('slug', $identifier);
+                })
+                ->first();
+
+            if (!$product) {
+                return $this->error('المنتج غير موجود', 404);
+            }
+
+            $categoryIds = [];
+            $category = $product->category_id ? Category::find($product->category_id) : null;
+
+            if ($category) {
+                $rootId = $category->parent_id ?: $category->id;
+                $categoryIds = Category::where('parent_id', $rootId)
+                    ->pluck('id')
+                    ->push($rootId)
+                    ->unique()
+                    ->values()
+                    ->all();
+            }
+
+            $perPage = min(max((int) $request->input('per_page', 12), 1), 24);
+
+            $query = Product::query()
+                ->where('status_id', 1)
+                ->where('id', '!=', $product->id)
+                ->when(!empty($categoryIds), fn ($q) => $q->whereIn('category_id', $categoryIds))
+                ->with(['primaryImage', 'discount', 'adsText'])
+                ->withCount('reviews')
+                ->withAvg('reviews', 'rating')
+                ->withMin('sizeTiers as lowest_price', 'price_per_unit')
+                ->orderByRaw('CASE WHEN category_id = ? THEN 0 ELSE 1 END', [$product->category_id])
+                ->orderByDesc('id');
+
+            $products = $query->paginate($perPage)->withQueryString();
+
+            return $this->success([
+                'products' => ProductListResource::collection($products),
+                'pagination' => [
+                    'current_page' => $products->currentPage(),
+                    'last_page'    => $products->lastPage(),
+                    'per_page'     => $products->perPage(),
+                    'total'        => $products->total(),
+                ],
+            ], 'تم جلب المنتجات المشابهة بنجاح');
+        } catch (\Exception $e) {
+            return $this->error('حدث خطأ أثناء جلب المنتجات المشابهة', 500, [
+                'exception' => $e->getMessage(),
+            ]);
+        }
+    }
+
     /**
      * 🔹 جلب جميع الألوان المتاحة للمنتجات
      */

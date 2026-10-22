@@ -21,7 +21,9 @@ class CategoryWithProductResource extends JsonResource
             'image'       => $this->image,
             'sub_image' => $this->sub_image,
             'is_parent'   => $this->isParent(),
-            'products'    => ProductResource::collection($this->products),
+            'products'    => $request->boolean('include_products', true)
+                ? ProductResource::collection($this->products)
+                : [],
             'category_banners' => BannerItemResource::collection($this->categoryBanners),
         ];
     }
