@@ -96,6 +96,8 @@ class StoreProductRequest extends FormRequest
             // Additional images
             'additional_images' => 'nullable|array',
             'additional_images.*' => 'image|max:2048',
+            'deleted_quantity_tier_ids' => 'nullable|array',
+            'deleted_quantity_tier_ids.*' => 'integer',
         ];
     }
 

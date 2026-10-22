@@ -1271,7 +1271,7 @@
                                                                                             <input type="text" class="form-control form-control-sm" 
                                                                                                    name="product_options[${index}][quantity_tiers][${tierIndex}][tier_name]" 
                                                                                                    value="${tier.tier_name || ''}" placeholder="اسم الشريحة">
-                                                                                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeTier(this)">
+                                                                                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeTier(this, ${index}, ${tierIndex})">
                                                                                                 <i class="fas fa-times"></i>
                                                                                             </button>
                                                                                         </div>
@@ -1887,11 +1887,17 @@
         /**
          * Remove a tier
          */
-        function removeTier(button) {
+        function removeTier(button, optionIndex, tierIndex) {
             const tierItem = $(button).closest('.tier-item');
-            const optionItem = tierItem.closest('.option-item');
-            const optionIndex = Number(optionItem.data('index'));
-            const tierIndex = tierItem.index();
+            const removedTier = existingOptions[optionIndex]?.quantity_tiers?.[tierIndex];
+
+            if (removedTier?.id) {
+                $('<input>', {
+                    type: 'hidden',
+                    name: 'deleted_quantity_tier_ids[]',
+                    value: removedTier.id
+                }).appendTo('#editProductForm');
+            }
 
             if (existingOptions[optionIndex]?.quantity_tiers) {
                 existingOptions[optionIndex].quantity_tiers.splice(tierIndex, 1);

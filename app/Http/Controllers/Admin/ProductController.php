@@ -712,6 +712,19 @@ class ProductController extends Controller
 
             $validated = $request->validated();
 
+            // حذف شرائح الكمية التي أزالها المستخدم صراحةً، مع قصر الحذف على المنتج الحالي.
+            $deletedQuantityTierIds = collect($request->input('deleted_quantity_tier_ids', []))
+                ->filter(fn ($id) => is_numeric($id))
+                ->map(fn ($id) => (int) $id)
+                ->unique()
+                ->values();
+
+            if ($deletedQuantityTierIds->isNotEmpty()) {
+                $product->sizeTiers()
+                    ->whereIn('id', $deletedQuantityTierIds)
+                    ->delete();
+            }
+
             /* =====================================================
             | MAIN IMAGE (products.image + product_images)
             ===================================================== */
