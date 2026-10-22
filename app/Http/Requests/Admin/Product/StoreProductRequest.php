@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Admin\Product;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreProductRequest extends FormRequest
 {
@@ -27,7 +28,16 @@ class StoreProductRequest extends FormRequest
             // Basic product fields
             'name' => 'required|string|max:255',
             'slug' => 'nullable|string|max:255|unique:products,slug,' . $this->route('id'),
-            'category_id' => 'required|exists:categories,id',
+            'main_category_id' => [
+                'required',
+                Rule::exists('categories', 'id')->whereNull('parent_id'),
+            ],
+            'category_id' => [
+                'required',
+                Rule::exists('categories', 'id')->where(
+                    fn ($query) => $query->where('parent_id', $this->input('main_category_id'))
+                ),
+            ],
             'description' => 'nullable|string',
             'price' => 'nullable|numeric|min:0',
             'price_text' => 'nullable',
@@ -86,6 +96,16 @@ class StoreProductRequest extends FormRequest
             // Additional images
             'additional_images' => 'nullable|array',
             'additional_images.*' => 'image|max:2048',
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'main_category_id.required' => 'يرجى اختيار القسم الرئيسي.',
+            'main_category_id.exists' => 'القسم الرئيسي المحدد غير صالح.',
+            'category_id.required' => 'يرجى اختيار قسم فرعي للمنتج.',
+            'category_id.exists' => 'القسم الفرعي لا يتبع القسم الرئيسي المحدد.',
         ];
     }
 }

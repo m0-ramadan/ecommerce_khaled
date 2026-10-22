@@ -723,15 +723,20 @@
                             placeholder="أدخل اسم المنتج" required>
                     </div>
                     <div class="col-md-4 mb-3">
-                        <label for="category_id" class="form-label required">القسم</label>
-                        <select class="form-control select2" id="category_id" name="category_id" required>
-                            <option value="">اختر القسم</option>
-                            @foreach ($categories as $category)
-                                <option value="{{ $category->id }}"
-                                    {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                        <label for="main_category_id" class="form-label required">القسم الرئيسي</label>
+                        <select class="form-control select2" id="main_category_id" name="main_category_id" required>
+                            <option value="">اختر القسم الرئيسي</option>
+                            @foreach ($mainCategories as $category)
+                                <option value="{{ $category->id }}" {{ old('main_category_id') == $category->id ? 'selected' : '' }}>
                                     {{ $category->name }}
                                 </option>
                             @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="category_id" class="form-label required">القسم الفرعي</label>
+                        <select class="form-control select2" id="category_id" name="category_id" data-selected="{{ old('category_id') }}" required disabled>
+                            <option value="">اختر القسم الرئيسي أولًا</option>
                         </select>
                     </div>
                     <div class="col-12 mb-3">
@@ -1872,5 +1877,24 @@
             collectFormData();
             $('#productForm').submit();
         }
+
+        const productCategoryTree = @json($mainCategories->mapWithKeys(fn ($category) => [$category->id => $category->children->map->only(['id', 'name'])->values()]));
+
+        function refreshProductSubcategories() {
+            const mainId = String($('#main_category_id').val() || '');
+            const subcategorySelect = $('#category_id');
+            const selectedId = String(subcategorySelect.data('selected') || '');
+            const children = productCategoryTree[mainId] || [];
+
+            subcategorySelect.empty().append(new Option(children.length ? 'اختر القسم الفرعي' : 'لا توجد أقسام فرعية', ''));
+            children.forEach((child) => {
+                subcategorySelect.append(new Option(child.name, child.id, false, String(child.id) === selectedId));
+            });
+            subcategorySelect.prop('disabled', !mainId || children.length === 0).trigger('change.select2');
+            subcategorySelect.data('selected', '');
+        }
+
+        $('#main_category_id').on('change', refreshProductSubcategories);
+        refreshProductSubcategories();
     </script>
 @endsection

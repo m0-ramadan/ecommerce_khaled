@@ -19,6 +19,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Facades\Excel;
 use PDF;
 
@@ -120,7 +121,9 @@ class ProductController extends Controller
         }
 
         // Get filter options
-        $categories = Category::where('status_id', 1)->get();
+        $categories = Category::with('parent')
+            ->whereNotNull('parent_id')
+            ->get();
         $colors = Color::all();
         $materials = Material::all();
         $printingMethods = PrintingMethod::all();
@@ -171,7 +174,12 @@ class ProductController extends Controller
                     break;
 
                 case 'move_to_category':
-                    $request->validate(['category_id' => 'required|exists:categories,id']);
+                    $request->validate([
+                        'category_id' => [
+                            'required',
+                            Rule::exists('categories', 'id')->whereNotNull('parent_id'),
+                        ],
+                    ]);
                     Product::whereIn('id', $productIds)->update(['category_id' => $request->category_id]);
                     $message = 'تم نقل المنتجات إلى التصنيف المحدد';
                     break;
@@ -317,7 +325,9 @@ class ProductController extends Controller
     public function create()
     {
         // Load all necessary data
-        $categories = Category::where('status_id', 1)->get();
+        $mainCategories = Category::with('children')
+            ->whereNull('parent_id')
+            ->get();
         $colors = Color::all();
         $materials = Material::all();
         $printingMethods = PrintingMethod::all();
@@ -325,7 +335,7 @@ class ProductController extends Controller
         $offers = Offer::all();
 
         return view('Admin.product.create', compact(
-            'categories',
+            'mainCategories',
             'colors',
             'materials',
             'printingMethods',
@@ -654,7 +664,9 @@ class ProductController extends Controller
         ]);
 
         // Get all necessary data for selects
-        $categories = Category::with('children')->whereNull('parent_id')->get();
+        $mainCategories = Category::with('children')
+            ->whereNull('parent_id')
+            ->get();
         $colors = Color::all();
         $materials = Material::all();
         $printingMethods = PrintingMethod::all();
@@ -663,7 +675,7 @@ class ProductController extends Controller
 
         return view('Admin.product.edit', compact(
             'product',
-            'categories',
+            'mainCategories',
             'colors',
             'materials',
             'printingMethods',
