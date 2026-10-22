@@ -615,16 +615,16 @@
                             <option value="">اختر القسم الرئيسي</option>
                             @foreach ($mainCategories as $category)
                                 <option value="{{ $category->id }}"
-                                    {{ old('main_category_id', $product->category?->parent_id) == $category->id ? 'selected' : '' }}>
+                                    {{ old('main_category_id', $product->category?->parent_id ?? $product->category_id) == $category->id ? 'selected' : '' }}>
                                     {{ $category->name }}
                                 </option>
                             @endforeach
                         </select>
                     </div>
                     <div class="col-md-4 mb-3">
-                        <label for="category_id" class="form-label required">القسم الفرعي</label>
+                        <label for="category_id" class="form-label">القسم الفرعي (اختياري)</label>
                         <select class="form-control select2" id="category_id" name="category_id"
-                            data-selected="{{ old('category_id', $product->category_id) }}" required disabled>
+                            data-selected="{{ old('category_id', $product->category?->parent_id ? $product->category_id : '') }}" disabled>
                             <option value="">اختر القسم الرئيسي أولًا</option>
                         </select>
                     </div>

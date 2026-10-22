@@ -366,7 +366,7 @@ class ProductController extends Controller
                 'name' => $validated['name'],
                 'slug' => $validated['slug'] ?? null,
                 'price_text' => $validated['price_text'],
-                'category_id' => $validated['category_id'],
+                'category_id' => $validated['category_id'] ?? $validated['main_category_id'],
                 'description' => $validated['description'],
                 'price' => $validated['price'],
                 'stock' => $validated['stock'] ?? 0,
@@ -763,6 +763,7 @@ class ProductController extends Controller
 
             $optionMapping = []; // map old id -> current id
             $submittedOptionIds = []; // كل الخيارات التي بقيت في الفورم بعد الحذف
+            $originalOptions = $product->options->keyBy('id');
 
             if ($request->filled('product_options')) {
                 // أولًا ننشئ أو نحدث كل الخيارات بدون dependencies
@@ -844,18 +845,31 @@ class ProductController extends Controller
                     ]);
                 }
 
-                // حذف الخيارات التي أزيلت من الفورم (سبب رجوع الكميات المحذوفة سابقًا)
-                $removedOptions = $product->options()
-                    ->whereNotIn('id', $submittedOptionIds)
-                    ->get();
+                // حذف الخيار المحذوف وكل ذريته حتى لو أُرسل أحد الأبناء بطلب معدل يدويًا.
+                $removedOptionIds = $originalOptions->keys()
+                    ->diff($submittedOptionIds)
+                    ->map(fn ($id) => (int) $id)
+                    ->values();
+                $cascadeOptionIds = $removedOptionIds->all();
 
-                foreach ($removedOptions as $removedOption) {
-                    $product->sizeTiers()->where('option_id', $removedOption->id)->delete();
-                    $removedOption->delete();
+                do {
+                    $descendantIds = $originalOptions
+                        ->filter(fn ($option) => in_array((int) $option->depends_on_option_id, $cascadeOptionIds, true))
+                        ->keys()
+                        ->map(fn ($id) => (int) $id)
+                        ->diff($cascadeOptionIds)
+                        ->values()
+                        ->all();
+                    $cascadeOptionIds = array_values(array_unique(array_merge($cascadeOptionIds, $descendantIds)));
+                } while ($descendantIds !== []);
+
+                if ($cascadeOptionIds !== []) {
+                    $product->sizeTiers()->whereIn('option_id', $cascadeOptionIds)->delete();
+                    $product->options()->whereIn('id', $cascadeOptionIds)->delete();
                 }
             } else {
                 // لو مفيش خيارات في الفورم، امسح كل الخيارات وشرائح الكمية التابعة لها
-                $product->sizeTiers()->where('is_quantity_tier', true)->delete();
+                $product->sizeTiers()->whereNotNull('option_id')->delete();
                 $product->options()->delete();
             }
 
@@ -890,7 +904,7 @@ class ProductController extends Controller
                 'name' => $validated['name'],
                 'slug' => $validated['slug'] ?? $product->slug,
                 'price_text' => $validated['price_text'] ?? null,
-                'category_id' => $validated['category_id'],
+                'category_id' => $validated['category_id'] ?? $validated['main_category_id'],
                 'description' => $validated['description'],
                 'price' => $validated['price'],
                 'stock' => $validated['stock'] ?? 0,

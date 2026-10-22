@@ -734,8 +734,8 @@
                         </select>
                     </div>
                     <div class="col-md-4 mb-3">
-                        <label for="category_id" class="form-label required">القسم الفرعي</label>
-                        <select class="form-control select2" id="category_id" name="category_id" data-selected="{{ old('category_id') }}" required disabled>
+                        <label for="category_id" class="form-label">القسم الفرعي (اختياري)</label>
+                        <select class="form-control select2" id="category_id" name="category_id" data-selected="{{ old('category_id') }}" disabled>
                             <option value="">اختر القسم الرئيسي أولًا</option>
                         </select>
                     </div>
@@ -1594,9 +1594,27 @@
          * Delete an option
          */
         function deleteOption(index) {
+            const indicesToDelete = new Set([index]);
+            let foundDescendant;
+
+            do {
+                foundDescendant = false;
+                productOptions.forEach((option, optionIndex) => {
+                    const parentIndex = Number(option.depends_on_option_id);
+                    if (!indicesToDelete.has(optionIndex) && option.depends_on_option_id !== null &&
+                        option.depends_on_option_id !== '' && indicesToDelete.has(parentIndex)) {
+                        indicesToDelete.add(optionIndex);
+                        foundDescendant = true;
+                    }
+                });
+            } while (foundDescendant);
+
+            const descendantsCount = indicesToDelete.size - 1;
             Swal.fire({
                 title: 'هل أنت متأكد؟',
-                text: 'سيتم حذف هذا الخيار',
+                text: descendantsCount > 0
+                    ? `سيتم حذف هذا الخيار و${descendantsCount} من الخيارات التابعة له`
+                    : 'سيتم حذف هذا الخيار',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
@@ -1605,9 +1623,24 @@
                 cancelButtonText: 'إلغاء'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    productOptions.splice(index, 1);
+                    const oldToNewIndex = new Map();
+                    const remainingOptions = [];
+                    productOptions.forEach((option, oldIndex) => {
+                        if (!indicesToDelete.has(oldIndex)) {
+                            oldToNewIndex.set(oldIndex, remainingOptions.length);
+                            remainingOptions.push(option);
+                        }
+                    });
+                    remainingOptions.forEach((option) => {
+                        if (option.depends_on_option_id !== null && option.depends_on_option_id !== '') {
+                            option.depends_on_option_id = oldToNewIndex.get(Number(option.depends_on_option_id)) ?? null;
+                        }
+                    });
+                    productOptions.splice(0, productOptions.length, ...remainingOptions);
                     refreshOptionsContainer();
-                    Swal.fire('تم الحذف!', 'تم حذف الخيار بنجاح', 'success');
+                    Swal.fire('تم الحذف!', descendantsCount > 0
+                        ? 'تم حذف الخيار وجميع الخيارات التابعة له'
+                        : 'تم حذف الخيار بنجاح', 'success');
                 }
             });
         }

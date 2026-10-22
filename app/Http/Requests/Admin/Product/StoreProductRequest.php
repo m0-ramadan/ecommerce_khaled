@@ -33,7 +33,7 @@ class StoreProductRequest extends FormRequest
                 Rule::exists('categories', 'id')->whereNull('parent_id'),
             ],
             'category_id' => [
-                'required',
+                'nullable',
                 Rule::exists('categories', 'id')->where(
                     fn ($query) => $query->where('parent_id', $this->input('main_category_id'))
                 ),
@@ -106,7 +106,6 @@ class StoreProductRequest extends FormRequest
         return [
             'main_category_id.required' => 'يرجى اختيار القسم الرئيسي.',
             'main_category_id.exists' => 'القسم الرئيسي المحدد غير صالح.',
-            'category_id.required' => 'يرجى اختيار قسم فرعي للمنتج.',
             'category_id.exists' => 'القسم الفرعي لا يتبع القسم الرئيسي المحدد.',
         ];
     }
