@@ -12,6 +12,7 @@ use App\Models\StationeryService;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -121,6 +122,175 @@ class StationeryController extends Controller
                 'pages_count' => max(1, $pagesCount),
             ],
         ]);
+    }
+
+    /**
+     * رفع ملف كبير على أجزاء (chunks) لتجاوز حد حجم الطلب على السيرفر (1MB)
+     */
+    public function uploadChunk(Request $request)
+    {
+        $validated = $request->validate([
+            'upload_id' => ['required', 'string', 'regex:/^[A-Za-z0-9_-]{8,64}$/'],
+            'chunk_index' => ['required', 'integer', 'min:0'],
+            'total_chunks' => ['required', 'integer', 'min:1', 'max:2000'],
+            'original_name' => ['required', 'string', 'max:255'],
+            'chunk' => ['required', 'file', 'max:1024'], // 1MB كحد أقصى لكل جزء
+        ]);
+
+        $uploadId = $validated['upload_id'];
+        $chunkIndex = (int) $validated['chunk_index'];
+        $totalChunks = (int) $validated['total_chunks'];
+        $originalName = $validated['original_name'];
+
+        if ($chunkIndex >= $totalChunks) {
+            return response()->json([
+                'status' => false,
+                'message' => 'رقم الجزء غير صالح',
+            ], 422);
+        }
+
+        if ($chunkIndex === 0) {
+            $this->cleanupStaleStationeryChunks();
+        }
+
+        $chunkDir = storage_path('app/stationery_chunks/' . $uploadId);
+        File::ensureDirectoryExists($chunkDir);
+
+        $request->file('chunk')->move($chunkDir, $chunkIndex . '.part');
+
+        if ($chunkIndex < $totalChunks - 1) {
+            return response()->json([
+                'status' => true,
+                'message' => 'تم استلام جزء من الملف',
+                'completed' => false,
+            ]);
+        }
+
+        // الجزء الأخير: تجميع الملف ثم التحقق منه وحفظه
+        $mergedPath = storage_path('app/stationery_chunks/' . $uploadId . '.merged');
+
+        try {
+            for ($i = 0; $i < $totalChunks; $i++) {
+                if (!is_file($chunkDir . '/' . $i . '.part')) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'أجزاء الملف غير مكتملة، يرجى إعادة المحاولة',
+                    ], 422);
+                }
+            }
+
+            $out = fopen($mergedPath, 'wb');
+            if ($out === false) {
+                throw new \RuntimeException('فشل تجهيز الملف');
+            }
+
+            for ($i = 0; $i < $totalChunks; $i++) {
+                $in = fopen($chunkDir . '/' . $i . '.part', 'rb');
+                if ($in === false) {
+                    fclose($out);
+                    throw new \RuntimeException('فشل تجهيز الملف');
+                }
+                stream_copy_to_stream($in, $out);
+                fclose($in);
+            }
+            fclose($out);
+
+            $sizeBytes = filesize($mergedPath) ?: 0;
+            if ($sizeBytes <= 0) {
+                throw new \RuntimeException('الملف فارغ');
+            }
+
+            if ($sizeBytes > 30 * 1024 * 1024) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'حجم الملف أكبر من الحد المسموح (30 ميجابايت)',
+                ], 422);
+            }
+
+            $extension = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
+            $allowedExtensions = ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png', 'heic', 'heif', 'webp'];
+            if (!in_array($extension, $allowedExtensions, true)) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'نوع الملف غير مدعوم',
+                ], 422);
+            }
+
+            $mimeType = File::mimeType($mergedPath) ?: 'application/octet-stream';
+            $isImage = in_array($extension, ['jpg', 'jpeg', 'png', 'heic', 'heif', 'webp'], true)
+                || str_starts_with($mimeType, 'image/');
+            $isPdf = $extension === 'pdf' || $mimeType === 'application/pdf';
+
+            $folder = 'stationery_uploads/' . date('Y/m');
+            $filename = Str::random(24) . '.' . $extension;
+            $path = $folder . '/' . $filename;
+
+            Storage::disk('public')->makeDirectory($folder);
+            $stream = fopen($mergedPath, 'rb');
+            if ($stream === false) {
+                throw new \RuntimeException('فشل حفظ الملف');
+            }
+            Storage::disk('public')->writeStream($path, $stream);
+            if (is_resource($stream)) {
+                fclose($stream);
+            }
+
+            $pagesCount = 1;
+            if ($isPdf) {
+                $pagesCount = $this->countPdfPages(storage_path('app/public/' . $path));
+            }
+
+            return response()->json([
+                'status' => true,
+                'message' => 'تم رفع الملف بنجاح',
+                'completed' => true,
+                'data' => [
+                    'file_path' => $path,
+                    'file_url' => asset('storage/' . $path),
+                    'original_name' => $originalName,
+                    'extension' => $extension,
+                    'is_image' => $isImage,
+                    'is_pdf' => $isPdf,
+                    'size_formatted' => $this->formatBytes($sizeBytes),
+                    'pages_count' => max(1, $pagesCount),
+                ],
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'حدث خطأ أثناء تجهيز الملف المرفوع، يرجى المحاولة ثانية',
+            ], 500);
+        } finally {
+            File::deleteDirectory($chunkDir);
+            if (is_file($mergedPath)) {
+                File::delete($mergedPath);
+            }
+        }
+    }
+
+    /**
+     * حذف الأجزاء المؤقتة القديمة (أقدم من 6 ساعات)
+     */
+    private function cleanupStaleStationeryChunks(): void
+    {
+        $baseDir = storage_path('app/stationery_chunks');
+        if (!is_dir($baseDir)) {
+            return;
+        }
+
+        $expiry = time() - (6 * 60 * 60);
+
+        foreach (glob($baseDir . '/*', GLOB_ONLYDIR) ?: [] as $dir) {
+            if (@filemtime($dir) < $expiry) {
+                File::deleteDirectory($dir);
+            }
+        }
+
+        foreach (glob($baseDir . '/*.merged') ?: [] as $file) {
+            if (@filemtime($file) < $expiry) {
+                @unlink($file);
+            }
+        }
     }
 
     /**
@@ -364,21 +534,55 @@ class StationeryController extends Controller
             return 1;
         }
 
-        try {
-            $content = file_get_contents($filepath);
-            if (preg_match_all("/\/Count\s+(\d+)/", $content, $matches)) {
-                $max = max(array_map('intval', $matches[1]));
-                if ($max > 0) return $max;
-            }
-            if (preg_match_all("/\/Type\s*\/Page[^s]/", $content, $matches)) {
-                $count = count($matches[0]);
-                if ($count > 0) return $count;
-            }
-        } catch (\Throwable $e) {
-            // fallback
+        $handle = @fopen($filepath, 'rb');
+        if ($handle === false) {
+            return 1;
         }
 
-        return 1;
+        $maxCount = 0;
+        $pageObjects = 0;
+        $seenPageObjects = [];
+        $carry = '';
+        $position = 0;
+
+        try {
+            while (!feof($handle)) {
+                $chunk = fread($handle, 1024 * 1024);
+                if ($chunk === false || $chunk === '') {
+                    break;
+                }
+
+                $buffer = $carry . $chunk;
+                $bufferStart = $position - strlen($carry);
+
+                if (preg_match_all('/\/Count\s+(\d+)/', $buffer, $matches, PREG_OFFSET_CAPTURE)) {
+                    foreach ($matches[1] as $match) {
+                        $maxCount = max($maxCount, (int) $match[0]);
+                    }
+                }
+
+                if (preg_match_all('/\/Type\s*\/Page[^s]/', $buffer, $pageMatches, PREG_OFFSET_CAPTURE)) {
+                    foreach ($pageMatches[0] as $match) {
+                        $absoluteOffset = $bufferStart + $match[1];
+                        if (!isset($seenPageObjects[$absoluteOffset])) {
+                            $seenPageObjects[$absoluteOffset] = true;
+                            $pageObjects++;
+                        }
+                    }
+                }
+
+                $position += strlen($chunk);
+                $carry = substr($buffer, -64);
+            }
+        } finally {
+            fclose($handle);
+        }
+
+        if ($maxCount > 0) {
+            return $maxCount;
+        }
+
+        return max(1, $pageObjects);
     }
 
     /**
