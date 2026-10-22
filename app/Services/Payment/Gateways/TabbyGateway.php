@@ -84,10 +84,11 @@ class TabbyGateway extends BaseGateway
 
             // التحقق من توفر تابي لهذا الطلب (حد أدنى للمبلغ، etc.)
             $installmentProduct = $responseData['configuration']['available_products']['installments'][0] ?? null;
+            $installmentAvailability = $responseData['configuration']['products']['installments'] ?? [];
             $webUrl = $installmentProduct['web_url'] ?? null;
 
-            if (! $installmentProduct || ! ($installmentProduct['is_available'] ?? false) || ! $webUrl) {
-                $reason = $responseData['configuration']['products']['installments']['rejection_reason']
+            if (! $installmentProduct || ! ($installmentAvailability['is_available'] ?? false) || ! $webUrl) {
+                $reason = $installmentAvailability['rejection_reason']
                     ?? $responseData['rejection_reason_code']
                     ?? 'unavailable';
 
