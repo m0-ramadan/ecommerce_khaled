@@ -1003,22 +1003,21 @@
                     <div id="textAdsContainer"></div>
                 </div>
 
-                <!-- Delivery Time & Warranty -->
+                <!-- Production Type & Warranty -->
                 <div class="row mt-4">
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">وقت التوصيل</label>
-                        <div class="row">
-                            <div class="col-6">
-                                <label for="from_days" class="form-label small">من (أيام)</label>
-                                <input type="number" class="form-control" id="from_days" name="from_days"
-                                    value="{{ old('from_days') }}" min="0" placeholder="0">
-                            </div>
-                            <div class="col-6">
-                                <label for="to_days" class="form-label small">إلى (أيام)</label>
-                                <input type="number" class="form-control" id="to_days" name="to_days"
-                                    value="{{ old('to_days') }}" min="0" placeholder="0">
-                            </div>
-                        </div>
+                        <label class="form-label">نوع الإنتاج ومدة التنفيذ</label>
+                        <select class="form-select" id="production_type" name="production_type">
+                            <option value="digital" {{ old('production_type', 'digital') === 'digital' ? 'selected' : '' }}>
+                                ديجيتال — من 4 إلى 8 أيام عمل
+                            </option>
+                            <option value="offset" {{ old('production_type') === 'offset' ? 'selected' : '' }}>
+                                أوفست — من 10 إلى 15 يوم عمل
+                            </option>
+                        </select>
+                        <small class="text-muted d-block mt-1">
+                            المدة تبدأ من تاريخ تعميد التصميم، وتُحدَّد تلقائيًا حسب النوع.
+                        </small>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label for="warranty_months" class="form-label">الضمان (بالأشهر)</label>

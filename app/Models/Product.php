@@ -20,6 +20,7 @@ class Product extends Model
         'includes_tax',
         'includes_shipping',
         'stock',
+        'production_type',
         'status_id',
         'image',
         'external_id',
@@ -113,6 +114,25 @@ class Product extends Model
     public function deliveryTime()
     {
         return $this->hasOne(DeliveryTime::class);
+    }
+
+    /**
+     * مدة التنفيذ المعتمدة حسب نوع الإنتاج المحدد في الداشبورد.
+     *
+     * @return array{from:int,to:int,label:string,note:string,production_type:string}
+     */
+    public function getProductionDeliveryAttribute(): array
+    {
+        $type = $this->production_type === 'offset' ? 'offset' : 'digital';
+        [$from, $to] = $type === 'offset' ? [10, 15] : [4, 8];
+
+        return [
+            'from' => $from,
+            'to' => $to,
+            'label' => $type === 'offset' ? 'أوفست' : 'ديجيتال',
+            'note' => 'المدة من تاريخ تعميد التصميم',
+            'production_type' => $type,
+        ];
     }
 
     public function warranty()

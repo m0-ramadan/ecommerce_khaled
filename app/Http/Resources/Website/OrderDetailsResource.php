@@ -27,12 +27,15 @@ class OrderDetailsResource extends JsonResource
             'subtotal'         => $this->subtotal,
             'tax_amount'       => $this->tax_amount,
             'discount_amount'  => $this->discount_amount,
+            'points_used'      => (int) $this->points_used,
+            'points_discount'  => $this->points_discount,
+            'points_awarded'   => (int) $this->points_awarded,
             'shipping_method'  => $this->shipping_method_name,
             'shipping_amount'  => $this->shipping_amount,
             'oto_order_id'     => $this->oto_order_id,
             'notes'            => $this->notes,
             'status_payment'   => $this->status_payment,
-            'user'             => new UserResource(auth()->user()),
+            'user'             => new UserResource($this->user ?? auth()->user()),
             'created_at'       => $this->created_at->translatedFormat('d M Y - h:i A'),
 
             // ============ هنا الإضافات الجديدة =============

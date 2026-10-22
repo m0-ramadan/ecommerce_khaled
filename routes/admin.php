@@ -73,6 +73,13 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
         Route::post('update', [SettingController::class, 'update'])->name('update');
         Route::post('update-pages', [SettingController::class, 'updatepages'])->name('updatepages');
     });
+
+    // Loyalty points
+    Route::prefix('loyalty')->name('loyalty.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\LoyaltyController::class, 'index'])->name('index');
+        Route::post('/settings', [\App\Http\Controllers\Admin\LoyaltyController::class, 'updateSettings'])->name('settings.update');
+        Route::post('/adjust', [\App\Http\Controllers\Admin\LoyaltyController::class, 'adjust'])->name('adjust');
+    });
     // Ads Management Routes
     Route::prefix('ads')->name('ads.')->group(function () {
         Route::get('/', [AdsController::class, 'index'])->name('index');           // List all ads
@@ -413,6 +420,10 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
         Route::post('/delivery-areas', [\App\Http\Controllers\Admin\StationeryPriceController::class, 'storeDeliveryArea'])->name('delivery-areas.store');
         Route::put('/delivery-areas', [\App\Http\Controllers\Admin\StationeryPriceController::class, 'updateDeliveryAreas'])->name('delivery-areas.update');
         Route::delete('/delivery-areas/{deliveryArea}', [\App\Http\Controllers\Admin\StationeryPriceController::class, 'destroyDeliveryArea'])->name('delivery-areas.destroy');
+        Route::get('/services', [\App\Http\Controllers\Admin\StationeryPriceController::class, 'services'])->name('services.index');
+        Route::post('/services', [\App\Http\Controllers\Admin\StationeryPriceController::class, 'storeService'])->name('services.store');
+        Route::put('/services', [\App\Http\Controllers\Admin\StationeryPriceController::class, 'updateServices'])->name('services.update');
+        Route::delete('/services/{service}', [\App\Http\Controllers\Admin\StationeryPriceController::class, 'destroyService'])->name('services.destroy');
         Route::get('/orders', [\App\Http\Controllers\Admin\StationeryPriceController::class, 'orders'])->name('orders');
     });
 });

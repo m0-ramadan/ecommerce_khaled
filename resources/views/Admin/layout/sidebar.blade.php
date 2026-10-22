@@ -118,6 +118,13 @@
             </a>
         </li>
 
+        <li class="menu-item {{ request()->routeIs('admin.loyalty.*') ? 'active' : '' }}">
+            <a href="{{ route('admin.loyalty.index') }}" class="menu-link">
+                <i class="menua-icon ti ti-gift"></i>
+                <div>نظام النقاط</div>
+            </a>
+        </li>
+
         <li class="menu-item {{ request()->routeIs('admin.sliders.*') ? 'active' : '' }}">
             <a href="{{ route('admin.sliders.index') }}" class="menu-link">
                 <i class="menu-icon tf-icons ti ti-slideshow"></i>
@@ -153,12 +160,17 @@
                 </li>
                 <li class="menu-item {{ request()->routeIs('admin.stationery.delivery-areas.*') ? 'active' : '' }}">
                     <a href="{{ route('admin.stationery.delivery-areas.index') }}" class="menu-link">
-                        <div>مناطق وأسعار التوصيل</div>
+                        <div>توصيل الطباعة (الرياض)</div>
                     </a>
                 </li>
                 <li class="menu-item {{ request()->routeIs('admin.stationery.paper-types.*') ? 'active' : '' }}">
                     <a href="{{ route('admin.stationery.paper-types.index') }}" class="menu-link">
                         <div>أنواع الورق</div>
+                    </a>
+                </li>
+                <li class="menu-item {{ request()->routeIs('admin.stationery.services.*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.stationery.services.index') }}" class="menu-link">
+                        <div>الخدمات الإضافية</div>
                     </a>
                 </li>
                 <li class="menu-item {{ request()->routeIs('admin.stationery.orders') ? 'active' : '' }}">

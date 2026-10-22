@@ -73,11 +73,17 @@ class ProductResource extends JsonResource
             }),
 
             // ================== Delivery Time ==================
-            'delivery_time' => $this->deliveryTime ? [
-                'from_days' => $this->deliveryTime->from_days,
-                'to_days'   => $this->deliveryTime->to_days,
-                'estimated' => $this->deliveryTime->from_days . ' - ' . $this->deliveryTime->to_days . ' أيام',
-            ] : null,
+            // المدة تُحدد من نوع الإنتاج في الداشبورد وتبدأ من تاريخ تعميد التصميم.
+            'production_type' => $this->production_delivery['production_type'],
+            'production_type_label' => $this->production_delivery['label'],
+            'delivery_time' => [
+                'from_days' => $this->production_delivery['from'],
+                'to_days'   => $this->production_delivery['to'],
+                'estimated' => $this->production_delivery['from'] . ' - ' . $this->production_delivery['to'] . ' أيام عمل',
+                'note'      => $this->production_delivery['note'],
+                'starts_from' => 'تاريخ تعميد التصميم',
+                'production_type' => $this->production_delivery['production_type'],
+            ],
 
             // ================== Warranty ==================
             'warranty' => $this->warranty ? [
@@ -142,6 +148,7 @@ class ProductResource extends JsonResource
 // ================== Options (TREE STRUCTURE) ==================
 'options' => $this->options
     ->whereNull('depends_on_option_id')
+    ->reject(fn ($option) => $this->isHiddenOptionName($option->option_name))
     ->groupBy('option_name')
     ->map(function ($group) {
         return [
@@ -187,7 +194,7 @@ class ProductResource extends JsonResource
                 'has_materials'     => $this->materials->count() > 0,
                 'has_printing'      => $this->printingMethods->count() > 0,
                 'has_warranty'      => !is_null($this->warranty),
-                'has_delivery_time' => !is_null($this->deliveryTime),
+                'has_delivery_time' => true,
                 'in_stock'          => $this->stock > 0,
                 'stock_status'      => $this->stock > 0 ? 'متوفر' : 'نفذت الكمية',
                 'stock_class'       => $this->stock > 0 ? 'in-stock' : 'out-of-stock',
@@ -223,9 +230,21 @@ class ProductResource extends JsonResource
 
         'has_multiple_prices' => $tiers->isNotEmpty(),
 
-        'children' => $option->dependentOptions->map(function ($child) {
-            return $this->formatOptionTree($child);
-        })->values(),
+        'children' => $option->dependentOptions
+            ->reject(fn ($child) => $this->isHiddenOptionName($child->option_name))
+            ->map(function ($child) {
+                return $this->formatOptionTree($child);
+            })->values(),
     ];
+}
+
+private function isHiddenOptionName(?string $name): bool
+{
+    $name = (string) $name;
+
+    return str_contains($name, 'تصوير عينة')
+        || str_contains($name, 'عينة قبل طباعة')
+        || str_contains($name, 'مدة التنفيذ للمنتج')
+        || str_contains($name, 'مدة تنفيذ المنتج');
 }
 }

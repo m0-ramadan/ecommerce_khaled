@@ -14,6 +14,8 @@ class UserResource extends JsonResource
             'name'       => $this->name,
             'email'      => $this->email,
             'phone'      => $this->phone,
+            'points'     => (int) ($this->points ?? 0),
+            'phone_verified_at' => $this->phone_verified_at?->format('Y-m-d H:i:s'),
             'image' => get_user_image($this->image),
             'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
         ];

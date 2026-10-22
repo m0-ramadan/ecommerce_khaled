@@ -25,6 +25,11 @@ class Order extends Model
         'subtotal',
         'shipping_amount',
         'discount_amount',
+        'points_used',
+        'points_discount',
+        'points_awarded',
+        'points_awarded_at',
+        'points_refunded_at',
         'tax_amount',
         'total_amount',
         'payment_method',
@@ -44,10 +49,15 @@ class Order extends Model
     protected $casts = [
         'shipped_at'   => 'datetime',
         'delivered_at' => 'datetime',
+        'points_awarded_at' => 'datetime',
+        'points_refunded_at' => 'datetime',
         'total_amount' => 'decimal:2',
         'subtotal'     => 'decimal:2',
         'shipping_amount' => 'decimal:2',
         'discount_amount' => 'decimal:2',
+        'points_discount' => 'decimal:2',
+        'points_used' => 'integer',
+        'points_awarded' => 'integer',
         'tax_amount'   => 'decimal:2',
     ];
 
@@ -86,6 +96,11 @@ class Order extends Model
     public function orderItems()  // ← اسم جديد
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function pointTransactions()
+    {
+        return $this->hasMany(PointTransaction::class);
     }
 
     // رقم الطلب بشكل جميل (مثال: ORD-2025-000123)

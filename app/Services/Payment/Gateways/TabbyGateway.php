@@ -82,20 +82,31 @@ class TabbyGateway extends BaseGateway
 
             $responseData = $response['data'];
 
-            // التحقق من توفر منتج التقسيط
+            // التحقق من توفر تابي لهذا الطلب (حد أدنى للمبلغ، etc.)
             $installmentProduct = $responseData['configuration']['available_products']['installments'][0] ?? null;
+            $webUrl = $installmentProduct['web_url'] ?? null;
 
-            // if (!$installmentProduct || !($installmentProduct['is_available'] ?? false)) {
-            //     throw new \Exception('Tabby installments not available for this transaction');
-            // }
+            if (! $installmentProduct || ! ($installmentProduct['is_available'] ?? false) || ! $webUrl) {
+                $reason = $responseData['configuration']['products']['installments']['rejection_reason']
+                    ?? $responseData['rejection_reason_code']
+                    ?? 'unavailable';
+
+                $message = match ($reason) {
+                    'order_amount_too_low' => 'الحد الأدنى لاستخدام تابي هو 10 ريال. يرجى اختيار طريقة دفع أخرى أو زيادة قيمة الطلب.',
+                    'order_amount_too_high' => 'قيمة الطلب تتجاوز الحد الأقصى المسموح لتابي.',
+                    default => 'تابي غير متاحة لهذا الطلب حاليًا. يرجى اختيار طريقة دفع أخرى.',
+                };
+
+                throw new \Exception($message);
+            }
 
             return [
                 'success' => true,
                 'gateway' => 'tabby',
                 'session_id' => $responseData['id'] ?? null,
                 'payment_id' => $responseData['payment']['id'] ?? null,
-                'payment_url' => $installmentProduct['web_url'] ?? null,
-                'checkout_url' => $installmentProduct['web_url'] ?? null,
+                'payment_url' => $webUrl,
+                'checkout_url' => $webUrl,
                 'qr_code_url' => $installmentProduct['qr_code'] ?? null,
                 'status' => $responseData['status'] ?? 'created',
                 'payment_status' => $responseData['payment']['status'] ?? 'CREATED',
@@ -144,7 +155,8 @@ class TabbyGateway extends BaseGateway
 
         return [
             'payment' => [
-                'amount'      => $this->formatAmount($order->total_amount) + $this->formatAmount($order->shipping_amount),
+                // total_amount يشمل الشحن والضريبة وخصم النقاط بالفعل
+                'amount'      => $this->formatAmount((float) $order->total_amount),
                 'currency'    => $this->currency,
                 'description' => 'Order #' . $order->order_number,
 

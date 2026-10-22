@@ -58,6 +58,11 @@ Route::prefix('v1')->group(function () {
             Route::post('/toggle', [FavoriteController::class, 'toggle']);
         });
 
+        Route::prefix('loyalty')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Api\Website\LoyaltyController::class, 'index']);
+            Route::post('quote', [\App\Http\Controllers\Api\Website\LoyaltyController::class, 'quote']);
+        });
+
         Route::prefix('order')->name('order.')->group(function () {
             Route::get('/', [OrderController::class, 'index'])->name('index');
             Route::get('/{orderID}', [OrderController::class, 'show'])->name('show');
@@ -78,6 +83,8 @@ Route::prefix('v1')->group(function () {
         Route::post('send-otp', [AuthController::class, 'sendOtp']);
         Route::post('reset-password',  [AuthController::class, 'resetPassword']);
         Route::post('verify-otp',  [AuthController::class, 'verifyOtp']);
+        Route::post('phone/send-otp', [AuthController::class, 'sendPhoneOtp'])->middleware('throttle:10,1');
+        Route::post('phone/verify-otp', [AuthController::class, 'verifyPhoneOtp'])->middleware('throttle:10,1');
     });
 
     Route::get('home', [HomeController::class, 'index']);

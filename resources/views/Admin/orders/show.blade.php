@@ -590,11 +590,6 @@
                                                     </div>
                                                 @endif
 
-                                                <div class="detail-item">
-                                                    <span class="detail-label">نوع الطلب:</span>
-                                                    <span class="detail-value">{{ $item->is_sample ? 'عينة' : 'طلب عادي' }}</span>
-                                                </div>
-
                                                 @if ($item->quantity_id)
                                                     <div class="detail-item">
                                                         <span class="detail-label">معرّف فئة الكمية:</span>

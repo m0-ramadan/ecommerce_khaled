@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class DeliveryTime extends Model
 {
-    protected $fillable = ['product_id', 'from_days', 'to_days'];
+    protected $fillable = ['product_id', 'from_days', 'to_days', 'note'];
 
     public function product()
     {

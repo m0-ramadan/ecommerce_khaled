@@ -8,6 +8,7 @@ use App\Models\CartItem;
 use App\Models\Product;
 use App\Models\StationeryPrice;
 use App\Models\StationeryDeliveryArea;
+use App\Models\StationeryService;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -38,6 +39,14 @@ class StationeryController extends Controller
                 'size_dimensions' => StationeryPrice::sizeDimensions(),
                 'paper_types' => StationeryPrice::paperTypes(),
                 'prices' => $prices,
+                'services' => StationeryService::where('is_active', true)
+                    ->orderBy('sort_order')
+                    ->get(['id', 'key', 'name', 'price']),
+                'min_paper_sheets' => [
+                    'A0' => 500,
+                    'A1' => 500,
+                    'A2' => 500,
+                ],
                 'min_order_price' => 0.50,
             ],
         ]);
@@ -45,6 +54,8 @@ class StationeryController extends Controller
 
     public function getDeliveryOptions()
     {
+        $riyadh = StationeryDeliveryArea::riyadh();
+
         return response()->json([
             'status' => true,
             'data' => [
@@ -53,10 +64,14 @@ class StationeryController extends Controller
                     'name' => 'استلام من الفرع',
                     'price' => 0,
                 ],
-                'areas' => StationeryDeliveryArea::where('is_active', true)
-                    ->orderBy('sort_order')
-                    ->orderBy('name')
-                    ->get(['id', 'name', 'price']),
+                'areas' => [
+                    [
+                        'id' => $riyadh->id,
+                        'name' => StationeryDeliveryArea::RIYADH_NAME,
+                        'price' => StationeryDeliveryArea::RIYADH_PRICE,
+                    ],
+                ],
+                'delivery_note' => 'التوصيل داخل الرياض فقط — 20 ريال لأي مكان',
             ],
         ]);
     }
@@ -125,8 +140,30 @@ class StationeryController extends Controller
             'files.*.copies' => 'required|integer|min:1',
             'files.*.orientation' => 'nullable|in:portrait,landscape',
             'files.*.side_type' => 'nullable|in:single,double',
+            'services' => 'nullable|array',
+            'services.*' => 'string|max:50',
             'note' => 'nullable|string|max:1000',
         ]);
+
+        // الخدمات المدفوعة الإضافية (سلك بلاستيك/حديد، تيب، تغليف شفاف)
+        $requestedServices = collect($request->input('services', []))
+            ->filter()
+            ->unique()
+            ->values();
+
+        $activeServices = StationeryService::where('is_active', true)
+            ->whereIn('key', $requestedServices)
+            ->orderBy('sort_order')
+            ->get();
+
+        if ($requestedServices->count() !== $activeServices->count()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'إحدى الخدمات الإضافية المختارة غير متاحة حالياً.',
+            ], 422);
+        }
+
+        $servicesTotal = (float) $activeServices->sum('price');
 
         $product = Product::where('slug', 'stationery-print-service')->first();
         if (!$product) {
@@ -175,6 +212,17 @@ class StationeryController extends Controller
             $copies = (int) $fileItem['copies'];
             $sideType = $fileItem['side_type'] ?? 'single';
             $orientation = $fileItem['orientation'] ?? 'portrait';
+
+            // المقاسات الكبيرة A0/A1/A2 تتطلب 500 ورقة على الأقل،
+            // وعدد الورق = عدد صفحات الملف × عدد النسخ.
+            $sheetsCount = $pagesCount * $copies;
+            if (in_array($paperSize, ['A0', 'A1', 'A2'], true) && $sheetsCount < 500) {
+                return response()->json([
+                    'status' => false,
+                    'message' => "المقاس {$paperSize} يتطلب حدًا أدنى 500 ورقة. "
+                        . "عدد الورق الحالي = {$pagesCount} صفحة × {$copies} نسخة = {$sheetsCount} ورقة.",
+                ], 422);
+            }
 
             // التمييز بين سعر الورقة لوحدها وسعر الورقة داخل الملف
             $isSingleSheet = ($pagesCount === 1);
@@ -233,7 +281,7 @@ class StationeryController extends Controller
             ];
         }
 
-        $totalJobPrice = max(0.50, round($totalJobPrice, 2));
+        $totalJobPrice = max(0.50, round($totalJobPrice + $servicesTotal, 2));
 
         // بناء خيارات السلة المنسقة
         $selectedOptions = [
@@ -249,10 +297,18 @@ class StationeryController extends Controller
                 'option_name' => 'إجمالي الصفحات والنسخ',
                 'option_value' => $totalJobPages . ' صفحة',
             ],
-            [
-                'option_name' => 'تفاصيل ملفات الطباعة',
-                'option_value' => json_encode($processedFiles, JSON_UNESCAPED_UNICODE),
-            ],
+        ];
+
+        if ($activeServices->isNotEmpty()) {
+            $selectedOptions[] = [
+                'option_name' => 'الخدمات الإضافية',
+                'option_value' => $activeServices->map(fn ($service) => $service->name . ' (' . number_format((float) $service->price, 2) . ' ر.س)')->implode(' + '),
+            ];
+        }
+
+        $selectedOptions[] = [
+            'option_name' => 'تفاصيل ملفات الطباعة',
+            'option_value' => json_encode($processedFiles, JSON_UNESCAPED_UNICODE),
         ];
 
         // إنشاء عنصر السلة
@@ -289,6 +345,12 @@ class StationeryController extends Controller
                 'total_price' => $totalJobPrice,
                 'files_count' => count($processedFiles),
                 'total_pages' => $totalJobPages,
+                'services' => $activeServices->map(fn ($service) => [
+                    'key' => $service->key,
+                    'name' => $service->name,
+                    'price' => (float) $service->price,
+                ])->values(),
+                'services_total' => $servicesTotal,
             ],
         ]);
     }

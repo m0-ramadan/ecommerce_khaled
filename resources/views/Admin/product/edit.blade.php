@@ -643,6 +643,23 @@
                     </div>
                 </div>
 
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="production_type" class="form-label">نوع الإنتاج ومدة التنفيذ</label>
+                        <select class="form-select" id="production_type" name="production_type">
+                            <option value="digital" {{ old('production_type', $product->production_type ?: 'digital') === 'digital' ? 'selected' : '' }}>
+                                ديجيتال — من 4 إلى 8 أيام عمل
+                            </option>
+                            <option value="offset" {{ old('production_type', $product->production_type) === 'offset' ? 'selected' : '' }}>
+                                أوفست — من 10 إلى 15 يوم عمل
+                            </option>
+                        </select>
+                        <small class="text-muted d-block mt-1">
+                            المدة تبدأ من تاريخ تعميد التصميم، وتُحدَّد تلقائيًا حسب النوع.
+                        </small>
+                    </div>
+                </div>
+
                 <div class="d-flex justify-content-between mt-4">
                     <div></div>
                     <button type="button" class="btn btn-primary next-step" data-next="2">
@@ -1864,7 +1881,16 @@
          * Remove a tier
          */
         function removeTier(button) {
-            $(button).closest('.tier-item').remove();
+            const tierItem = $(button).closest('.tier-item');
+            const optionItem = tierItem.closest('.option-item');
+            const optionIndex = Number(optionItem.data('index'));
+            const tierIndex = tierItem.index();
+
+            if (existingOptions[optionIndex]?.quantity_tiers) {
+                existingOptions[optionIndex].quantity_tiers.splice(tierIndex, 1);
+            }
+
+            tierItem.remove();
         }
 
         /**

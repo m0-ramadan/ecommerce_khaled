@@ -17,10 +17,12 @@ use App\Models\StationeryDeliveryArea;
 use App\Models\UserAddress;
 use App\Services\OtoShippingService;
 use App\Services\Payment\PaymentService;
+use App\Services\LoyaltyService;
 use App\Traits\ApiResponseTrait;
 use App\Traits\HandlesPaymobPayment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class OrderController extends Controller
 {
@@ -30,10 +32,16 @@ class OrderController extends Controller
 
     private OtoShippingService $shippingServices;
 
-    public function __construct(PaymentService $paymentService, OtoShippingService $shippingServices)
-    {
+    private LoyaltyService $loyalty;
+
+    public function __construct(
+        PaymentService $paymentService,
+        OtoShippingService $shippingServices,
+        LoyaltyService $loyalty
+    ) {
         $this->paymentService = $paymentService;
         $this->shippingServices = $shippingServices;
+        $this->loyalty = $loyalty;
     }
 
     /**
@@ -122,18 +130,20 @@ class OrderController extends Controller
                     $shippingAddress = 'استلام من الفرع';
                     $address = null;
                 } else {
-                    $deliveryArea = StationeryDeliveryArea::where('is_active', true)
-                        ->find($request->input('stationery_delivery_area_id'));
+                    // التوصيل داخل الرياض فقط وبسعر ثابت 20 ريال
+                    $deliveryArea = StationeryDeliveryArea::riyadh();
 
-                    if (! $deliveryArea) {
-                        return $this->errorResponse('منطقة توصيل الطباعة المختارة غير متاحة.', 422);
-                    }
                     if (! $address) {
                         return $this->errorResponse('يرجى اختيار عنوان للتوصيل للبيت.', 422);
                     }
 
-                    $shippingPrice = (float) $deliveryArea->price;
-                    $shippingMethodName = 'توصيل للبيت - ' . $deliveryArea->name;
+                    $city = Str::lower((string) $address->city);
+                    if (! Str::contains($city, ['الرياض', 'riyadh'])) {
+                        return $this->errorResponse('عذرًا، التوصيل متاح داخل مدينة الرياض فقط.', 422);
+                    }
+
+                    $shippingPrice = StationeryDeliveryArea::RIYADH_PRICE;
+                    $shippingMethodName = 'توصيل داخل الرياض - ' . $deliveryArea->name;
                 }
             } else {
                 if (!$request->filled('orderId') || !$request->filled('deliveryOptionId')) {
@@ -153,7 +163,16 @@ class OrderController extends Controller
                 $shippingMethodName = $shippingQuote['name'];
             }
 
-            $totalAmount = ($cart->total - $discountAmount) + $shippingPrice;
+            // خصم النقاط (إن وجد)
+            $pointsRequested = (int) $request->input('points_to_use', 0);
+            $eligibleAmount = max(0, (float) $cart->total - (float) $discountAmount);
+            $pointsQuote = $user
+                ? $this->loyalty->quote($user, $pointsRequested, $eligibleAmount)
+                : ['points' => 0, 'discount' => 0.0];
+            $pointsUsed = (int) $pointsQuote['points'];
+            $pointsDiscount = (float) $pointsQuote['discount'];
+
+            $totalAmount = ($cart->total - $discountAmount - $pointsDiscount) + $shippingPrice;
             $taxRate = 0.15;
             $taxAmount = $totalAmount * ($taxRate / (1 + $taxRate));
 
@@ -169,6 +188,8 @@ class OrderController extends Controller
                 'subtotal' => $cart->subtotal,
                 'shipping_amount' => $shippingPrice,
                 'discount_amount' => $discountAmount,
+                'points_used' => $pointsUsed,
+                'points_discount' => $pointsDiscount,
                 'tax_amount' => $taxAmount,
                 'total_amount' => $totalAmount,
                 'payment_method' => $request->payment_method,
@@ -199,6 +220,11 @@ class OrderController extends Controller
                     'quantity_id' => $item->quantity_id,
                     'image_design' => $item->image_design,
                 ]);
+            }
+
+            // خصم النقاط من رصيد العميل (داخل نفس معاملة إنشاء الطلب)
+            if ($user && $pointsUsed > 0) {
+                $this->loyalty->redeemForOrder($order, $pointsUsed, $pointsDiscount);
             }
 
             // تفريغ السلة بعد الطلب

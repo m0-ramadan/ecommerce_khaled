@@ -262,6 +262,16 @@ class OrderController extends Controller
 
         $order->save();
 
+        // نقاط الولاء: منح عند التسليم، واسترجاع عند الإلغاء/الاسترداد
+        if ($newStatus === 'delivered' && $oldStatus !== 'delivered') {
+            app(\App\Services\LoyaltyService::class)->awardForOrder($order);
+        }
+
+        if (in_array($newStatus, ['cancelled', 'refunded'], true)
+            && ! in_array($oldStatus, ['cancelled', 'refunded'], true)) {
+            app(\App\Services\LoyaltyService::class)->refundForCancelledOrder($order);
+        }
+
         // إضافة ملاحظة إذا وجدت
         if ($request->filled('notes')) {
             // يمكنك إضافة سجل للملاحظات هنا

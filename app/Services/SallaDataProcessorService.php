@@ -576,23 +576,37 @@ class SallaDataProcessorService
     public function processDesignServiceOption($product, $option, &$results)
     {
         foreach ($option['details'] as $detail) {
+            $name = (string) ($detail['name'] ?? '');
+            $price = (float) ($detail['additional_price'] ?? 0);
+
+            // سياسة الأسعار الثابتة لخدمات التصميم
+            if (str_contains($name, 'تعديل')) {
+                $name = 'لدي تصميم يحتاج تعديل';
+                $price = 100;
+            } elseif (str_contains($name, 'طلب خدمة تصميم') || str_contains($name, 'احتاج خدمة تصميم')) {
+                $name = 'طلب خدمة تصميم';
+                $price = 350;
+            } elseif (str_contains($name, 'رفع تصميم') || str_contains($name, 'تصميم خاص')) {
+                $price = 0;
+            }
+
             $designService = DesignService::firstOrCreate(
-                ['name' => $detail['name']],
+                ['name' => $name],
                 [
-                    'description' => $detail['name'],
-                    'price' => $detail['additional_price'] ?? 0
+                    'description' => $name,
+                    'price' => $price
                 ]
             );
 
             // ربط خدمة التصميم بالمنتج
             $product->designServices()->syncWithoutDetaching([
-                $designService->id => ['additional_price' => $detail['additional_price'] ?? 0]
+                $designService->id => ['additional_price' => $price]
             ]);
 
             $results['design_services'][] = [
                 'id' => $designService->id,
-                'name' => $detail['name'],
-                'price' => $detail['additional_price'] ?? 0
+                'name' => $name,
+                'price' => $price
             ];
         }
     }
@@ -675,6 +689,15 @@ class SallaDataProcessorService
      */
     public function processGeneralOption($product, $option, &$results)
     {
+        // خيار تصوير العينة ومدة التنفيذ القديمة لم يعودا جزءًا من تجربة الشراء.
+        $optionName = (string) ($option['name'] ?? '');
+        if (str_contains($optionName, 'تصوير عينة')
+            || str_contains($optionName, 'عينة قبل طباعة')
+            || str_contains($optionName, 'مدة التنفيذ للمنتج')
+            || str_contains($optionName, 'مدة تنفيذ المنتج')) {
+            return;
+        }
+
         foreach ($option['details'] as $detail) {
             ProductOptions::updateOrCreate(
                 [

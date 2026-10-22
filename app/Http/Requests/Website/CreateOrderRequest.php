@@ -72,6 +72,7 @@ class CreateOrderRequest extends FormRequest
             'notes'             => 'nullable|string|max:1000',
 
             'coupon_code'       => 'nullable|string',
+            'points_to_use'     => 'nullable|integer|min:0',
 
             // Shipping OTO Fields
             'orderId'           => 'nullable|string',

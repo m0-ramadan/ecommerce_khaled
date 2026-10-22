@@ -8,6 +8,7 @@ use App\Models\OrderItem;
 use App\Models\StationeryPrice;
 use App\Models\StationeryDeliveryArea;
 use App\Models\StationeryPaperType;
+use App\Models\StationeryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -53,9 +54,66 @@ class StationeryPriceController extends Controller
 
     public function deliveryAreas()
     {
-        $deliveryAreas = StationeryDeliveryArea::orderBy('sort_order')->orderBy('name')->get();
+        // التوصيل داخل الرياض فقط بسعر ثابت 20 ريال
+        StationeryDeliveryArea::riyadh();
+        $deliveryAreas = StationeryDeliveryArea::where('name', StationeryDeliveryArea::RIYADH_NAME)->get();
 
         return view('Admin.stationery.delivery-areas', compact('deliveryAreas'));
+    }
+
+    public function services()
+    {
+        $services = StationeryService::orderBy('sort_order')->orderBy('name')->get();
+
+        return view('Admin.stationery.services', compact('services'));
+    }
+
+    public function storeService(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:150|unique:stationery_services,name',
+            'price' => 'required|numeric|min:0',
+        ]);
+
+        $baseKey = Str::slug($validated['name']) ?: 'service-' . Str::lower(Str::random(8));
+        $key = $baseKey;
+        $suffix = 2;
+        while (StationeryService::where('key', $key)->exists()) {
+            $key = $baseKey . '-' . $suffix++;
+        }
+
+        StationeryService::create([
+            'key' => $key,
+            'name' => trim($validated['name']),
+            'price' => $validated['price'],
+            'is_active' => true,
+            'sort_order' => (StationeryService::max('sort_order') ?? 0) + 1,
+        ]);
+
+        return back()->with('success', 'تمت إضافة الخدمة الإضافية بنجاح.');
+    }
+
+    public function updateServices(Request $request)
+    {
+        foreach ($request->input('services', []) as $id => $values) {
+            $service = StationeryService::find($id);
+            if ($service) {
+                $service->update([
+                    'name' => trim((string) ($values['name'] ?? $service->name)),
+                    'price' => max(0, (float) ($values['price'] ?? $service->price)),
+                    'is_active' => isset($values['is_active']),
+                ]);
+            }
+        }
+
+        return back()->with('success', 'تم تحديث الخدمات الإضافية.');
+    }
+
+    public function destroyService(StationeryService $service)
+    {
+        $service->delete();
+
+        return back()->with('success', 'تم حذف الخدمة الإضافية.');
     }
 
     public function paperTypes()

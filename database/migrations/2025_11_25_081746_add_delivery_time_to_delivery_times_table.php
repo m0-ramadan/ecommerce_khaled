@@ -11,18 +11,20 @@ return new class extends Migration
      */
     public function up()
     {
+        // نفصل إعادة التسمية عن إضافة الملاحظة حتى لا يشير موضع العمود
+        // إلى اسم تم تغييره داخل نفس ALTER TABLE.
         Schema::table('delivery_times', function (Blueprint $table) {
-            // تغيير الأسماء
             if (Schema::hasColumn('delivery_times', 'from_days')) {
                 $table->renameColumn('from_days', 'min_days');
             }
             if (Schema::hasColumn('delivery_times', 'to_days')) {
                 $table->renameColumn('to_days', 'max_days');
             }
-            
-            // إضافة note
+        });
+
+        Schema::table('delivery_times', function (Blueprint $table) {
             if (!Schema::hasColumn('delivery_times', 'note')) {
-                $table->text('note')->nullable()->after('to_days');
+                $table->text('note')->nullable()->after('max_days');
             }
         });
     }

@@ -47,6 +47,7 @@ class StoreProductRequest extends FormRequest
             'includes_shipping' => 'nullable',
 
             // Delivery time
+            'production_type' => 'nullable|in:offset,digital',
             'from_days' => 'nullable|integer|min:0',
             'to_days' => 'nullable|integer|min:0',
 

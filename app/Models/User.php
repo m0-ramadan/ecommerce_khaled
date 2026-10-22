@@ -18,6 +18,8 @@ class User extends Authenticatable
         'facebook_id',
         'apple_id',
         'phone',
+        'points',
+        'phone_verified_at',
         'image'
     ];
 
@@ -28,8 +30,15 @@ class User extends Authenticatable
 
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'phone_verified_at' => 'datetime',
         'password' => 'hashed',
+        'points' => 'integer',
     ];
+
+    public function pointTransactions()
+    {
+        return $this->hasMany(PointTransaction::class);
+    }
 
     public function reviews()
     {

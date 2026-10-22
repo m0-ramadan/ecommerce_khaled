@@ -8,7 +8,9 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Mail\Website\OtpMail;
 use App\Models\OtpVerification;
+use App\Models\PhoneOtp;
 use App\Support\SaudiPhone;
+use App\Services\WhatsAppOtpService;
 
 use App\Traits\ApiResponseTrait;
 
@@ -126,6 +128,153 @@ class AuthController extends Controller
         } catch (\Exception $e) {
             return $this->error('حدث خطأ أثناء تسجيل الدخول الاجتماعي', 500, ['exception' => $e->getMessage()]);
         }
+    }
+
+    /**
+     * 🔹 إرسال رمز OTP لتسجيل الدخول برقم الجوال عبر واتساب
+     */
+    public function sendPhoneOtp(Request $request, WhatsAppOtpService $whatsapp)
+    {
+        $request->validate([
+            'phone' => ['required', 'string'],
+        ], [
+            'phone.required' => 'رقم الجوال مطلوب.',
+        ]);
+
+        $phone = SaudiPhone::normalize($request->input('phone'));
+
+        if (! $phone) {
+            return $this->error('يرجى إدخال رقم جوال سعودي صالح.', 422);
+        }
+
+        // منع الإرسال المتكرر: 3 رسائل كل 10 دقائق ورسالة واحدة كل 60 ثانية
+        $recentCount = PhoneOtp::where('phone', $phone)
+            ->where('created_at', '>', now()->subMinutes(10))
+            ->count();
+
+        if ($recentCount >= 3) {
+            return $this->error('تم طلب رموز تحقق كثيرة لهذا الرقم. يرجى المحاولة بعد 10 دقائق.', 429);
+        }
+
+        $lastOtp = PhoneOtp::where('phone', $phone)->latest()->first();
+        if ($lastOtp && $lastOtp->created_at->gt(now()->subSeconds(60))) {
+            $seconds = 60 - $lastOtp->created_at->diffInSeconds(now());
+
+            return $this->error("يرجى الانتظار {$seconds} ثانية قبل إعادة الإرسال.", 429);
+        }
+
+        $code = (string) random_int(100000, 999999);
+
+        // إبطال أي رموز سابقة غير مستخدمة
+        PhoneOtp::where('phone', $phone)->whereNull('used_at')->update(['used_at' => now()]);
+
+        $otp = PhoneOtp::create([
+            'phone' => $phone,
+            'otp' => Hash::make($code),
+            'expires_at' => now()->addMinutes(5),
+            'ip' => $request->ip(),
+            'user_agent' => Str::limit((string) $request->userAgent(), 250, ''),
+        ]);
+
+        $result = $whatsapp->send($phone, $code);
+
+        if (! ($result['success'] ?? false)) {
+            $otp->delete();
+
+            return $this->error('تعذر إرسال رمز التحقق عبر واتساب. يرجى المحاولة لاحقًا.', 422, [
+                'provider_error' => $result['error'] ?? null,
+            ]);
+        }
+
+        return $this->success([
+            'phone' => $phone,
+            'expires_in' => 300,
+            'resend_after' => 60,
+            'delivery' => 'whatsapp',
+        ], 'تم إرسال رمز التحقق إلى واتساب');
+    }
+
+    /**
+     * 🔹 التحقق من رمز واتساب وتسجيل الدخول (أو إنشاء حساب تلقائيًا)
+     */
+    public function verifyPhoneOtp(Request $request)
+    {
+        $request->validate([
+            'phone' => ['required', 'string'],
+            'otp' => ['required', 'digits:6'],
+        ], [
+            'phone.required' => 'رقم الجوال مطلوب.',
+            'otp.required' => 'رمز التحقق مطلوب.',
+            'otp.digits' => 'رمز التحقق يجب أن يكون 6 أرقام.',
+        ]);
+
+        $phone = SaudiPhone::normalize($request->input('phone'));
+
+        if (! $phone) {
+            return $this->error('يرجى إدخال رقم جوال سعودي صالح.', 422);
+        }
+
+        $otp = PhoneOtp::where('phone', $phone)
+            ->whereNull('used_at')
+            ->latest()
+            ->first();
+
+        if (! $otp) {
+            return $this->error('رمز التحقق غير صالح أو تم استخدامه. يرجى طلب رمز جديد.', 422);
+        }
+
+        if ($otp->isExpired()) {
+            $otp->update(['used_at' => now()]);
+
+            return $this->error('انتهت صلاحية رمز التحقق. يرجى طلب رمز جديد.', 422);
+        }
+
+        if ($otp->attempts >= 5) {
+            return $this->error('تم تجاوز عدد المحاولات المسموح. يرجى طلب رمز جديد.', 422);
+        }
+
+        if (! Hash::check((string) $request->input('otp'), $otp->otp)) {
+            $otp->increment('attempts');
+
+            return $this->error('رمز التحقق غير صحيح.', 422);
+        }
+
+        $otp->update(['used_at' => now()]);
+
+        $user = User::whereIn('phone', SaudiPhone::variants($phone))->first();
+        $isNewUser = false;
+
+        if (! $user) {
+            $baseEmail = 'phone_' . ltrim(preg_replace('/\D+/', '', $phone), '0') . '@otp.tala.local';
+            $email = $baseEmail;
+            $suffix = 1;
+
+            while (User::where('email', $email)->exists()) {
+                $email = 'phone_' . ltrim(preg_replace('/\D+/', '', $phone), '0') . '_' . $suffix++ . '@otp.tala.local';
+            }
+
+            $user = User::create([
+                'name' => 'عميل تالا',
+                'email' => $email,
+                'phone' => $phone,
+                'password' => Hash::make(Str::random(32)),
+                'phone_verified_at' => now(),
+            ]);
+            $isNewUser = true;
+        } else {
+            $user->forceFill([
+                'phone' => $phone,
+                'phone_verified_at' => now(),
+            ])->save();
+        }
+
+        $token = $user->createToken('api_token')->plainTextToken;
+
+        return $this->success([
+            'user' => new UserResource($user),
+            'token' => $token,
+            'is_new_user' => $isNewUser,
+        ], $isNewUser ? 'تم إنشاء حسابك وتسجيل الدخول بنجاح' : 'تم تسجيل الدخول بنجاح');
     }
 
     /**

@@ -118,6 +118,13 @@ return [
             ? 'https://api.tabby.ai/api/v1/sandbox'
             : 'https://api.tabby.ai/api/v1',
     ],
+    'whatsapp_cloud' => [
+        'access_token' => env('WHATSAPP_CLOUD_ACCESS_TOKEN'),
+        'phone_number_id' => env('WHATSAPP_CLOUD_PHONE_NUMBER_ID', '1457396494115488'),
+        'api_version' => env('WHATSAPP_CLOUD_API_VERSION', 'v25.0'),
+        'otp_template' => env('WHATSAPP_CLOUD_OTP_TEMPLATE', 'waitmeyah_otp'),
+        'otp_language' => env('WHATSAPP_CLOUD_OTP_LANGUAGE', 'ar'),
+    ],
     'oto' => [
     'api_url' => env('OTO_API_URL', 'https://api.tryoto.com/rest/v2/'),
     'api_token' => env('OTO_API_KEY','AMf-vBwvpqeBuVWQlcFwqVsjjwWL1bPf0P1F64Ne_eNWn17BrJj5jQADtnYC_VbJh6-PRJ1EvPlmbkObml-VNchJfmwyQ5RqEBG1YRA902az1WFdJR2LZ6zbCyRYkB2sAEsaohqshI0VRvd-U6DFGoP40kEw1sG-08AwsvsdMM9bc9pT1GF5DWDzIER1ikoxb1hn9IVpbUF5cqXDk0U3Tmbdt7W4O2DNNA'),

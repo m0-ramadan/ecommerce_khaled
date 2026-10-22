@@ -360,6 +360,7 @@ class ProductController extends Controller
                 'description' => $validated['description'],
                 'price' => $validated['price'],
                 'stock' => $validated['stock'] ?? 0,
+                'production_type' => $request->input('production_type') === 'offset' ? 'offset' : 'digital',
                 'status_id' => $validated['status_id'],
                 'has_discount' => $request->boolean('has_discount'),
                 'includes_tax' => $request->boolean('includes_tax'),
@@ -440,13 +441,13 @@ class ProductController extends Controller
                 $product->offers()->sync($request->input('offers'));
             }
 
-            // Handle delivery time
-            if ($request->filled('from_days') || $request->filled('to_days')) {
-                $product->deliveryTime()->create([
-                    'from_days' => $request->input('from_days'),
-                    'to_days' => $request->input('to_days'),
-                ]);
-            }
+            // Handle delivery time (driven by production type)
+            [$fromDays, $toDays] = $request->input('production_type') === 'offset' ? [10, 15] : [4, 8];
+            $product->deliveryTime()->updateOrCreate([], [
+                'from_days' => $fromDays,
+                'to_days' => $toDays,
+                'note' => 'المدة من تاريخ تعميد التصميم',
+            ]);
 
             // Handle warranty
             if ($request->filled('warranty_months')) {
@@ -735,72 +736,101 @@ class ProductController extends Controller
             | PRODUCT OPTIONS WITH DEPENDENCIES
             ===================================================== */
 
-            $existingOptions = $product->options()->get()->keyBy('id'); // خيارات موجودة مسبقًا
-            $optionMapping = []; // map old id -> new id
+            $optionMapping = []; // map old id -> current id
+            $submittedOptionIds = []; // كل الخيارات التي بقيت في الفورم بعد الحذف
 
             if ($request->filled('product_options')) {
                 // أولًا ننشئ أو نحدث كل الخيارات بدون dependencies
                 foreach ($request->product_options as $optionData) {
-                    if (! empty($optionData['option_name']) && ! empty($optionData['option_value'])) {
+                    if (empty($optionData['option_name']) || empty($optionData['option_value'])) {
+                        continue;
+                    }
 
-                        $createdOption = $product->options()->updateOrCreate(
-                            ['id' => $optionData['id'] ?? null], // لو id موجود حدثه، لو مش موجود أنشئ جديد
-                            [
-                                'option_name' => $optionData['option_name'],
-                                'option_value' => $optionData['option_value'],
-                                'additional_price' => $optionData['additional_price'] ?? 0,
-                                'is_required' => isset($optionData['is_required']) && $optionData['is_required'] == '1',
-                                'option_type' => $optionData['option_type'] ?? 'regular',
-                                'external_option_id' => $optionData['external_option_id'] ?? null,
-                                'external_detail_id' => $optionData['external_detail_id'] ?? null,
-                                'depends_on_detail_id' => $optionData['depends_on_detail_id'] ?? null,
-                            ]
-                        );
+                    // لا نسمح بتعديل خيار يخص منتجًا آخر عبر تمرير id غير تابع لهذا المنتج
+                    $oldId = ! empty($optionData['id']) ? (int) $optionData['id'] : null;
+                    $createdOption = $oldId
+                        ? $product->options()->whereKey($oldId)->first()
+                        : null;
 
-                        // خزّن الخريطة id قديم -> id جديد
-                        if (! empty($optionData['id'])) {
-                            $optionMapping[$optionData['id']] = $createdOption->id;
-                        }
+                    if (! $createdOption) {
+                        $createdOption = $product->options()->make();
+                    }
 
-                        // إنشاء شرائح الكمية
-                        if (! empty($optionData['quantity_tiers'])) {
-                            foreach ($optionData['quantity_tiers'] as $tierData) {
-                                if (! empty($tierData['quantity']) && ! empty($tierData['price_per_unit'])) {
-                                    $product->sizeTiers()->updateOrCreate(
-                                        [
-                                            'option_id' => $createdOption->id,
-                                            'quantity' => $tierData['quantity'],
-                                        ],
-                                        [
-                                            'price_per_unit' => $tierData['price_per_unit'],
-                                            'tier_name' => $tierData['tier_name'] ?? "شريحة {$tierData['quantity']}+",
-                                            'is_quantity_tier' => true,
-                                            'tier_type' => 'quantity',
-                                        ]
-                                    );
-                                }
-                            }
+                    $createdOption->fill([
+                        'option_name' => $optionData['option_name'],
+                        'option_value' => $optionData['option_value'],
+                        'additional_price' => $optionData['additional_price'] ?? 0,
+                        'is_required' => isset($optionData['is_required']) && $optionData['is_required'] == '1',
+                        'external_option_id' => $optionData['external_option_id'] ?? null,
+                        'external_detail_id' => $optionData['external_detail_id'] ?? null,
+                        'depends_on_detail_id' => $optionData['depends_on_detail_id'] ?? null,
+                    ]);
+                    $createdOption->save();
+
+                    $submittedOptionIds[] = $createdOption->id;
+                    $optionMapping[$createdOption->id] = $createdOption->id;
+                    if ($oldId) {
+                        $optionMapping[$oldId] = $createdOption->id;
+                    }
+
+                    // مزامنة شرائح الكمية: نحذف المحذوف من الفورم ونضيف/نحدّث الباقي
+                    $product->sizeTiers()
+                        ->where('option_id', $createdOption->id)
+                        ->where('is_quantity_tier', true)
+                        ->delete();
+
+                    foreach (($optionData['quantity_tiers'] ?? []) as $tierData) {
+                        if (! empty($tierData['quantity']) && ! empty($tierData['price_per_unit'])) {
+                            $product->sizeTiers()->create([
+                                'option_id' => $createdOption->id,
+                                'quantity' => $tierData['quantity'],
+                                'price_per_unit' => $tierData['price_per_unit'],
+                                'tier_name' => $tierData['tier_name'] ?? "شريحة {$tierData['quantity']}+",
+                                'is_quantity_tier' => true,
+                                'tier_type' => 'quantity',
+                            ]);
                         }
                     }
                 }
 
                 // الآن حدث الـ depends_on_option_id لكل خيار
                 foreach ($request->product_options as $optionData) {
-                    if (! empty($optionData['id']) && ! empty($optionData['depends_on_option_id'])) {
-                        $createdOptionId = $optionMapping[$optionData['id']] ?? null;
-                        $dependsOnId = $optionMapping[$optionData['depends_on_option_id']] ?? null;
-
-                        if ($createdOptionId && $dependsOnId) {
-                            $product->options()->find($createdOptionId)
-                                ->update([
-                                    'depends_on_option_id' => $dependsOnId,
-                                    'dependency_condition' => $optionData['dependency_condition'] ?? null
-                                ]);
-                        }
+                    $oldId = ! empty($optionData['id']) ? (int) $optionData['id'] : null;
+                    if (! $oldId) {
+                        continue;
                     }
+
+                    $createdOptionId = $optionMapping[$oldId] ?? null;
+                    if (! $createdOptionId) {
+                        continue;
+                    }
+
+                    $dependsOnId = null;
+                    if (! empty($optionData['depends_on_option_id'])) {
+                        $parentId = (int) $optionData['depends_on_option_id'];
+                        $dependsOnId = $optionMapping[$parentId] ?? null;
+                    }
+
+                    $product->options()->whereKey($createdOptionId)->update([
+                        'depends_on_option_id' => $dependsOnId,
+                        'dependency_condition' => $dependsOnId
+                            ? ($optionData['dependency_condition'] ?? null)
+                            : null,
+                    ]);
+                }
+
+                // حذف الخيارات التي أزيلت من الفورم (سبب رجوع الكميات المحذوفة سابقًا)
+                $removedOptions = $product->options()
+                    ->whereNotIn('id', $submittedOptionIds)
+                    ->get();
+
+                foreach ($removedOptions as $removedOption) {
+                    $product->sizeTiers()->where('option_id', $removedOption->id)->delete();
+                    $removedOption->delete();
                 }
             } else {
-                // لو مفيش خيارات جديدة، ممكن تمسح القديمة
+                // لو مفيش خيارات في الفورم، امسح كل الخيارات وشرائح الكمية التابعة لها
+                $product->sizeTiers()->where('is_quantity_tier', true)->delete();
                 $product->options()->delete();
             }
 
@@ -839,6 +869,7 @@ class ProductController extends Controller
                 'description' => $validated['description'],
                 'price' => $validated['price'],
                 'stock' => $validated['stock'] ?? 0,
+                'production_type' => $request->input('production_type') === 'offset' ? 'offset' : 'digital',
                 'status_id' => $validated['status_id'],
                 'has_discount' => $request->boolean('has_discount'),
                 'includes_tax' => $request->boolean('includes_tax'),
@@ -956,17 +987,14 @@ class ProductController extends Controller
                 : $product->offers()->detach();
 
             /* =====================================================
-            | DELIVERY TIME
+            | DELIVERY TIME (driven by production type)
             ===================================================== */
-            if ($request->filled('from_days') || $request->filled('to_days')) {
-                $product->deliveryTime()->updateOrCreate([], [
-                    'from_days' => $request->from_days,
-                    'to_days' => $request->to_days,
-                    'is_active' => true,
-                ]);
-            } else {
-                $product->deliveryTime()?->delete();
-            }
+            [$fromDays, $toDays] = $request->input('production_type') === 'offset' ? [10, 15] : [4, 8];
+            $product->deliveryTime()->updateOrCreate([], [
+                'from_days' => $fromDays,
+                'to_days' => $toDays,
+                'note' => 'المدة من تاريخ تعميد التصميم',
+            ]);
 
             /* =====================================================
             | WARRANTY
