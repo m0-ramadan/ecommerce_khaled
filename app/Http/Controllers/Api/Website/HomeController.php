@@ -8,8 +8,10 @@ use App\Http\Resources\Website\HomeCategoryResource;
 use App\Http\Resources\Wesite\TestimonialResource;
 use App\Models\Banner;
 use App\Models\Category;
+use App\Models\Product;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 
 class HomeController extends Controller
 {
@@ -23,24 +25,57 @@ class HomeController extends Controller
         try {
 
             $subCategoriesLimit = min(max((int) $request->input('categories_limit', 4), 1), 8);
-            $productsLimit = min(max((int) $request->input('products_limit', 6), 1), 12);
+            $productsLimit = min(max((int) $request->input('products_limit', 4), 1), 12);
+            $hasHomeVisibility = Schema::hasColumn('products', 'show_in_home');
 
+            $visibleProductQuery = function ($query) use ($hasHomeVisibility) {
+                $query->where('status_id', 1);
+
+                if ($hasHomeVisibility) {
+                    $query->where('show_in_home', true);
+                }
+            };
+
+            // الصفحة الرئيسية تعرض الأقسام الرئيسية فقط، والأقسام الفرعية تظهر داخل صفحة القسم.
             $sub_categories = Category::where('status_id', 1)
-                ->whereHas('products', function ($q) {
-                    $q->where('status_id', 1);
+                ->whereNull('parent_id')
+                ->where(function ($query) use ($visibleProductQuery) {
+                    $query->whereHas('products', $visibleProductQuery)
+                        ->orWhereHas('children.products', $visibleProductQuery);
                 })
                 ->orderBy('order', 'asc')
                 ->paginate($subCategoriesLimit)
                 ->withQueryString();
 
             $sub_categories->getCollection()->each(function (Category $category) use ($productsLimit) {
-                $products = $category->products()
+                // منتجات القسم الرئيسي تشمل منتجات أقسامه الفرعية أيضاً.
+                $categoryIds = array_merge(
+                    [$category->id],
+                    $category->children()->pluck('id')->all()
+                );
+
+                $productsQuery = Product::query()
+                    ->where('status_id', 1)
+                    ->whereIn('category_id', $categoryIds)
                     ->select(['id', 'category_id', 'name', 'slug', 'price', 'price_text', 'has_discount', 'stock', 'status_id'])
                     ->with(['primaryImage', 'discount', 'adsText'])
                     ->withCount('reviews')
                     ->withAvg('reviews', 'rating')
-                    ->withMin('sizeTiers as lowest_price', 'price_per_unit')
-                    ->latest('id')
+                    ->withMin('sizeTiers as lowest_price', 'price_per_unit');
+
+                // ترتيب وإظهار المنتجات في الرئيسية حسب إعدادات الداشبورد (عند توفر الحقول).
+                if (Schema::hasColumn('products', 'show_in_home')) {
+                    $productsQuery->where('show_in_home', true);
+                }
+                if (Schema::hasColumn('products', 'home_order')) {
+                    // المنتجات ذات ترتيب مخصص (1، 2، 3...) تظهر أولاً، ثم الباقي الأحدث.
+                    $productsQuery
+                        ->orderByRaw('CASE WHEN home_order = 0 THEN 1 ELSE 0 END')
+                        ->orderBy('home_order', 'asc');
+                }
+
+                $products = $productsQuery
+                    ->orderByDesc('id')
                     ->limit($productsLimit)
                     ->get();
 

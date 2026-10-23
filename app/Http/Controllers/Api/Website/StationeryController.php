@@ -27,6 +27,7 @@ class StationeryController extends Controller
     public function getPrices()
     {
         $prices = StationeryPrice::where('is_active', true)
+            ->whereIn('paper_size', StationeryPrice::defaultSizes())
             ->orderBy('sort_order')
             ->get();
 
@@ -45,12 +46,9 @@ class StationeryController extends Controller
                     ->orderBy('sort_order')
                     ->get(['id', 'key', 'name', 'price']),
                 'pricing_rules' => [
-                    'A4' => ['multiplier' => 1],
-                    'A3' => ['multiplier' => 1.75],
-                    'A5' => ['multiplier' => 0.75],
-                    'A2' => ['independent_price' => true, 'minimum_total' => 400, 'minimum_sheets' => 100],
-                    'A1' => ['independent_price' => true, 'minimum_total' => 500, 'minimum_sheets' => 100],
-                    'cardstock_multiplier' => 1.20,
+                    // كل أسعار A1 إلى A5 تُدار يدوياً من الداشبورد بدون معادلات.
+                    'A1' => ['minimum_total' => 500, 'minimum_total_double' => 900, 'minimum_sheets' => 100, 'color_extra' => 100],
+                    'A2' => ['minimum_total' => 400, 'minimum_total_double' => 750, 'minimum_sheets' => 100, 'color_extra' => 100],
                 ],
                 'min_order_price' => 0.50,
             ],
@@ -314,13 +312,14 @@ class StationeryController extends Controller
             'files.*.copies' => 'required|integer|min:1',
             'files.*.orientation' => 'nullable|in:portrait,landscape',
             'files.*.side_type' => 'nullable|in:single,double',
-            'services' => 'nullable|array',
-            'services.*' => 'string|max:50',
+            'files.*.services' => 'nullable|array',
+            'files.*.services.*' => 'string|max:50',
             'note' => 'nullable|string|max:1000',
         ]);
 
-        // الخدمات المدفوعة الإضافية (سلك بلاستيك/حديد، تيب، تغليف شفاف)
-        $requestedServices = collect($request->input('services', []))
+        // الخدمات المدفوعة الإضافية تُختار لكل ملف على حدة، وتُحتسب لكل نسخة.
+        $requestedServices = collect($request->input('files', []))
+            ->flatMap(fn ($file) => (array) ($file['services'] ?? []))
             ->filter()
             ->unique()
             ->values();
@@ -328,7 +327,8 @@ class StationeryController extends Controller
         $activeServices = StationeryService::where('is_active', true)
             ->whereIn('key', $requestedServices)
             ->orderBy('sort_order')
-            ->get();
+            ->get()
+            ->keyBy('key');
 
         if ($requestedServices->count() !== $activeServices->count()) {
             return response()->json([
@@ -337,7 +337,7 @@ class StationeryController extends Controller
             ], 422);
         }
 
-        $servicesTotal = (float) $activeServices->sum('price');
+        $servicesTotal = 0.0;
 
         $product = Product::where('slug', 'stationery-print-service')->first();
         if (!$product) {
@@ -362,7 +362,9 @@ class StationeryController extends Controller
         );
 
         // جلب الأسعار المعتمدة من الداشبورد لحساب التكلفة السيرفرية بدقة
-        $prices = StationeryPrice::where('is_active', true)->get()->keyBy(function ($item) {
+        $prices = StationeryPrice::where('is_active', true)
+            ->whereIn('paper_size', StationeryPrice::defaultSizes())
+            ->get()->keyBy(function ($item) {
             return implode('_', [
                 $item->service_type,
                 $item->paper_type,
@@ -396,16 +398,23 @@ class StationeryController extends Controller
                 ], 422);
             }
 
+            // الورق العادي متاح فقط حتى مقاس A3.
+            if (in_array($paperSize, ['A1', 'A2'], true) && $paperType === 'plain') {
+                return response()->json([
+                    'status' => false,
+                    'message' => "الورق العادي غير متاح لمقاس {$paperSize}. يرجى اختيار الكوشيه أو المقوّى.",
+                ], 422);
+            }
+
             // التمييز بين سعر الورقة لوحدها وسعر الورقة داخل الملف
             $isSingleSheet = ($pagesCount === 1);
             if (isset($fileItem['print_mode'])) {
                 $isSingleSheet = ($fileItem['print_mode'] === 'single');
             }
 
-            // A4 هو أساس A3 وA5، أما A1 وA2 فأسعارهما مستقلة في الداشبورد.
-            // الورق المقوى مشتق من سعر الورق العادي مع زيادة 20%.
-            $basePaperType = $paperType === 'cardstock' ? 'plain' : $paperType;
-            $baseSize = in_array($paperSize, ['A1', 'A2'], true) ? $paperSize : 'A4';
+            // A1 وA2 والمقاسات الأخرى تُسعَّر مباشرة من صفوف الداشبورد دون مضاعفات.
+            $basePaperType = $paperType;
+            $baseSize = $paperSize;
             $key = implode('_', [$serviceType, $basePaperType, $baseSize, $sideType, $orientation]);
             $priceRow = $prices->get($key);
 
@@ -426,7 +435,27 @@ class StationeryController extends Controller
 
             $pricing = app(StationeryPricingService::class);
             $pagePrice = $pricing->pagePrice($basePrice, $paperSize, $paperType);
-            $fileTotal = $pricing->total($basePrice, $paperSize, $paperType, $sheetsCount);
+            $printTotal = $pricing->total(
+                $basePrice,
+                $paperSize,
+                $paperType,
+                $sheetsCount,
+                $colorType,
+                $sideType
+            );
+
+            // خدمات هذا الملف فقط — السعر × عدد النسخ.
+            $fileServiceKeys = collect($fileItem['services'] ?? [])
+                ->filter()
+                ->unique()
+                ->values();
+            $fileServices = $activeServices->filter(
+                fn ($service) => $fileServiceKeys->contains($service->key)
+            );
+            $fileServicesTotal = round((float) $fileServices->sum('price') * $copies, 2);
+
+            $fileTotal = round($printTotal + $fileServicesTotal, 2);
+            $servicesTotal += $fileServicesTotal;
             $totalJobPrice += $fileTotal;
             $totalJobPages += ($pagesCount * $copies);
 
@@ -454,11 +483,18 @@ class StationeryController extends Controller
                 'is_single_sheet' => $isSingleSheet,
                 'pricing_mode' => $isSingleSheet ? 'ورقة مفردة' : 'ورقة داخل ملف',
                 'price_per_page' => $pagePrice,
+                'print_total' => $printTotal,
+                'services' => $fileServices->map(fn ($service) => [
+                    'key' => $service->key,
+                    'name' => $service->name,
+                    'price' => (float) $service->price,
+                ])->values(),
+                'services_total' => $fileServicesTotal,
                 'file_total' => $fileTotal,
             ];
         }
 
-        $totalJobPrice = max(0.50, round($totalJobPrice + $servicesTotal, 2));
+        $totalJobPrice = max(0.50, round($totalJobPrice, 2));
 
         // بناء خيارات السلة المنسقة
         $selectedOptions = [

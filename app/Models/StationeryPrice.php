@@ -45,7 +45,6 @@ class StationeryPrice extends Model
     public static function sizeDimensions(): array
     {
         return [
-            'A0' => '84.1 × 118.9 cm',
             'A1' => '59.4 × 84.1 cm',
             'A2' => '42.0 × 59.4 cm',
             'A3' => '29.7 × 42.0 cm',

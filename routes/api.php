@@ -77,12 +77,8 @@ Route::prefix('v1')->group(function () {
     });
 
     Route::prefix('auth')->group(function () {
-        Route::post('/register', [AuthController::class, 'register']);
-        Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
-        Route::post('/social-login', [AuthController::class, 'socialLogin']);
-        Route::post('send-otp', [AuthController::class, 'sendOtp']);
-        Route::post('reset-password',  [AuthController::class, 'resetPassword']);
-        Route::post('verify-otp',  [AuthController::class, 'verifyOtp']);
+        // تسجيل الدخول وإنشاء الحساب برقم الجوال ورمز واتساب OTP فقط.
+        // تم إيقاف طرق الدخول الأخرى (كلمة المرور / التسجيل المباشر / السوشيال / OTP بالإيميل).
         Route::post('phone/send-otp', [AuthController::class, 'sendPhoneOtp'])->middleware('throttle:10,1');
         Route::post('phone/verify-otp', [AuthController::class, 'verifyPhoneOtp'])->middleware('throttle:10,1');
     });

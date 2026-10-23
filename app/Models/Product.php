@@ -33,6 +33,8 @@ class Product extends Model
         'meta_description',
         'meta_keywords',
         'price_text',
+        'show_in_home',
+        'home_order',
         'valid_combinations', // حقل جديد
         'combination_count',  // حقل جديد
         'options_conditions'  // حقل جديد
@@ -58,10 +60,16 @@ class Product extends Model
     public static function generateUniqueSlug($name)
     {
         $slug = \Illuminate\Support\Str::slug($name);
+
+        // الأسماء العربية قد تُنتج Slug فارغاً، لذا نستخدم بديلاً فريداً.
+        if ($slug === '') {
+            $slug = 'product-' . \Illuminate\Support\Str::lower(\Illuminate\Support\Str::random(8));
+        }
+
         $originalSlug = $slug;
         $count = 1;
 
-        while (static::where('slug', $slug)->exists()) {
+        while (static::withTrashed()->where('slug', $slug)->exists()) {
             $slug = "{$originalSlug}-{$count}";
             $count++;
         }
@@ -73,6 +81,8 @@ class Product extends Model
         'has_discount' => 'boolean',
         'includes_tax' => 'boolean',
         'includes_shipping' => 'boolean',
+        'show_in_home' => 'boolean',
+        'home_order' => 'integer',
         'price' => 'decimal:2',
     ];
 

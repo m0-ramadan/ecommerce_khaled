@@ -754,10 +754,11 @@
                 <h5 class="modal-title">إضافة قسم فرعي جديد</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="{{ route('admin.categories.store') }}" method="POST" id="addChildForm">
+            <form action="{{ route('admin.categories.store') }}" method="POST" enctype="multipart/form-data" id="addChildForm">
                 @csrf
                 <div class="modal-body">
                     <input type="hidden" name="parent_id" value="{{ $category->id }}">
+                    <input type="hidden" name="status_id" value="1">
                     <div class="mb-3">
                         <label for="child_name" class="form-label">اسم القسم الفرعي</label>
                         <input type="text" class="form-control" id="child_name" name="name" required>
@@ -765,6 +766,15 @@
                     <div class="mb-3">
                         <label for="child_order" class="form-label">ترتيب العرض</label>
                         <input type="number" class="form-control" id="child_order" name="order" value="0" min="0">
+                    </div>
+                    <div class="mb-3">
+                        <label for="child_image" class="form-label">صورة القسم الفرعي</label>
+                        <input type="file" class="form-control" id="child_image" name="image" accept="image/*">
+                        <small class="text-muted d-block mt-1">تظهر هذه الصورة داخل صفحة القسم الرئيسي.</small>
+                    </div>
+                    <div class="mb-3">
+                        <label for="child_sub_image" class="form-label">صورة فرعية إضافية (اختياري)</label>
+                        <input type="file" class="form-control" id="child_sub_image" name="sub_image" accept="image/*">
                     </div>
                 </div>
                 <div class="modal-footer">

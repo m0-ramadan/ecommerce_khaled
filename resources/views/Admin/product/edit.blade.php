@@ -648,6 +648,26 @@
                         <input type="number" class="form-control" id="stock" name="stock"
                             value="{{ old('stock', $product->stock) }}" min="0" required>
                     </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">العرض في الصفحة الرئيسية</label>
+                        <div class="form-check form-switch mt-2">
+                            <input type="hidden" name="show_in_home" value="0">
+                            <input class="form-check-input" type="checkbox" role="switch"
+                                id="show_in_home" name="show_in_home" value="1"
+                                {{ old('show_in_home', $product->show_in_home ?? true) ? 'checked' : '' }}>
+                            <label class="form-check-label" for="show_in_home">
+                                إظهار المنتج تحت قسمه في الصفحة الرئيسية
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="home_order" class="form-label">ترتيب الظهور في الرئيسية</label>
+                        <input type="number" class="form-control" id="home_order" name="home_order"
+                            value="{{ old('home_order', $product->home_order ?? 0) }}" min="0">
+                        <small class="text-muted d-block mt-1">
+                            ضع 1 للمنتج الأول ثم 2 وهكذا، و0 يعني ترتيب افتراضي. تُعرض أول 4 منتجات فقط لكل قسم رئيسي.
+                        </small>
+                    </div>
                 </div>
 
                 <div class="row">

@@ -43,6 +43,8 @@ class StoreProductRequest extends FormRequest
             'price_text' => 'nullable',
             'stock' => 'required|min:0',
             'status_id' => 'required|in:1,2,3',
+            'show_in_home' => 'nullable',
+            'home_order' => 'nullable|integer|min:0',
 
             // Main image
             'image' => 'nullable|image|max:2048',

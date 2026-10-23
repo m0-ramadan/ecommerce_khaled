@@ -13,12 +13,14 @@ use App\Models\Offer;
 use App\Models\PrintingMethod;
 use App\Models\PrintLocation;
 use App\Models\Product;
+use App\Models\ProductOptions;
 use App\Models\ProductTextAd;
 use App\Models\Size;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Facades\Excel;
 use PDF;
@@ -274,47 +276,233 @@ class ProductController extends Controller
         try {
             DB::beginTransaction();
 
-            // Duplicate the product
+            $product->load([
+                'images',
+                'discount',
+                'colors',
+                'materials',
+                'printingMethods',
+                'printLocations',
+                'offers',
+                'deliveryTime',
+                'warranty',
+                'features',
+                'adsText',
+                'options',
+                'sizeTiers',
+            ]);
+
+            // Duplicate the product itself
             $newProduct = $product->replicate();
             $newProduct->name = $request->name;
+            $newProduct->slug = Product::generateUniqueSlug($request->name);
+            // external_id فريد في جدول المنتجات، لذلك لا ننسخه حتى لا يفشل الحفظ.
+            $newProduct->external_id = null;
             $newProduct->save();
 
-            // Duplicate images
-            if ($product->image) {
-                $newImagePath = $this->duplicateImage($product->image, 'products');
-                $newProduct->update(['image' => $newImagePath]);
+            // ---------- Images ----------
+            $mainImagePath = null;
+            foreach ($product->images as $image) {
+                if (empty($image->path)) {
+                    continue;
+                }
+
+                $newPath = $this->duplicateImage($image->path, 'products');
+                if (! $newPath) {
+                    continue;
+                }
+
+                $newImage = $newProduct->images()->make();
+                $newImage->forceFill([
+                    'path' => $newPath,
+                    'alt' => $image->alt ?? $newProduct->name,
+                    'type' => $image->type ?? 'additional',
+                    'order' => $image->order ?? 1,
+                    'is_primary' => (bool) ($image->is_primary ?? false),
+                    'is_active' => (bool) ($image->is_active ?? true),
+                ]);
+                $newImage->save();
+
+                if (($image->type === 'main' || $image->is_primary) && ! $mainImagePath) {
+                    $mainImagePath = $newPath;
+                }
             }
 
-            // Duplicate relationships
-            $product->colors()->each(function ($color) use ($newProduct) {
-                $newProduct->colors()->attach($color->id);
-            });
+            if (! $mainImagePath && $product->image) {
+                $mainImagePath = $this->duplicateImage($product->image, 'products');
+                if ($mainImagePath) {
+                    $newProduct->images()->create([
+                        'path' => $mainImagePath,
+                        'alt' => $newProduct->name,
+                        'type' => 'main',
+                        'order' => 1,
+                    ]);
+                }
+            }
 
-            $product->materials()->each(function ($material) use ($newProduct) {
-                $newProduct->materials()->attach($material->id, [
-                    'quantity' => $material->pivot->quantity,
-                    'unit' => $material->pivot->unit,
+            if ($mainImagePath) {
+                $newProduct->update(['image' => $mainImagePath]);
+            }
+
+            // ---------- Discount ----------
+            if ($product->discount) {
+                $discount = $product->discount->replicate();
+                $discount->product_id = $newProduct->id;
+                $discount->save();
+            }
+
+            // ---------- Colors ----------
+            foreach ($product->colors as $color) {
+                $newProduct->colors()->attach($color->id, [
+                    'additional_price' => $color->pivot->additional_price ?? 0,
                 ]);
-            });
+            }
 
-            // Add more relationship duplications as needed
+            // ---------- Materials ----------
+            foreach ($product->materials as $material) {
+                $newProduct->materials()->attach($material->id, [
+                    'quantity' => $material->pivot->quantity ?? 0,
+                    'unit' => $material->pivot->unit ?? 'piece',
+                    'additional_price' => $material->pivot->additional_price ?? 0,
+                ]);
+            }
+
+            // ---------- Printing methods ----------
+            foreach ($product->printingMethods as $method) {
+                $newProduct->printingMethods()->attach($method->id, [
+                    'additional_price' => $method->pivot->additional_price ?? 0,
+                ]);
+            }
+
+            // ---------- Print locations ----------
+            foreach ($product->printLocations as $location) {
+                $newProduct->printLocations()->attach($location->id, [
+                    'additional_price' => $location->pivot->additional_price ?? 0,
+                ]);
+            }
+
+            // ---------- Offers ----------
+            foreach ($product->offers as $offer) {
+                $pivot = [];
+                if ($offer->pivot) {
+                    $pivot = collect($offer->pivot->getAttributes())
+                        ->except(['product_id', 'offer_id', 'created_at', 'updated_at'])
+                        ->all();
+                }
+                $newProduct->offers()->attach($offer->id, $pivot);
+            }
+
+            // ---------- Delivery time / warranty / features / text ads ----------
+            if ($product->deliveryTime) {
+                $delivery = $product->deliveryTime->replicate();
+                $delivery->product_id = $newProduct->id;
+                $delivery->save();
+            }
+
+            if ($product->warranty) {
+                $warranty = $product->warranty->replicate();
+                $warranty->product_id = $newProduct->id;
+                $warranty->save();
+            }
+
+            foreach ($product->features as $feature) {
+                $newFeature = $feature->replicate();
+                $newFeature->product_id = $newProduct->id;
+                $newFeature->save();
+            }
+
+            foreach ($product->adsText as $ad) {
+                $newAd = $ad->replicate();
+                $newAd->product_id = $newProduct->id;
+                $newAd->save();
+            }
+
+            // ---------- Product options + quantity/size tiers ----------
+            $optionMap = [];
+            foreach ($product->options as $option) {
+                $newOption = $option->replicate();
+                $newOption->product_id = $newProduct->id;
+                $newOption->depends_on_option_id = null;
+                $newOption->save();
+                $optionMap[$option->id] = $newOption->id;
+            }
+
+            foreach ($product->options as $option) {
+                if (! $option->depends_on_option_id) {
+                    continue;
+                }
+
+                $newOptionId = $optionMap[$option->id] ?? null;
+                $newDependencyId = $optionMap[$option->depends_on_option_id] ?? null;
+
+                if ($newOptionId && $newDependencyId) {
+                    ProductOptions::whereKey($newOptionId)->update([
+                        'depends_on_option_id' => $newDependencyId,
+                    ]);
+                }
+            }
+
+            foreach (DB::table('product_size_tiers')->where('product_id', $product->id)->get() as $tier) {
+                $tierData = (array) $tier;
+                unset($tierData['id']);
+
+                $tierData['product_id'] = $newProduct->id;
+                $tierData['option_id'] = $optionMap[$tier->option_id] ?? $tier->option_id;
+                $tierData['related_option_id'] = ! empty($tier->related_option_id)
+                    ? ($optionMap[$tier->related_option_id] ?? $tier->related_option_id)
+                    : null;
+                if (array_key_exists('depends_on_option_id', $tierData) && $tierData['depends_on_option_id']) {
+                    $tierData['depends_on_option_id'] = $optionMap[$tierData['depends_on_option_id']] ?? $tierData['depends_on_option_id'];
+                }
+                if (array_key_exists('parent_option_id', $tierData) && $tierData['parent_option_id']) {
+                    $tierData['parent_option_id'] = $optionMap[$tierData['parent_option_id']] ?? $tierData['parent_option_id'];
+                }
+                $tierData['created_at'] = now();
+                $tierData['updated_at'] = now();
+
+                DB::table('product_size_tiers')->insert($tierData);
+            }
 
             DB::commit();
 
             return response()->json([
                 'success' => true,
                 'message' => 'تم نسخ المنتج بنجاح',
-                'data' => $newProduct,
+                'data' => $newProduct->fresh(),
             ]);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             DB::rollBack();
-            Log::error('Error duplicating product: ' . $e->getMessage());
+            Log::error('Error duplicating product: ' . $e->getMessage(), [
+                'product_id' => $product->id,
+                'trace' => $e->getTraceAsString(),
+            ]);
 
             return response()->json([
                 'success' => false,
-                'message' => 'فشل في نسخ المنتج',
+                'message' => 'فشل في نسخ المنتج: ' . $e->getMessage(),
             ], 500);
         }
+    }
+
+    /**
+     * نسخ ملف صورة إلى مسار جديد وإرجاع المسار الجديد.
+     */
+    private function duplicateImage(string $sourcePath, string $folder): ?string
+    {
+        $disk = Storage::disk('public');
+
+        if (! $disk->exists($sourcePath)) {
+            return null;
+        }
+
+        $extension = pathinfo($sourcePath, PATHINFO_EXTENSION) ?: 'jpg';
+        $newPath = trim($folder, '/') . '/' . Str::uuid() . '.' . $extension;
+
+        if (! $disk->copy($sourcePath, $newPath)) {
+            return null;
+        }
+
+        return $newPath;
     }
 
     /**
@@ -372,6 +560,8 @@ class ProductController extends Controller
                 'stock' => $validated['stock'] ?? 0,
                 'production_type' => $request->input('production_type') === 'offset' ? 'offset' : 'digital',
                 'status_id' => $validated['status_id'],
+                'show_in_home' => $request->has('show_in_home') ? $request->boolean('show_in_home') : true,
+                'home_order' => max(0, (int) $request->input('home_order', 0)),
                 'has_discount' => $request->boolean('has_discount'),
                 'includes_tax' => $request->boolean('includes_tax'),
                 'includes_shipping' => $request->boolean('includes_shipping'),
@@ -910,6 +1100,8 @@ class ProductController extends Controller
                 'stock' => $validated['stock'] ?? 0,
                 'production_type' => $request->input('production_type') === 'offset' ? 'offset' : 'digital',
                 'status_id' => $validated['status_id'],
+                'show_in_home' => $request->has('show_in_home') ? $request->boolean('show_in_home') : true,
+                'home_order' => max(0, (int) $request->input('home_order', 0)),
                 'has_discount' => $request->boolean('has_discount'),
                 'includes_tax' => $request->boolean('includes_tax'),
                 'includes_shipping' => $request->boolean('includes_shipping'),
