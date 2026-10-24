@@ -1663,29 +1663,41 @@
                 confirmButtonText: 'نسخ',
                 cancelButtonText: 'إلغاء',
                 showLoaderOnConfirm: true,
-                preConfirm: (name) => {
+                preConfirm: async (name) => {
                     if (!name) {
                         Swal.showValidationMessage('يجب إدخال اسم للمنتج');
                         return false;
                     }
 
-                    return fetch(`/admin/products/${productId}/duplicate`, {
-                            method: 'POST',
-                            headers: {
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({
-                                name: name
-                            })
+                    const response = await fetch(`/admin/products/${productId}/duplicate`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            name: name
                         })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (!data.success) {
-                                throw new Error(data.message || 'حدث خطأ أثناء النسخ');
-                            }
-                            return data;
-                        });
+                    });
+
+                    // قد يرجع الخادم صفحة 404/500 بصيغة HTML، لذا لا نعتمد على response.json() مباشرة.
+                    const raw = await response.text();
+                    let data = null;
+                    try {
+                        data = raw ? JSON.parse(raw) : null;
+                    } catch (e) {
+                        data = null;
+                    }
+
+                    if (!response.ok || !data || !data.success) {
+                        throw new Error(
+                            data?.message ||
+                            `تعذّر نسخ المنتج (HTTP ${response.status})`
+                        );
+                    }
+
+                    return data;
                 },
                 allowOutsideClick: () => !Swal.isLoading()
             }).then((result) => {
@@ -1699,6 +1711,14 @@
                         window.location.href = '/admin/products/' + result.value.data.id + '/edit';
                     });
                 }
+            }).catch((error) => {
+                // حتى لا تظل نافذة النسخ عالقة بدون أي رسالة عند فشل الطلب.
+                Swal.fire({
+                    icon: 'error',
+                    title: 'خطأ!',
+                    text: error?.message || 'حدث خطأ أثناء نسخ المنتج',
+                    confirmButtonText: 'حسناً'
+                });
             });
         }
 

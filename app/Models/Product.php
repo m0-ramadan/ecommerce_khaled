@@ -343,7 +343,9 @@ class Product extends Model
     {
         $product = parent::resolveRouteBinding($value, $field);
 
-        if (!$product || $product->trashed() || !$product->is_active) {
+        // ملاحظة: لا يوجد عمود/accessor باسم is_active في المنتجات،
+        // وكان فحصه هنا يجعل كل مسارات {product} ترجع 404 (منها نسخ المنتج).
+        if (!$product || $product->trashed()) {
             abort(404, 'المنتج غير موجود أو غير متاح');
         }
 
