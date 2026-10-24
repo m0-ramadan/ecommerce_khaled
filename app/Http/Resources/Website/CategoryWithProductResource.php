@@ -16,10 +16,12 @@ class CategoryWithProductResource extends JsonResource
             'slug'        => $this->slug,
             'description' => $this->description,
             'parent'      => $this->whenLoaded('parent', fn() => new self($this->parent)),
-            'children'    => self::collection(CategoryResource::collection($this->children)),
+            // الأبناء لازم يخرجوا بـ CategoryResource حتى تُبنى روابط صورهم
+            // كاملة (get_user_image) بدل المسار النسبي المخزّن في قاعدة البيانات.
+            'children'    => CategoryResource::collection($this->children),
             'order'       => $this->order,
-            'image'       => $this->image,
-            'sub_image' => $this->sub_image,
+            'image'       => $this->image ? get_user_image($this->image) : null,
+            'sub_image'   => $this->sub_image ? get_user_image($this->sub_image) : null,
             'is_parent'   => $this->isParent(),
             'products'    => $request->boolean('include_products', true)
                 ? ProductResource::collection($this->products)
