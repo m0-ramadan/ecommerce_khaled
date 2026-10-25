@@ -92,7 +92,13 @@
     <div class="row g-4">
         <div class="col-lg-6">
             <div class="card shadow-sm border-0 h-100">
-                <div class="card-header bg-white border-bottom"><h5 class="mb-0">أعلى العملاء بالنقاط</h5></div>
+                <div class="card-header bg-white border-bottom d-flex flex-wrap align-items-center justify-content-between gap-2">
+                    <h5 class="mb-0">أرصدة العملاء</h5>
+                    <form method="GET" action="{{ route('admin.loyalty.index') }}" class="d-flex gap-2">
+                        <input type="text" name="q" value="{{ request('q') }}" class="form-control form-control-sm" placeholder="ابحث بالاسم أو الجوال أو البريد">
+                        <button class="btn btn-sm btn-outline-primary text-nowrap">بحث</button>
+                    </form>
+                </div>
                 <div class="card-body">
                     <div class="table-responsive">
                         <table class="table table-bordered align-middle">

@@ -15,14 +15,21 @@ class LoyaltyController extends Controller
     {
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $settings = LoyaltySetting::current();
+        $search = trim((string) $request->input('q'));
 
         $users = User::query()
-            ->where('points', '>', 0)
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                        ->orWhere('phone', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%");
+                });
+            })
             ->orderByDesc('points')
-            ->limit(30)
+            ->limit(50)
             ->get(['id', 'name', 'phone', 'email', 'points']);
 
         $transactions = PointTransaction::with(['user:id,name,phone'])
