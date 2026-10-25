@@ -110,7 +110,15 @@ class LoyaltyService
         }
 
         $eligibleAmount = max(0, (float) $order->total_amount - (float) $order->shipping_amount);
-        $points = (int) floor($eligibleAmount * (float) $settings->earn_rate);
+        $earnMode = $settings->earn_mode ?: 'amount';
+
+        $points = 0;
+        if (in_array($earnMode, ['amount', 'both'], true)) {
+            $points += (int) floor($eligibleAmount * (float) $settings->earn_rate);
+        }
+        if (in_array($earnMode, ['per_order', 'both'], true)) {
+            $points += max(0, (int) $settings->points_per_order);
+        }
 
         if ($points <= 0) {
             $order->forceFill(['points_awarded_at' => now()])->save();

@@ -43,7 +43,9 @@ class LoyaltyController extends Controller
             'value' => $settings->pointsToSar((float) $user->points),
             'settings' => [
                 'is_active' => (bool) $settings->is_active,
+                'earn_mode' => $settings->earn_mode ?: 'amount',
                 'earn_rate' => (float) $settings->earn_rate,
+                'points_per_order' => (int) $settings->points_per_order,
                 'redeem_rate' => (float) $settings->redeem_rate,
                 'min_redeem_points' => (int) $settings->min_redeem_points,
                 'max_redeem_percent' => (float) $settings->max_redeem_percent,

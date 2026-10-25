@@ -71,7 +71,7 @@ class OrderController extends Controller
             'pending' => Order::where('status', 'pending')->count(),
             'processing' => Order::where('status', 'processing')->count(),
             'shipped' => Order::where('status', 'shipped')->count(),
-            'delivered' => Order::where('status', 'delivered')->count(),
+            'delivered' => Order::whereIn('status', ['delivered', 'completed'])->count(),
             'cancelled' => Order::where('status', 'cancelled')->count(),
             'total_revenue' => Order::where('status', '!=', 'cancelled')->sum('total_amount'),
         ];
@@ -246,12 +246,14 @@ class OrderController extends Controller
             $order->shipped_at = now();
         }
 
-        if ($newStatus == 'delivered' && $oldStatus != 'delivered') {
-            $order->delivered_at = now();
+        $completedStatuses = ['delivered', 'completed'];
+
+        if (in_array($newStatus, $completedStatuses, true) && ! in_array($oldStatus, $completedStatuses, true)) {
+            $order->delivered_at = $order->delivered_at ?: now();
         }
 
         // إذا تم إلغاء الطلب، إعادة المخزون
-        if ($newStatus == 'cancelled' && !in_array($oldStatus, ['cancelled', 'delivered'])) {
+        if ($newStatus == 'cancelled' && !in_array($oldStatus, ['cancelled', 'delivered', 'completed'])) {
             foreach ($order->items as $item) {
                 $product = $item->product;
                 if ($product) {
@@ -262,8 +264,8 @@ class OrderController extends Controller
 
         $order->save();
 
-        // نقاط الولاء: منح عند التسليم، واسترجاع عند الإلغاء/الاسترداد
-        if ($newStatus === 'delivered' && $oldStatus !== 'delivered') {
+        // نقاط الولاء: منح عند التسليم (delivered أو completed)، واسترجاع عند الإلغاء/الاسترداد
+        if (in_array($newStatus, $completedStatuses, true) && ! in_array($oldStatus, $completedStatuses, true)) {
             app(\App\Services\LoyaltyService::class)->awardForOrder($order);
         }
 

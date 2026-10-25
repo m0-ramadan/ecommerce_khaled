@@ -46,8 +46,22 @@
                     </div>
                 </div>
                 <div class="col-md-3">
+                    <label class="form-label fw-bold">طريقة اكتساب النقاط</label>
+                    <select name="earn_mode" class="form-select" required>
+                        <option value="amount" {{ ($settings->earn_mode ?? 'amount') === 'amount' ? 'selected' : '' }}>حسب قيمة الطلب (لكل 1 ر.س)</option>
+                        <option value="per_order" {{ ($settings->earn_mode ?? 'amount') === 'per_order' ? 'selected' : '' }}>نقاط ثابتة لكل طلب</option>
+                        <option value="both" {{ ($settings->earn_mode ?? 'amount') === 'both' ? 'selected' : '' }}>الاثنان معًا</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">نقاط ثابتة لكل طلب</label>
+                    <input type="number" name="points_per_order" value="{{ $settings->points_per_order ?? 0 }}" min="0" step="1" class="form-control">
+                    <small class="text-muted">تُستخدم مع "نقاط ثابتة لكل طلب" أو "الاثنان معًا".</small>
+                </div>
+                <div class="col-md-3">
                     <label class="form-label fw-bold">نقاط لكل 1 ر.س</label>
                     <input type="number" name="earn_rate" value="{{ $settings->earn_rate }}" min="0" step="0.01" class="form-control" required>
+                    <small class="text-muted">تُستخدم مع "حسب قيمة الطلب" أو "الاثنان معًا".</small>
                 </div>
                 <div class="col-md-3">
                     <label class="form-label fw-bold">عدد النقاط لاستبدال 1 ر.س</label>

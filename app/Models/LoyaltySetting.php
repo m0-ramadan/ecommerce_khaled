@@ -8,7 +8,9 @@ class LoyaltySetting extends Model
 {
     protected $fillable = [
         'is_active',
+        'earn_mode',
         'earn_rate',
+        'points_per_order',
         'redeem_rate',
         'min_redeem_points',
         'max_redeem_percent',
@@ -18,7 +20,9 @@ class LoyaltySetting extends Model
 
     protected $casts = [
         'is_active' => 'boolean',
+        'earn_mode' => 'string',
         'earn_rate' => 'decimal:2',
+        'points_per_order' => 'integer',
         'redeem_rate' => 'decimal:2',
         'min_redeem_points' => 'integer',
         'max_redeem_percent' => 'decimal:2',
@@ -29,7 +33,9 @@ class LoyaltySetting extends Model
     {
         return static::query()->firstOrCreate([], [
             'is_active' => true,
+            'earn_mode' => 'amount',
             'earn_rate' => 1,
+            'points_per_order' => 0,
             'redeem_rate' => 20,
             'min_redeem_points' => 100,
             'max_redeem_percent' => 50,

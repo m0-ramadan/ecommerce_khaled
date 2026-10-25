@@ -44,7 +44,9 @@ class LoyaltyController extends Controller
     {
         $validated = $request->validate([
             'is_active' => 'nullable|boolean',
+            'earn_mode' => 'required|in:amount,per_order,both',
             'earn_rate' => 'required|numeric|min:0',
+            'points_per_order' => 'nullable|integer|min:0',
             'redeem_rate' => 'required|numeric|min:0.01',
             'min_redeem_points' => 'required|integer|min:0',
             'max_redeem_percent' => 'required|numeric|min:0|max:100',
@@ -54,7 +56,9 @@ class LoyaltyController extends Controller
 
         LoyaltySetting::current()->update([
             'is_active' => $request->boolean('is_active'),
+            'earn_mode' => $validated['earn_mode'],
             'earn_rate' => $validated['earn_rate'],
+            'points_per_order' => $validated['points_per_order'] ?? 0,
             'redeem_rate' => $validated['redeem_rate'],
             'min_redeem_points' => $validated['min_redeem_points'],
             'max_redeem_percent' => $validated['max_redeem_percent'],
