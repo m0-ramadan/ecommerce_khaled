@@ -217,10 +217,31 @@ class Product extends Model
     public function scopeFiltered($query, Request $request)
     {
         // الفلاتر المباشرة
-        $filters = ['category_id', 'status_id', 'warranty_id'];
+        $filters = ['status_id', 'warranty_id'];
         foreach ($filters as $filter) {
             if ($request->filled($filter)) {
                 $query->where($filter, $request->get($filter));
+            }
+        }
+
+        // فلتر القسم: اختيار قسم رئيسي يشمل منتجات أقسامه الفرعية أيضًا.
+        if ($request->filled('category_id')) {
+            $categoryId = $request->get('category_id');
+            $category = \App\Models\Category::find($categoryId);
+
+            if ($category) {
+                $categoryIds = [$category->id];
+
+                if (is_null($category->parent_id)) {
+                    $categoryIds = array_merge(
+                        $categoryIds,
+                        $category->children()->pluck('id')->all()
+                    );
+                }
+
+                $query->whereIn('category_id', $categoryIds);
+            } else {
+                $query->where('category_id', $categoryId);
             }
         }
 
