@@ -301,6 +301,9 @@ class OrderController extends Controller
 
         $order->update(['status' => 'cancelled']);
 
+        // إعادة النقاط المستخدمة عند إلغاء الطلب من الموقع.
+        $this->loyalty->refundForCancelledOrder($order);
+
         return $this->successResponse(
             new OrderDetailsResource($order),
             'تم إلغاء الطلب بنجاح'
