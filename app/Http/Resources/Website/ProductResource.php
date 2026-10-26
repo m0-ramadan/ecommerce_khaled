@@ -85,6 +85,17 @@ class ProductResource extends JsonResource
                 'production_type' => $this->production_delivery['production_type'],
             ],
 
+            // الكميات الأكبر من الحد ده بتتحول لمدة الأوفست (10 - 15 يوم).
+            'large_quantity_threshold' => \App\Models\Product::LARGE_QUANTITY_THRESHOLD,
+            'offset_delivery_time' => [
+                'from_days' => $this->offset_delivery['from'],
+                'to_days'   => $this->offset_delivery['to'],
+                'estimated' => $this->offset_delivery['from'] . ' - ' . $this->offset_delivery['to'] . ' أيام عمل',
+                'note'      => $this->offset_delivery['note'],
+                'starts_from' => 'تاريخ تعميد التصميم',
+                'production_type' => $this->offset_delivery['production_type'],
+            ],
+
             // ================== Warranty ==================
             'warranty' => $this->warranty ? [
                 'months'       => $this->warranty->months,

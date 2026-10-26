@@ -127,22 +127,70 @@ class Product extends Model
     }
 
     /**
+     * الحد اللي فوقه بنحوّل المنتج لمدة الأوفست مهما كان نوع إنتاجه.
+     */
+    public const LARGE_QUANTITY_THRESHOLD = 300;
+
+    /**
      * مدة التنفيذ المعتمدة حسب نوع الإنتاج المحدد في الداشبورد.
      *
      * @return array{from:int,to:int,label:string,note:string,production_type:string}
      */
     public function getProductionDeliveryAttribute(): array
     {
-        $type = $this->production_type === 'offset' ? 'offset' : 'digital';
-        [$from, $to] = $type === 'offset' ? [10, 15] : [4, 8];
+        return $this->deliveryForQuantity();
+    }
 
+    /**
+     * مدة الأوفست (للكميات الكبيرة).
+     *
+     * @return array{from:int,to:int,label:string,note:string,production_type:string}
+     */
+    public function getOffsetDeliveryAttribute(): array
+    {
+        return $this->deliveryTimes()['offset'];
+    }
+
+    /**
+     * مدد التنفيذ المتاحة.
+     *
+     * @return array<string, array{from:int,to:int,label:string,note:string,production_type:string}>
+     */
+    public function deliveryTimes(): array
+    {
         return [
-            'from' => $from,
-            'to' => $to,
-            'label' => $type === 'offset' ? 'أوفست' : 'ديجيتال',
-            'note' => 'المدة من تاريخ تعميد التصميم',
-            'production_type' => $type,
+            'digital' => [
+                'from' => 4,
+                'to' => 8,
+                'label' => 'ديجيتال',
+                'note' => 'المدة من تاريخ تعميد التصميم',
+                'production_type' => 'digital',
+            ],
+            'offset' => [
+                'from' => 10,
+                'to' => 15,
+                'label' => 'أوفست',
+                'note' => 'المدة من تاريخ تعميد التصميم',
+                'production_type' => 'offset',
+            ],
         ];
+    }
+
+    /**
+     * المدة الفعلية: نوع إنتاج المنتج، إلا لو الكمية أكبر من 300
+     * فتتحول دايمًا لمدة الأوفست.
+     *
+     * @return array{from:int,to:int,label:string,note:string,production_type:string}
+     */
+    public function deliveryForQuantity(?int $quantity = null): array
+    {
+        $type = $this->production_type === 'offset' ? 'offset' : 'digital';
+
+        if ($quantity !== null && $quantity > self::LARGE_QUANTITY_THRESHOLD) {
+            $type = 'offset';
+        }
+
+        return $this->deliveryTimes()[$type];
     }
 
     public function warranty()
