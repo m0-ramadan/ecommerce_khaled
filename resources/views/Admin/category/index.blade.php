@@ -200,6 +200,19 @@
                 </div>
             @endif
 
+            {{-- أخطاء التحقق: كانت بتضيع في صمت وخلّي المستخدم فاكر إن الحفظ مش شغال --}}
+            @if ($errors->any())
+                <div class="alert alert-danger alert-dismissible m-3" role="alert">
+                    <div class="fw-bold mb-1">تعذر حفظ القسم:</div>
+                    <ul class="mb-0 ps-3">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
             <div class="table-responsive text-nowrap" bis_skin_checked="1">
                 <table class="table table-hover">
                     <thead>
@@ -238,15 +251,20 @@
                                 </td>
 
                                 <td>
-                                    @if ($category->image)
-                                        <img src="{{ get_user_image($category->image) }} " alt="{{ $category->name }}"
+                                    @php
+                                        // الصورة الافتراضية القديمة (imgbb) بنعتبرها "بدون صورة".
+                                        $categoryImageUrl = \App\Http\Resources\Website\CategoryResource::resolveImage($category->image);
+                                        $categorySubImageUrl = \App\Http\Resources\Website\CategoryResource::resolveImage($category->sub_image);
+                                    @endphp
+                                    @if ($categoryImageUrl)
+                                        <img src="{{ $categoryImageUrl }}" alt="{{ $category->name }}"
                                             class="category-image" data-bs-toggle="tooltip" data-bs-placement="top"
                                             title="صورة القسم">
                                     @else
                                         <span class="badge bg-secondary">بدون صورة</span>
                                     @endif
 
-                                    @if ($category->sub_image)
+                                    @if ($categorySubImageUrl)
                                         <div class="mt-1" bis_skin_checked="1">
                                             <small class="text-muted">صورة فرعية</small>
                                         </div>

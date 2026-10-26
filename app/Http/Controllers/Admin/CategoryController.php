@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Website\CategoryResource;
 use App\Models\Category;
 use App\Models\Banner;
 use App\Models\BannerItem;
@@ -117,7 +118,7 @@ class CategoryController extends Controller
 
             DB::commit();
 
-            $message = 'تم إضافة القسم بنجاح';
+            $message = "تم إضافة القسم \"{$category->name}\" بنجاح";
 
             if ($request->wantsJson() || $request->is('api/*')) {
                 return response()->json([
@@ -134,7 +135,9 @@ class CategoryController extends Controller
                     ->with('add_another', true);
             }
 
-            return redirect()->route('admin.categories.index')
+            // نرجّع للّيست مع فلتر باسم القسم الجديد عشان يبان فورًا
+            // (كان ممكن يقع في صفحة تانية بسبب الترتيب/الـ pagination).
+            return redirect()->route('admin.categories.index', ['search' => $category->name])
                 ->with('success', $message);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -458,13 +461,20 @@ class CategoryController extends Controller
         $category->order = $data['order'] ?? 0;
         $category->status_id = $data['status_id'];
 
-        // Handle image uploads
+        // Handle image uploads.
+        // ملاحظة: أعمدة الصور قديمة و NOT NULL وبقيمة افتراضية صورة من imgbb،
+        // فلو مفيش رفع بنخزّن سلسلة فاضية عشان القيمة الافتراضية متتحطّش
+        // والموقع يقدر يستخدم صورة القسم أو الـ fallback.
         if ($request->hasFile('image')) {
             $category->image = $this->uploadImage($request->file('image'), 'categories', $category->image);
+        } elseif (blank($category->image) || in_array($category->image, CategoryResource::PLACEHOLDER_IMAGES, true)) {
+            $category->image = '';
         }
 
         if ($request->hasFile('sub_image')) {
             $category->sub_image = $this->uploadImage($request->file('sub_image'), 'categories/sub', $category->sub_image);
+        } elseif (blank($category->sub_image) || in_array($category->sub_image, CategoryResource::PLACEHOLDER_IMAGES, true)) {
+            $category->sub_image = '';
         }
     }
 

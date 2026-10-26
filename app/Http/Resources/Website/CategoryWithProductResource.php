@@ -20,8 +20,9 @@ class CategoryWithProductResource extends JsonResource
             // كاملة (get_user_image) بدل المسار النسبي المخزّن في قاعدة البيانات.
             'children'    => CategoryResource::collection($this->children),
             'order'       => $this->order,
-            'image'       => $this->image ? get_user_image($this->image) : null,
-            'sub_image'   => $this->sub_image ? get_user_image($this->sub_image) : null,
+            'image'       => CategoryResource::resolveImage($this->image),
+            'sub_image'   => CategoryResource::resolveImage($this->sub_image)
+                ?? CategoryResource::resolveImage($this->image),
             'is_parent'   => $this->isParent(),
             'products'    => $request->boolean('include_products', true)
                 ? ProductResource::collection($this->products)
