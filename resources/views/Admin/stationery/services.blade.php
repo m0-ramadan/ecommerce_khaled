@@ -36,6 +36,19 @@
                     <div class="input-group"><input type="number" name="price" value="{{ old('price', 10) }}" min="0" step="0.01" class="form-control" required><span class="input-group-text">ر.س</span></div>
                 </div>
                 <div class="col-md-2 d-grid"><button class="btn btn-success" type="submit"><i class="ti ti-plus me-1"></i>إضافة</button></div>
+                <div class="col-12">
+                    <label class="form-label fw-bold mb-1">المقاسات المتاحة</label>
+                    <div class="d-flex flex-wrap gap-3">
+                        @foreach ($sizes as $size)
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="available_sizes[]"
+                                       id="new-size-{{ $size }}" value="{{ $size }}" checked>
+                                <label class="form-check-label" for="new-size-{{ $size }}">{{ $size }}</label>
+                            </div>
+                        @endforeach
+                    </div>
+                    <small class="text-muted">شيل العلامة من أي مقاس عشان تمنع الخدمة عليه. مثال: شيل A1 وA2 عشان الخدمة تظهر للمقاسات الأصغر بس.</small>
+                </div>
             </form>
         </div>
     </div>
@@ -51,17 +64,36 @@
                 @method('PUT')
                 <div class="table-responsive">
                     <table class="table table-bordered align-middle">
-                        <thead class="table-light"><tr><th>اسم الخدمة</th><th>السعر</th><th class="text-center">متاح</th><th class="text-center">حذف</th></tr></thead>
+                        <thead class="table-light"><tr><th>اسم الخدمة</th><th>السعر</th><th>المقاسات المتاحة</th><th class="text-center">متاح</th><th class="text-center">حذف</th></tr></thead>
                         <tbody>
                             @forelse ($services as $service)
+                                @php
+                                    // null = كل المقاسات، [] = ولا مقاس.
+                                    $serviceSizes = is_array($service->available_sizes)
+                                        ? array_map('strtoupper', $service->available_sizes)
+                                        : array_map('strtoupper', $sizes);
+                                @endphp
                                 <tr>
                                     <td><input type="text" name="services[{{ $service->id }}][name]" value="{{ $service->name }}" class="form-control" required></td>
                                     <td><div class="input-group"><input type="number" name="services[{{ $service->id }}][price]" value="{{ $service->price }}" min="0" step="0.01" class="form-control" required><span class="input-group-text">ر.س</span></div></td>
+                                    <td>
+                                        <div class="d-flex flex-wrap gap-2">
+                                            @foreach ($sizes as $size)
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="checkbox"
+                                                           name="services[{{ $service->id }}][available_sizes][]"
+                                                           id="size-{{ $service->id }}-{{ $size }}" value="{{ $size }}"
+                                                           {{ in_array(strtoupper($size), $serviceSizes, true) ? 'checked' : '' }}>
+                                                    <label class="form-check-label small" for="size-{{ $service->id }}-{{ $size }}">{{ $size }}</label>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </td>
                                     <td class="text-center"><input type="checkbox" name="services[{{ $service->id }}][is_active]" value="1" class="form-check-input" {{ $service->is_active ? 'checked' : '' }}></td>
                                     <td class="text-center"><button type="submit" form="delete-service-{{ $service->id }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('حذف الخدمة؟')"><i class="ti ti-trash"></i></button></td>
                                 </tr>
                             @empty
-                                <tr><td colspan="4" class="text-center text-muted py-4">لا توجد خدمات مضافة.</td></tr>
+                                <tr><td colspan="5" class="text-center text-muted py-4">لا توجد خدمات مضافة.</td></tr>
                             @endforelse
                         </tbody>
                     </table>

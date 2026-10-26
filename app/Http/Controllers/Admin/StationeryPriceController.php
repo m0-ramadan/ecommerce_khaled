@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\StationeryLargeFormatRule;
 use App\Models\StationeryPrice;
 use App\Models\StationeryDeliveryArea;
 use App\Models\StationeryPaperType;
@@ -45,6 +46,10 @@ class StationeryPriceController extends Controller
         $orientations = StationeryPrice::orientations();
         $sideTypes = StationeryPrice::sideTypes();
 
+        // إعدادات سعر البداية للمقاسات الكبيرة (A1 / A2)
+        $largeFormatRules = StationeryLargeFormatRule::orderBy('paper_size')->get()
+            ->keyBy(fn ($rule) => strtoupper($rule->paper_size));
+
         // إحصائيات سريعة للطلبات
         $stationeryOrdersCount = OrderItem::whereHas('product', function ($q) {
             $q->where('slug', 'stationery-print-service');
@@ -58,6 +63,7 @@ class StationeryPriceController extends Controller
             'paperTypes',
             'orientations',
             'sideTypes',
+            'largeFormatRules',
             'stationeryOrdersCount'
         ));
     }
@@ -74,8 +80,9 @@ class StationeryPriceController extends Controller
     public function services()
     {
         $services = StationeryService::orderBy('sort_order')->orderBy('name')->get();
+        $sizes = StationeryService::supportedSizes();
 
-        return view('Admin.stationery.services', compact('services'));
+        return view('Admin.stationery.services', compact('services', 'sizes'));
     }
 
     public function storeService(Request $request)
@@ -83,6 +90,8 @@ class StationeryPriceController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:150|unique:stationery_services,name',
             'price' => 'required|numeric|min:0',
+            'available_sizes' => 'nullable|array',
+            'available_sizes.*' => 'string|in:' . implode(',', StationeryService::supportedSizes()),
         ]);
 
         $baseKey = Str::slug($validated['name']) ?: 'service-' . Str::lower(Str::random(8));
@@ -96,6 +105,7 @@ class StationeryPriceController extends Controller
             'key' => $key,
             'name' => trim($validated['name']),
             'price' => $validated['price'],
+            'available_sizes' => $this->normalizeAvailableSizes($validated['available_sizes'] ?? null),
             'is_active' => true,
             'sort_order' => (StationeryService::max('sort_order') ?? 0) + 1,
         ]);
@@ -111,12 +121,43 @@ class StationeryPriceController extends Controller
                 $service->update([
                     'name' => trim((string) ($values['name'] ?? $service->name)),
                     'price' => max(0, (float) ($values['price'] ?? $service->price)),
+                    'available_sizes' => $this->normalizeAvailableSizes($values['available_sizes'] ?? null),
                     'is_active' => isset($values['is_active']),
                 ]);
             }
         }
 
         return back()->with('success', 'تم تحديث الخدمات الإضافية.');
+    }
+
+    /**
+     * المقاسات المختارة للخدمة. لو كل المقاسات متاحة نخزن null
+     * (يعني الخدمة متاحة للكل) بدل ما نخزن مصفوفة كاملة.
+     */
+    protected function normalizeAvailableSizes($sizes): ?array
+    {
+        if (! is_array($sizes)) {
+            return null;
+        }
+
+        $supported = array_map('strtoupper', StationeryService::supportedSizes());
+        $selected = array_values(array_intersect(
+            array_map(fn ($size) => strtoupper(trim((string) $size)), $sizes),
+            $supported
+        ));
+
+        // كل المقاسات مختارة = null (متاحة للكل).
+        if (count($selected) === count($supported)) {
+            return null;
+        }
+
+        // ولا مقاس مختار = الخدمة متاحة (مؤقتاً) لكن مش هتظهر لأي مقاس.
+        if ($selected === []) {
+            return [];
+        }
+
+        // نحافظ على ترتيب المقاسات المنطقي (A1, A2, ...).
+        return array_values(array_intersect($supported, $selected));
     }
 
     public function destroyService(StationeryService $service)
@@ -283,6 +324,47 @@ class StationeryPriceController extends Controller
 
         return redirect()->route('admin.stationery.index')
             ->with('success', 'تم حفظ وتحديث أسعار خدمات القرطاسية والطباعة بنجاح!');
+    }
+
+    /**
+     * تحديث أسعار البداية للمقاسات الكبيرة (A1 / A2) وعدد الورق المشمول،
+     * وتفعيل/إلغاء الحد الأدنى للفاتورة.
+     */
+    public function updateLargeFormatRules(Request $request)
+    {
+        $validated = $request->validate([
+            'rules' => 'required|array',
+            'rules.*.included_sheets' => 'nullable|integer|min:0|max:100000',
+            'rules.*.single_bw_price' => 'nullable|numeric|min:0',
+            'rules.*.single_color_price' => 'nullable|numeric|min:0',
+            'rules.*.double_bw_price' => 'nullable|numeric|min:0',
+            'rules.*.double_color_price' => 'nullable|numeric|min:0',
+        ]);
+
+        foreach ($validated['rules'] as $size => $values) {
+            $size = strtoupper((string) $size);
+
+            if (! in_array($size, StationeryLargeFormatRule::sizes(), true)) {
+                continue;
+            }
+
+            StationeryLargeFormatRule::updateOrCreate(
+                ['paper_size' => $size],
+                [
+                    'is_minimum_enabled' => ! empty($values['is_minimum_enabled']),
+                    'included_sheets' => max(0, (int) ($values['included_sheets'] ?? 0)),
+                    'single_bw_price' => max(0, (float) ($values['single_bw_price'] ?? 0)),
+                    'single_color_price' => max(0, (float) ($values['single_color_price'] ?? 0)),
+                    'double_bw_price' => max(0, (float) ($values['double_bw_price'] ?? 0)),
+                    'double_color_price' => max(0, (float) ($values['double_color_price'] ?? 0)),
+                ]
+            );
+        }
+
+        StationeryLargeFormatRule::flushCache();
+
+        return redirect()->route('admin.stationery.index')
+            ->with('success', 'تم تحديث أسعار البداية للمقاسات الكبيرة بنجاح!');
     }
 
     /**

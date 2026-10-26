@@ -2,40 +2,48 @@
 
 namespace App\Services;
 
+use App\Models\StationeryLargeFormatRule;
+
 class StationeryPricingService
 {
     /**
-     * عدد الورق المشمول في السعر الأدنى للمقاسات الكبيرة A1 / A2.
+     * القيمة الافتراضية لعدد الورق المشمول في سعر البداية
+     * (تُستخدم فقط لو جدول إعدادات المقاسات الكبيرة غير موجود).
      */
     public const LARGE_FORMAT_INCLUDED_SHEETS = 100;
 
     /**
-     * السعر الأدنى لأول 100 ورقة للمقاسات الكبيرة.
-     * A2: 400 وجه واحد / 750 وجهين — A1: 500 وجه واحد / 900 وجهين.
-     * وتُضاف 100 ريال لأي حالة ملونة.
+     * سعر البداية للمقاسات الكبيرة.
+     * القيم بقت تُدار من الداشبورد (stationery_large_format_rules)،
+     * والثوابت دي مجرد fallback لو الجدول لسه مش موجود.
+     */
+    protected array $fallbackMinimums = [
+        'A2' => [
+            'single' => ['bw' => 400.0, 'color' => 500.0],
+            'double' => ['bw' => 750.0, 'color' => 850.0],
+        ],
+        'A1' => [
+            'single' => ['bw' => 500.0, 'color' => 600.0],
+            'double' => ['bw' => 900.0, 'color' => 1000.0],
+        ],
+    ];
+
+    /**
+     * سعر البداية حسب المقاس والوجه واللون.
      */
     public function largeFormatMinimum(string $paperSize, string $sideType = 'single', string $colorType = 'bw'): float
     {
         $size = strtoupper($paperSize);
 
-        $minimums = [
-            'A2' => [
-                'single' => 400.0,
-                'double' => 750.0,
-            ],
-            'A1' => [
-                'single' => 500.0,
-                'double' => 900.0,
-            ],
-        ];
-
-        $base = $minimums[$size][$sideType === 'double' ? 'double' : 'single'] ?? 0.0;
-
-        if ($colorType === 'color') {
-            $base += 100.0;
+        $rule = StationeryLargeFormatRule::forSize($size);
+        if ($rule) {
+            return $rule->startingPrice($sideType, $colorType);
         }
 
-        return $base;
+        $side = $sideType === 'double' ? 'double' : 'single';
+        $color = $colorType === 'color' ? 'color' : 'bw';
+
+        return (float) ($this->fallbackMinimums[$size][$side][$color] ?? 0.0);
     }
 
     /**
@@ -49,7 +57,7 @@ class StationeryPricingService
 
     /**
      * إجمالي تكلفة الطباعة لعدد من الورق.
-     * - A1 / A2: سعر أدنى ثابت لأول 100 ورقة، ثم سعر كل ورقة زيادة من الداشبورد.
+     * - A1 / A2: حسب إعدادات الداشبورد (سعر بداية + عدد ورق مشمول، أو سعر × عدد).
      * - A3 / A4 / A5: عدد الورق × السعر اليدوي للمقاس.
      */
     public function total(
@@ -61,14 +69,23 @@ class StationeryPricingService
         string $sideType = 'single'
     ): float {
         $size = strtoupper($paperSize);
+        $pricePerSheet = $this->pagePrice($basePrice, $size, $paperType);
 
         if (in_array($size, ['A1', 'A2'], true)) {
-            $minimumTotal = $this->largeFormatMinimum($size, $sideType, $colorType);
+            $rule = StationeryLargeFormatRule::forSize($size);
+
+            if ($rule) {
+                return $rule->total($pricePerSheet, $sheets, $colorType, $sideType);
+            }
+
             $extraSheets = max(0, $sheets - self::LARGE_FORMAT_INCLUDED_SHEETS);
 
-            return round($minimumTotal + ($extraSheets * $this->pagePrice($basePrice, $size, $paperType)), 2);
+            return round(
+                $this->largeFormatMinimum($size, $sideType, $colorType) + ($extraSheets * $pricePerSheet),
+                2
+            );
         }
 
-        return round($sheets * $this->pagePrice($basePrice, $size, $paperType), 2);
+        return round($sheets * $pricePerSheet, 2);
     }
 }

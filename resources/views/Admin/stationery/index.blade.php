@@ -69,6 +69,90 @@
         </div>
     @endif
 
+    {{-- Large Format Rules (A1 / A2) --}}
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header border-bottom bg-white d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div>
+                <h5 class="mb-1 fw-bold">
+                    <i class="ti ti-size text-warning me-1"></i>
+                    أسعار البداية للمقاسات الكبيرة (A1 / A2)
+                </h5>
+                <p class="text-muted mb-0 small">
+                    تحكم في سعر البداية وعدد الورق المشمول، ويمكنك إلغاء الحد الأدنى نهائياً.
+                </p>
+            </div>
+            <button type="submit" form="largeFormatForm" class="btn btn-outline-primary btn-sm">
+                <i class="ti ti-device-floppy me-1"></i>حفظ إعدادات A1 / A2
+            </button>
+        </div>
+        <form id="largeFormatForm" action="{{ route('admin.stationery.large-format-rules.update') }}" method="POST">
+            @csrf
+            @method('PUT')
+            <div class="card-body">
+                <div class="alert alert-info bg-info-subtle border-0 mb-3">
+                    <strong>كيف يعمل؟</strong>
+                    لو «الحد الأدنى» مفعّل: إجمالي الطباعة = سعر البداية لأول عدد الورق المشمول، وأي ورقة زيادة تُحسب بسعر الورقة.
+                    لو ملغي: إجمالي الطباعة = عدد الورق × سعر الورقة، بدون أي حد أدنى.
+                    عدد الورق مسموح بأي كمية في كل الحالات.
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered align-middle mb-0">
+                        <thead class="table-light text-center">
+                            <tr>
+                                <th rowspan="2" class="align-middle">المقاس</th>
+                                <th rowspan="2" class="align-middle">الحد الأدنى مفعّل؟</th>
+                                <th rowspan="2" class="align-middle">عدد الورق المشمول</th>
+                                <th colspan="2">وجه واحد</th>
+                                <th colspan="2">وجهين</th>
+                            </tr>
+                            <tr>
+                                <th class="small py-1">أبيض وأسود</th>
+                                <th class="small py-1">ألوان</th>
+                                <th class="small py-1">أبيض وأسود</th>
+                                <th class="small py-1">ألوان</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (['A1', 'A2'] as $size)
+                                @php $rule = $largeFormatRules[$size] ?? null; @endphp
+                                <tr>
+                                    <td class="text-center">
+                                        <span class="badge bg-label-primary badge-size">{{ $size }}</span>
+                                        <div class="small text-muted mt-1">{{ $dimensions[$size] ?? '' }}</div>
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="hidden" name="rules[{{ $size }}][is_minimum_enabled]" value="0">
+                                        <input class="form-check-input" type="checkbox"
+                                               name="rules[{{ $size }}][is_minimum_enabled]" value="1"
+                                               @checked(old("rules.$size.is_minimum_enabled", $rule?->is_minimum_enabled ?? true))>
+                                    </td>
+                                    <td>
+                                        <div class="input-group input-group-sm">
+                                            <input type="number" min="0" step="1" class="form-control text-center"
+                                                   name="rules[{{ $size }}][included_sheets]"
+                                                   value="{{ old("rules.$size.included_sheets", $rule?->included_sheets ?? 100) }}">
+                                            <span class="input-group-text">ورقة</span>
+                                        </div>
+                                    </td>
+                                    @foreach ([['single_bw_price', 'single', 'bw'], ['single_color_price', 'single', 'color'], ['double_bw_price', 'double', 'bw'], ['double_color_price', 'double', 'color']] as $priceField)
+                                        <td>
+                                            <div class="input-group input-group-sm">
+                                                <input type="number" min="0" step="0.05" class="form-control fw-bold text-center"
+                                                       name="rules[{{ $size }}][{{ $priceField[0] }}]"
+                                                       value="{{ old("rules.$size.{$priceField[0]}", $rule?->{$priceField[0]} ?? 0) }}">
+                                                <span class="input-group-text">ر.س</span>
+                                            </div>
+                                        </td>
+                                    @endforeach
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </form>
+    </div>
+
     {{-- Main Form --}}
     <form id="pricingForm" action="{{ route('admin.stationery.update') }}" method="POST">
         @csrf
@@ -111,9 +195,9 @@
                             <strong>قواعد التسعير:</strong>
                             جميع الأسعار من A1 إلى A5 تُدخل يدوياً لكل نوع ورق ووجه واتجاه (لا توجد معادلات أو مضاعفات).
                             الورق العادي متاح فقط حتى مقاس A3، أما A1 وA2 فيُتاحان بنوعي الكوشيه والمقوّى.
-                            للمقاسين A1 وA2: الحد الأدنى 100 ورقة، وسعر أول 100 ورقة هو 500 ر.س لـA1 و400 ر.س لـA2 لوجه واحد أبيض وأسود،
-                            و900 ر.س لـA1 و750 ر.س لـA2 لوجهين، وتُضاف 100 ر.س لأي حالة ملونة،
-                            ثم تُحسب كل ورقة زيادة بالسعر المسجل للمقاس والوجه واللون.
+                            للمقاسين A1 وA2: سعر البداية وعدد الورق المشمول (وتفعيل/إلغاء الحد الأدنى) تُضبط من بطاقة
+                            «أسعار البداية للمقاسات الكبيرة» بالأعلى، ثم تُحسب كل ورقة زيادة بالسعر المسجل للمقاس والوجه واللون.
+                            عدد الورق مسموح بأي كمية لكل المقاسات.
                         </div>
                         <div class="table-responsive text-nowrap">
                             <table class="table table-bordered table-hover align-middle">

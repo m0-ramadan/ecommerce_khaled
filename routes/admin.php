@@ -412,6 +412,7 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
     Route::prefix('stationery')->name('stationery.')->group(function () {
         Route::get('/prices', [\App\Http\Controllers\Admin\StationeryPriceController::class, 'index'])->name('index');
         Route::put('/prices', [\App\Http\Controllers\Admin\StationeryPriceController::class, 'update'])->name('update');
+        Route::put('/large-format-rules', [\App\Http\Controllers\Admin\StationeryPriceController::class, 'updateLargeFormatRules'])->name('large-format-rules.update');
         Route::get('/delivery-areas', [\App\Http\Controllers\Admin\StationeryPriceController::class, 'deliveryAreas'])->name('delivery-areas.index');
         Route::get('/paper-types', [\App\Http\Controllers\Admin\StationeryPriceController::class, 'paperTypes'])->name('paper-types.index');
         Route::post('/paper-types', [\App\Http\Controllers\Admin\StationeryPriceController::class, 'storePaperType'])->name('paper-types.store');

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Product;
+use App\Models\StationeryLargeFormatRule;
 use App\Models\StationeryPrice;
 use App\Models\StationeryDeliveryArea;
 use App\Models\StationeryService;
@@ -44,12 +45,16 @@ class StationeryController extends Controller
                 'prices' => $prices,
                 'services' => StationeryService::where('is_active', true)
                     ->orderBy('sort_order')
-                    ->get(['id', 'key', 'name', 'price']),
-                'pricing_rules' => [
-                    // كل أسعار A1 إلى A5 تُدار يدوياً من الداشبورد بدون معادلات.
-                    'A1' => ['minimum_total' => 500, 'minimum_total_double' => 900, 'minimum_sheets' => 100, 'color_extra' => 100],
-                    'A2' => ['minimum_total' => 400, 'minimum_total_double' => 750, 'minimum_sheets' => 100, 'color_extra' => 100],
-                ],
+                    ->get(['id', 'key', 'name', 'price', 'available_sizes']),
+                // إعدادات أسعار البداية للمقاسات الكبيرة (A1 / A2) — تُدار من الداشبورد.
+                'pricing_rules' => collect(StationeryLargeFormatRule::sizes())
+                    ->mapWithKeys(function (string $size) {
+                        $rule = StationeryLargeFormatRule::forSize($size);
+
+                        return [$size => $rule ? $rule->toPricingRule() : null];
+                    })
+                    ->filter()
+                    ->all(),
                 'min_order_price' => 0.50,
             ],
         ]);
@@ -389,14 +394,8 @@ class StationeryController extends Controller
             $sideType = $fileItem['side_type'] ?? 'single';
             $orientation = $fileItem['orientation'] ?? 'portrait';
 
+            // عدد الورق مفتوح لكل المقاسات — مفيش حد أدنى للطلب.
             $sheetsCount = $pagesCount * $copies;
-            if (in_array($paperSize, ['A1', 'A2'], true) && $sheetsCount < 100) {
-                return response()->json([
-                    'status' => false,
-                    'message' => "المقاس {$paperSize} يتطلب حدًا أدنى 100 ورقة. "
-                        . "عدد الورق الحالي = {$sheetsCount} ورقة.",
-                ], 422);
-            }
 
             // الورق العادي متاح فقط حتى مقاس A3.
             if (in_array($paperSize, ['A1', 'A2'], true) && $paperType === 'plain') {
@@ -452,6 +451,20 @@ class StationeryController extends Controller
             $fileServices = $activeServices->filter(
                 fn ($service) => $fileServiceKeys->contains($service->key)
             );
+
+            // بعض الخدمات متاحة لمقاسات معينة بس (مثلاً مفيش سلك بلاستك لمقاس A1/A2).
+            $servicesNotAllowed = $fileServices
+                ->reject(fn ($service) => $service->isAvailableForSize($paperSize));
+
+            if ($servicesNotAllowed->isNotEmpty()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'الخدمات الإضافية ('
+                        . implode('، ', $servicesNotAllowed->pluck('name')->all())
+                        . ") غير متاحة لمقاس {$paperSize}.",
+                ], 422);
+            }
+
             $fileServicesTotal = round((float) $fileServices->sum('price') * $copies, 2);
 
             $fileTotal = round($printTotal + $fileServicesTotal, 2);
