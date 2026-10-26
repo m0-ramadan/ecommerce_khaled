@@ -59,10 +59,7 @@ class ProductController extends Controller
             });
         }
 
-        // Apply additional filters
-        if ($request->filled('category_id')) {
-            $query->where('category_id', $request->category_id);
-        }
+        // فلتر التصنيف بيتطبق جوه scopeFiltered (وبيشمل الفروع كلها).
 
         if ($request->filled('status_id')) {
             $query->where('status_id', $request->status_id);
@@ -126,6 +123,14 @@ class ProductController extends Controller
         $categories = Category::with('parent')
             ->whereNotNull('parent_id')
             ->get();
+
+        // شجرة التصنيفات للفلتر: الرئيسي وفروعه بكل المستويات.
+        $categoryTree = Category::with('childrenRecursive')
+            ->whereNull('parent_id')
+            ->orderBy('order')
+            ->orderBy('name')
+            ->get();
+
         $colors = Color::all();
         $materials = Material::all();
         $printingMethods = PrintingMethod::all();
@@ -138,6 +143,7 @@ class ProductController extends Controller
             'inactiveProducts',
             'lowStockProducts',
             'categories',
+            'categoryTree',
             'colors',
             'materials',
             'printingMethods',

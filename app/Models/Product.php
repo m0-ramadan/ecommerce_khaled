@@ -272,25 +272,15 @@ class Product extends Model
             }
         }
 
-        // فلتر القسم: اختيار قسم رئيسي يشمل منتجات أقسامه الفرعية أيضًا.
+        // فلتر القسم: اختيار قسم رئيسي يشمل منتجات أقسامه الفرعية بكل المستويات.
         if ($request->filled('category_id')) {
-            $categoryId = $request->get('category_id');
-            $category = \App\Models\Category::find($categoryId);
+            $categoryId = (int) $request->get('category_id');
+            $categoryIds = array_merge(
+                [$categoryId],
+                \App\Models\Category::descendantIdsOf($categoryId)
+            );
 
-            if ($category) {
-                $categoryIds = [$category->id];
-
-                if (is_null($category->parent_id)) {
-                    $categoryIds = array_merge(
-                        $categoryIds,
-                        $category->children()->pluck('id')->all()
-                    );
-                }
-
-                $query->whereIn('category_id', $categoryIds);
-            } else {
-                $query->where('category_id', $categoryId);
-            }
+            $query->whereIn('category_id', $categoryIds);
         }
 
         // هل لديه خصم؟

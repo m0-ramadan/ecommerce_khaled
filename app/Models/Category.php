@@ -55,6 +55,40 @@ class Category extends Model
         return $this->hasMany(Category::class, 'parent_id')->orderBy('order');
     }
 
+    /**
+     * كل الأبناء بكل المستويات (للفلاتر والقوائم الشجرية).
+     */
+    public function childrenRecursive()
+    {
+        return $this->children()->with('childrenRecursive');
+    }
+
+    /**
+     * IDs كل التصنيفات الفرعية تحت التصنيف ده (بكل المستويات).
+     *
+     * @return array<int, int>
+     */
+    public static function descendantIdsOf(int $categoryId): array
+    {
+        $byParent = static::query()
+            ->get(['id', 'parent_id'])
+            ->groupBy(fn ($category) => (int) ($category->parent_id ?? 0));
+
+        $ids = [];
+        $stack = [$categoryId];
+
+        while ($stack) {
+            $current = array_pop($stack);
+
+            foreach ($byParent->get($current, []) as $child) {
+                $ids[] = (int) $child->id;
+                $stack[] = (int) $child->id;
+            }
+        }
+
+        return array_values(array_unique($ids));
+    }
+
     public function products()
     {
         return $this->hasMany(Product::class)->where('status_id', 1);

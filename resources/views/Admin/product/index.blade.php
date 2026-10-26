@@ -627,9 +627,10 @@
                                     <h6 class="filter-section-title">التصنيفات</h6>
                                     <select class="form-select select2" id="categoryFilter" name="category_id">
                                         <option value="">جميع التصنيفات</option>
-                                        @foreach ($categories as $category)
-                                            <option value="{{ $category->id }}">{{ $category->name }}</option>
-                                        @endforeach
+                                        @include('Admin.product.partials.category-options', [
+                                            'categories' => $categoryTree,
+                                            'level' => 0,
+                                        ])
                                     </select>
                                 </div>
                             </div>
