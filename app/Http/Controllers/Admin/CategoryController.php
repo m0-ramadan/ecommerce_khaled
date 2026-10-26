@@ -357,7 +357,9 @@ class CategoryController extends Controller
 
         return $request->validate([
             'name' => 'required|string|max:255',
-            'slug' => 'nullable|string|max:255|unique:categories,slug,' . $categoryId,
+            // مش بنستخدم unique هنا: لو الـ slug مكرر بنضيف له رقم تلقائيًا
+            // في fillCategoryData بدل ما الحفظ يفشل برسالة "الرابط مأخوذ".
+            'slug' => 'nullable|string|max:255',
             'description' => 'nullable|string',
             'parent_id' => 'nullable|exists:categories,id',
             'order' => 'nullable|integer|min:0',
@@ -454,7 +456,11 @@ class CategoryController extends Controller
     {
         $category->name = $data['name'];
         if (!empty($data['slug'])) {
-            $category->slug = $data['slug'];
+            // لو الـ slug مستخدم بالفعل نضيف -1 / -2 ... بدل ما الحفظ يفشل.
+            $category->slug = Category::generateUniqueSlug(
+                $data['slug'],
+                $category->exists ? $category->id : null
+            );
         }
         $category->description = $data['description'] ?? null;
         $category->parent_id = $data['parent_id'] ?? null;
