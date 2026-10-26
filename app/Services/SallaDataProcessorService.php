@@ -699,7 +699,10 @@ class SallaDataProcessorService
             // ومش عايزينها ترجع تاني مع أي استيراد جديد.
             || str_contains($optionName, 'واتس')
             || str_contains($optionName, 'ايميل')
-            || str_contains($optionName, 'إيميل')) {
+            || str_contains($optionName, 'إيميل')
+            // رسوم الشحن بقت بتتحسب من خدمة الشحن نفسها مش كخيار على المنتج.
+            || str_contains($optionName, 'شحن')
+            || str_contains($optionName, 'توصيل')) {
             return;
         }
 
