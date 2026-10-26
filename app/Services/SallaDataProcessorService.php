@@ -694,7 +694,12 @@ class SallaDataProcessorService
         if (str_contains($optionName, 'تصوير عينة')
             || str_contains($optionName, 'عينة قبل طباعة')
             || str_contains($optionName, 'مدة التنفيذ للمنتج')
-            || str_contains($optionName, 'مدة تنفيذ المنتج')) {
+            || str_contains($optionName, 'مدة تنفيذ المنتج')
+            // خيارات إرسال الطلب القديمة (واتساب/إيميل) اتشالت من كل المنتجات
+            // ومش عايزينها ترجع تاني مع أي استيراد جديد.
+            || str_contains($optionName, 'واتس')
+            || str_contains($optionName, 'ايميل')
+            || str_contains($optionName, 'إيميل')) {
             return;
         }
 
