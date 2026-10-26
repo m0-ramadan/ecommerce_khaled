@@ -127,7 +127,8 @@ return [
     ],
     'oto' => [
     'api_url' => env('OTO_API_URL', 'https://api.tryoto.com/rest/v2/'),
-    'api_token' => env('OTO_API_KEY','AMf-vBwvpqeBuVWQlcFwqVsjjwWL1bPf0P1F64Ne_eNWn17BrJj5jQADtnYC_VbJh6-PRJ1EvPlmbkObml-VNchJfmwyQ5RqEBG1YRA902az1WFdJR2LZ6zbCyRYkB2sAEsaohqshI0VRvd-U6DFGoP40kEw1sG-08AwsvsdMM9bc9pT1GF5DWDzIER1ikoxb1hn9IVpbUF5cqXDk0U3Tmbdt7W4O2DNNA'),
+    // لازم يتحدد من الـ .env — مفيش توكن مكتوب في الكود.
+    'api_token' => env('OTO_API_KEY'),
     'sender_address' => env('OTO_SENDER_ADDRESS'),
     'sender_city' => env('OTO_SENDER_CITY', 'Riyadh'),
     'sender_phone' => env('OTO_SENDER_PHONE'),
