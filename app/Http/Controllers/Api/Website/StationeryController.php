@@ -64,6 +64,15 @@ class StationeryController extends Controller
     {
         $riyadh = StationeryDeliveryArea::riyadh();
 
+        // السعر والحالة بيتقروا من الداشبورد مش من ثابت في الكود.
+        $price = (float) $riyadh->price;
+
+        $areas = $riyadh->is_active ? [[
+            'id' => $riyadh->id,
+            'name' => $riyadh->name ?: StationeryDeliveryArea::RIYADH_NAME,
+            'price' => $price,
+        ]] : [];
+
         return response()->json([
             'status' => true,
             'data' => [
@@ -72,14 +81,8 @@ class StationeryController extends Controller
                     'name' => 'استلام من الفرع',
                     'price' => 0,
                 ],
-                'areas' => [
-                    [
-                        'id' => $riyadh->id,
-                        'name' => StationeryDeliveryArea::RIYADH_NAME,
-                        'price' => StationeryDeliveryArea::RIYADH_PRICE,
-                    ],
-                ],
-                'delivery_note' => 'التوصيل داخل الرياض فقط — 20 ريال لأي مكان',
+                'areas' => $areas,
+                'delivery_note' => 'التوصيل داخل الرياض فقط — ' . rtrim(rtrim(number_format($price, 2, '.', ''), '0'), '.') . ' ريال لأي مكان',
             ],
         ]);
     }
