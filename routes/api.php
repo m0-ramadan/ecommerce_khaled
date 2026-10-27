@@ -23,6 +23,7 @@ use App\Http\Controllers\Api\Website\OtoV2ShippingController;
 use App\Http\Controllers\Api\Website\ArticleCommentController;
 use App\Http\Controllers\Api\Website\ArticleCategoryController;
 use App\Http\Controllers\Api\Website\CustomizationOptionsController;
+use App\Http\Controllers\Api\Website\WhatsAppWebhookController;
 
 
 Route::prefix('v1')->group(function () {
@@ -132,6 +133,11 @@ Route::prefix('v1')->group(function () {
     Route::get('trace/{codeOrder}', [OrderController::class, 'traceOrder'])->name('trace');
 
     Route::post('/paymob/webhook', [OrderController::class, 'webhook'])->withoutMiddleware(['throttle:60,1']);
+
+    // WhatsApp Cloud API webhook (Meta → السيرفر)
+    Route::get('whatsapp/webhook', [WhatsAppWebhookController::class, 'verify']);
+    Route::post('whatsapp/webhook', [WhatsAppWebhookController::class, 'receive'])
+        ->withoutMiddleware(['throttle:api', 'throttle:60,1']);
 
     // مقالات
     Route::prefix('articles')->group(function () {
