@@ -55,6 +55,11 @@ return [
         'public_key' => env('PAYMOB_PUBLIC_KEY'),
         'hmac_secret' => env('PAYMOB_HMAC_SECRET'),
         'integration_id' => env('PAYMOB_INTEGRATION_ID'),
+        // ممكن أكتر من تكامل (كارت + Apple Pay) مفصولين بفاصلة.
+        'integration_ids' => array_values(array_filter(array_map(
+            'intval',
+            explode(',', (string) env('PAYMOB_INTEGRATION_IDS', env('PAYMOB_INTEGRATION_ID', '')))
+        ))),
         'iframe_id' => env('PAYMOB_IFRAME_ID'),
         'username' => env('PAYMOB_USERNAME'),
         'password' => env('PAYMOB_PASSWORD'),

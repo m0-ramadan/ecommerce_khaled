@@ -115,7 +115,11 @@ trait HandlesPaymobPayment
                 'amount_cents'     => $amountInCents,
                 'currency'         => 'SAR',
                 'reference_id'     => $order->order_number,
-                'payment_methods'  => [config('services.paymob.integration_id')],
+                // ممكن يكون أكتر من تكامل (كارت + Apple Pay) — الاتنين بيظهروا للعميل.
+                'payment_methods'  => array_values(array_map(
+                    'intval',
+                    config('services.paymob.integration_ids') ?: [config('services.paymob.integration_id')]
+                )),
                 'full_name'        => $order->customer_name,
                 'email'            => $order->customer_email ?? 'customer@example.com',
                 'phone_number'     => $this->paymobPhoneNumber($order->customer_phone),
