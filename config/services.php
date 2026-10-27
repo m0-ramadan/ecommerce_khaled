@@ -133,6 +133,7 @@ return [
         'api_version' => env('WHATSAPP_CLOUD_API_VERSION', 'v25.0'),
         'otp_template' => env('WHATSAPP_CLOUD_OTP_TEMPLATE', 'waitmeyah_otp'),
         'otp_language' => env('WHATSAPP_CLOUD_OTP_LANGUAGE', 'ar'),
+        'waba_id' => env('WHATSAPP_CLOUD_WABA_ID'),
         // Webhook (Meta → nosso servidor)
         'webhook_verify_token' => env('WHATSAPP_CLOUD_WEBHOOK_VERIFY_TOKEN'),
         'app_secret' => env('WHATSAPP_CLOUD_APP_SECRET'),
