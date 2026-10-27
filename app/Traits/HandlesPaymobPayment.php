@@ -47,10 +47,17 @@ trait HandlesPaymobPayment
      */
     private function paymobAuthenticate(): array
     {
-        $response = Http::post('https://ksa.paymob.com/api/auth/tokens', [
-            'username' => config('services.paymob.username'),
-            'password' => config('services.paymob.password'),
-        ]);
+        // الحسابات الجديدة في Paymob بتستخدم API Key (JWT) بدل username/password.
+        $apiKey = config('services.paymob.api_key');
+
+        $payload = $apiKey
+            ? ['api_key' => $apiKey]
+            : [
+                'username' => config('services.paymob.username'),
+                'password' => config('services.paymob.password'),
+            ];
+
+        $response = Http::post('https://ksa.paymob.com/api/auth/tokens', $payload);
 
         if ($response->failed()) {
             return [
