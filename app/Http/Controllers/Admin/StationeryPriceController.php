@@ -334,6 +334,9 @@ class StationeryPriceController extends Controller
     {
         $validated = $request->validate([
             'rules' => 'required|array',
+            // لازم يكون موجود هنا عشان validate() يرجّعه؛ وإلا الحقل بيتشال
+            // ويفضل الحد الأدنى مقفول دايمًا.
+            'rules.*.is_minimum_enabled' => 'nullable|in:0,1',
             'rules.*.included_sheets' => 'nullable|integer|min:0|max:100000',
             'rules.*.single_bw_price' => 'nullable|numeric|min:0',
             'rules.*.single_color_price' => 'nullable|numeric|min:0',
