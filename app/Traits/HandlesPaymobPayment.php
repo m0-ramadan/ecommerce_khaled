@@ -219,12 +219,12 @@ trait HandlesPaymobPayment
 
             $order = Order::where('order_number', $orderNumber)->first();
 
-            if ($order && $order->status === 'pending') {
+            if ($order && $order->status_payment !== Order::PAYMENT_STATUS_PAID) {
                 $order->update([
-                    'status'         => 'paid',
+                    'status_payment' => Order::PAYMENT_STATUS_PAID,
+                    'status'         => 'processing',
                     'payment_method' => 'paymob',
                     'transaction_id' => $obj['id'],
-                    'paid_at'         => now(),
                 ]);
 
                 // هنا نفذ كل حاجة: تفريغ المخزون، إرسال إيميل، إشعار واتساب، إلخ

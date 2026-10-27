@@ -396,27 +396,21 @@ class OrderController extends Controller
 
     public function webhook(Request $request)
     {
-        $hmacSecret = config('services.paymob.hmac_secret');
-
-        $receivedHmac = $request->header('X-Paymob-Hmac-Signature')
-            ?? $request->input('hmac');
-
-        if (! $receivedHmac || empty($hmacSecret)) {
-            return response('Unauthorized', 401);
-        }
-
-        $obj = $request->input('obj');
-        $concatenated = collect($obj)->flatten()->implode('');
-        $calculatedHmac = hash_hmac('sha512', $concatenated, $hmacSecret);
-
-        if (! hash_equals($calculatedHmac, $receivedHmac)) {
+        // التحقق من التوقيع بنفس منطق Paymob (ترتيب حقول ثابت) — موجود في الـ trait.
+        if (! $this->verifyPaymobHmac($request->all())) {
             \Illuminate\Support\Facades\Log::warning('PayMob Webhook HMAC Invalid', ['ip' => $request->ip()]);
 
             return response('Invalid HMAC', 400);
         }
 
+        $obj = $request->input('obj');
+
         if ($request->input('type') === 'TRANSACTION' && $obj['success'] && $obj['is_capture']) {
-            $orderNumber = $obj['merchant_reference'] ?? null;
+            // مرجع الأوردر بيختلف حسب نوع العملية.
+            $orderNumber = $obj['merchant_reference']
+                ?? $obj['order']['merchant_order_id']
+                ?? $obj['payment_link']['reference_id']
+                ?? null;
 
             if (! $orderNumber) {
                 return response('No reference', 400);
@@ -424,12 +418,14 @@ class OrderController extends Controller
 
             $order = Order::where('order_number', $orderNumber)->first();
 
-            if ($order && $order->status === 'pending') {
+            if ($order && $order->status_payment !== Order::PAYMENT_STATUS_PAID) {
+                // ملاحظة: عمود status مش فيه قيمة "paid" — الدفع بيتسجل في status_payment،
+                // والأوردر نفسه بيتحوّل لـ processing (نفس سلوك بوابة الدفع الحالية).
                 $order->update([
-                    'status' => 'paid',
+                    'status_payment' => Order::PAYMENT_STATUS_PAID,
+                    'status' => 'processing',
                     'payment_method' => 'paymob',
                     'transaction_id' => $obj['id'],
-                    'paid_at' => now(),
                 ]);
 
                 // تفريغ السلة دلوقتي (آمن لأن الدفع تم)
