@@ -74,6 +74,35 @@ trait HandlesPaymobPayment
     }
 
     /**
+     * دومين المتجر اللي العميل بيرجع له بعد الدفع.
+     */
+    private function paymobFrontendUrl(): string
+    {
+        return rtrim((string) (config('services.paymob.frontend_url') ?: 'https://talaaljazeera.com'), '/');
+    }
+
+    /**
+     * Paymob KSA بتقبل رقم الجوال بصيغة دولية +9665XXXXXXXX فقط،
+     * وأي صيغة تانية (05… أو 966… أو 5…) بترجع "Invalid phone number".
+     */
+    private function paymobPhoneNumber(?string $phone): string
+    {
+        $digits = preg_replace('/\D+/', '', (string) $phone) ?? '';
+
+        if (str_starts_with($digits, '00966')) {
+            $digits = substr($digits, 5);
+        } elseif (str_starts_with($digits, '966')) {
+            $digits = substr($digits, 3);
+        }
+
+        if (str_starts_with($digits, '0')) {
+            $digits = substr($digits, 1);
+        }
+
+        return '+966' . $digits;
+    }
+
+    /**
      * إنشاء رابط دفع PayMob (الطريقة الصحيحة الجديدة)
      */
     private function createPaymobPaymentLink($token, $order)
@@ -89,18 +118,15 @@ trait HandlesPaymobPayment
                 'payment_methods'  => [config('services.paymob.integration_id')],
                 'full_name'        => $order->customer_name,
                 'email'            => $order->customer_email ?? 'customer@example.com',
-                'phone_number'     => $order->customer_phone,
+                'phone_number'     => $this->paymobPhoneNumber($order->customer_phone),
                 'expires_at'       => now()->setTimezone('Asia/Riyadh')->addHours(2)->format('Y-m-d\TH:i:s'),
                 'save_selection'   => true,
                 'is_live'          => config('services.paymob.mode') === 'live',
 
-                // URLs مهمة جدًا
-                //   'redirect_url'     => url("/payment/success/{$order->order_number}"),
-                'redirect_url' => "https://ecommerce-xo.vercel.app/payment-status?status=success&orderId={$order->order_number}",
-                'cancel_url'   => url("/payment-status?status=failed&orderId={$order->order_number}"),
-
-                // Webhook بيجي من الداشبورد، بس ممكن تبعته كمان
-                'callback_url' => url('/api/v1/paymob/webhook'),
+                // الأسماء دي هي اللي Paymob بتقراها فعلاً (redirect_url/callback_url
+                // كانت بتتجاهلها فماكنش فيه لا رجوع للمتجر ولا Webhook).
+                'redirection_url' => $this->paymobFrontendUrl() . "/payment-status?status=success&orderId={$order->order_number}",
+                'notification_url' => url('/api/v1/paymob/webhook'),
             ]);
         if ($response->failed()) {
             return [
@@ -124,12 +150,39 @@ trait HandlesPaymobPayment
      */
     public function verifyPaymobHmac(array $payload): bool
     {
-        $hmac = $payload['hmac'] ?? '';
-        unset($payload['hmac']);
+        $hmac = (string) ($payload['hmac'] ?? '');
+        $obj = $payload['obj'] ?? null;
+        $secret = (string) config('services.paymob.hmac_secret');
 
-        ksort($payload);
-        $concatenated = collect($payload)->flatten()->implode('');
-        $secret = config('services.paymob.hmac_secret');
+        if ($hmac === '' || $secret === '' || ! is_array($obj)) {
+            return false;
+        }
+
+        // Paymob بتحسب الـ HMAC على ترتيب ثابت من الحقول (مش كل الحقول مرتبة أبجديًا).
+        $bool = fn ($value) => is_bool($value) ? ($value ? 'true' : 'false') : (string) ($value ?? '');
+
+        $concatenated = implode('', [
+            $obj['amount_cents'] ?? '',
+            $obj['created_at'] ?? '',
+            $obj['currency'] ?? '',
+            $bool($obj['error_occured'] ?? null),
+            $bool($obj['has_parent_transaction'] ?? null),
+            $obj['id'] ?? '',
+            $obj['integration_id'] ?? '',
+            $bool($obj['is_3d_secure'] ?? null),
+            $bool($obj['is_auth'] ?? null),
+            $bool($obj['is_capture'] ?? null),
+            $bool($obj['is_refunded'] ?? null),
+            $bool($obj['is_standalone_payment'] ?? null),
+            $bool($obj['is_voided'] ?? null),
+            $obj['order']['id'] ?? '',
+            $obj['owner'] ?? '',
+            $bool($obj['pending'] ?? null),
+            $obj['source_data']['pan'] ?? '',
+            $obj['source_data']['sub_type'] ?? '',
+            $obj['source_data']['type'] ?? '',
+            $bool($obj['success'] ?? null),
+        ]);
 
         return hash_equals(hash_hmac('sha512', $concatenated, $secret), $hmac);
     }
@@ -149,8 +202,11 @@ trait HandlesPaymobPayment
         // دفع ناجح + تم السحب (Capture)
         if ($type === 'TRANSACTION' && $obj['success'] === true && $obj['is_capture'] === true) {
 
-            // الحقل الصح في KSA هو merchant_reference
-            $orderNumber = $obj['merchant_reference'] ?? null;
+            // مرجع الأوردر بيختلف حسب نوع العملية، فبنجرب كل الأماكن المحتملة.
+            $orderNumber = $obj['merchant_reference']
+                ?? $obj['order']['merchant_order_id']
+                ?? $obj['payment_link']['reference_id']
+                ?? null;
 
             if (!$orderNumber) {
                 \Illuminate\Support\Facades\Log::error('PayMob Webhook: No merchant_reference', $obj);

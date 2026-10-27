@@ -60,6 +60,7 @@ return [
         'password' => env('PAYMOB_PASSWORD'),
         'callback_url' => env('PAYMOB_CALLBACK_URL'),
         'mode' => env('PAYMOB_MODE', 'test'),
+        'frontend_url' => env('PAYMOB_FRONTEND_URL', 'https://talaaljazeera.com'),
     ],
     //    'paymob' => [
     //     'username' => env('PAYMOB_USERNAME'),
