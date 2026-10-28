@@ -56,8 +56,38 @@ class WhatsAppWebhookController extends Controller
         $payload = json_decode($raw, true) ?: [];
 
         $this->appendToLog($payload);
+        $this->applyStatuses($payload);
 
         return response('EVENT_RECEIVED', 200);
+    }
+
+    /**
+     * تحديث حالة الرسائل المسجلة عندنا بحسب أحداث ميتا.
+     */
+    protected function applyStatuses(array $payload): void
+    {
+        foreach (($payload['entry'] ?? []) as $entry) {
+            foreach (($entry['changes'] ?? []) as $change) {
+                foreach (($change['value']['statuses'] ?? []) as $status) {
+                    $wamid = $status['id'] ?? null;
+
+                    if (! $wamid) {
+                        continue;
+                    }
+
+                    $message = \App\Models\WhatsAppMessage::where('wamid', $wamid)->first();
+
+                    if ($message) {
+                        $message->applyMetaStatus((string) ($status['status'] ?? ''), $status['errors'] ?? null);
+                    } else {
+                        Log::warning('WhatsApp webhook status for unknown wamid', [
+                            'wamid' => $wamid,
+                            'status' => $status['status'] ?? null,
+                        ]);
+                    }
+                }
+            }
+        }
     }
 
     /**

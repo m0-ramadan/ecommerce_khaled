@@ -22,6 +22,13 @@ return new class extends Migration
             return;
         }
 
+        // MySQL: نجعل الأعمدة تقبل NULL الأول، وبعدين نمسح الـ placeholders.
+        // (لو مسحنا القيم قبل التعديل، العمود NOT NULL هيرفض القيمة الفاضية.)
+        if (DB::getDriverName() === 'mysql') {
+            DB::statement('ALTER TABLE `categories` MODIFY `image` VARCHAR(255) NULL DEFAULT NULL');
+            DB::statement('ALTER TABLE `categories` MODIFY `sub_image` VARCHAR(255) NULL DEFAULT NULL');
+        }
+
         // تنضيف القيم القديمة اللي هي في الحقيقة placeholder مش صورة حقيقية.
         DB::table('categories')
             ->whereIn('sub_image', $this->placeholderUrls)
@@ -30,12 +37,6 @@ return new class extends Migration
         DB::table('categories')
             ->whereIn('image', $this->placeholderUrls)
             ->update(['image' => null]);
-
-        // MySQL: نجعل الأعمدة تقبل NULL وبدون default.
-        if (DB::getDriverName() === 'mysql') {
-            DB::statement('ALTER TABLE `categories` MODIFY `image` VARCHAR(255) NULL DEFAULT NULL');
-            DB::statement('ALTER TABLE `categories` MODIFY `sub_image` VARCHAR(255) NULL DEFAULT NULL');
-        }
     }
 
     public function down(): void

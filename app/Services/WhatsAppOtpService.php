@@ -75,14 +75,28 @@ class WhatsAppOtpService
             $data = $response->json();
 
             if ($response->successful() && ! empty($data['messages'][0]['id'])) {
+                $wamid = $data['messages'][0]['id'];
+
+                // بنسجلها pending_delivery لحد ما الـ Webhook يأكد delivered/read/failed.
+                $this->recordMessage($phone, $wamid, 'pending_delivery', null, null, $data);
+
                 return [
                     'success' => true,
-                    'sid' => $data['messages'][0]['id'],
+                    'sid' => $wamid,
                     'status' => $data['messages'][0]['message_status'] ?? 'accepted',
                 ];
             }
 
             $error = $data['error']['message'] ?? 'Failed to send WhatsApp OTP';
+
+            $this->recordMessage(
+                $phone,
+                null,
+                'failed',
+                (string) ($data['error']['code'] ?? ''),
+                $error,
+                $data
+            );
 
             Log::warning('WhatsApp Cloud OTP sending failed.', [
                 'to' => $this->normalizePhoneNumber($phone),
@@ -99,7 +113,34 @@ class WhatsAppOtpService
                 'error' => $e->getMessage(),
             ]);
 
+            $this->recordMessage($phone, null, 'failed', '', $e->getMessage(), []);
+
             return ['success' => false, 'error' => $e->getMessage()];
+        }
+    }
+
+    /**
+     * حفظ الرسالة ومتابعة حالتها.
+     */
+    protected function recordMessage(string $to, ?string $wamid, string $status, ?string $errorCode, ?string $errorMessage, array $payload = []): void
+    {
+        try {
+            \App\Models\WhatsAppMessage::updateOrCreate(
+                ['wamid' => $wamid],
+                [
+                    'to_phone' => $this->normalizePhoneNumber($to),
+                    'template' => config('services.whatsapp_cloud.otp_template'),
+                    'status' => $status,
+                    'meta_status' => $status,
+                    'error_code' => $errorCode ?: null,
+                    'error_message' => $errorMessage ?: null,
+                    'sent_at' => $wamid ? now() : null,
+                    'failed_at' => $status === 'failed' ? now() : null,
+                    'payload' => $payload ?: null,
+                ]
+            );
+        } catch (\Throwable $e) {
+            Log::warning('WhatsApp message tracking failed: ' . $e->getMessage());
         }
     }
 
