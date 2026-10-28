@@ -240,8 +240,8 @@ class OrderController extends Controller
             if ($paymentMethod && $paymentMethod->key !== 'cash') {
                 $gateway = $paymentMethod->key; // 'paymob', 'tamara', 'tabby'
 
-                if ($gateway === 'paymob') {
-                    $result = $this->initiatePaymobPayment($order);
+                if (in_array($gateway, ['paymob', 'applepay'], true)) {
+                    $result = $this->initiatePaymobPayment($order, $gateway === 'applepay');
                 } else {
                     $result = $this->paymentService->processOrderPayment(
                         $user,

@@ -12,7 +12,7 @@ trait HandlesPaymobPayment
     /**
      * بدء عملية الدفع عبر PayMob KSA باستخدام Payment Links (الطريقة الجديدة والموصى بها)
      */
-    public function initiatePaymobPayment($order)
+    public function initiatePaymobPayment($order, bool $applePayOnly = false)
     {
         // 1. Authentication
         $auth = $this->paymobAuthenticate();
@@ -21,7 +21,7 @@ trait HandlesPaymobPayment
         }
 
         // 2. Create Payment Link
-        $paymentLink = $this->createPaymobPaymentLink($auth['token'], $order);
+        $paymentLink = $this->createPaymobPaymentLink($auth['token'], $order, $applePayOnly);
 
         if (!$paymentLink['success']) {
             return [
@@ -105,9 +105,23 @@ trait HandlesPaymobPayment
     /**
      * إنشاء رابط دفع PayMob (الطريقة الصحيحة الجديدة)
      */
-    private function createPaymobPaymentLink($token, $order)
+    private function createPaymobPaymentLink($token, $order, bool $applePayOnly = false)
     {
         $amountInCents = max(100, (int) round(($order->total_amount ?? 0) * 100));
+
+        $integrationIds = array_values(array_filter(array_map(
+            'intval',
+            (array) (config('services.paymob.integration_ids') ?: [config('services.paymob.integration_id')])
+        )));
+
+        if ($applePayOnly) {
+            $applePayId = (int) config('services.paymob.apple_pay_integration_id', 35561);
+            $integrationIds = array_values(array_filter($integrationIds, fn ($id) => $id === $applePayId));
+
+            if (empty($integrationIds)) {
+                return ['success' => false, 'message' => 'Apple Pay غير متاح حاليًا، من فضلك اختر الدفع بالبطاقات.'];
+            }
+        }
 
         $response = Http::withToken($token)
             ->asForm()
@@ -116,10 +130,7 @@ trait HandlesPaymobPayment
                 'currency'         => 'SAR',
                 'reference_id'     => $order->order_number,
                 // ممكن يكون أكتر من تكامل (كارت + Apple Pay) — الاتنين بيظهروا للعميل.
-                'payment_methods'  => array_values(array_map(
-                    'intval',
-                    config('services.paymob.integration_ids') ?: [config('services.paymob.integration_id')]
-                )),
+                'payment_methods'  => $integrationIds,
                 'full_name'        => $order->customer_name,
                 'email'            => $order->customer_email ?? 'customer@example.com',
                 'phone_number'     => $this->paymobPhoneNumber($order->customer_phone),

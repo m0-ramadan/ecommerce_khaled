@@ -60,6 +60,8 @@ return [
             'intval',
             explode(',', (string) env('PAYMOB_INTEGRATION_IDS', env('PAYMOB_INTEGRATION_ID', '')))
         ))),
+        // تكامل Apple Pay وحده (لما العميل يختار Apple Pay من صفحة الدفع).
+        'apple_pay_integration_id' => (int) env('PAYMOB_APPLE_PAY_INTEGRATION_ID', 35561),
         'iframe_id' => env('PAYMOB_IFRAME_ID'),
         'username' => env('PAYMOB_USERNAME'),
         'password' => env('PAYMOB_PASSWORD'),
