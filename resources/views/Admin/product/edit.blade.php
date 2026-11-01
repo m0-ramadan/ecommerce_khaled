@@ -1427,8 +1427,10 @@
             </option>`;
 
             // البحث عن أبناء هذا الخيار (الخيارات التي تعتمد عليه)
-            const children = existingOptions.filter((opt, idx) =>
-                idx !== currentIndex && opt.depends_on_option_id == option.id
+            const children = option.id == null ? [] : existingOptions.filter((opt, idx) =>
+                idx !== currentIndex &&
+                opt.depends_on_option_id != null &&
+                Number(opt.depends_on_option_id) === Number(option.id)
             );
 
             // إضافة الأبناء بشكل متكرر
@@ -1488,7 +1490,11 @@
          * الحصول على جميع الأبناء المباشرين لخيار معين
          */
         function getDirectChildren(optionId) {
-            return existingOptions.filter(opt => opt.depends_on_option_id == optionId);
+            if (optionId == null) return [];
+            return existingOptions.filter(opt =>
+                opt.depends_on_option_id != null &&
+                Number(opt.depends_on_option_id) === Number(optionId)
+            );
         }
 
         /**
@@ -1638,6 +1644,9 @@
                 quantity_tiers: []
             };
 
+            // نحفظ أي تعديلات في الفورم قبل إعادة الرسم
+            syncOptionsFromDom();
+
             // Add to beginning of array
             existingOptions.unshift(newOption);
 
@@ -1689,6 +1698,8 @@
             const price = $('#new_option_price').val() || 0;
             const type = $('#new_option_type').val();
             const isRequired = $('#new_option_required').is(':checked');
+
+            syncOptionsFromDom();
 
             values.reverse().forEach(value => {
                 const newOption = {
@@ -1748,6 +1759,22 @@
                 cancelButtonText: 'إلغاء'
             }).then((result) => {
                 if (result.isConfirmed) {
+                    syncOptionsFromDom();
+
+                    // نسجل الحذف صريح في الفورم عشان السيرفر يحذف بس اللي اتطلب.
+                    const markDeleted = (opt) => {
+                        if (!opt || !opt.id) return;
+                        const hidden = document.createElement('input');
+                        hidden.type = 'hidden';
+                        hidden.name = 'deleted_option_ids[]';
+                        hidden.value = opt.id;
+                        hidden.className = 'deleted-option-id';
+                        document.getElementById('editProductForm')?.appendChild(hidden);
+                    };
+
+                    markDeleted(option);
+                    descendants.forEach(markDeleted);
+
                     if (option.id) {
                         // حذف الخيار وجميع أبنائه
                         const descendantIndices = descendants.map(d => existingOptions.indexOf(d)).filter(i => i !==
@@ -1804,7 +1831,10 @@
          * Generate hierarchical tree item
          */
         function generateHierarchyTreeItem(option, index) {
-            const children = existingOptions.filter(opt => opt.depends_on_option_id == option.id);
+            const children = option.id == null ? [] : existingOptions.filter(opt =>
+                opt.depends_on_option_id != null &&
+                Number(opt.depends_on_option_id) === Number(option.id)
+            );
             const typeLabel = getOptionTypeLabel(option.option_type);
 
             let html = `
@@ -1835,6 +1865,41 @@
         /**
          * Refresh the entire options container
          */
+
+        /**
+         * مزامنة القيم المكتوبة في الفورم مع مصفوفة الخيارات
+         * قبل أي إعادة رسم، عشان التعديلات ماتضيعش.
+         */
+        function syncOptionsFromDom() {
+            const container = document.getElementById('optionsContainer');
+            if (!container) return;
+
+            container.querySelectorAll('.option-item').forEach((el) => {
+                const index = parseInt(el.dataset.index, 10);
+                const option = existingOptions[index];
+                if (!option) return;
+
+                const field = (suffix) =>
+                    el.querySelector(`[name="product_options[${index}][${suffix}]"]`);
+
+                const nameInput = field('option_name');
+                if (nameInput) option.option_name = nameInput.value;
+                const valueInput = field('option_value');
+                if (valueInput) option.option_value = valueInput.value;
+                const priceInput = field('additional_price');
+                if (priceInput) option.additional_price = priceInput.value;
+                const typeInput = field('option_type');
+                if (typeInput) option.option_type = typeInput.value;
+                const depInput = field('depends_on_option_id');
+                if (depInput) option.depends_on_option_id = depInput.value || null;
+                const condInput = field('dependency_condition');
+                if (condInput) option.dependency_condition = condInput.value;
+
+                const required = el.querySelector(`input[name="product_options[${index}][is_required]"]`);
+                if (required) option.is_required = required.checked;
+            });
+        }
+
         function refreshOptionsContainer() {
             const container = document.getElementById('optionsContainer');
             container.innerHTML = '';
@@ -1868,12 +1933,23 @@
                 easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
                 scrollSensitivity: 30,
                 scrollSpeed: 10,
-                onEnd: function(evt) {
-                    // Reorder existingOptions array
-                    const movedItem = existingOptions.splice(evt.oldIndex, 1)[0];
-                    existingOptions.splice(evt.newIndex, 0, movedItem);
+                onEnd: function() {
+                    // نحفظ التعديلات الأول (data-index لسه مطابق للمصفوفة)
+                    syncOptionsFromDom();
 
-                    // Refresh indices
+                    // نعيد ترتيب المصفوفة حسب ترتيب الـ DOM الجديد
+                    const container = document.getElementById('optionsContainer');
+                    const ordered = [];
+                    container.querySelectorAll('.option-item').forEach((el) => {
+                        const idx = parseInt(el.dataset.index, 10);
+                        if (existingOptions[idx]) ordered.push(existingOptions[idx]);
+                    });
+                    existingOptions.forEach((opt) => {
+                        if (!ordered.includes(opt)) ordered.push(opt);
+                    });
+                    existingOptions.length = 0;
+                    existingOptions.push(...ordered);
+
                     refreshOptionsContainer();
                 }
             });
@@ -1890,6 +1966,7 @@
          * Add quantity tier to an option
          */
         function addQuantityTier(index) {
+            syncOptionsFromDom();
             const option = existingOptions[index];
             if (!option.quantity_tiers) {
                 option.quantity_tiers = [];

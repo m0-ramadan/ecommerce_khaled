@@ -961,6 +961,13 @@ class ProductController extends Controller
             $submittedOptionIds = []; // كل الخيارات التي بقيت في الفورم بعد الحذف
             $originalOptions = $product->options->keyBy('id');
 
+            // الحذف بقى صريح: بنحذف بس اللي العميل داس عليه "حذف".
+            // أي خيار مش موجود في الفورم (بسبب مشكلة عرض/JS) بيفضل زي ما هو.
+            $deletedOptionIds = collect($request->input('deleted_option_ids', []))
+                ->filter(fn ($id) => is_numeric($id))
+                ->map(fn ($id) => (int) $id)
+                ->unique();
+
             if ($request->filled('product_options')) {
                 // أولًا ننشئ أو نحدث كل الخيارات بدون dependencies
                 foreach ($request->product_options as $optionData) {
@@ -1043,7 +1050,7 @@ class ProductController extends Controller
 
                 // حذف الخيار المحذوف وكل ذريته حتى لو أُرسل أحد الأبناء بطلب معدل يدويًا.
                 $removedOptionIds = $originalOptions->keys()
-                    ->diff($submittedOptionIds)
+                    ->intersect($deletedOptionIds)
                     ->map(fn ($id) => (int) $id)
                     ->values();
                 $cascadeOptionIds = $removedOptionIds->all();
@@ -1063,10 +1070,30 @@ class ProductController extends Controller
                     $product->sizeTiers()->whereIn('option_id', $cascadeOptionIds)->delete();
                     $product->options()->whereIn('id', $cascadeOptionIds)->delete();
                 }
-            } else {
-                // لو مفيش خيارات في الفورم، امسح كل الخيارات وشرائح الكمية التابعة لها
-                $product->sizeTiers()->whereNotNull('option_id')->delete();
-                $product->options()->delete();
+            } elseif ($deletedOptionIds->isNotEmpty()) {
+                // مفيش خيارات في الفورم: نحذف فقط اللي اتحدد حذفه صريح
+                // (مع كل الخيارات اللي تعتمد عليه).
+                $cascadeOptionIds = $originalOptions->keys()
+                    ->intersect($deletedOptionIds)
+                    ->map(fn ($id) => (int) $id)
+                    ->values()
+                    ->all();
+
+                do {
+                    $descendantIds = $originalOptions
+                        ->filter(fn ($option) => in_array((int) $option->depends_on_option_id, $cascadeOptionIds, true))
+                        ->keys()
+                        ->map(fn ($id) => (int) $id)
+                        ->diff($cascadeOptionIds)
+                        ->values()
+                        ->all();
+                    $cascadeOptionIds = array_values(array_unique(array_merge($cascadeOptionIds, $descendantIds)));
+                } while ($descendantIds !== []);
+
+                if ($cascadeOptionIds !== []) {
+                    $product->sizeTiers()->whereIn('option_id', $cascadeOptionIds)->delete();
+                    $product->options()->whereIn('id', $cascadeOptionIds)->delete();
+                }
             }
 
             /* =====================================================
