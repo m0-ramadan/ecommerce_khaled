@@ -195,14 +195,14 @@ class OrderController extends Controller
             $pointsUsed = (int) $pointsQuote['points'];
             $pointsDiscount = (float) $pointsQuote['discount'];
 
-            // خصم بوابة الدفع (تابي/تمارا) — النسبة بتتظبط من الداشبورد.
+            // زيادة بوابة الدفع (تابي/تمارا) — النسبة بتتظبط من الداشبورد.
             $paymentMethod = PaymentMethod::find($request->payment_method);
-            $gatewayDiscount = 0.0;
-            if ($paymentMethod && (float) ($paymentMethod->discount_percent ?? 0) > 0) {
-                $gatewayDiscount = round($eligibleAmount * ((float) $paymentMethod->discount_percent / 100), 2);
+            $gatewayFee = 0.0;
+            if ($paymentMethod && (float) ($paymentMethod->fee_percent ?? 0) > 0) {
+                $gatewayFee = round($eligibleAmount * ((float) $paymentMethod->fee_percent / 100), 2);
             }
 
-            $totalAmount = ($cart->total - $discountAmount - $pointsDiscount - $gatewayDiscount) + $shippingPrice;
+            $totalAmount = ($cart->total - $discountAmount - $pointsDiscount + $gatewayFee) + $shippingPrice;
             $taxRate = 0.15;
             $taxAmount = $totalAmount * ($taxRate / (1 + $taxRate));
 
@@ -220,7 +220,7 @@ class OrderController extends Controller
                 'discount_amount' => $discountAmount,
                 'points_used' => $pointsUsed,
                 'points_discount' => $pointsDiscount,
-                'gateway_discount' => $gatewayDiscount,
+                'gateway_fee' => $gatewayFee,
                 'tax_amount' => $taxAmount,
                 'total_amount' => $totalAmount,
                 'payment_method' => $request->payment_method,
