@@ -255,6 +255,7 @@ class AuthController extends Controller
 
             $user = User::create([
                 'name' => 'عميل تالا',
+                'username' => $this->generateUsername(),
                 'email' => $email,
                 'phone' => $phone,
                 'password' => Hash::make(Str::random(32)),
@@ -262,10 +263,17 @@ class AuthController extends Controller
             ]);
             $isNewUser = true;
         } else {
-            $user->forceFill([
+            $updates = [
                 'phone' => $phone,
                 'phone_verified_at' => now(),
-            ])->save();
+            ];
+
+            // الحسابات القديمة اللي اتسجلت قبل إضافة اسم المستخدم.
+            if (blank($user->username)) {
+                $updates['username'] = $this->generateUsername();
+            }
+
+            $user->forceFill($updates)->save();
         }
 
         $token = $user->createToken('api_token')->plainTextToken;
@@ -275,6 +283,46 @@ class AuthController extends Controller
             'token' => $token,
             'is_new_user' => $isNewUser,
         ], $isNewUser ? 'تم إنشاء حسابك وتسجيل الدخول بنجاح' : 'تم تسجيل الدخول بنجاح');
+    }
+
+    /**
+     * اسم مستخدم فريد: tala + السنة/الشهر/اليوم + 4 أرقام.
+     */
+    private function generateUsername(): string
+    {
+        do {
+            $username = 'tala' . now()->format('ymd') . random_int(1000, 9999);
+        } while (User::where('username', $username)->exists());
+
+        return $username;
+    }
+
+    /**
+     * 🔹 تحديث بيانات الملف الشخصي
+     */
+    public function updateProfile(Request $request)
+    {
+        $user = $request->user();
+
+        $validated = $request->validate([
+            'name' => 'nullable|string|max:255',
+            'email' => 'nullable|email|max:255|unique:users,email,' . $user->id,
+            'phone' => 'nullable|string|max:20',
+        ]);
+
+        if (array_key_exists('phone', $validated) && filled($validated['phone'])) {
+            $validated['phone'] = SaudiPhone::normalize($validated['phone']);
+        }
+
+        $user->fill(array_filter($validated, fn ($value) => $value !== null));
+
+        if (blank($user->username)) {
+            $user->username = $this->generateUsername();
+        }
+
+        $user->save();
+
+        return $this->success(new UserResource($user->fresh()), 'تم تحديث بياناتك بنجاح');
     }
 
     /**

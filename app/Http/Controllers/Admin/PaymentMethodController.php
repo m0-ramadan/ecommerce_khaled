@@ -28,6 +28,7 @@ class PaymentMethodController extends Controller
             'icon' => 'nullable|string|max:255',
             'is_active' => 'boolean',
             'is_payment' => 'boolean',
+            'discount_percent' => 'nullable|numeric|min:0|max:100',
         ]);
 
         $validated['key'] = Str::slug($validated['key']);
@@ -56,6 +57,7 @@ class PaymentMethodController extends Controller
             'icon' => 'nullable|string|max:255',
             'is_active' => 'boolean',
             'is_payment' => 'boolean',
+            'discount_percent' => 'nullable|numeric|min:0|max:100',
         ]);
 
         $validated['key'] = Str::slug($validated['key']);

@@ -27,6 +27,7 @@ class Order extends Model
         'discount_amount',
         'points_used',
         'points_discount',
+        'gateway_discount',
         'points_awarded',
         'points_awarded_at',
         'points_refunded_at',

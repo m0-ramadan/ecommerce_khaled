@@ -50,6 +50,7 @@ Route::prefix('v1')->group(function () {
 
         Route::prefix('auth')->group(function () {
             Route::get('/profile', [AuthController::class, 'profile']);
+            Route::put('/profile', [AuthController::class, 'updateProfile']);
             Route::post('/change-password', [AuthController::class, 'changePassword']);
             Route::post('/logout', [AuthController::class, 'logout']);
         });

@@ -117,6 +117,29 @@ class OrderController extends Controller
             $shippingAddress = $request->shipping_address;
             $shouldCreateShipment = true;
 
+            // بيانات العميل بتتاخد من عنوان الشحن لو موجود.
+            $customerName = $request->customer_name ?? $user?->name;
+            $customerPhone = $request->customer_phone ?? $user?->phone;
+            $customerEmail = $request->customer_email ?? $user?->email;
+
+            if ($address) {
+                $addressName = trim((string) $address->first_name . ' ' . (string) $address->last_name);
+                if ($addressName !== '') {
+                    $customerName = $addressName;
+                }
+                if (filled($address->phone)) {
+                    $customerPhone = $address->phone;
+                }
+                if (blank($shippingAddress)) {
+                    $shippingAddress = implode(', ', array_filter([
+                        $address->city,
+                        $address->area,
+                        $address->address_details,
+                        $address->apartment_number,
+                    ]));
+                }
+            }
+
             if ($hasStationery) {
                 $deliveryType = $request->input('stationery_delivery_type');
                 if (! in_array($deliveryType, ['pickup', 'home_delivery'], true)) {
@@ -172,7 +195,14 @@ class OrderController extends Controller
             $pointsUsed = (int) $pointsQuote['points'];
             $pointsDiscount = (float) $pointsQuote['discount'];
 
-            $totalAmount = ($cart->total - $discountAmount - $pointsDiscount) + $shippingPrice;
+            // خصم بوابة الدفع (تابي/تمارا) — النسبة بتتظبط من الداشبورد.
+            $paymentMethod = PaymentMethod::find($request->payment_method);
+            $gatewayDiscount = 0.0;
+            if ($paymentMethod && (float) ($paymentMethod->discount_percent ?? 0) > 0) {
+                $gatewayDiscount = round($eligibleAmount * ((float) $paymentMethod->discount_percent / 100), 2);
+            }
+
+            $totalAmount = ($cart->total - $discountAmount - $pointsDiscount - $gatewayDiscount) + $shippingPrice;
             $taxRate = 0.15;
             $taxAmount = $totalAmount * ($taxRate / (1 + $taxRate));
 
@@ -181,15 +211,16 @@ class OrderController extends Controller
                 'user_id' => $user?->id,
                 'order_number' => $this->generateUniqueOrderNumber(),
                 'address_id' => $address?->id,
-                'customer_name' => $request->customer_name ?? $user?->name,
-                'customer_phone' => $request->customer_phone ?? $user?->phone,
-                'customer_email' => $request->customer_email ?? $user?->email,
+                'customer_name' => $customerName,
+                'customer_phone' => $customerPhone,
+                'customer_email' => $customerEmail,
                 'shipping_address' => $shippingAddress,
                 'subtotal' => $cart->subtotal,
                 'shipping_amount' => $shippingPrice,
                 'discount_amount' => $discountAmount,
                 'points_used' => $pointsUsed,
                 'points_discount' => $pointsDiscount,
+                'gateway_discount' => $gatewayDiscount,
                 'tax_amount' => $taxAmount,
                 'total_amount' => $totalAmount,
                 'payment_method' => $request->payment_method,
@@ -232,7 +263,6 @@ class OrderController extends Controller
             $cart->update(['subtotal' => 0, 'total' => 0]);
             // إذا كان الدفع ليس نقداً (payment_method !== 1)
 
-            $paymentMethod = PaymentMethod::find($request->payment_method);
             if ($shouldCreateShipment && $request->filled('orderId') && $request->filled('deliveryOptionId')) {
                 $this->shippingServices->createShipment($request->orderId, $request->deliveryOptionId, $shippingPrice);
             }

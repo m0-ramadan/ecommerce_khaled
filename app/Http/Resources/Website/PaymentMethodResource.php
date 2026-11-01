@@ -16,6 +16,7 @@ class PaymentMethodResource extends JsonResource
             'icon'      => $this->icon,
             'image'     => $this->image ? asset($this->image) : null,
             'is_active' => $this->is_active,
+            'discount_percent' => (float) ($this->discount_percent ?? 0),
         ];
     }
 }

@@ -495,6 +495,15 @@
                                             </div>
                                         </div>
                                     </div>
+                                    </div>
+
+                                    <div class="form-group mt-3">
+                                        <label for="discount_percent">نسبة الخصم % (تابي / تمارا)</label>
+                                        <input type="number" step="0.01" min="0" max="100" class="form-control"
+                                            id="discount_percent" name="discount_percent"
+                                            value="{{ old('discount_percent', 0) }}">
+                                        <small class="text-muted">تُخصم من إجمالي الطلب عند اختيار هذه الوسيلة (0 = بدون خصم).</small>
+                                    </div>
                                 </div>
                             </div>
 
