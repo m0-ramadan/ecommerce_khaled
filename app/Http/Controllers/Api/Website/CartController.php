@@ -241,9 +241,13 @@ class CartController extends Controller
     // رفع صورة للعنصر في السلة
     public function uploadImage(Request $request)
     {
+        // التصميم ممكن يكون صورة بأي صيغة أو PDF — بحد أقصى 5 ميجا.
         $request->validate([
-            'image' => 'required|image|max:2048',
+            'image' => 'required|file|mimes:jpg,jpeg,png,webp,gif,bmp,svg,avif,heic,heif,tiff,tif,pdf,ai,psd,eps|max:5120',
             'cart_item_id' => 'required|exists:cart_items,id',
+        ], [
+            'image.mimes' => 'صيغة الملف غير مدعومة. ارفع صورة أو PDF (حتى 5 ميجا).',
+            'image.max' => 'حجم الملف أكبر من 5 ميجا.',
         ]);
 
         $cartItem = CartItem::findOrFail($request->input('cart_item_id'));
