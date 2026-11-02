@@ -1,6 +1,6 @@
 @foreach ($categories as $category)
     <option value="{{ $category->id }}"
-        @selected((string) request('category_id') === (string) $category->id)>
+        @selected((string) ($selectedId ?? request('category_id')) === (string) $category->id)>
         {{ str_repeat('— ', $level ?? 0) }}{{ $category->name }}
     </option>
     @if ($category->childrenRecursive->isNotEmpty())

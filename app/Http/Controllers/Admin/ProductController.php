@@ -183,10 +183,8 @@ class ProductController extends Controller
 
                 case 'move_to_category':
                     $request->validate([
-                        'category_id' => [
-                            'required',
-                            Rule::exists('categories', 'id')->whereNotNull('parent_id'),
-                        ],
+                        // مسموح ننقل لقسم رئيسي أو فرعي.
+                        'category_id' => ['required', Rule::exists('categories', 'id')],
                     ]);
                     Product::whereIn('id', $productIds)->update(['category_id' => $request->category_id]);
                     $message = 'تم نقل المنتجات إلى التصنيف المحدد';

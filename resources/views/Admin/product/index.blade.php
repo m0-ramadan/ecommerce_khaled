@@ -772,9 +772,11 @@
                             <div class="col-md-6" bis_skin_checked="1">
                                 <select class="form-select" id="bulkCategorySelect">
                                     <option value="">اختر التصنيف</option>
-                                    @foreach ($categories as $category)
-                                        <option value="{{ $category->id }}">{{ $category->name }}</option>
-                                    @endforeach
+                                    @include('Admin.product.partials.category-options', [
+                                        'categories' => $categoryTree,
+                                        'level' => 0,
+                                        'selectedId' => '',
+                                    ])
                                 </select>
                             </div>
                         </div>
