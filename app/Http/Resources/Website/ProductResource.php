@@ -166,7 +166,7 @@ class ProductResource extends JsonResource
             'name' => $group->first()->option_name,
             'items' => $group->map(function ($option) {
                 return $this->formatOptionTree($option);
-            })->values(),
+            })->filter()->values(),
         ];
     })
     ->values(),
@@ -211,8 +211,14 @@ class ProductResource extends JsonResource
                 'stock_class'       => $this->stock > 0 ? 'in-stock' : 'out-of-stock',
             ],
         ];
-    }private function formatOptionTree($option)
+    }private function formatOptionTree($option, array $visited = [])
 {
+    // حماية من أي سايكل قديم في البيانات يمنع إن الـ API يقع.
+    if (in_array((int) $option->id, $visited, true)) {
+        return null;
+    }
+    $visited[] = (int) $option->id;
+
     $keywords = ['رفع', 'ملف', 'صورة'];
     $hasFile = collect($keywords)->contains(
         fn ($word) => str_contains($option->option_value, $word)
@@ -243,9 +249,11 @@ class ProductResource extends JsonResource
 
         'children' => $option->dependentOptions
             ->reject(fn ($child) => $this->isHiddenOptionName($child->option_name))
-            ->map(function ($child) {
-                return $this->formatOptionTree($child);
-            })->values(),
+            ->map(function ($child) use ($visited) {
+                return $this->formatOptionTree($child, $visited);
+            })
+            ->filter()
+            ->values(),
     ];
 }
 

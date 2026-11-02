@@ -967,8 +967,10 @@ class ProductController extends Controller
                 ->unique();
 
             if ($request->filled('product_options')) {
+                $createdIdsByIndex = [];
+
                 // أولًا ننشئ أو نحدث كل الخيارات بدون dependencies
-                foreach ($request->product_options as $optionData) {
+                foreach ($request->product_options as $optIndex => $optionData) {
                     if (empty($optionData['option_name']) || empty($optionData['option_value'])) {
                         continue;
                     }
@@ -984,6 +986,7 @@ class ProductController extends Controller
                     }
 
                     $createdOption->fill([
+                        'order' => (int) $optIndex,
                         'option_name' => $optionData['option_name'],
                         'option_value' => $optionData['option_value'],
                         'additional_price' => $optionData['additional_price'] ?? 0,
@@ -994,6 +997,7 @@ class ProductController extends Controller
                     ]);
                     $createdOption->save();
 
+                    $createdIdsByIndex[$optIndex] = $createdOption->id;
                     $submittedOptionIds[] = $createdOption->id;
                     $optionMapping[$createdOption->id] = $createdOption->id;
                     if ($oldId) {
@@ -1020,14 +1024,17 @@ class ProductController extends Controller
                     }
                 }
 
-                // الآن حدث الـ depends_on_option_id لكل خيار
-                foreach ($request->product_options as $optionData) {
-                    $oldId = ! empty($optionData['id']) ? (int) $optionData['id'] : null;
-                    if (! $oldId) {
-                        continue;
-                    }
+                // الآن حدث الـ depends_on_option_id لكل خيار (بما فيهم الخيارات الجديدة)
+                $intendedParents = [];
+                $intendedConditions = [];
 
-                    $createdOptionId = $optionMapping[$oldId] ?? null;
+                foreach ($request->product_options as $optIndex => $optionData) {
+                    $oldId = ! empty($optionData['id']) ? (int) $optionData['id'] : null;
+
+                    $createdOptionId = $oldId
+                        ? ($optionMapping[$oldId] ?? null)
+                        : ($createdIdsByIndex[$optIndex] ?? null);
+
                     if (! $createdOptionId) {
                         continue;
                     }
@@ -1038,11 +1045,35 @@ class ProductController extends Controller
                         $dependsOnId = $optionMapping[$parentId] ?? null;
                     }
 
-                    $product->options()->whereKey($createdOptionId)->update([
-                        'depends_on_option_id' => $dependsOnId,
-                        'dependency_condition' => $dependsOnId
-                            ? ($optionData['dependency_condition'] ?? null)
-                            : null,
+                    $intendedParents[(int) $createdOptionId] = $dependsOnId;
+                    $intendedConditions[(int) $createdOptionId] = $optionData['dependency_condition'] ?? 'equals';
+                }
+
+                // منع الاعتماد على النفس وأي سايكل (A يعتمد على B وB يعتمد على A)
+                foreach ($intendedParents as $childId => $parentId) {
+                    $seen = [];
+                    $cursor = $parentId;
+
+                    while ($cursor !== null) {
+                        if ((int) $cursor === (int) $childId) {
+                            $intendedParents[$childId] = null;
+                            break;
+                        }
+                        if (isset($seen[(int) $cursor])) {
+                            break;
+                        }
+                        $seen[(int) $cursor] = true;
+                        $cursor = $intendedParents[(int) $cursor] ?? null;
+                    }
+                }
+
+                foreach ($intendedParents as $childId => $parentId) {
+                    $condition = $parentId ? ($intendedConditions[$childId] ?? 'equals') : null;
+
+                    $product->options()->whereKey($childId)->update([
+                        'depends_on_option_id' => $parentId,
+                        'dependency_condition' => $condition,
+                        'dependency_operator' => $condition === 'not_equals' ? '!=' : ($condition ? '=' : null),
                     ]);
                 }
 

@@ -16,6 +16,7 @@ class ProductOptions extends Model
         'option_value',
         'additional_price',
         'is_required',
+        'order',
         'category',
         'extra_data',
         'depends_on_option_id',
@@ -203,7 +204,7 @@ class ProductOptions extends Model
         return $this->hasMany(
             self::class,
             'depends_on_option_id'
-        );
+        )->orderBy('order')->orderBy('id');
     }
 
 

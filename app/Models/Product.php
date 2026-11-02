@@ -373,7 +373,9 @@ class Product extends Model
 
     public function options()
     {
-        return $this->hasMany(ProductOptions::class, 'product_id');
+        return $this->hasMany(ProductOptions::class, 'product_id')
+            ->orderBy('order')
+            ->orderBy('id');
     }
 
     // public function primaryImage()
