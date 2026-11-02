@@ -348,6 +348,12 @@ class OtoShippingService
         $customerDistrict = optional($address)->area ?: 'الوسطى';
         $customerPhone = (string) (optional($address)->phone ?: ($user->phone ?: '0500000000'));
 
+        // الاسم اللي بيظهر في الشحن = اسم العنوان المحفوظ (مش اسم الحساب).
+        $customerName = trim((string) optional($address)->first_name . ' ' . (string) optional($address)->last_name);
+        if ($customerName === '') {
+            $customerName = $user->name ?: 'عميل متجر تالا';
+        }
+
         // 2. الحساب الديناميكي للوزن والأبعاد وحجم الطرد
         $metrics = $this->calculateCartPackageMetrics($cart);
 
@@ -402,7 +408,7 @@ class OtoShippingService
             /* ================= Customer ================= */
 
             'customer' => [
-                'name' => $user->name ?: 'عميل متجر تالا',
+                'name' => $customerName,
                 'email' => $user->email ?: 'customer@talaaljazeera.com',
                 'mobile' => $customerPhone,
                 'address' => $customerAddress,
