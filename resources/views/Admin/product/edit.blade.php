@@ -1124,6 +1124,8 @@
         // ============================================
         let removedImages = [];
         let optionCounter = {{ $product->options->count() }};
+        // معرّفات مؤقتة للخيارات الجديدة (id = null) عشان تتربط ببعضها قبل الحفظ.
+        let newOptionSeq = 0;
         let sortableInstance = null;
         const existingOptions = @json($existingOptions);
 
@@ -1318,6 +1320,7 @@
                     </div>
 
                     <input type="hidden" name="product_options[${index}][id]" value="${option.id || ''}">
+                    <input type="hidden" name="product_options[${index}][temp_id]" value="${option.temp_id || ''}">
 
                     <div class="option-content-grid">
                         <div>
@@ -1420,9 +1423,10 @@
         function generateOptionWithChildren(option, optionIndex, currentIndex, selectedValue, level) {
             const prefix = '─'.repeat(level * 2) + (level > 0 ? ' ' : '');
             const spacing = level > 0 ? '&nbsp;&nbsp;' + '&nbsp;&nbsp;'.repeat(level) : '';
-            const selected = selectedValue == option.id ? 'selected' : '';
+            const optionKey = option.id != null ? option.id : (option.temp_id || '');
+            const selected = String(selectedValue ?? '') === String(optionKey) ? 'selected' : '';
 
-            let html = `<option value="${option.id}" ${selected} style="padding-right: ${level * 20}px">
+            let html = `<option value="${optionKey}" ${selected} style="padding-right: ${level * 20}px">
                 ${spacing}${prefix} ${option.option_name} (${option.option_value})
             </option>`;
 
@@ -1632,6 +1636,7 @@
             // Create new option object
             const newOption = {
                 id: null,
+                temp_id: 'new_' + (++newOptionSeq),
                 option_name: name,
                 option_value: value,
                 additional_price: price,
@@ -1704,6 +1709,7 @@
             values.reverse().forEach(value => {
                 const newOption = {
                     id: null,
+                    temp_id: 'new_' + (++newOptionSeq),
                     option_name: name,
                     option_value: value,
                     additional_price: price,

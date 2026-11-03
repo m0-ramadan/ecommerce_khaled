@@ -968,6 +968,7 @@ class ProductController extends Controller
 
             if ($request->filled('product_options')) {
                 $createdIdsByIndex = [];
+                $tempOptionMapping = []; // temp_id (new_1) => created option id
 
                 // أولًا ننشئ أو نحدث كل الخيارات بدون dependencies
                 foreach ($request->product_options as $optIndex => $optionData) {
@@ -998,6 +999,9 @@ class ProductController extends Controller
                     $createdOption->save();
 
                     $createdIdsByIndex[$optIndex] = $createdOption->id;
+                    if (! empty($optionData['temp_id'])) {
+                        $tempOptionMapping[(string) $optionData['temp_id']] = $createdOption->id;
+                    }
                     $submittedOptionIds[] = $createdOption->id;
                     $optionMapping[$createdOption->id] = $createdOption->id;
                     if ($oldId) {
@@ -1040,9 +1044,15 @@ class ProductController extends Controller
                     }
 
                     $dependsOnId = null;
-                    if (! empty($optionData['depends_on_option_id'])) {
-                        $parentId = (int) $optionData['depends_on_option_id'];
-                        $dependsOnId = $optionMapping[$parentId] ?? null;
+                    $parentRaw = $optionData['depends_on_option_id'] ?? null;
+
+                    if ($parentRaw !== null && $parentRaw !== '') {
+                        if (is_numeric($parentRaw)) {
+                            $dependsOnId = $optionMapping[(int) $parentRaw] ?? null;
+                        } else {
+                            // خيار جديد بيشاور على خيار جديد تاني (temp_id).
+                            $dependsOnId = $tempOptionMapping[(string) $parentRaw] ?? null;
+                        }
                     }
 
                     $intendedParents[(int) $createdOptionId] = $dependsOnId;
