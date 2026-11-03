@@ -46,6 +46,16 @@ class CartController extends Controller
     // إضافة منتج للسلة
     public function add(AddToCartRequest $request)
     {
+        // بعض المنتجات بتطلب ملاحظة إجبارية (بيتحدد من الداشبورد).
+        $noteProduct = Product::find($request->product_id);
+        if ($noteProduct && $noteProduct->notes_enabled && blank($request->input('note'))) {
+            return $this->errorResponse(
+                'الملاحظات مطلوبة: ' . ($noteProduct->notes_label ?: 'اكتب ملاحظتك'),
+                422,
+                ['note' => ['الملاحظة مطلوبة لهذا المنتج']]
+            );
+        }
+
         $cart = $this->getCurrentCart();
 
         return DB::transaction(function () use ($request, $cart) {
@@ -91,6 +101,9 @@ class CartController extends Controller
             if ($cartItem) {
                 // لو العنصر موجود — نزود الكمية بالكمية الواردة
                 $cartItem->increment('quantity', $request->quantity);
+                if ($request->filled('note')) {
+                    $cartItem->note = $request->input('note');
+                }
                 $cartItem->price_per_unit = $priceData['price_per_unit'];
                 $cartItem->line_total = $cartItem->quantity * $cartItem->price_per_unit;
                 $cartItem->save();

@@ -141,6 +141,9 @@ class ProductResource extends JsonResource
                 ];
             }),
 
+            'notes_enabled' => (bool) ($this->notes_enabled ?? false),
+            'notes_label' => $this->notes_label,
+
             // ================== Images ==================
             'images' => $this->images
                 ->sortBy('order')

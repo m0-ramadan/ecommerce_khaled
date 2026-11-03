@@ -39,6 +39,8 @@ class StoreProductRequest extends FormRequest
                 ),
             ],
             'description' => 'nullable|string',
+            'notes_enabled' => 'nullable|boolean',
+            'notes_label' => 'nullable|string|max:255',
             'price' => 'nullable|numeric|min:0',
             'price_text' => 'nullable',
             'stock' => 'required|min:0',

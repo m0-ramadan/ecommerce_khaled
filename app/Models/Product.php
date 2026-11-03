@@ -15,6 +15,8 @@ class Product extends Model
         'name',
         'slug',
         'description',
+        'notes_enabled',
+        'notes_label',
         'price',
         'has_discount',
         'includes_tax',
@@ -84,6 +86,7 @@ class Product extends Model
         'show_in_home' => 'boolean',
         'home_order' => 'integer',
         'price' => 'decimal:2',
+        'notes_enabled' => 'boolean',
     ];
 
     public function getSlugAttribute($value)

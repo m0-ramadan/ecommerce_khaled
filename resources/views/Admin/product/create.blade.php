@@ -743,6 +743,20 @@
                         <label for="description" class="form-label">الوصف</label>
                         <textarea class="form-control summernote" id="description" name="description" rows="6">{{ old('description') }}</textarea>
                     </div>
+                    <div class="col-12 mb-3">
+                        <div class="border rounded p-3 bg-light">
+                            <div class="form-check form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" id="notes_enabled" name="notes_enabled" value="1"
+                                    {{ old('notes_enabled') ? 'checked' : '' }}>
+                                <label class="form-check-label fw-bold" for="notes_enabled">
+                                    تفعيل الملاحظات لهذا المنتج (إجبارية عند الإضافة للسلة)
+                                </label>
+                            </div>
+                            <input type="text" class="form-control" id="notes_label" name="notes_label"
+                                value="{{ old('notes_label') }}" placeholder="مثال: اكتب اسم التصميم أو المقاس المطلوب">
+                            <small class="text-muted">النص ده هو السؤال اللي هيظهر للعميل تحت خانة الملاحظات.</small>
+                        </div>
+                    </div>
                     <div class="col-md-6 mb-3">
                         <label for="status_id" class="form-label required">الحالة</label>
                         <select class="form-select" id="status_id" name="status_id" required>

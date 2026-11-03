@@ -25,6 +25,7 @@ class CartItemResource extends JsonResource
             'material'           => $this->material_id ? MaterialResource::make($this->material) : null,
             'material_id'        => $this->material_id,
             'quantity'           => $this->quantity,
+            'note'               => $this->note,
             'is_sample'          => $this->is_sample,
             'price_per_unit'     => $this->price_per_unit,
             'image_design'       => $this->image_design ? asset('storage/' . $this->image_design) : null,
