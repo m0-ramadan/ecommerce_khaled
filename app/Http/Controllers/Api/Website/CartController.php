@@ -371,6 +371,20 @@ class CartController extends Controller
         }
 
         // ============================
+        // 🖨️ طباعة وجهين: +2 ريال للوحدة لما الكمية أقل من 250
+        // ============================
+        $hasDoubleSided = false;
+        foreach ($request->selected_options ?? [] as $optionData) {
+            $text = (string) ($optionData['option_value'] ?? '') . ' ' . (string) ($optionData['option_name'] ?? '');
+            if (mb_strpos($text, 'وجهين') !== false) {
+                $hasDoubleSided = true;
+                break;
+            }
+        }
+
+        $unitPrice += ($hasDoubleSided && $quantity < 250) ? 2 : 0;
+
+        // ============================
         // 🧮 totals
         // ============================
         $lineTotal = ($unitPrice * $quantity) + $oneTimePrice;
