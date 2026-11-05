@@ -569,6 +569,8 @@ class ProductController extends Controller
                 'has_discount' => $request->boolean('has_discount'),
                 'includes_tax' => $request->boolean('includes_tax'),
                 'includes_shipping' => $request->boolean('includes_shipping'),
+                'notes_enabled' => $request->boolean('notes_enabled'),
+                'notes_label' => $request->filled('notes_label') ? $request->input('notes_label') : null,
             ]);
 
             // Handle main image
@@ -1177,6 +1179,8 @@ class ProductController extends Controller
                 'has_discount' => $request->boolean('has_discount'),
                 'includes_tax' => $request->boolean('includes_tax'),
                 'includes_shipping' => $request->boolean('includes_shipping'),
+                'notes_enabled' => $request->boolean('notes_enabled'),
+                'notes_label' => $request->filled('notes_label') ? $request->input('notes_label') : null,
                 // الحقول الجديدة لتركيبات الخيارات
                 'valid_combinations' => $request->filled('valid_combinations') ?
                     json_decode($request->valid_combinations, true) : null,
