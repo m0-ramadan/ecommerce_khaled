@@ -61,3 +61,17 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&family=Noto+Kufi+Arabic:wght@100..900&display=swap"
         rel="stylesheet">
+<style>
+/* قوائم الاختيار (select / select2): النص أسود دائمًا */
+select,
+select option,
+.select2-results__option {
+    color: #111 !important;
+}
+
+.select2-container--default .select2-results__option--highlighted,
+.select2-container--default .select2-results__option[aria-selected="true"] {
+    color: #fff !important;
+    background-color: #0d6efd !important;
+}
+</style>
