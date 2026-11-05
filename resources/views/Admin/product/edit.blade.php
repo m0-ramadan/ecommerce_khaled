@@ -1051,6 +1051,10 @@
 
     <!-- Fixed Action Buttons -->
     <div class="action-buttons-fixed">
+        <button type="submit" form="editProductForm" formnovalidate class="btn btn-success"
+            title="حفظ التعديلات" style="box-shadow: 0 10px 25px rgba(25,135,84,.45);">
+            <i class="fas fa-save"></i>
+        </button>
         <a href="{{ route('admin.products.show', $product->id) }}" class="btn btn-info" title="عرض المنتج">
             <i class="fas fa-eye"></i>
         </a>

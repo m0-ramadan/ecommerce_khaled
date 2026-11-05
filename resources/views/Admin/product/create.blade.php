@@ -1134,6 +1134,10 @@
 
     <!-- Fixed Action Buttons -->
     <div class="action-buttons-fixed">
+        <button type="submit" form="productForm" formnovalidate class="btn btn-success"
+            title="حفظ المنتج" style="box-shadow: 0 10px 25px rgba(25,135,84,.45);">
+            <i class="fas fa-save"></i>
+        </button>
         <button type="button" class="btn btn-success" onclick="window.scrollTo({top: 0, behavior: 'smooth'})"
             title="العودة للأعلى">
             <i class="fas fa-arrow-up"></i>
