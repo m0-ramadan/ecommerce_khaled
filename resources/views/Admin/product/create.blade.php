@@ -749,12 +749,12 @@
                                 <input class="form-check-input" type="checkbox" id="notes_enabled" name="notes_enabled" value="1"
                                     {{ old('notes_enabled') ? 'checked' : '' }}>
                                 <label class="form-check-label fw-bold" for="notes_enabled">
-                                    تفعيل الملاحظات لهذا المنتج (إجبارية عند الإضافة للسلة)
+                                    تفعيل الملاحظات لهذا المنتج (اختيارية للعميل)
                                 </label>
                             </div>
                             <input type="text" class="form-control" id="notes_label" name="notes_label"
                                 value="{{ old('notes_label') }}" placeholder="مثال: اكتب اسم التصميم أو المقاس المطلوب">
-                            <small class="text-muted">النص ده هو السؤال اللي هيظهر للعميل تحت خانة الملاحظات.</small>
+                            <small class="text-muted">النص ده هو السؤال اللي هيظهر للعميل تحت خانة الملاحظات (العميل يقدر يسيبها فاضية).</small>
                         </div>
                     </div>
                     <div class="col-md-6 mb-3">
