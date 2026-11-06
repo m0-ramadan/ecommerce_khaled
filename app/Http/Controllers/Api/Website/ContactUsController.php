@@ -17,7 +17,10 @@ class ContactUsController extends Controller
     public function store(ContactUsRequest $request)
     {
 
-        $contact = ContactUs::create($request->validated());
+        $data = $request->validated();
+        $data['last_name'] = $data['last_name'] ?? '';
+
+        $contact = ContactUs::create($data);
 
     //    Mail::to(env("EMAIL_RECIEVERED"))->send(new ContactUsNotification($contact));
 
