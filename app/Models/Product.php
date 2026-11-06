@@ -132,7 +132,7 @@ class Product extends Model
     /**
      * الحد اللي فوقه بنحوّل المنتج لمدة الأوفست مهما كان نوع إنتاجه.
      */
-    public const LARGE_QUANTITY_THRESHOLD = 300;
+    public const LARGE_QUANTITY_THRESHOLD = 250;
 
     /**
      * مدة التنفيذ المعتمدة حسب نوع الإنتاج المحدد في الداشبورد.
@@ -180,7 +180,7 @@ class Product extends Model
     }
 
     /**
-     * المدة الفعلية: نوع إنتاج المنتج، إلا لو الكمية أكبر من 300
+     * المدة الفعلية: نوع إنتاج المنتج، إلا لو الكمية أكبر من 250
      * فتتحول دايمًا لمدة الأوفست.
      *
      * @return array{from:int,to:int,label:string,note:string,production_type:string}
