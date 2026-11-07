@@ -21,6 +21,7 @@ use App\Http\Controllers\Admin\PaymentMethodController;
 use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\PermissionsController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\PackageController;
 use App\Http\Controllers\Admin\RegionController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\RolesController;
@@ -253,6 +254,9 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
         Route::post('{product}/duplicate', [ProductController::class, 'duplicate'])->name('duplicate');
     });
     Route::post('products/update/{id}', [ProductController::class, 'update'])->name('products.update');
+
+    // Packages (باقات مميزة)
+    Route::resource('packages', PackageController::class);
 
     // Contacts
     Route::prefix('contacts')->as('contact.')->group(function () {

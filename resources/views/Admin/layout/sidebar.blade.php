@@ -111,6 +111,13 @@
             </a>
         </li>
 
+        <li class="menu-item {{ request()->routeIs('admin.packages.*') ? 'active' : '' }}">
+            <a href="{{ route('admin.packages.index') }}" class="menu-link">
+                <i class="menua-icon ti ti-package"></i>
+                <div>الباقات المميزة</div>
+            </a>
+        </li>
+
         <li class="menu-item">
             <a href="{{ route('admin.categories.index') }}" class="menu-link">
                 <i class="menua-icon ti ti-category"></i>

@@ -2,48 +2,125 @@
 
 namespace App\Http\Controllers\Admin;
 
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Http\Interfaces\Admin\PackageInterface;
-use App\Http\Requests\Admin\Package\StorePackageRequest;
-use App\Http\Requests\Admin\Package\UpdatePackageRequest;
+use App\Models\Package;
+use App\Models\Product;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class PackageController extends Controller
 {
-    protected $packageInterface;
-
-    public function __construct(PackageInterface $packageInterface)
+    public function index()
     {
-      $this->packageInterface = $packageInterface;
+        $packages = Package::withCount('products')->orderBy('order')->latest()->paginate(15);
+
+        return view('Admin.packages.index', compact('packages'));
     }
 
-    public function index(){
-       return  $this->packageInterface->index();
+    public function create()
+    {
+        $products = Product::orderBy('name')->get(['id', 'name']);
+
+        return view('Admin.packages.create', compact('products'));
     }
 
+    public function store(Request $request)
+    {
+        $data = $this->validated($request);
+        $data['slug'] = Package::makeSlug($data['name']);
+        $data['is_active'] = $request->boolean('is_active', true);
+        $data['order'] = (int) $request->input('order', 0);
+        $data['image'] = $request->hasFile('image') ? $request->file('image')->store('packages', 'public') : null;
+        $data['background_image'] = $request->hasFile('background_image') ? $request->file('background_image')->store('packages', 'public') : null;
 
-    public function create(){
-        return  $this->packageInterface->create();
+        DB::transaction(function () use ($request, $data) {
+            $package = Package::create($data);
+            $this->syncProducts($package, $request);
+        });
+
+        return redirect()->route('admin.packages.index')->with('success', 'تم إضافة الباقة بنجاح');
     }
 
-    public function store( StorePackageRequest $request){
-        return  $this->packageInterface->store($request);
+    public function edit(Package $package)
+    {
+        $package->load('products.tiers');
+        $products = Product::orderBy('name')->get(['id', 'name']);
+
+        return view('Admin.packages.edit', compact('package', 'products'));
     }
 
-    public function edit($id){
-        return  $this->packageInterface->edit($id);
+    public function update(Request $request, Package $package)
+    {
+        $data = $this->validated($request);
+        $data['slug'] = $package->slug ?: Package::makeSlug($data['name'], $package->id);
+        $data['is_active'] = $request->boolean('is_active');
+        $data['order'] = (int) $request->input('order', 0);
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store('packages', 'public');
+        }
+        if ($request->hasFile('background_image')) {
+            $data['background_image'] = $request->file('background_image')->store('packages', 'public');
+        }
+
+        DB::transaction(function () use ($request, $package, $data) {
+            $package->update($data);
+            $this->syncProducts($package, $request);
+        });
+
+        return redirect()->route('admin.packages.index')->with('success', 'تم تحديث الباقة بنجاح');
     }
 
-    public function status(){
-        return  $this->packageInterface->status();
+    public function destroy(Package $package)
+    {
+        $package->delete();
+
+        return redirect()->route('admin.packages.index')->with('success', 'تم حذف الباقة');
     }
 
-
-    public function update(UpdatePackageRequest $request){
-        return  $this->packageInterface->update($request);
+    private function validated(Request $request): array
+    {
+        return $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'image' => 'nullable|image|max:4096',
+            'background_image' => 'nullable|image|max:4096',
+            'order' => 'nullable|integer',
+            'products' => 'nullable|array',
+            'products.*.product_id' => 'nullable|exists:products,id',
+            'products.*.type' => 'nullable|in:main,optional',
+            'products.*.base_quantity' => 'nullable|integer|min:0',
+            'products.*.base_price' => 'nullable|numeric|min:0',
+            'products.*.tiers' => 'nullable|string',
+        ]);
     }
 
-    public function destroy($id){
-        return  $this->packageInterface->destroy($id);
+    private function syncProducts(Package $package, Request $request): void
+    {
+        $package->products()->delete();
+
+        foreach (($request->input('products') ?? []) as $index => $row) {
+            if (empty($row['product_id'])) {
+                continue;
+            }
+
+            $packageProduct = $package->products()->create([
+                'product_id' => (int) $row['product_id'],
+                'type' => ($row['type'] ?? 'main') === 'optional' ? 'optional' : 'main',
+                'base_quantity' => max(0, (int) ($row['base_quantity'] ?? 0)),
+                'base_price' => max(0, (float) ($row['base_price'] ?? 0)),
+                'order' => (int) $index,
+            ]);
+
+            foreach (preg_split('/\r?\n/', (string) ($row['tiers'] ?? '')) as $line) {
+                if (! preg_match('/^\s*(\d+)\s*[:=،,]\s*([\d.]+)\s*$/', $line, $m)) {
+                    continue;
+                }
+                $packageProduct->tiers()->create([
+                    'quantity' => (int) $m[1],
+                    'price' => (float) $m[2],
+                ]);
+            }
+        }
     }
 }

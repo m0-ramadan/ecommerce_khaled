@@ -29,6 +29,7 @@ use App\Http\Controllers\Api\Website\WhatsAppWebhookController;
 Route::prefix('v1')->group(function () {
 
     Route::middleware('auth:sanctum')->group(function () {
+        Route::post('/packages/{id}/order', [\App\Http\Controllers\Api\Website\PackageController::class, 'order']);
         Route::prefix('addresses')->group(function () {
             Route::get('/', [UserAddressController::class, 'index']);
             Route::get('/places', [UserAddressController::class, 'getPlaces']);
@@ -124,6 +125,10 @@ Route::prefix('v1')->group(function () {
         Route::get('/{id}/related', [ProductController::class, 'related']);
         Route::get('/{id}', [ProductController::class, 'show']);
     });
+
+    // الباقات المميزة
+    Route::get('/packages', [\App\Http\Controllers\Api\Website\PackageController::class, 'index']);
+    Route::get('/packages/{id}', [\App\Http\Controllers\Api\Website\PackageController::class, 'show']);
 
     Route::get('/banners', [BannerController::class, 'index']);
     Route::get('/payment-methods', [OrderController::class, 'paymentMethods']);
