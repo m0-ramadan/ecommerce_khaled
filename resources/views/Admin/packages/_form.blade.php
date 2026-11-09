@@ -59,6 +59,16 @@
         أو <code>من+:السعر</code> لرينج مفتوح (مثال: <code>250+:1800</code>). العميل بيكتب الكمية بنفسه.
     </p>
 
+    <!-- عناوين الأعمدة -->
+    <div class="row g-2 mb-1 d-none d-md-flex align-items-end fw-bold small text-muted">
+        <div class="col-md-3">المنتج</div>
+        <div class="col-md-2">النوع (أساسي / مرشح)</div>
+        <div class="col-md-2">الحد الأدنى للكمية</div>
+        <div class="col-md-2">السعر الأساسي (ريال)</div>
+        <div class="col-md-2">شرائح الكمية (رينجات: من-إلى:السعر)</div>
+        <div class="col-md-1 text-center">حذف</div>
+    </div>
+
     <div id="rows">
         @if ($isEdit)
             @foreach ($package->products as $i => $pp)
