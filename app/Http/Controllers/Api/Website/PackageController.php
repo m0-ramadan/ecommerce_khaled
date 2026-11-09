@@ -65,20 +65,22 @@ class PackageController extends Controller
                         && ($t->max_quantity === null || $quantity <= (int) $t->max_quantity);
                 }) ?: $tiers->filter(fn ($t) => $quantity >= (int) $t->quantity)->sortByDesc('quantity')->first();
 
+                // سعر الشريحة = سعر القطعة الواحدة، والإجمالي = الكمية × سعر القطعة.
                 if ($packageProduct->type === 'main') {
                     $min = (int) $packageProduct->base_quantity;
                     if ($quantity < $min) {
                         $quantity = $min;
                     }
-                    $total = (float) $packageProduct->base_price;
-                    if ($tier && $quantity > $min) {
-                        $total += (float) $tier->price;
-                    }
+                    $total = $tier
+                        ? round($quantity * (float) $tier->price, 2)
+                        : (float) $packageProduct->base_price;
                 } else {
                     if ($quantity <= 0) {
                         continue;
                     }
-                    $total = $tier ? (float) $tier->price : round((float) ($packageProduct->product?->price ?? 0) * $quantity, 2);
+                    $total = $tier
+                        ? round($quantity * (float) $tier->price, 2)
+                        : round((float) ($packageProduct->product?->price ?? 0) * $quantity, 2);
                 }
 
                 if ($total <= 0) {
