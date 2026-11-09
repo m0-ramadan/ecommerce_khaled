@@ -112,13 +112,29 @@ class PackageController extends Controller
                 'order' => (int) $index,
             ]);
 
+            // الشرائح بقت رينجات: من-إلى:السعر  (أو من:السعر لرينج مفتوح)
             foreach (preg_split('/\r?\n/', (string) ($row['tiers'] ?? '')) as $line) {
-                if (! preg_match('/^\s*(\d+)\s*[:=،,]\s*([\d.]+)\s*$/', $line, $m)) {
+                $line = trim($line);
+                if ($line === '') {
                     continue;
                 }
+
+                if (preg_match('/^\s*(\d+)\s*-\s*(\d+)\s*[:=،,]\s*([\d.]+)\s*$/', $line, $m)) {
+                    $from = (int) $m[1];
+                    $to = (int) $m[2];
+                    $price = (float) $m[3];
+                } elseif (preg_match('/^\s*(\d+)\s*\+?\s*[:=،,]\s*([\d.]+)\s*$/', $line, $m)) {
+                    $from = (int) $m[1];
+                    $to = null;
+                    $price = (float) $m[2];
+                } else {
+                    continue;
+                }
+
                 $packageProduct->tiers()->create([
-                    'quantity' => (int) $m[1],
-                    'price' => (float) $m[2],
+                    'quantity' => max(0, $from),
+                    'max_quantity' => $to !== null && $to >= $from ? $to : null,
+                    'price' => $price,
                 ]);
             }
         }

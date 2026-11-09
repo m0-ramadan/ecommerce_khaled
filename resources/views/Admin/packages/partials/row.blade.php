@@ -22,7 +22,7 @@
             value="{{ $pp->base_price ?? 0 }}" placeholder="السعر الأساسي">
     </div>
     <div class="col-md-2">
-        <textarea class="form-control" rows="2" name="products[{{ $i }}][tiers]" placeholder="50:500">{{ $pp ? $pp->tiers->map(fn ($t) => $t->quantity . ':' . $t->price)->implode("\n") : '' }}</textarea>
+        <textarea class="form-control" rows="2" name="products[{{ $i }}][tiers]" placeholder="50-99:500">{{ $pp ? $pp->tiers->map(fn ($t) => $t->quantity . ($t->max_quantity ? '-' . $t->max_quantity : '+') . ':' . $t->price)->implode("\n") : '' }}</textarea>
     </div>
     <div class="col-md-1">
         <button type="button" class="btn btn-danger btn-sm w-100"

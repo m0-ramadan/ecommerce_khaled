@@ -56,20 +56,29 @@ class PackageController extends Controller
                     continue;
                 }
 
-                $tier = null;
-                if (! empty($selection['tier_id'])) {
-                    $tier = $packageProduct->tiers->firstWhere('id', (int) $selection['tier_id']);
-                }
+                $quantity = (int) ($selection['quantity'] ?? 0);
+                $tiers = $packageProduct->tiers;
+
+                // الرينج اللي الكمية بتقع فيه (أو أعلى رينج بدايته أقل من الكمية).
+                $tier = $tiers->first(function ($t) use ($quantity) {
+                    return $quantity >= (int) $t->quantity
+                        && ($t->max_quantity === null || $quantity <= (int) $t->max_quantity);
+                }) ?: $tiers->filter(fn ($t) => $quantity >= (int) $t->quantity)->sortByDesc('quantity')->first();
 
                 if ($packageProduct->type === 'main') {
-                    $quantity = max(1, (int) $packageProduct->base_quantity + (int) ($tier->quantity ?? 0));
-                    $total = (float) $packageProduct->base_price + (float) ($tier->price ?? 0);
+                    $min = (int) $packageProduct->base_quantity;
+                    if ($quantity < $min) {
+                        $quantity = $min;
+                    }
+                    $total = (float) $packageProduct->base_price;
+                    if ($tier && $quantity > $min) {
+                        $total += (float) $tier->price;
+                    }
                 } else {
-                    if (! $tier) {
+                    if ($quantity <= 0) {
                         continue;
                     }
-                    $quantity = max(1, (int) $tier->quantity);
-                    $total = (float) $tier->price;
+                    $total = $tier ? (float) $tier->price : round((float) ($packageProduct->product?->price ?? 0) * $quantity, 2);
                 }
 
                 if ($total <= 0) {
@@ -80,6 +89,7 @@ class PackageController extends Controller
                 $hash = md5(json_encode([
                     'package_id' => $package->id,
                     'package_product_id' => $packageProduct->id,
+                    'quantity' => $quantity,
                     'tier_id' => $tier->id ?? null,
                     'user_id' => $cart->user_id,
                 ]));
@@ -99,6 +109,7 @@ class PackageController extends Controller
                                 'package_id' => $package->id,
                                 'type' => $packageProduct->type,
                                 'tier_id' => $tier->id ?? null,
+                                'quantity' => $quantity,
                             ],
                         ],
                     ]
@@ -148,7 +159,8 @@ class PackageController extends Controller
                     ],
                     'tiers' => $pp->tiers->map(fn ($t) => [
                         'id' => $t->id,
-                        'quantity' => (int) $t->quantity,
+                        'min_quantity' => (int) $t->quantity,
+                        'max_quantity' => $t->max_quantity !== null ? (int) $t->max_quantity : null,
                         'price' => (float) $t->price,
                     ])->values(),
                 ];
