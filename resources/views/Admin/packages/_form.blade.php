@@ -104,11 +104,30 @@
             const $el = jQuery(this);
             if ($el.hasClass('select2-hidden-accessible')) return;
 
+            const normalizeArabic = function (text) {
+                return String(text || '')
+                    .replace(/[\u064B-\u065F\u0670\u06D6-\u06ED]/g, '')
+                    .replace(/[\u0623\u0625\u0622]/g, '\u0627')
+                    .replace(/\u0649/g, '\u064A')
+                    .replace(/\u0629/g, '\u0647')
+                    .replace(/\u0640/g, '')
+                    .replace(/\s+/g, ' ')
+                    .trim()
+                    .toLowerCase();
+            };
+
             $el.select2({
                 width: '100%',
                 dir: 'rtl',
+                matcher: function (params, data) {
+                    const term = normalizeArabic(params.term || '');
+                    if (!term) return data;
+                    const text = normalizeArabic(data.text || '');
+                    if (text.indexOf(term) > -1) return data;
+                    return null;
+                },
                 language: {
-                    noResults: function () { return 'لا توجد نتائج'; },
+                    noResults: function () { return 'لا توجد نتائج — جرّب كلمة أخرى'; },
                     searching: function () { return 'جارٍ البحث...'; },
                 },
                 templateResult: function (item) {
