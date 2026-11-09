@@ -119,6 +119,8 @@
             $el.select2({
                 width: '100%',
                 dir: 'rtl',
+                placeholder: { id: '', text: 'ابحث عن المنتج بالاسم...' },
+                allowClear: false,
                 matcher: function (params, data) {
                     const term = normalizeArabic(params.term || '');
                     if (!term) return data;
@@ -144,9 +146,12 @@
                     return $wrap;
                 },
                 templateSelection: function (item) {
-                    return item.text || 'ابحث عن المنتج بالاسم...';
+                    return (item && item.text) ? item.text : 'ابحث عن المنتج بالاسم...';
                 },
             });
+
+            // تأكيد عرض النص المحدد بعد التهيئة
+            $el.trigger('change.select2');
         });
     }
 

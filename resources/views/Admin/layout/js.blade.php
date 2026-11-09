@@ -550,7 +550,8 @@
 </script>
 <script>
     $(function() {
-        $('.select2').select2();
+        // فقط عناصر <select> — لتجنّب إعادة تهيئة حاويات Select2 نفسها
+        $('select.select2').select2();
 
         if ("") {
             console.log("")
