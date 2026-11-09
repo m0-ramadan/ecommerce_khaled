@@ -20,7 +20,7 @@ class PackageController extends Controller
 
     public function create()
     {
-        $products = Product::orderBy('name')->get(['id', 'name']);
+        $products = Product::orderBy('name')->get(['id', 'name', 'image']);
 
         return view('Admin.packages.create', compact('products'));
     }
@@ -45,7 +45,7 @@ class PackageController extends Controller
     public function edit(Package $package)
     {
         $package->load('products.tiers');
-        $products = Product::orderBy('name')->get(['id', 'name']);
+        $products = Product::orderBy('name')->get(['id', 'name', 'image']);
 
         return view('Admin.packages.edit', compact('package', 'products'));
     }

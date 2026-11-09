@@ -67,6 +67,22 @@ select,
 select option,
 .select2-results__option {
     color: #111 !important;
+    background-color: #fff;
+}
+
+.select2-dropdown,
+.select2-container--default .select2-selection--single,
+.select2-container--default .select2-search--dropdown .select2-search__field {
+    background-color: #fff !important;
+    color: #111 !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    color: #111 !important;
+}
+
+.select2-results__option img {
+    flex: 0 0 auto;
 }
 
 .select2-container--default .select2-results__option--highlighted,

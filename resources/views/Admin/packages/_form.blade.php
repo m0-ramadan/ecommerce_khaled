@@ -84,11 +84,47 @@
 <script>
     let packageRowIndex = {{ $rowsCount }};
 
+    function initProductSelect(scope) {
+        if (!window.jQuery || !jQuery.fn.select2) return;
+
+        jQuery(scope || document).find('.product-select').each(function () {
+            const $el = jQuery(this);
+            if ($el.hasClass('select2-hidden-accessible')) return;
+
+            $el.select2({
+                width: '100%',
+                dir: 'rtl',
+                language: {
+                    noResults: function () { return 'لا توجد نتائج'; },
+                    searching: function () { return 'جارٍ البحث...'; },
+                },
+                templateResult: function (item) {
+                    if (!item.id || !item.element) return item.text;
+                    const img = item.element.dataset ? item.element.dataset.image : '';
+                    const $wrap = jQuery('<span class="d-flex align-items-center gap-2"></span>');
+                    if (img) {
+                        jQuery('<img>')
+                            .attr('src', img)
+                            .css({ width: '30px', height: '30px', objectFit: 'contain', borderRadius: '6px', background: '#f1f5f9' })
+                            .appendTo($wrap);
+                    }
+                    jQuery('<span>').text(item.text).appendTo($wrap);
+                    return $wrap;
+                },
+                templateSelection: function (item) {
+                    return item.text || 'ابحث عن المنتج بالاسم...';
+                },
+            });
+        });
+    }
+
     function addPackageRow() {
         const tpl = document.getElementById('rowTemplate').innerHTML.replace(/__i/g, packageRowIndex++);
         const wrap = document.createElement('div');
         wrap.innerHTML = tpl;
-        document.getElementById('rows').appendChild(wrap.firstElementChild);
+        const row = wrap.firstElementChild;
+        document.getElementById('rows').appendChild(row);
+        initProductSelect(row);
     }
 
     document.getElementById('packageForm').addEventListener('submit', function () {
@@ -97,5 +133,9 @@
                 el.name = el.name.replace(/products\[\d+\]/, 'products[' + idx + ']');
             });
         });
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        initProductSelect(document);
     });
 </script>
