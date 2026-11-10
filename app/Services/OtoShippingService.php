@@ -23,7 +23,7 @@ class OtoShippingService
 
     public function refreshToken()
     {
-        $response = Http::withHeaders([
+        $response = Http::timeout(30)->withHeaders([
             'Content-Type' => 'application/json',
         ])->post($this->baseUrl . 'refreshToken', [
             'refresh_token' => $this->token, // نفس اللي في cURL
@@ -36,7 +36,7 @@ class OtoShippingService
     public function getPickupLocations($token)
     {
 
-        $response = Http::withToken($token)
+        $response = Http::timeout(30)->withToken($token)
             ->get($this->baseUrl . 'getPickupLocationList');
 
         return $response->json();
@@ -142,10 +142,11 @@ class OtoShippingService
             $packageCount = 1;
         } else {
             $packageSize = 'large';
-            $packageCount = max(1, (int) ceil($totalWeight / 20));
-            $boxLength = 60;
-            $boxWidth = 45;
-            $boxHeight = 40;
+            // كاب أقصى عدد طرود لكل شحنة عشان مزود الشحن يرجّع تسعير بسرعة
+            $packageCount = min(5, max(1, (int) ceil($totalWeight / 20)));
+            $boxLength = 80;
+            $boxWidth = 60;
+            $boxHeight = 50;
         }
 
         return [
@@ -436,7 +437,7 @@ class OtoShippingService
 
         /* ================= SEND REQUEST ================= */
 
-        $response = Http::withToken($token)
+        $response = Http::timeout(30)->withToken($token)
             ->post($this->baseUrl . 'createOrder', $payload);
         if ($response->failed()) {
             Log::error('Failed to create OTO order', [
@@ -494,7 +495,7 @@ class OtoShippingService
 
     public function getDeliveryFee($order_id, $accessToken)
     {
-        $response = Http::withToken($accessToken)
+        $response = Http::timeout(30)->withToken($accessToken)
             ->post($this->baseUrl . 'getDeliveryFee', [
                 'orderId' => (string) $order_id
             ]);
@@ -688,7 +689,7 @@ class OtoShippingService
         ];
 
         // استدعاء API
-        $response = Http::withToken($shippingOrder->accessToken)
+        $response = Http::timeout(30)->withToken($shippingOrder->accessToken)
             ->post($this->baseUrl . 'createShipment', $payload);
 
         // تحقق من نجاح الطلب
