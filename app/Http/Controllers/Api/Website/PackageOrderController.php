@@ -6,12 +6,15 @@ use App\Http\Controllers\Controller;
 use App\Models\Package;
 use App\Models\PackageOrder;
 use App\Models\PackageOrderItem;
+use App\Models\PaymentMethod;
+use App\Traits\HandlesPaymobPayment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class PackageOrderController extends Controller
 {
+    use HandlesPaymobPayment;
     public function index(Request $request)
     {
         $user = auth('sanctum')->user();
@@ -142,10 +145,31 @@ class PackageOrderController extends Controller
             return $order;
         });
 
+        // لو طريقة الدفع إلكترونية (Paymob / Apple Pay) ننشئ رابط دفع لطلب الباقة.
+        $paymentUrl = null;
+        $shortenUrl = null;
+
+        $paymentMethod = $data['payment_method'] ? PaymentMethod::find($data['payment_method']) : null;
+        if ($paymentMethod && in_array($paymentMethod->key, ['paymob', 'applepay'], true)) {
+            $result = $this->initiatePaymobPayment($packageOrder, $paymentMethod->key === 'applepay');
+
+            if (! ($result['success'] ?? false)) {
+                return response()->json([
+                    'status' => false,
+                    'message' => $result['message'] ?? 'تعذر بدء عملية الدفع. يرجى المحاولة مرة أخرى.',
+                ], 422);
+            }
+
+            $paymentUrl = $result['payment_url'] ?? null;
+            $shortenUrl = $result['shorten_url'] ?? null;
+        }
+
         return response()->json([
             'status' => true,
             'message' => 'تم إنشاء طلب الباقة بنجاح',
             'data' => $packageOrder->load('items'),
+            'payment_url' => $paymentUrl,
+            'shorten_url' => $shortenUrl,
         ], 201);
     }
 }
