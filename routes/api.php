@@ -29,7 +29,6 @@ use App\Http\Controllers\Api\Website\WhatsAppWebhookController;
 Route::prefix('v1')->group(function () {
 
     Route::middleware('auth:sanctum')->group(function () {
-        Route::post('/packages/{id}/order', [\App\Http\Controllers\Api\Website\PackageController::class, 'order']);
         Route::get('/package-orders', [\App\Http\Controllers\Api\Website\PackageOrderController::class, 'index']);
         Route::post('/package-orders', [\App\Http\Controllers\Api\Website\PackageOrderController::class, 'store']);
         Route::get('/package-orders/{id}', [\App\Http\Controllers\Api\Website\PackageOrderController::class, 'show']);
