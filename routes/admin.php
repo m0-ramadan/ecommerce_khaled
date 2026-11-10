@@ -22,6 +22,7 @@ use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\PermissionsController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\PackageController;
+use App\Http\Controllers\Admin\PackageOrderController;
 use App\Http\Controllers\Admin\RegionController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\RolesController;
@@ -257,6 +258,13 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
 
     // Packages (باقات مميزة)
     Route::resource('packages', PackageController::class);
+
+    // طلبات الباكدجات (منفصلة عن طلبات المنتجات)
+    Route::prefix('package-orders')->as('package-orders.')->group(function () {
+        Route::get('/', [PackageOrderController::class, 'index'])->name('index');
+        Route::get('/{id}', [PackageOrderController::class, 'show'])->name('show');
+        Route::post('/{id}/status', [PackageOrderController::class, 'updateStatus'])->name('status');
+    });
 
     // Contacts
     Route::prefix('contacts')->as('contact.')->group(function () {
