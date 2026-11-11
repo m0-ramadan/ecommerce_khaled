@@ -114,7 +114,7 @@
         <li class="menu-item {{ request()->routeIs('admin.package-orders.*') ? 'active' : '' }}">
             <a href="{{ route('admin.package-orders.index') }}" class="menu-link">
                 <i class="menua-icon ti ti-packages"></i>
-                <div>طلبات الباكدجات</div>
+                <div>طلبات البكجات</div>
             </a>
         </li>
 

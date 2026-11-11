@@ -1,11 +1,11 @@
 @extends('Admin.layout.master')
-@section('title', 'طلبات الباكدجات')
+@section('title', 'طلبات البكجات')
 @section('content')
     <div class="container-fluid">
         @if (session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
-                <h4 class="mb-0">طلبات الباكدجات</h4>
+                <h4 class="mb-0">طلبات البكجات</h4>
                 <form method="GET" class="d-flex gap-2">
                     <input type="text" name="q" value="{{ request('q') }}" class="form-control" placeholder="رقم الطلب / الاسم / الجوال">
                     <button class="btn btn-primary">بحث</button>
@@ -36,7 +36,7 @@
                                 <td><a href="{{ route('admin.package-orders.show', $order->id) }}" class="btn btn-sm btn-warning">عرض</a></td>
                             </tr>
                         @empty
-                            <tr><td colspan="12" class="text-center">لا توجد طلبات باكدجات بعد</td></tr>
+                            <tr><td colspan="12" class="text-center">لا توجد طلبات بكجات بعد</td></tr>
                         @endforelse
                     </tbody>
                 </table>
