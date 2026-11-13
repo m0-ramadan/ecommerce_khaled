@@ -29,8 +29,10 @@
     </div>
 
     <div class="mb-3">
-        <label class="form-label">الوصف</label>
-        <textarea name="description" rows="3" class="form-control">{{ old('description', $package->description ?? '') }}</textarea>
+        <label class="form-label">الوصف (يظهر في صفحة الباقة تحت الاسم)</label>
+        <textarea name="description" rows="4" class="form-control"
+            placeholder="مثال: باقة متكاملة ومختارة بعناية لتلبية احتياجاتك الأساسية، بجودة عالية وتصميم احترافي.">{{ old('description', $package->description ?? '') }}</textarea>
+        <small class="text-muted">لو سيبته فاضي مش هيظهر وصف في صفحة الباقة.</small>
     </div>
 
     <div class="row">
