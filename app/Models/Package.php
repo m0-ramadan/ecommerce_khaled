@@ -7,9 +7,9 @@ use Illuminate\Support\Str;
 
 class Package extends Model
 {
-    protected $fillable = ['name', 'slug', 'description', 'image', 'background_image', 'is_active', 'order'];
+    protected $fillable = ['name', 'slug', 'description', 'image', 'background_image', 'design_price', 'is_active', 'order'];
 
-    protected $casts = ['is_active' => 'boolean', 'order' => 'integer'];
+    protected $casts = ['is_active' => 'boolean', 'order' => 'integer', 'design_price' => 'decimal:2'];
 
     public function products()
     {

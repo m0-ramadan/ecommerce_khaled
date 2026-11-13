@@ -33,6 +33,7 @@ class PackageController extends Controller
         $data['order'] = (int) $request->input('order', 0);
         $data['image'] = $request->hasFile('image') ? $request->file('image')->store('packages', 'public') : null;
         $data['background_image'] = $request->hasFile('background_image') ? $request->file('background_image')->store('packages', 'public') : null;
+        $data['design_price'] = (float) $request->input('design_price', 0);
 
         DB::transaction(function () use ($request, $data) {
             $package = Package::create($data);
@@ -56,6 +57,7 @@ class PackageController extends Controller
         $data['slug'] = $package->slug ?: Package::makeSlug($data['name'], $package->id);
         $data['is_active'] = $request->boolean('is_active');
         $data['order'] = (int) $request->input('order', 0);
+        $data['design_price'] = (float) $request->input('design_price', $package->design_price ?? 0);
         if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')->store('packages', 'public');
         }
@@ -85,6 +87,7 @@ class PackageController extends Controller
             'description' => 'nullable|string',
             'image' => 'nullable|image|max:4096',
             'background_image' => 'nullable|image|max:4096',
+            'design_price' => 'nullable|numeric|min:0',
             'order' => 'nullable|integer',
             'products' => 'nullable|array',
             'products.*.product_id' => 'nullable|exists:products,id',

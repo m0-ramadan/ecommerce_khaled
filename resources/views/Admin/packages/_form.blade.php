@@ -50,6 +50,15 @@
         </div>
     </div>
 
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <label class="form-label">سعر خدمة التصميم للباقة (ريال)</label>
+            <input type="number" step="0.01" min="0" name="design_price" class="form-control"
+                value="{{ old('design_price', $package->design_price ?? 0) }}">
+            <small class="text-muted">لو العميل اختار «أحتاج تصميمات» تُضاف القيمة دي لإجمالي الطلب.</small>
+        </div>
+    </div>
+
     <hr>
     <h5>منتجات الباقة</h5>
     <p class="text-muted small mb-2">

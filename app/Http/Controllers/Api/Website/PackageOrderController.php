@@ -30,6 +30,29 @@ class PackageOrderController extends Controller
         return response()->json(['status' => true, 'data' => $orders]);
     }
 
+    public function uploadDesign(Request $request)
+    {
+        $user = auth('sanctum')->user();
+        if (! $user) {
+            return response()->json(['status' => false, 'message' => 'يجب تسجيل الدخول أولاً'], 401);
+        }
+
+        $request->validate([
+            'file' => 'required|file|mimes:pdf|max:5120',
+        ], [
+            'file.mimes' => 'الملف لازم يكون PDF.',
+            'file.max' => 'حجم الملف أكبر من 5 ميجا.',
+        ]);
+
+        $path = $request->file('file')->store('package_designs', 'public');
+
+        return response()->json([
+            'status' => true,
+            'message' => 'تم رفع ملف التصميم',
+            'data' => ['path' => $path, 'url' => asset('storage/' . $path)],
+        ]);
+    }
+
     public function show($id)
     {
         $user = auth('sanctum')->user();
@@ -61,6 +84,8 @@ class PackageOrderController extends Controller
             'oto_order_id' => 'nullable|string',
             'payment_method' => 'nullable|string',
             'notes' => 'nullable|string',
+            'design_type' => 'nullable|in:needs_design,has_design',
+            'design_file' => 'nullable|string',
         ]);
 
         $package = Package::active()->with(['products.product', 'products.tiers'])->findOrFail($data['package_id']);
@@ -118,6 +143,10 @@ class PackageOrderController extends Controller
 
             $shipping = round((float) ($data['shipping_price'] ?? 0), 2);
 
+            // خدمة التصميم: لو العميل محتاج تصميمات تُضاف قيمة تصميم الباقة
+            $needsDesign = ($data['design_type'] ?? null) === 'needs_design';
+            $designFee = $needsDesign ? round((float) ($package->design_price ?? 0), 2) : 0;
+
             $order = PackageOrder::create([
                 'user_id' => $user->id,
                 'package_id' => $package->id,
@@ -127,7 +156,10 @@ class PackageOrderController extends Controller
                 'payment_method' => $data['payment_method'] ?? null,
                 'items_total' => $itemsTotal,
                 'shipping_amount' => $shipping,
-                'total_amount' => round($itemsTotal + $shipping, 2),
+                'design_type' => $data['design_type'] ?? null,
+                'design_fee' => $designFee,
+                'design_file' => $data['design_file'] ?? null,
+                'total_amount' => round($itemsTotal + $shipping + $designFee, 2),
                 'shipping_address' => $data['shipping_address'] ?? null,
                 'customer_name' => $data['customer_name'] ?? $user->name,
                 'customer_phone' => $data['customer_phone'] ?? $user->phone,

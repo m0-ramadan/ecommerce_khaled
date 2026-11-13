@@ -21,6 +21,18 @@
                         <p><b>الشحن:</b> {{ $order->delivery_option_name }}</p>
                         <p><b>منتجات:</b> {{ number_format((float) $order->items_total, 2) }} ريال</p>
                         <p><b>الشحن:</b> {{ number_format((float) $order->shipping_amount, 2) }} ريال</p>
+                        <p><b>التصميم:</b>
+                            @if ($order->design_type === 'needs_design')
+                                يحتاج تصميمات — {{ number_format((float) $order->design_fee, 2) }} ريال
+                            @elseif ($order->design_type === 'has_design')
+                                لدي تصميم
+                                @if ($order->design_file)
+                                    — <a href="{{ asset('storage/' . $order->design_file) }}" target="_blank">تحميل الملف (PDF)</a>
+                                @endif
+                            @else
+                                —
+                            @endif
+                        </p>
                         <p class="fw-bold"><b>الإجمالي:</b> {{ number_format((float) $order->total_amount, 2) }} ريال</p>
                     </div>
                 </div>

@@ -40,6 +40,7 @@ class PackageController extends Controller
             'description' => $package->description,
             'image' => $package->image ? asset('storage/' . $package->image) : null,
             'background_image' => $package->background_image ? asset('storage/' . $package->background_image) : null,
+            'design_price' => (float) ($package->design_price ?? 0),
             'products_count' => $package->products_count ?? $package->products->count(),
         ];
 
