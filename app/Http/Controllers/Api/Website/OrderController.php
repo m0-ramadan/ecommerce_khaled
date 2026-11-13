@@ -168,6 +168,11 @@ class OrderController extends Controller
                     $shippingPrice = StationeryDeliveryArea::RIYADH_PRICE;
                     $shippingMethodName = 'توصيل داخل الرياض - ' . $deliveryArea->name;
                 }
+            } elseif ($request->boolean('pickup') || $request->input('deliveryOptionName') === 'استلام من الفرع') {
+                // استلام من الفرع — بدون شحن
+                $shippingPrice = 0;
+                $shippingMethodName = 'استلام من الفرع';
+                $shouldCreateShipment = false;
             } else {
                 if (!$request->filled('orderId') || !$request->filled('deliveryOptionId')) {
                     return $this->errorResponse('يرجى اختيار شركة شحن متاحة قبل إتمام الطلب.', 422);
