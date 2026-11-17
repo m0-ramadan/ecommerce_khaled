@@ -276,6 +276,38 @@ class AuthController extends Controller
             $user->forceFill($updates)->save();
         }
 
+        // دمج سلة الزائر (X-Session-Id) مع سلة الحساب بعد تسجيل الدخول
+        try {
+            $sessionId = $request->header('X-Session-Id');
+            if ($sessionId) {
+                $guestCart = \App\Models\Cart::where('session_id', $sessionId)->first();
+                if ($guestCart) {
+                    $userCart = \App\Models\Cart::firstOrCreate(
+                        ['user_id' => $user->id],
+                        ['subtotal' => 0, 'total' => 0]
+                    );
+
+                    foreach ($guestCart->items as $guestItem) {
+                        $existing = $userCart->items()->where('hash_key', $guestItem->hash_key)->first();
+                        if ($existing) {
+                            $existing->quantity += $guestItem->quantity;
+                            $existing->line_total = $existing->price_per_unit * $existing->quantity;
+                            $existing->save();
+                        } else {
+                            $guestItem->cart_id = $userCart->id;
+                            $guestItem->save();
+                        }
+                    }
+
+                    $subtotal = $userCart->items()->sum('line_total');
+                    $userCart->update(['subtotal' => $subtotal, 'total' => $subtotal]);
+                    $guestCart->delete();
+                }
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('guest cart merge failed', ['error' => $e->getMessage()]);
+        }
+
         $token = $user->createToken('api_token')->plainTextToken;
 
         return $this->success([

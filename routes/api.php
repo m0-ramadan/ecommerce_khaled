@@ -28,6 +28,15 @@ use App\Http\Controllers\Api\Website\WhatsAppWebhookController;
 
 Route::prefix('v1')->group(function () {
 
+    // سلة الزوار (بدون تسجيل دخول) — تُدمج مع سلة الحساب بعد تسجيل الدخول
+    Route::prefix('guest-cart')->name('guest-cart.')->group(function () {
+        Route::get('/', [CartController::class, 'index'])->name('index');
+        Route::post('/add', [CartController::class, 'add'])->name('add');
+        Route::put('/items/{cartItem}', [CartController::class, 'update'])->name('update');
+        Route::delete('/items/{cartItem}', [CartController::class, 'remove'])->name('remove');
+        Route::delete('/clear', [CartController::class, 'clear'])->name('clear');
+    });
+
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/package-orders/design-upload', [\App\Http\Controllers\Api\Website\PackageOrderController::class, 'uploadDesign']);
         Route::get('/package-orders', [\App\Http\Controllers\Api\Website\PackageOrderController::class, 'index']);
