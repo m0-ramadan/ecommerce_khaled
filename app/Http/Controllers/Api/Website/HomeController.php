@@ -57,7 +57,7 @@ class HomeController extends Controller
                 $productsQuery = Product::query()
                     ->where('status_id', 1)
                     ->whereIn('category_id', $categoryIds)
-                    ->select(['id', 'category_id', 'name', 'slug', 'price', 'price_text', 'has_discount', 'stock', 'status_id'])
+                    ->select(['id', 'category_id', 'name', 'slug', 'price', 'price_text', 'has_discount', 'stock', 'status_id', 'description'])
                     ->with(['primaryImage', 'discount', 'adsText'])
                     ->withCount('reviews')
                     ->withAvg('reviews', 'rating')
