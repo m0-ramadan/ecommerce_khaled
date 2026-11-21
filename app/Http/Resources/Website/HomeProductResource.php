@@ -28,7 +28,7 @@ class HomeProductResource extends JsonResource
             'text_ads' => ProductTextAdResource::collection($this->whenLoaded('adsText')),
             'short_description' => \Illuminate\Support\Str::limit(
                 trim(preg_replace('/\s+/u', ' ', strip_tags((string) $this->description))),
-                110
+                45
             ),
             'is_summary' => true,
         ];
