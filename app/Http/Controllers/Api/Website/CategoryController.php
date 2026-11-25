@@ -51,7 +51,7 @@ class CategoryController extends Controller
     public function show($identifier)
     {
         try {
-            $category = Category::with(['children', 'categoryBanners'])
+            $category = Category::with(['children', 'categoryBanners', 'parent.children', 'parent.categoryBanners'])
                 ->where(function ($query) use ($identifier) {
                     $query->where('id', $identifier)
                           ->orWhere('slug', $identifier);
