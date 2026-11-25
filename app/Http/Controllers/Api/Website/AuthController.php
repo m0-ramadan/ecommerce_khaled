@@ -340,6 +340,19 @@ class AuthController extends Controller
             'name' => 'nullable|string|max:255',
             'email' => 'nullable|email|max:255|unique:users,email,' . $user->id,
             'phone' => 'nullable|string|max:20',
+            'username' => [
+                'nullable',
+                'string',
+                'min:4',
+                'max:30',
+                'regex:/^[A-Za-z0-9._]+$/',
+                'unique:users,username,' . $user->id,
+            ],
+        ], [
+            'username.unique' => 'اسم المستخدم مستخدم بالفعل، اختر اسمًا آخر.',
+            'username.regex' => 'اسم المستخدم يقبل الحروف الإنجليزية والأرقام والنقطة والشرطة السفلية فقط.',
+            'username.min' => 'اسم المستخدم لازم يكون 4 أحرف على الأقل.',
+            'username.max' => 'اسم المستخدم أقصى طول 30 حرفًا.',
         ]);
 
         if (array_key_exists('phone', $validated) && filled($validated['phone'])) {
