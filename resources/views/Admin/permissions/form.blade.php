@@ -6,24 +6,24 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary-color: #696cff;
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --dark-bg: #1e1e2d;
-            --dark-card: #2b3b4c;
+            --primary-color: #14213d;
+            --primary-gradient: linear-gradient(135deg, #14213d 0%, #0c182a 100%);
+            --dark-bg: #f6f8fb;
+            --dark-card: #ffffff;
         }
 
         body {
             font-family: "Cairo", sans-serif !important;
             background: var(--dark-bg);
-            color: #fff;
+            color: #1e293b;
         }
 
         .form-card {
             background: var(--dark-card);
             border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 5px 20px rgba(15, 23, 42, 0.05);
             padding: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
         }
 
         .form-header {
@@ -40,15 +40,15 @@
 
         .form-label {
             font-weight: 600;
-            color: rgba(255, 255, 255, 0.9);
+            color: #1e293b;
             margin-bottom: 8px;
             display: block;
         }
 
         .form-control {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #fff;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            color: #1e293b;
             border-radius: 10px;
             padding: 12px 15px;
             transition: all 0.3s ease;
@@ -57,18 +57,18 @@
         .form-control:focus {
             background: rgba(255, 255, 255, 0.1);
             border-color: var(--primary-color);
-            color: #fff;
-            box-shadow: 0 0 0 0.25rem rgba(105, 108, 255, 0.25);
+            color: #1e293b;
+            box-shadow: 0 0 0 0.25rem rgba(20, 33, 61, 0.25);
         }
 
         .form-text {
             font-size: 13px;
-            color: rgba(255, 255, 255, 0.6);
+            color: #64748b;
             margin-top: 5px;
         }
 
         .error-message {
-            color: #dc3545;
+            color: #ef4444;
             font-size: 13px;
             margin-top: 5px;
         }
@@ -82,31 +82,31 @@
         }
 
         .btn-primary:hover {
-            background: linear-gradient(135deg, #5a6fd8 0%, #6a4a9a 100%);
+            background: linear-gradient(135deg, #14213d 0%, #1e3a5f 100%);
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(105, 108, 255, 0.4);
+            box-shadow: 0 5px 15px rgba(20, 33, 61, 0.4);
         }
 
         .btn-secondary {
             background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #fff;
+            border: 1px solid #e2e8f0;
+            color: #1e293b;
             padding: 12px 30px;
             border-radius: 10px;
             font-weight: 600;
         }
 
         .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: rgba(255, 255, 255, 0.3);
+            background: #f1f5f9;
+            border-color: #e2e8f0;
         }
 
         .module-info {
-            background: rgba(255, 255, 255, 0.03);
+            background: #f8fafc;
             border-radius: 10px;
             padding: 20px;
             margin-bottom: 25px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            border: 1px solid #e2e8f0;
         }
 
         .info-icon {
@@ -123,23 +123,23 @@
         }
 
         .info-text {
-            color: rgba(255, 255, 255, 0.7);
+            color: #64748b;
             font-size: 14px;
             line-height: 1.6;
         }
 
         .permission-name-preview {
-            background: rgba(255, 255, 255, 0.05);
+            background: #f8fafc;
             border-radius: 8px;
             padding: 10px 15px;
             margin-top: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
             font-family: monospace;
-            color: rgba(255, 255, 255, 0.9);
+            color: #1e293b;
         }
 
         .example-box {
-            background: rgba(255, 255, 255, 0.02);
+            background: #f8fafc;
             border-radius: 8px;
             padding: 15px;
             margin-top: 10px;
@@ -148,12 +148,12 @@
 
         .example-title {
             font-weight: 600;
-            color: rgba(255, 255, 255, 0.9);
+            color: #1e293b;
             margin-bottom: 5px;
         }
 
         .example-text {
-            color: rgba(255, 255, 255, 0.7);
+            color: #64748b;
             font-size: 13px;
             font-family: monospace;
         }
@@ -340,21 +340,21 @@
                                     <div class="row text-center" bis_skin_checked="1">
                                         <div class="col-6 mb-3" bis_skin_checked="1">
                                             <div class="stats-number"
-                                                style="font-size: 24px; font-weight: 700; color: #fff;">
+                                                style="font-size: 24px; font-weight: 700; color: #0f172a;">
                                                 {{ count($modules) }}
                                             </div>
                                             <div class="stats-label"
-                                                style="font-size: 13px; color: rgba(255, 255, 255, 0.7);">
+                                                style="font-size: 13px; color: #64748b;">
                                                 وحدة متاحة
                                             </div>
                                         </div>
                                         <div class="col-6 mb-3" bis_skin_checked="1">
                                             <div class="stats-number"
-                                                style="font-size: 24px; font-weight: 700; color: #fff;">
+                                                style="font-size: 24px; font-weight: 700; color: #0f172a;">
                                                 {{ count($permissionTypes) }}
                                             </div>
                                             <div class="stats-label"
-                                                style="font-size: 13px; color: rgba(255, 255, 255, 0.7);">
+                                                style="font-size: 13px; color: #64748b;">
                                                 نوع إجراء
                                             </div>
                                         </div>

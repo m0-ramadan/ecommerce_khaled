@@ -22,7 +22,7 @@
         }
 
         .invoice-header {
-            border-bottom: 3px solid #696cff;
+            border-bottom: 3px solid #14213d;
             padding-bottom: 20px;
             margin-bottom: 30px;
         }
@@ -35,7 +35,7 @@
         .company-name {
             font-size: 28px;
             font-weight: 700;
-            color: #696cff;
+            color: #14213d;
             margin-bottom: 10px;
         }
 
@@ -58,7 +58,7 @@
 
         .invoice-title .order-number {
             font-size: 18px;
-            color: #696cff;
+            color: #14213d;
             font-weight: 600;
         }
 
@@ -81,7 +81,7 @@
         }
 
         .info-box h4 {
-            color: #696cff;
+            color: #14213d;
             margin-bottom: 10px;
             font-size: 16px;
             border-bottom: 2px solid #eee;
@@ -111,7 +111,7 @@
         }
 
         .items-table th {
-            background: #696cff;
+            background: #14213d;
             color: white;
             padding: 12px;
             text-align: right;
@@ -126,7 +126,7 @@
         }
 
         .items-table tr:last-child td {
-            border-bottom: 2px solid #696cff;
+            border-bottom: 2px solid #14213d;
         }
 
         .items-table tr:hover {
@@ -176,7 +176,7 @@
 
         .total-row {
             background: #f0f7ff;
-            color: #696cff;
+            color: #14213d;
         }
 
         .footer {
@@ -190,7 +190,7 @@
 
         .footer-logo {
             font-size: 24px;
-            color: #696cff;
+            color: #14213d;
             margin-bottom: 10px;
         }
 
@@ -219,8 +219,8 @@
         }
 
         .status-delivered {
-            background: #d4edda;
-            color: #155724;
+            background: #ebf0f8;
+            color: #14213d;
         }
 
         .status-cancelled {
@@ -237,7 +237,7 @@
         }
 
         .notes-box h4 {
-            color: #696cff;
+            color: #14213d;
             margin-bottom: 10px;
             font-size: 16px;
         }
@@ -303,12 +303,12 @@
                 }
 
                 .btn-print {
-                    background: #696cff;
+                    background: #14213d;
                     color: white;
                 }
 
                 .btn-close {
-                    background: #dc3545;
+                    background: #ef4444;
                     color: white;
                 }
 
@@ -416,7 +416,7 @@
 
         <!-- قائمة المنتجات -->
         <div class="items-section">
-            <h3 style="color: #696cff; margin-bottom: 15px; border-bottom: 2px solid #eee; padding-bottom: 10px;">
+            <h3 style="color: #14213d; margin-bottom: 15px; border-bottom: 2px solid #eee; padding-bottom: 10px;">
                 <i class="fas fa-shopping-cart me-2"></i>المنتجات المطلوبة
             </h3>
 
@@ -535,19 +535,19 @@
                 }
                 
                 .btn-print {
-                    background: #696cff;
+                    background: #14213d;
                     color: white;
                 }
                 
                 .btn-close {
-                    background: #dc3545;
+                    background: #ef4444;
                     color: white;
                 }
                 
                 .btn-print:hover {
                     background: #5a5fcc;
                     transform: translateY(-2px);
-                    box-shadow: 0 5px 15px rgba(105, 108, 255, 0.3);
+                    box-shadow: 0 5px 15px rgba(20, 33, 61, 0.3);
                 }
                 
                 .btn-close:hover {

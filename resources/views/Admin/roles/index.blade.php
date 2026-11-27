@@ -6,31 +6,31 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary-color: #696cff;
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --success-color: #28a745;
-            --danger-color: #dc3545;
-            --warning-color: #ffc107;
-            --info-color: #17a2b8;
+            --primary-color: #14213d;
+            --primary-gradient: linear-gradient(135deg, #14213d 0%, #0c182a 100%);
+            --success-color: #14213d;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --info-color: #06b6d4;
             --light-bg: #f8f9fa;
             --border-color: #e9ecef;
             --text-muted: #6c757d;
-            --dark-bg: #1e1e2d;
-            --dark-card: #2b3b4c;
+            --dark-bg: #f6f8fb;
+            --dark-card: #ffffff;
         }
 
         body {
             font-family: "Cairo", sans-serif !important;
             background: var(--dark-bg);
-            color: #fff;
+            color: #1e293b;
         }
 
         .role-card {
             background: var(--dark-card);
             border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 5px 20px rgba(15, 23, 42, 0.05);
             padding: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
             margin-bottom: 30px;
         }
 
@@ -46,16 +46,16 @@
             background: var(--dark-card);
             border-radius: 12px;
             padding: 20px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 15px rgba(15, 23, 42, 0.05);
             border-top: 4px solid var(--primary-color);
             transition: transform 0.3s ease;
             margin-bottom: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
         }
 
         .stats-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 8px 25px rgba(15, 23, 42, 0.05);
         }
 
         .stats-icon {
@@ -76,65 +76,65 @@
 
         .icon-admin {
             background: rgba(220, 53, 69, 0.2);
-            color: #dc3545;
+            color: #ef4444;
             border: 1px solid rgba(220, 53, 69, 0.3);
         }
 
         .icon-editor {
             background: rgba(12, 99, 228, 0.2);
-            color: #0c63e4;
+            color: #0284c7;
             border: 1px solid rgba(12, 99, 228, 0.3);
         }
 
         .icon-viewer {
-            background: rgba(32, 201, 151, 0.2);
-            color: #20c997;
-            border: 1px solid rgba(32, 201, 151, 0.3);
+            background: rgba(30, 58, 95, 0.2);
+            color: #14213d;
+            border: 1px solid rgba(30, 58, 95, 0.3);
         }
 
         .stats-number {
             font-size: 24px;
             font-weight: 700;
             margin-bottom: 5px;
-            color: #fff;
+            color: #1e293b;
         }
 
         .stats-label {
-            color: rgba(255, 255, 255, 0.7);
+            color: #64748b;
             font-size: 14px;
         }
 
         .role-item {
-            background: rgba(255, 255, 255, 0.05);
+            background: #f8fafc;
             border-radius: 10px;
             padding: 20px;
             margin-bottom: 15px;
             transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
             border-left: 4px solid transparent;
         }
 
         .role-item:hover {
             transform: translateX(-5px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            background: rgba(105, 108, 255, 0.1);
+            box-shadow: 0 5px 15px rgba(15, 23, 42, 0.05);
+            background: rgba(20, 33, 61, 0.1);
             border-color: var(--primary-color);
         }
 
         .role-item.super-admin {
-            border-left-color: #dc3545;
+            border-left-color: #ef4444;
         }
 
         .role-item.admin {
-            border-left-color: #ffc107;
+            border-left-color: #f59e0b;
         }
 
         .role-item.editor {
-            border-left-color: #0dcaf0;
+            border-left-color: #22b8cf;
         }
 
         .role-item.viewer {
-            border-left-color: #20c997;
+            border-left-color: #14213d;
         }
 
         .role-badge {
@@ -147,26 +147,26 @@
 
         .badge-super-admin {
             background: linear-gradient(135deg, rgba(220, 53, 69, 0.2) 0%, rgba(253, 126, 20, 0.2) 100%);
-            color: #fd7e14;
+            color: #f59e0b;
             border: 1px solid rgba(253, 126, 20, 0.3);
         }
 
         .badge-admin {
             background: rgba(133, 100, 4, 0.2);
-            color: #ffc107;
+            color: #f59e0b;
             border: 1px solid rgba(255, 193, 7, 0.3);
         }
 
         .badge-editor {
             background: rgba(12, 84, 96, 0.2);
-            color: #0dcaf0;
+            color: #22b8cf;
             border: 1px solid rgba(13, 202, 240, 0.3);
         }
 
         .badge-viewer {
-            background: linear-gradient(135deg, rgba(21, 87, 36, 0.2) 0%, rgba(32, 201, 151, 0.2) 100%);
-            color: #20c997;
-            border: 1px solid rgba(32, 201, 151, 0.3);
+            background: linear-gradient(135deg, rgba(20, 33, 61, 0.2) 0%, rgba(30, 58, 95, 0.2) 100%);
+            color: #14213d;
+            border: 1px solid rgba(30, 58, 95, 0.3);
         }
 
         .role-details {
@@ -184,12 +184,12 @@
 
         .detail-label {
             font-weight: 600;
-            color: rgba(255, 255, 255, 0.8);
+            color: #1e293b;
             min-width: 100px;
         }
 
         .detail-value {
-            color: rgba(255, 255, 255, 0.9);
+            color: #1e293b;
         }
 
         .permissions-list {
@@ -200,17 +200,17 @@
         }
 
         .permission-badge {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
             border-radius: 15px;
             padding: 4px 12px;
             font-size: 12px;
-            color: rgba(255, 255, 255, 0.8);
+            color: #1e293b;
         }
 
         .permission-badge:hover {
-            background: rgba(105, 108, 255, 0.2);
-            color: #fff;
+            background: rgba(20, 33, 61, 0.2);
+            color: #1e293b;
         }
 
         .search-box {
@@ -220,16 +220,16 @@
         .search-box input {
             padding-right: 40px;
             border-radius: 25px;
-            background: rgba(255, 255, 255, 0.05);
-            border-color: rgba(255, 255, 255, 0.1);
-            color: #fff;
+            background: #f8fafc;
+            border-color: #e2e8f0;
+            color: #1e293b;
         }
 
         .search-box input:focus {
             background: rgba(255, 255, 255, 0.1);
             border-color: var(--primary-color);
-            color: #fff;
-            box-shadow: 0 0 0 0.25rem rgba(105, 108, 255, 0.25);
+            color: #1e293b;
+            box-shadow: 0 0 0 0.25rem rgba(20, 33, 61, 0.25);
         }
 
         .search-box .search-icon {
@@ -237,7 +237,7 @@
             left: 15px;
             top: 50%;
             transform: translateY(-50%);
-            color: rgba(255, 255, 255, 0.5);
+            color: #64748b;
         }
 
         .empty-state {
@@ -247,12 +247,12 @@
 
         .empty-state-icon {
             font-size: 60px;
-            color: rgba(255, 255, 255, 0.1);
+            color: #94a3b8;
             margin-bottom: 20px;
         }
 
         .empty-state-text {
-            color: rgba(255, 255, 255, 0.7);
+            color: #64748b;
             margin-bottom: 20px;
         }
 
@@ -262,9 +262,9 @@
         }
 
         .btn-primary:hover {
-            background: linear-gradient(135deg, #5a6fd8 0%, #6a4a9a 100%);
+            background: linear-gradient(135deg, #14213d 0%, #1e3a5f 100%);
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(105, 108, 255, 0.4);
+            box-shadow: 0 5px 15px rgba(20, 33, 61, 0.4);
         }
 
         @media (max-width: 768px) {
@@ -548,8 +548,8 @@
                     text: `سيتم حذف الرتبة "${roleName}" نهائياً`,
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonColor: '#d33',
-                    cancelButtonColor: '#3085d6',
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#14213d',
                     confirmButtonText: 'نعم، احذف',
                     cancelButtonText: 'إلغاء',
                     reverseButtons: true

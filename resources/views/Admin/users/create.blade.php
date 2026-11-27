@@ -57,7 +57,7 @@
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: #696cff;
+            background: #14213d;
             color: white;
             display: flex;
             align-items: center;
@@ -68,7 +68,7 @@
 
         .avatar-upload label:hover {
             transform: scale(1.1);
-            box-shadow: 0 5px 15px rgba(105, 108, 255, 0.4);
+            box-shadow: 0 5px 15px rgba(20, 33, 61, 0.4);
         }
 
         .avatar-upload input[type="file"] {
@@ -77,19 +77,19 @@
 
         .required::after {
             content: " *";
-            color: #dc3545;
+            color: #ef4444;
         }
 
         .alert-guide {
             background: #e7f7ff;
-            border-right: 4px solid #696cff;
+            border-right: 4px solid #14213d;
             padding: 20px;
             border-radius: 10px;
             margin-bottom: 25px;
         }
 
         .alert-guide h6 {
-            color: #696cff;
+            color: #14213d;
             margin-bottom: 15px;
         }
 
@@ -124,7 +124,7 @@
         .strength-fill {
             height: 100%;
             width: 0%;
-            background: #dc3545;
+            background: #ef4444;
             transition: all 0.3s ease;
         }
 
@@ -166,7 +166,7 @@
             align-items: center;
             justify-content: center;
             font-size: 36px;
-            color: #696cff;
+            color: #14213d;
             border: 3px solid #dee2e6;
         }
 
@@ -180,7 +180,7 @@
         .preview-name {
             font-size: 18px;
             font-weight: 600;
-            color: #2c3e50;
+            color: #0f172a;
             margin-bottom: 5px;
         }
 
@@ -473,23 +473,23 @@
             let color, text;
             switch (strength) {
                 case 0:
-                    color = '#dc3545';
+                    color = '#ef4444';
                     text = 'ضعيفة جداً';
                     break;
                 case 1:
-                    color = '#dc3545';
+                    color = '#ef4444';
                     text = 'ضعيفة';
                     break;
                 case 2:
-                    color = '#ffc107';
+                    color = '#f59e0b';
                     text = 'متوسطة';
                     break;
                 case 3:
-                    color = '#28a745';
+                    color = '#14213d';
                     text = 'قوية';
                     break;
                 case 4:
-                    color = '#20c997';
+                    color = '#14213d';
                     text = 'قوية جداً';
                     break;
             }
@@ -508,8 +508,8 @@
                 text: 'سيتم مسح جميع البيانات المدخلة',
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: '#14213d',
+                cancelButtonColor: '#ef4444',
                 confirmButtonText: 'نعم، امسح',
                 cancelButtonText: 'إلغاء',
                 reverseButtons: true

@@ -10,38 +10,38 @@
 // JS global variables
 window.config = {
   colors: {
-    primary: '#7367f0',
-    secondary: '#a8aaae',
-    success: '#28c76f',
-    info: '#00cfe8',
-    warning: '#ff9f43',
-    danger: '#ea5455',
-    dark: '#4b4b4b',
+    primary: '#14213d',
+    secondary: '#64748b',
+    success: '#1e3a5f',
+    info: '#06b6d4',
+    warning: '#eb993d',
+    danger: '#ef4444',
+    dark: '#1e293b',
     black: '#000',
     white: '#fff',
-    cardColor: '#fff',
-    bodyBg: '#f8f7fa',
-    bodyColor: '#6f6b7d',
-    headingColor: '#5d596c',
-    textMuted: '#a5a3ae',
-    borderColor: '#dbdade'
+    cardColor: '#ffffff',
+    bodyBg: '#f6f8fb',
+    bodyColor: '#334155',
+    headingColor: '#0f172a',
+    textMuted: '#64748b',
+    borderColor: '#e2e8f0'
   },
   colors_label: {
-    primary: '#7367f029',
-    secondary: '#a8aaae29',
-    success: '#28c76f29',
-    info: '#00cfe829',
-    warning: '#ff9f4329',
-    danger: '#ea545529',
-    dark: '#4b4b4b29'
+    primary: '#14213d24',
+    secondary: '#64748b24',
+    success: '#1e3a5f24',
+    info: '#06b6d424',
+    warning: '#eb993d24',
+    danger: '#ef444424',
+    dark: '#1e293b24'
   },
   colors_dark: {
-    cardColor: '#2f3349',
-    bodyBg: '#25293c',
-    bodyColor: '#b6bee3',
-    headingColor: '#cfd3ec',
-    textMuted: '#7983bb',
-    borderColor: '#434968'
+    cardColor: '#ffffff',
+    bodyBg: '#f6f8fb',
+    bodyColor: '#334155',
+    headingColor: '#0f172a',
+    textMuted: '#64748b',
+    borderColor: '#e2e8f0'
   },
   enableMenuLocalStorage: true // Enable menu state with local storage support
 };
@@ -87,21 +87,11 @@ TemplateCustomizer.LANGUAGES.fr = { ... };
  * defaultShowDropdownOnHover : true, false (for horizontal layout only)
  */
 
-if (typeof TemplateCustomizer !== 'undefined') {
-  window.templateCustomizer = new TemplateCustomizer({
-    cssPath: assetsPath + 'vendor/css' + (rtlSupport ? '/rtl' : '') + '/',
-    themesPath: assetsPath + 'vendor/css' + (rtlSupport ? '/rtl' : '') + '/',
-    displayCustomizer: true,
-    lang: localStorage.getItem('templateCustomizer-' + templateName + '--Lang') || 'en', // Set default language here
-    // defaultTheme: 2,
-    defaultStyle: 'dark',
-    // defaultTextDir: 'rtl',
-    // defaultContentLayout: 'wide',
-    // defaultHeaderType: 'static',
-    // defaultMenuCollapsed: true,
-    // defaultNavbarType: 'sticky',
-    // defaultFooterFixed: false,
-    // defaultShowDropdownOnHover: false,
-    controls: ['rtl', 'style', 'headerType', 'contentLayout', 'layoutCollapsed', 'layoutNavbarOptions', 'themes']
+// Light mode permanently enforced — template customizer dark mode removed.
+try {
+  Object.keys(localStorage).forEach(function (k) {
+    if (k.indexOf('templateCustomizer-') === 0 && k.indexOf('--Style') !== -1) {
+      localStorage.setItem(k, 'light');
+    }
   });
-}
+} catch (e) {}

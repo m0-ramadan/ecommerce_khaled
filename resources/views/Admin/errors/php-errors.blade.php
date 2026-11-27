@@ -14,13 +14,13 @@
         }
 
         .php-error-card:hover {
-            border-color: #ff9f43;
+            border-color: #f59e0b;
             box-shadow: 0 5px 20px rgba(255, 159, 67, 0.1);
         }
 
         .php-error-header {
             background: linear-gradient(135deg, rgba(255, 159, 67, 0.1), rgba(255, 159, 67, 0.05));
-            border-bottom: 2px solid #ff9f43;
+            border-bottom: 2px solid #f59e0b;
             padding: 15px;
             border-radius: 12px 12px 0 0;
         }
@@ -29,7 +29,7 @@
             width: 60px;
             height: 60px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #ff9f43, #ff8c2e);
+            background: linear-gradient(135deg, #f59e0b, #ff8c2e);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -48,13 +48,13 @@
 
         .level-fatal {
             background: rgba(234, 84, 85, 0.2);
-            color: #ea5455;
+            color: #ef4444;
             border: 1px solid rgba(234, 84, 85, 0.3);
         }
 
         .level-error {
             background: rgba(255, 107, 107, 0.2);
-            color: #ff6b6b;
+            color: #f86c6b;
             border: 1px solid rgba(255, 107, 107, 0.3);
         }
 
@@ -77,9 +77,9 @@
         }
 
         .level-strict {
-            background: rgba(32, 201, 151, 0.2);
-            color: #20c997;
-            border: 1px solid rgba(32, 201, 151, 0.3);
+            background: rgba(30, 58, 95, 0.2);
+            color: #14213d;
+            border: 1px solid rgba(30, 58, 95, 0.3);
         }
 
         .error-content-container {
@@ -107,12 +107,12 @@
         }
 
         .error-line.fatal {
-            border-left-color: #ea5455;
+            border-left-color: #ef4444;
             background: rgba(234, 84, 85, 0.1);
         }
 
         .error-line.error {
-            border-left-color: #ff6b6b;
+            border-left-color: #f86c6b;
             background: rgba(255, 107, 107, 0.1);
         }
 
@@ -127,7 +127,7 @@
         }
 
         .error-timestamp {
-            color: #20c997;
+            color: #14213d;
             font-weight: 500;
             font-size: 12px;
             margin-right: 10px;
@@ -150,7 +150,7 @@
         }
 
         .error-file .line {
-            color: #ff9f43;
+            color: #f59e0b;
             font-weight: 500;
         }
 
@@ -174,11 +174,11 @@
         }
 
         .stack-line-number {
-            color: #ff9f43;
+            color: #f59e0b;
         }
 
         .error-summary {
-            background: #26253d;
+            background: #ffffff;
             border-radius: 10px;
             padding: 15px;
             margin-bottom: 20px;
@@ -206,7 +206,7 @@
         }
 
         .error-filters {
-            background:#26253d;
+            background:#ffffff;
             border-radius: 10px;
             padding: 15px;
             margin-bottom: 20px;
@@ -222,7 +222,7 @@
             padding: 6px 15px;
             border-radius: 20px;
             border: 2px solid transparent;
-            background: #26253d;
+            background: #ffffff;
             color: var(--bs-body-color);
             font-size: 13px;
             font-weight: 500;
@@ -236,13 +236,13 @@
         }
 
         .filter-btn.active {
-            border-color: #696cff;
-            background: rgba(105, 108, 255, 0.1);
-            color: #696cff;
+            border-color: #14213d;
+            background: rgba(20, 33, 61, 0.1);
+            color: #14213d;
         }
 
         .php-info-card {
-            background: #26253d;
+            background: #ffffff;
             border-radius: 10px;
             padding: 20px;
             margin-top: 20px;
@@ -257,7 +257,7 @@
         }
 
         .info-item {
-            background:#26253d;
+            background:#ffffff;
             padding: 15px;
             border-radius: 8px;
             border: 1px solid var(--bs-border-color);
@@ -284,15 +284,15 @@
         }
 
         .status-good {
-            background: #28c76f;
+            background: #14213d;
         }
 
         .status-warning {
-            background: #ff9f43;
+            background: #f59e0b;
         }
 
         .status-bad {
-            background: #ea5455;
+            background: #ef4444;
         }
 
         .error-pagination {
@@ -310,7 +310,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background:#26253d;
+            background:#ffffff;
             border: 1px solid var(--bs-border-color);
             color: var(--bs-body-color);
             cursor: pointer;
@@ -318,9 +318,9 @@
         }
 
         .page-btn:hover {
-            background: #696cff;
+            background: #14213d;
             color: white;
-            border-color: #696cff;
+            border-color: #14213d;
         }
 
         .page-btn.disabled {
@@ -329,9 +329,9 @@
         }
 
         .page-btn.active {
-            background: #696cff;
+            background: #14213d;
             color: white;
-            border-color: #696cff;
+            border-color: #14213d;
         }
 
         .error-count {
@@ -359,7 +359,7 @@
             gap: 10px;
             cursor: pointer;
             padding: 8px 15px;
-            background: #26253d;
+            background: #ffffff;
             border-radius: 20px;
             user-select: none;
         }
@@ -383,7 +383,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color:#26253d;
+            background-color:#ffffff;
             transition: .4s;
             border-radius: 34px;
         }
@@ -395,13 +395,13 @@
             width: 14px;
             left: 3px;
             bottom: 3px;
-            background-color: #26253d;
+            background-color: #ffffff;
             transition: .4s;
             border-radius: 50%;
         }
 
         input:checked + .toggle-slider {
-            background-color: #28c76f;
+            background-color: #14213d;
         }
 
         input:checked + .toggle-slider:before {

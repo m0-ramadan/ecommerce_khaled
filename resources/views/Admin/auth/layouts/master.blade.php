@@ -16,8 +16,9 @@
     @include('Admin.layout.css')
     <!-- Page -->
     <link rel="stylesheet" href="{{ asset('dashboard/assets/vendor/css/pages/page-auth.css') }}" />
+    @yield('css')
+    <link rel="stylesheet" href="{{ asset('dashboard/assets/css/tala-dashboard.css') }}" />
 </head>
-@yield('css')
 
 <body>
     <!-- Content -->

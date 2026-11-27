@@ -30,7 +30,7 @@
         }
 
         .form-section h6 {
-            color: #696cff;
+            color: #14213d;
             margin-bottom: 20px;
             padding-bottom: 10px;
             border-bottom: 2px solid #dee2e6;
@@ -38,19 +38,19 @@
 
         .required::after {
             content: " *";
-            color: #dc3545;
+            color: #ef4444;
         }
 
         .alert-guide {
             background: #e7f7ff;
-            border-right: 4px solid #696cff;
+            border-right: 4px solid #14213d;
             padding: 20px;
             border-radius: 10px;
             margin-bottom: 25px;
         }
 
         .alert-guide h6 {
-            color: #696cff;
+            color: #14213d;
             margin-bottom: 15px;
         }
 
@@ -114,7 +114,7 @@
         .product-details h6 {
             margin-bottom: 5px;
             font-weight: 600;
-            color: #2c3e50;
+            color: #0f172a;
             font-size: 14px;
         }
 
@@ -160,7 +160,7 @@
         }
 
         .remove-item {
-            color: #dc3545;
+            color: #ef4444;
             cursor: pointer;
             transition: color 0.3s;
         }
@@ -198,7 +198,7 @@
 
         .summary-value {
             font-weight: 600;
-            color: #2c3e50;
+            color: #0f172a;
         }
 
         .total-row {
@@ -553,22 +553,23 @@
 @endsection
 
 @section('js')
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    @php
+        $mappedOrderProducts = $products->map(function ($product) {
+            return [
+                'id' => $product->id,
+                'name' => $product->name,
+                'price' => $product->price,
+                'final_price' => $product->final_price,
+                'stock' => $product->stock,
+                'image' => $product->image ? asset('storage/' . $product->image) : asset('images/default-product.png'),
+                'category' => $product->category->name ?? 'غير مصنف',
+            ];
+        })->values();
+    @endphp
     <script>
         let itemIndex = 0;
-        let products = @json(
-            $products->map(function ($product) {
-                return [
-                    'id' => $product->id,
-                    'name' => $product->name,
-                    'price' => $product->price,
-                    'final_price' => $product->final_price,
-                    'stock' => $product->stock,
-                    'image' => $product->image ? asset('storage/' . $product->image) : asset('images/default-product.png'),
-                    'category' => $product->category->name ?? 'غير مصنف',
-                ];
-            }));
+        let products = @json($mappedOrderProducts);
 
 
         $(document).ready(function() {
@@ -736,8 +737,8 @@
                 text: 'سيتم مسح جميع البيانات المدخلة',
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: '#14213d',
+                cancelButtonColor: '#ef4444',
                 confirmButtonText: 'نعم، امسح',
                 cancelButtonText: 'إلغاء',
                 reverseButtons: true

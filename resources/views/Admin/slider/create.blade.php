@@ -16,7 +16,7 @@
             overflow: hidden;
         }
         .dropzone-box:hover, .dropzone-box.dragover {
-            border-color: #696cff;
+            border-color: #14213d;
             background-color: #f8f9ff;
         }
         .preview-img-container {
@@ -57,7 +57,7 @@
             transition: all 0.2s;
         }
         .remove-img-btn:hover {
-            background: #dc3545;
+            background: #ef4444;
             transform: scale(1.1);
         }
         .link-type-card {
@@ -71,13 +71,13 @@
             gap: 10px;
         }
         .link-type-card:hover {
-            border-color: #696cff;
+            border-color: #14213d;
             background-color: #fcfdfd;
         }
         .link-type-card.selected {
-            border-color: #696cff;
+            border-color: #14213d;
             background-color: #f0f2ff;
-            color: #696cff;
+            color: #14213d;
             font-weight: 600;
         }
     </style>

@@ -6,31 +6,31 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary-color: #696cff;
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --success-color: #28a745;
-            --danger-color: #dc3545;
-            --warning-color: #ffc107;
-            --info-color: #17a2b8;
+            --primary-color: #14213d;
+            --primary-gradient: linear-gradient(135deg, #14213d 0%, #0c182a 100%);
+            --success-color: #14213d;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --info-color: #06b6d4;
             --light-bg: #f8f9fa;
             --border-color: #e9ecef;
             --text-muted: #6c757d;
-            --dark-bg: #1e1e2d;
-            --dark-card: #2b3b4c;
+            --dark-bg: #f6f8fb;
+            --dark-card: #ffffff;
         }
 
         body {
             font-family: "Cairo", sans-serif !important;
             background: var(--dark-bg);
-            color: #fff;
+            color: #1e293b;
         }
 
         .order-card {
             background: var(--dark-card);
             border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 5px 20px rgba(15, 23, 42, 0.05);
             padding: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
         }
 
         .order-header {
@@ -48,55 +48,55 @@
         }
 
         .status-pending {
-            background: rgba(133, 100, 4, 0.2);
-            color: #ffc107;
-            border: 1px solid rgba(255, 193, 7, 0.3);
+            background: #fef3c7;
+            color: #b45309;
+            border: 1px solid #fde68a;
         }
 
         .status-processing {
-            background: rgba(0, 64, 133, 0.2);
-            color: #0dcaf0;
-            border: 1px solid rgba(13, 202, 240, 0.3);
+            background: #dbeafe;
+            color: #1d4ed8;
+            border: 1px solid #bfdbfe;
         }
 
         .status-shipped {
-            background: rgba(12, 84, 96, 0.2);
-            color: #0dcaf0;
-            border: 1px solid rgba(13, 202, 240, 0.3);
+            background: #e0f2fe;
+            color: #0369a1;
+            border: 1px solid #bae6fd;
         }
 
         .status-delivered {
-            background: linear-gradient(135deg, rgba(21, 87, 36, 0.2) 0%, rgba(32, 201, 151, 0.2) 100%);
-            color: #20c997;
-            border: 1px solid rgba(32, 201, 151, 0.3);
+            background: #ebf0f8;
+            color: #0c182a;
+            border: 1px solid #cbd7ea;
         }
 
         .status-cancelled {
-            background: linear-gradient(135deg, rgba(220, 53, 69, 0.2) 0%, rgba(253, 126, 20, 0.2) 100%);
-            color: #fd7e14;
-            border: 1px solid rgba(253, 126, 20, 0.3);
+            background: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
         }
 
         .status-refunded {
-            background: rgba(56, 61, 65, 0.2);
-            color: #adb5bd;
-            border: 1px solid rgba(173, 181, 189, 0.3);
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid #e2e8f0;
         }
 
         .stats-card {
             background: var(--dark-card);
             border-radius: 12px;
             padding: 20px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 15px rgba(15, 23, 42, 0.05);
             border-top: 4px solid var(--primary-color);
             transition: transform 0.3s ease;
             margin-bottom: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
         }
 
         .stats-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 8px 25px rgba(15, 23, 42, 0.05);
         }
 
         .stats-icon {
@@ -117,40 +117,40 @@
 
         .icon-revenue {
             background: rgba(12, 99, 228, 0.2);
-            color: #0c63e4;
+            color: #0284c7;
             border: 1px solid rgba(12, 99, 228, 0.3);
         }
 
         .icon-pending {
             background: rgba(133, 100, 4, 0.2);
-            color: #ffc107;
+            color: #f59e0b;
             border: 1px solid rgba(255, 193, 7, 0.3);
         }
 
         .icon-delivered {
-            background: linear-gradient(135deg, rgba(21, 87, 36, 0.2) 0%, rgba(32, 201, 151, 0.2) 100%);
-            color: #20c997;
-            border: 1px solid rgba(32, 201, 151, 0.3);
+            background: linear-gradient(135deg, rgba(20, 33, 61, 0.2) 0%, rgba(30, 58, 95, 0.2) 100%);
+            color: #14213d;
+            border: 1px solid rgba(30, 58, 95, 0.3);
         }
 
         .stats-number {
             font-size: 24px;
             font-weight: 700;
             margin-bottom: 5px;
-            color: #fff;
+            color: #1e293b;
         }
 
         .stats-label {
-            color: rgba(255, 255, 255, 0.7);
+            color: #64748b;
             font-size: 14px;
         }
 
         .filter-card {
-            background: rgba(255, 255, 255, 0.05);
+            background: #f8fafc;
             border-radius: 12px;
             padding: 20px;
             margin-bottom: 25px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
         }
 
         .filter-row {
@@ -167,16 +167,16 @@
         .search-box input {
             padding-right: 40px;
             border-radius: 25px;
-            background: rgba(255, 255, 255, 0.05);
-            border-color: rgba(255, 255, 255, 0.1);
-            color: #fff;
+            background: #f8fafc;
+            border-color: #e2e8f0;
+            color: #1e293b;
         }
 
         .search-box input:focus {
-            background: rgba(255, 255, 255, 0.1);
+            background: #ffffff;
             border-color: var(--primary-color);
-            color: #fff;
-            box-shadow: 0 0 0 0.25rem rgba(105, 108, 255, 0.25);
+            color: #1e293b;
+            box-shadow: 0 0 0 0.2rem rgba(20, 33, 61, 0.16);
         }
 
         .search-box .search-icon {
@@ -184,44 +184,44 @@
             left: 15px;
             top: 50%;
             transform: translateY(-50%);
-            color: rgba(255, 255, 255, 0.5);
+            color: #64748b;
         }
 
         .order-item {
-            background: rgba(255, 255, 255, 0.05);
+            background: #f8fafc;
             border-radius: 10px;
             padding: 20px;
             margin-bottom: 15px;
             transition: all 0.3s ease;
             border-right: 4px solid transparent;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
         }
 
         .order-item:hover {
             transform: translateX(-5px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            background: rgba(105, 108, 255, 0.1);
+            box-shadow: 0 5px 15px rgba(15, 23, 42, 0.05);
+            background: #f3f6fb;
             border-color: var(--primary-color);
         }
 
         .order-item.pending {
-            border-color: #ffc107;
+            border-color: #f59e0b;
         }
 
         .order-item.processing {
-            border-color: #0d6efd;
+            border-color: #0284c7;
         }
 
         .order-item.shipped {
-            border-color: #0dcaf0;
+            border-color: #22b8cf;
         }
 
         .order-item.delivered {
-            border-color: #20c997;
+            border-color: #14213d;
         }
 
         .order-item.cancelled {
-            border-color: #dc3545;
+            border-color: #ef4444;
         }
 
         .order-header-info {
@@ -235,13 +235,13 @@
 
         .order-title {
             font-weight: 600;
-            color: rgba(255, 255, 255, 0.9);
+            color: #1e293b;
             font-size: 16px;
         }
 
         .order-date {
             font-size: 12px;
-            color: rgba(255, 255, 255, 0.7);
+            color: #64748b;
         }
 
         .order-details {
@@ -259,12 +259,12 @@
 
         .detail-label {
             font-weight: 600;
-            color: rgba(255, 255, 255, 0.8);
+            color: #1e293b;
             min-width: 80px;
         }
 
         .detail-value {
-            color: rgba(255, 255, 255, 0.9);
+            color: #1e293b;
         }
 
         .order-actions {
@@ -280,12 +280,12 @@
 
         .empty-state-icon {
             font-size: 60px;
-            color: rgba(255, 255, 255, 0.1);
+            color: #94a3b8;
             margin-bottom: 20px;
         }
 
         .empty-state-text {
-            color: rgba(255, 255, 255, 0.7);
+            color: #64748b;
             margin-bottom: 20px;
         }
 
@@ -299,9 +299,9 @@
         .status-filter-btn {
             padding: 8px 20px;
             border-radius: 25px;
-            background: rgba(255, 255, 255, 0.05);
-            color: rgba(255, 255, 255, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: #f8fafc;
+            color: #64748b;
+            border: 1px solid #e2e8f0;
             cursor: pointer;
             transition: all 0.3s ease;
             font-size: 14px;
@@ -309,7 +309,7 @@
 
         .status-filter-btn:hover {
             background: rgba(255, 255, 255, 0.1);
-            color: #fff;
+            color: #1e293b;
         }
 
         .status-filter-btn.active {
@@ -324,9 +324,9 @@
         }
 
         .sort-btn {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: rgba(255, 255, 255, 0.8);
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            color: #1e293b;
             padding: 8px 15px;
             border-radius: 25px;
             cursor: pointer;
@@ -337,7 +337,7 @@
 
         .sort-btn:hover {
             background: rgba(255, 255, 255, 0.1);
-            color: #fff;
+            color: #1e293b;
         }
 
         .sort-dropdown-content {
@@ -345,12 +345,12 @@
             position: absolute;
             background: var(--dark-card);
             min-width: 200px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 8px 16px rgba(15, 23, 42, 0.05);
             border-radius: 10px;
             z-index: 1;
             padding: 10px 0;
             margin-top: 5px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
         }
 
         .sort-dropdown:hover .sort-dropdown-content {
@@ -361,12 +361,12 @@
             padding: 10px 20px;
             cursor: pointer;
             transition: background 0.3s;
-            color: rgba(255, 255, 255, 0.8);
+            color: #1e293b;
         }
 
         .sort-item:hover {
-            background: rgba(105, 108, 255, 0.1);
-            color: #fff;
+            background: #ebf0f8;
+            color: #1e3a5f;
         }
 
         .sort-item.active {
@@ -380,20 +380,20 @@
         }
 
         .btn-primary:hover {
-            background: linear-gradient(135deg, #5a6fd8 0%, #6a4a9a 100%);
+            background: linear-gradient(135deg, #1e3a5f 0%, #0c182a 100%);
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(105, 108, 255, 0.4);
+            box-shadow: 0 5px 15px rgba(20, 33, 61, 0.28);
         }
 
         .btn-secondary {
             background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #fff;
+            border: 1px solid #e2e8f0;
+            color: #1e293b;
         }
 
         .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: rgba(255, 255, 255, 0.3);
+            background: #f1f5f9;
+            border-color: #e2e8f0;
         }
 
         .btn-outline-primary {
@@ -760,7 +760,6 @@
 @endsection
 
 @section('js')
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         $(document).ready(function() {
@@ -783,8 +782,8 @@
                     text: `سيتم حذف الطلب "${orderName}" نهائياً`,
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonColor: '#d33',
-                    cancelButtonColor: '#3085d6',
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#14213d',
                     confirmButtonText: 'نعم، احذف',
                     cancelButtonText: 'إلغاء',
                     reverseButtons: true

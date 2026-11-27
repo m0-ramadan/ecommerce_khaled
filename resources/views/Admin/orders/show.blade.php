@@ -6,31 +6,31 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary-color: #696cff;
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --success-color: #28a745;
-            --danger-color: #dc3545;
-            --warning-color: #ffc107;
-            --info-color: #17a2b8;
+            --primary-color: #14213d;
+            --primary-gradient: linear-gradient(135deg, #14213d 0%, #0c182a 100%);
+            --success-color: #14213d;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --info-color: #06b6d4;
             --light-bg: #f8f9fa;
             --border-color: #e9ecef;
             --text-muted: #6c757d;
-            --dark-bg: #1e1e2d;
-            --dark-card: #2b3b4c;
+            --dark-bg: #f6f8fb;
+            --dark-card: #ffffff;
         }
 
         body {
             font-family: "Cairo", sans-serif !important;
             background: var(--dark-bg);
-            color: #fff;
+            color: #1e293b;
         }
 
         .order-detail-card {
             background: var(--dark-card);
             border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 5px 20px rgba(15, 23, 42, 0.05);
             padding: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
         }
 
         .order-detail-header {
@@ -51,31 +51,31 @@
 
         .status-pending {
             background: rgba(133, 100, 4, 0.2);
-            color: #ffc107;
+            color: #f59e0b;
             border: 1px solid rgba(255, 193, 7, 0.3);
         }
 
         .status-processing {
             background: rgba(0, 64, 133, 0.2);
-            color: #0dcaf0;
+            color: #22b8cf;
             border: 1px solid rgba(13, 202, 240, 0.3);
         }
 
         .status-shipped {
             background: rgba(12, 84, 96, 0.2);
-            color: #0dcaf0;
+            color: #22b8cf;
             border: 1px solid rgba(13, 202, 240, 0.3);
         }
 
         .status-delivered {
-            background: linear-gradient(135deg, rgba(21, 87, 36, 0.2) 0%, rgba(32, 201, 151, 0.2) 100%);
-            color: #20c997;
-            border: 1px solid rgba(32, 201, 151, 0.3);
+            background: linear-gradient(135deg, rgba(20, 33, 61, 0.2) 0%, rgba(30, 58, 95, 0.2) 100%);
+            color: #14213d;
+            border: 1px solid rgba(30, 58, 95, 0.3);
         }
 
         .status-cancelled {
             background: linear-gradient(135deg, rgba(220, 53, 69, 0.2) 0%, rgba(253, 126, 20, 0.2) 100%);
-            color: #fd7e14;
+            color: #f59e0b;
             border: 1px solid rgba(253, 126, 20, 0.3);
         }
 
@@ -86,18 +86,18 @@
         }
 
         .info-section {
-            background: rgba(255, 255, 255, 0.05);
+            background: #f8fafc;
             border-radius: 12px;
             padding: 20px;
             margin-bottom: 25px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
         }
 
         .info-section h6 {
             color: var(--primary-color);
             margin-bottom: 20px;
             padding-bottom: 10px;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 2px solid #e2e8f0;
         }
 
         .info-row {
@@ -105,7 +105,7 @@
             align-items: center;
             margin-bottom: 15px;
             padding-bottom: 15px;
-            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+            border-bottom: 1px dashed #e2e8f0;
         }
 
         .info-row:last-child {
@@ -117,11 +117,11 @@
         .info-label {
             min-width: 150px;
             font-weight: 600;
-            color: rgba(255, 255, 255, 0.8);
+            color: #1e293b;
         }
 
         .info-value {
-            color: rgba(255, 255, 255, 0.9);
+            color: #1e293b;
             font-weight: 500;
             flex-grow: 1;
             overflow-wrap: anywhere;
@@ -130,22 +130,22 @@
         .details-list {
             margin: 10px 0 0;
             padding-right: 20px;
-            color: rgba(255, 255, 255, 0.9);
+            color: #1e293b;
         }
 
         .details-list li { margin-bottom: 6px; }
 
         .product-item {
-            background: rgba(255, 255, 255, 0.05);
+            background: #f8fafc;
             border-radius: 10px;
             padding: 15px;
             margin-bottom: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
             transition: all 0.3s ease;
         }
 
         .product-item:hover {
-            background: rgba(105, 108, 255, 0.1);
+            background: rgba(20, 33, 61, 0.1);
             border-color: var(--primary-color);
         }
 
@@ -160,13 +160,13 @@
 
         .product-name {
             font-weight: 600;
-            color: rgba(255, 255, 255, 0.9);
+            color: #1e293b;
             font-size: 16px;
         }
 
         .product-price {
             font-weight: 700;
-            color: #20c997;
+            color: #14213d;
         }
 
         .product-details {
@@ -184,19 +184,19 @@
 
         .detail-label {
             font-weight: 600;
-            color: rgba(255, 255, 255, 0.7);
+            color: #64748b;
             min-width: 80px;
         }
 
         .detail-value {
-            color: rgba(255, 255, 255, 0.9);
+            color: #1e293b;
         }
 
         .summary-card {
-            background: rgba(255, 255, 255, 0.05);
+            background: #f8fafc;
             border-radius: 12px;
             padding: 20px;
-            border: 2px solid rgba(255, 255, 255, 0.1);
+            border: 2px solid #e2e8f0;
         }
 
         .summary-row {
@@ -205,7 +205,7 @@
             align-items: center;
             margin-bottom: 10px;
             padding-bottom: 10px;
-            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+            border-bottom: 1px dashed #e2e8f0;
         }
 
         .summary-row:last-child {
@@ -216,17 +216,17 @@
 
         .summary-label {
             font-weight: 600;
-            color: rgba(255, 255, 255, 0.8);
+            color: #1e293b;
         }
 
         .summary-value {
             font-weight: 600;
-            color: rgba(255, 255, 255, 0.9);
+            color: #1e293b;
         }
 
         .total-row {
             font-size: 18px;
-            color: #20c997;
+            color: #14213d;
             font-weight: 700;
         }
 
@@ -263,20 +263,20 @@
         }
 
         .timeline-content {
-            background: rgba(255, 255, 255, 0.05);
+            background: #f8fafc;
             border-radius: 10px;
             padding: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
         }
 
         .timeline-date {
             font-size: 12px;
-            color: rgba(255, 255, 255, 0.7);
+            color: #64748b;
             margin-bottom: 5px;
         }
 
         .timeline-text {
-            color: rgba(255, 255, 255, 0.9);
+            color: #1e293b;
             font-weight: 500;
         }
 
@@ -304,7 +304,7 @@
         .btn-action:hover {
             background: rgba(255, 255, 255, 0.3);
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(105, 108, 255, 0.4);
+            box-shadow: 0 5px 15px rgba(20, 33, 61, 0.4);
         }
 
         .status-buttons {
@@ -318,8 +318,8 @@
             padding: 8px 20px;
             border-radius: 25px;
             border: 2px solid transparent;
-            background: rgba(255, 255, 255, 0.05);
-            color: rgba(255, 255, 255, 0.8);
+            background: #f8fafc;
+            color: #1e293b;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -327,9 +327,9 @@
 
         .status-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 5px 15px rgba(15, 23, 42, 0.05);
             background: rgba(255, 255, 255, 0.1);
-            color: #fff;
+            color: #1e293b;
         }
 
         .status-btn.active {
@@ -344,20 +344,20 @@
         }
 
         .btn-primary:hover {
-            background: linear-gradient(135deg, #5a6fd8 0%, #6a4a9a 100%);
+            background: linear-gradient(135deg, #14213d 0%, #1e3a5f 100%);
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(105, 108, 255, 0.4);
+            box-shadow: 0 5px 15px rgba(20, 33, 61, 0.4);
         }
 
         .btn-secondary {
             background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #fff;
+            border: 1px solid #e2e8f0;
+            color: #1e293b;
         }
 
         .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: rgba(255, 255, 255, 0.3);
+            background: #f1f5f9;
+            border-color: #e2e8f0;
         }
 
         .btn-outline-primary {
@@ -843,7 +843,7 @@
                                                     <a class="btn btn-sm btn-outline-primary" href="{{ $shipment->shipping_label_url }}" target="_blank" rel="noopener"><i class="fas fa-file-pdf me-1"></i>بوليصة الشحن</a>
                                                 @endif
                                                 @if ($shipment->notes || $shipment->failure_reason || $shipment->return_reason)
-                                                    <div class="mt-2 text-white-50">{{ collect([$shipment->notes, $shipment->failure_reason, $shipment->return_reason])->filter()->implode(' — ') }}</div>
+                                                    <div class="mt-2 text-muted">{{ collect([$shipment->notes, $shipment->failure_reason, $shipment->return_reason])->filter()->implode(' — ') }}</div>
                                                 @endif
                                             </div>
                                         @endforeach
@@ -1003,8 +1003,8 @@
                 text: 'هل أنت متأكد من تغيير حالة الطلب؟',
                 icon: 'question',
                 showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: '#14213d',
+                cancelButtonColor: '#ef4444',
                 confirmButtonText: 'نعم، تحديث',
                 cancelButtonText: 'إلغاء',
                 reverseButtons: true
@@ -1062,8 +1062,8 @@
                 text: 'سيتم حذف الطلب "{{ $order->order_number }}" نهائياً',
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#14213d',
                 confirmButtonText: 'نعم، احذف',
                 cancelButtonText: 'إلغاء',
                 reverseButtons: true

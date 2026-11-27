@@ -44,8 +44,8 @@
         }
 
         .status-active {
-            background-color: #d1fae5;
-            color: #065f46;
+            background-color: #ebf0f8;
+            color: #14213d;
         }
 
         .status-inactive {
@@ -614,8 +614,8 @@
                         text: `سيتم حذف القسم "${name}" بشكل دائم`,
                         icon: 'warning',
                         showCancelButton: true,
-                        confirmButtonColor: '#d33',
-                        cancelButtonColor: '#3085d6',
+                        confirmButtonColor: '#ef4444',
+                        cancelButtonColor: '#14213d',
                         confirmButtonText: 'نعم، احذف',
                         cancelButtonText: 'إلغاء'
                     }).then((result) => {

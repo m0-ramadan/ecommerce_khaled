@@ -9,14 +9,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css" />
     <style>
         :root {
-            --primary-color: #696cff;
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --success-color: #28a745;
-            --danger-color: #dc3545;
-            --warning-color: #ffc107;
-            --info-color: #17a2b8;
-            --dark-bg: #1e1e2d;
-            --dark-card: #2b3b4c;
+            --primary-color: #14213d;
+            --primary-gradient: linear-gradient(135deg, #14213d 0%, #0c182a 100%);
+            --success-color: #14213d;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --info-color: #06b6d4;
+            --dark-bg: #f6f8fb;
+            --dark-card: #ffffff;
             --text-light: rgba(255, 255, 255, 0.9);
             --text-muted: rgba(255, 255, 255, 0.7);
         }
@@ -51,7 +51,7 @@
         .product-main-image {
             border-radius: 15px;
             overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
             height: 400px;
             position: relative;
             background: var(--dark-card);
@@ -101,9 +101,9 @@
             background: var(--dark-card);
             border-radius: 15px;
             padding: 25px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 5px 20px rgba(15, 23, 42, 0.05);
             height: 100%;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
         }
 
         .product-price-section {
@@ -116,7 +116,7 @@
 
         .original-price {
             font-size: 18px;
-            color: rgba(255, 255, 255, 0.8);
+            color: #1e293b;
             text-decoration: line-through;
         }
 
@@ -147,17 +147,17 @@
         }
 
         .stock-status.in-stock {
-            color: #20c997;
-            background: rgba(32, 201, 151, 0.1);
+            color: #14213d;
+            background: rgba(30, 58, 95, 0.1);
         }
 
         .stock-status.low-stock {
-            color: #ffc107;
+            color: #f59e0b;
             background: rgba(255, 193, 7, 0.1);
         }
 
         .stock-status.out-of-stock {
-            color: #dc3545;
+            color: #ef4444;
             background: rgba(220, 53, 69, 0.1);
         }
 
@@ -168,15 +168,15 @@
         }
 
         .stock-indicator.in-stock {
-            background-color: #20c997;
+            background-color: #14213d;
         }
 
         .stock-indicator.low-stock {
-            background-color: #ffc107;
+            background-color: #f59e0b;
         }
 
         .stock-indicator.out-of-stock {
-            background-color: #dc3545;
+            background-color: #ef4444;
         }
 
         .status-badge {
@@ -188,15 +188,15 @@
         }
 
         .status-active {
-            color: #20c997;
+            color: #14213d;
         }
 
         .status-inactive {
-            color: #dc3545;
+            color: #ef4444;
         }
 
         .status-draft {
-            color: #ffc107;
+            color: #f59e0b;
         }
 
         .detail-card {
@@ -204,13 +204,13 @@
             border-radius: 10px;
             padding: 20px;
             margin-bottom: 20px;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 3px 10px rgba(15, 23, 42, 0.05);
+            border: 1px solid #e2e8f0;
         }
 
         .detail-card h5 {
             color: var(--primary-color);
-            border-bottom: 2px solid rgba(105, 108, 255, 0.3);
+            border-bottom: 2px solid rgba(20, 33, 61, 0.3);
             padding-bottom: 10px;
             margin-bottom: 15px;
             display: flex;
@@ -225,7 +225,7 @@
             display: flex;
             justify-content: space-between;
             padding: 8px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid #e2e8f0;
         }
 
         .detail-item:last-child {
@@ -245,11 +245,11 @@
 
         /* Product Options Styles - Enhanced */
         .options-group {
-            background: rgba(105, 108, 255, 0.05);
+            background: rgba(20, 33, 61, 0.05);
             border-radius: 12px;
             padding: 15px;
             margin-bottom: 20px;
-            border: 1px solid rgba(105, 108, 255, 0.2);
+            border: 1px solid rgba(20, 33, 61, 0.2);
         }
 
         .option-header {
@@ -258,12 +258,12 @@
             gap: 10px;
             margin-bottom: 15px;
             padding-bottom: 10px;
-            border-bottom: 1px solid rgba(105, 108, 255, 0.2);
+            border-bottom: 1px solid rgba(20, 33, 61, 0.2);
         }
 
         .option-id {
             background: var(--primary-color);
-            color: white;
+            color: #1e293b;
             padding: 3px 10px;
             border-radius: 20px;
             font-size: 12px;
@@ -280,7 +280,7 @@
 
         .option-required {
             background: var(--danger-color);
-            color: white;
+            color: #1e293b;
             padding: 3px 10px;
             border-radius: 20px;
             font-size: 12px;
@@ -293,18 +293,18 @@
         }
 
         .detail-item-card {
-            background: rgba(255, 255, 255, 0.05);
+            background: #f8fafc;
             border-radius: 8px;
             padding: 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
             transition: all 0.3s ease;
         }
 
         .detail-item-card:hover {
-            background: rgba(105, 108, 255, 0.1);
+            background: rgba(20, 33, 61, 0.1);
             border-color: var(--primary-color);
         }
 
@@ -315,7 +315,7 @@
 
         .detail-price {
             background: var(--success-color);
-            color: white;
+            color: #1e293b;
             padding: 3px 10px;
             border-radius: 20px;
             font-size: 12px;
@@ -335,7 +335,7 @@
         }
 
         .dependency-chain {
-            background: rgba(0, 0, 0, 0.2);
+            background: #f8fafc;
             border-radius: 8px;
             padding: 10px;
             margin-top: 10px;
@@ -357,7 +357,7 @@
 
         .operator-badge {
             background: var(--info-color);
-            color: white;
+            color: #1e293b;
             padding: 2px 8px;
             border-radius: 12px;
             font-size: 11px;
@@ -385,7 +385,7 @@
         }
 
         .badge-new {
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            background: linear-gradient(135deg, #f86c6b 0%, #ee5a52 100%);
             color: white;
             padding: 5px 15px;
             border-radius: 20px;
@@ -428,7 +428,7 @@
         }
 
         .action-buttons .btn {
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 5px 15px rgba(15, 23, 42, 0.05);
             border-radius: 50%;
             width: 60px;
             height: 60px;
@@ -443,13 +443,13 @@
             width: 150px;
             height: 150px;
             margin: 0 auto;
-            background: rgba(255, 255, 255, 0.05);
+            background: #f8fafc;
             border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: var(--text-muted);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
         }
 
         .social-share {
@@ -508,10 +508,10 @@
         }
 
         .timeline-content {
-            background: rgba(255, 255, 255, 0.05);
+            background: #f8fafc;
             padding: 15px;
             border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
         }
 
         .empty-state {
@@ -527,11 +527,11 @@
         }
 
         .review-card {
-            background: rgba(255, 255, 255, 0.05);
+            background: #f8fafc;
             border-radius: 10px;
             padding: 15px;
             margin-bottom: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
         }
 
         .review-header {
@@ -1048,8 +1048,7 @@
                     <div class="mb-3" bis_skin_checked="1">
                         <label class="form-label">الرابط (Slug)</label>
                         <div class="input-group" bis_skin_checked="1">
-                            <input type="text" class="form-control" value="{{ $product->slug }}" readonly
-                                style="background: rgba(255,255,255,0.05); color: white; border-color: rgba(255,255,255,0.1);">
+                            <input type="text" class="form-control" value="{{ $product->slug }}" readonly>
                             <button class="btn btn-outline-secondary" type="button" onclick="copySlug()">
                                 <i class="fas fa-copy"></i>
                             </button>
@@ -1059,7 +1058,7 @@
                     @if ($product->meta_title)
                         <div class="mb-3" bis_skin_checked="1">
                             <label class="form-label">عنوان الصفحة</label>
-                            <div class="bg-dark p-2 rounded" style="background: rgba(255,255,255,0.05);"
+                            <div class="bg-light p-2 rounded border"
                                 bis_skin_checked="1">
                                 {{ $product->meta_title }}
                             </div>
@@ -1069,7 +1068,7 @@
                     @if ($product->meta_description)
                         <div class="mb-3" bis_skin_checked="1">
                             <label class="form-label">وصف الصفحة</label>
-                            <div class="bg-dark p-2 rounded" style="background: rgba(255,255,255,0.05);"
+                            <div class="bg-light p-2 rounded border"
                                 bis_skin_checked="1">
                                 {{ $product->meta_description }}
                             </div>
@@ -1187,9 +1186,9 @@
     <!-- Delete Modal -->
     <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
-            <div class="modal-content" style="background: var(--dark-card);">
-                <div class="modal-header" style="border-color: rgba(255,255,255,0.1);">
-                    <h5 class="modal-title text-white">تأكيد الحذف</h5>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">تأكيد الحذف</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -1205,7 +1204,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer" style="border-color: rgba(255,255,255,0.1);">
+                <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
                     <form action="{{ route('admin.products.destroy', $product->id) }}" method="POST" id="deleteForm">
                         @csrf
@@ -1222,9 +1221,9 @@
     <!-- Share Modal -->
     <div class="modal fade" id="shareModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
-            <div class="modal-content" style="background: var(--dark-card);">
-                <div class="modal-header" style="border-color: rgba(255,255,255,0.1);">
-                    <h5 class="modal-title text-white">مشاركة المنتج</h5>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">مشاركة المنتج</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -1232,8 +1231,7 @@
                         <label class="form-label">رابط المنتج</label>
                         <div class="input-group" bis_skin_checked="1">
                             <input type="text" class="form-control" id="shareUrl" readonly
-                                value="{{ url('/products/' . $product->slug) }}"
-                                style="background: rgba(255,255,255,0.05); color: white; border-color: rgba(255,255,255,0.1);">
+                                value="{{ url('/products/' . $product->slug) }}">
                             <button class="btn btn-outline-secondary" type="button" onclick="copyShareUrl()">
                                 <i class="fas fa-copy"></i>
                             </button>
@@ -1386,8 +1384,8 @@
                 width: 150,
                 margin: 1,
                 color: {
-                    dark: '#696cff',
-                    light: '#1e1e2d'
+                    dark: '#14213d',
+                    light: '#ffffff'
                 }
             }, function(error, canvas) {
                 if (error) {

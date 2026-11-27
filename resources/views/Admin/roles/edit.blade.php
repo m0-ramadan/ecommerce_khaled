@@ -25,7 +25,7 @@
         }
 
         .form-control.is-invalid {
-            border-color: #dc3545;
+            border-color: #ef4444;
         }
 
         .invalid-feedback {

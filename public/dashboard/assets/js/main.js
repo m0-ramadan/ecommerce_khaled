@@ -5,7 +5,7 @@
 'use strict';
 
 window.isRtl = window.Helpers.isRtl();
-window.isDarkStyle = window.Helpers.isDarkStyle();
+window.isDarkStyle = false;
 let menu,
   animate,
   isHorizontalLayout = false;
@@ -96,73 +96,20 @@ if (document.getElementById('layout-menu')) {
     });
   }
 
-  // Update light/dark image based on current style
-  function switchImage(style) {
-    if (style === 'system') {
-      if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        style = 'dark';
-      } else {
-        style = 'light';
-      }
-    }
-    const switchImagesList = [].slice.call(document.querySelectorAll('[data-app-' + style + '-img]'));
+  // Light mode enforced globally
+  function switchImage() {
+    const switchImagesList = [].slice.call(document.querySelectorAll('[data-app-light-img]'));
     switchImagesList.map(function (imageEl) {
-      const setImage = imageEl.getAttribute('data-app-' + style + '-img');
-      imageEl.src = assetsPath + 'img/' + setImage; // Using window.assetsPath to get the exact relative path
+      const setImage = imageEl.getAttribute('data-app-light-img');
+      if (setImage) {
+        imageEl.src = assetsPath + 'img/' + setImage;
+      }
     });
   }
 
-  //Style Switcher (Light/Dark/System Mode)
-  let styleSwitcher = document.querySelector('.dropdown-style-switcher');
-
-  // Get style from local storage or use 'system' as default
-  let storedStyle =
-    localStorage.getItem('templateCustomizer-' + templateName + '--Style') || //if no template style then use Customizer style
-    (window.templateCustomizer?.settings?.defaultStyle ?? 'light'); //!if there is no Customizer then use default style as light
-
-  // Set style on click of style switcher item if template customizer is enabled
-  if (window.templateCustomizer && styleSwitcher) {
-    let styleSwitcherItems = [].slice.call(styleSwitcher.children[1].querySelectorAll('.dropdown-item'));
-    styleSwitcherItems.forEach(function (item) {
-      item.addEventListener('click', function () {
-        let currentStyle = this.getAttribute('data-theme');
-        if (currentStyle === 'light') {
-          window.templateCustomizer.setStyle('light');
-        } else if (currentStyle === 'dark') {
-          window.templateCustomizer.setStyle('dark');
-        } else {
-          window.templateCustomizer.setStyle('system');
-        }
-      });
-    });
-
-    // Update style switcher icon based on the stored style
-
-    const styleSwitcherIcon = styleSwitcher.querySelector('i');
-
-    if (storedStyle === 'light') {
-      styleSwitcherIcon.classList.add('ti-sun');
-      new bootstrap.Tooltip(styleSwitcherIcon, {
-        title: 'Light Mode',
-        fallbackPlacements: ['bottom']
-      });
-    } else if (storedStyle === 'dark') {
-      styleSwitcherIcon.classList.add('ti-moon');
-      new bootstrap.Tooltip(styleSwitcherIcon, {
-        title: 'Dark Mode',
-        fallbackPlacements: ['bottom']
-      });
-    } else {
-      styleSwitcherIcon.classList.add('ti-device-desktop');
-      new bootstrap.Tooltip(styleSwitcherIcon, {
-        title: 'System Mode',
-        fallbackPlacements: ['bottom']
-      });
-    }
-  }
-
-  // Run switchImage function based on the stored style
-  switchImage(storedStyle);
+  document.documentElement.classList.remove('dark-style');
+  document.documentElement.classList.add('light-style');
+  switchImage();
 
   // Internationalization (Language Dropdown)
   // ---------------------------------------
@@ -372,7 +319,7 @@ if (document.getElementById('layout-menu')) {
   // If current layout is vertical and current window screen is > small
 
   // Auto update menu collapsed/expanded based on the themeConfig
-  if (typeof TemplateCustomizer !== 'undefined') {
+  if (typeof TemplateCustomizer !== 'undefined' && window.templateCustomizer && window.templateCustomizer.settings) {
     if (window.templateCustomizer.settings.defaultMenuCollapsed) {
       window.Helpers.setCollapsed(true, false);
     } else {
@@ -445,7 +392,7 @@ if (typeof $ !== 'undefined') {
       });
     }, 10);
 
-    if (searchInput.length) {
+    if (searchInput.length && typeof $.fn.typeahead === 'function') {
       // Filter config
       var filterConfig = function (data) {
         return function findMatches(q, cb) {
@@ -470,17 +417,27 @@ if (typeof $ !== 'undefined') {
         };
       };
 
-      // Search JSON
-      var searchJson = 'search-vertical.json'; // For vertical layout
-      if ($('#layout-menu').hasClass('menu-horizontal')) {
-        var searchJson = 'search-horizontal.json'; // For vertical layout
-      }
-      // Search API AJAX call
-      var searchData = $.ajax({
-        url:window.location.origin+"/search-pages", //? Use your own search api instead
-        dataType: 'json',
-        async: false
-      }).responseJSON;
+      // Build quick navigation index from sidebar links (avoids failing /search-pages sync XHR)
+      var searchData = {
+        pages: [].slice.call(document.querySelectorAll('#layout-menu a.menu-link[href]'))
+          .filter(function (el) {
+            var href = el.getAttribute('href');
+            return href && href !== 'javascript:void(0);' && href !== '#';
+          })
+          .map(function (el) {
+            var iconEl = el.querySelector('i');
+            var iconCls = 'ti-circle-dot';
+            if (iconEl) {
+              var match = iconEl.className.match(/ti-[a-z0-9-]+/i);
+              if (match) iconCls = match[0];
+            }
+            return {
+              name: (el.textContent || '').trim(),
+              url: el.getAttribute('href'),
+              icon: iconCls
+            };
+          })
+      };
       // Init typeahead on searchInput
       searchInput.each(function () {
         var $this = $(this);

@@ -34,7 +34,7 @@
             top: 0;
             bottom: 0;
             width: 3px;
-            background: #696cff;
+            background: #14213d;
         }
 
         .timeline-item {
@@ -51,7 +51,7 @@
             height: 13px;
             border-radius: 50%;
             background: white;
-            border: 3px solid #696cff;
+            border: 3px solid #14213d;
         }
 
         .timeline-content {
@@ -87,7 +87,7 @@
 
         .timeline-title {
             font-weight: 600;
-            color: #2c3e50;
+            color: #0f172a;
             margin-bottom: 10px;
         }
 
@@ -98,11 +98,11 @@
         }
 
         .activity-type-1 .timeline-icon {
-            background: #667eea;
+            background: #14213d;
         }
 
         .activity-type-2 .timeline-icon {
-            background: #764ba2;
+            background: #1e3a5f;
         }
 
         .activity-type-3 .timeline-icon {
@@ -114,7 +114,7 @@
         }
 
         .activity-type-5 .timeline-icon {
-            background: #2ecc71;
+            background: #14213d;
         }
 
         .activity-type-6 .timeline-icon {
@@ -142,7 +142,7 @@
             border-radius: 12px;
             padding: 20px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            border-top: 4px solid #696cff;
+            border-top: 4px solid #14213d;
             margin-bottom: 20px;
         }
 
@@ -158,18 +158,18 @@
         }
 
         .icon-activities {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #14213d 0%, #1e3a5f 100%);
             color: white;
         }
 
         .icon-today {
             background: #e7f5ff;
-            color: #0c63e4;
+            color: #0284c7;
         }
 
         .icon-week {
-            background: #d4edda;
-            color: #155724;
+            background: #ebf0f8;
+            color: #14213d;
         }
 
         .icon-month {
@@ -193,7 +193,7 @@
             border-radius: 12px;
             padding: 20px;
             margin-bottom: 25px;
-            border-right: 4px solid #696cff;
+            border-right: 4px solid #14213d;
         }
 
         .filter-buttons {
@@ -219,9 +219,9 @@
         }
 
         .filter-btn.active {
-            background: #696cff;
+            background: #14213d;
             color: white;
-            border-color: #696cff;
+            border-color: #14213d;
         }
 
         @media (max-width: 768px) {

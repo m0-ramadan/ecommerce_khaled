@@ -28,7 +28,7 @@
     }
 
     .coupon-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #14213d 0%, #1e3a5f 100%);
         color: white;
         padding: 15px;
         text-align: center;
@@ -55,7 +55,7 @@
         font-size: 16px;
         font-weight: 600;
         margin-bottom: 8px;
-        color: #2c3e50;
+        color: #0f172a;
         line-height: 1.4;
         height: 45px;
         overflow: hidden;
@@ -82,7 +82,7 @@
     .coupon-value {
         font-size: 22px;
         font-weight: 700;
-        color: #2ecc71;
+        color: #14213d;
         text-align: center;
         margin-bottom: 5px;
     }
@@ -127,8 +127,8 @@
     }
 
     .badge-active {
-        background-color: #d1fae5;
-        color: #065f46;
+        background-color: #ebf0f8;
+        color: #14213d;
     }
 
     .badge-inactive {
@@ -179,13 +179,13 @@
     }
 
     .stats-icon.total {
-        background: rgba(105, 108, 255, 0.1);
-        color: #696cff;
+        background: rgba(20, 33, 61, 0.1);
+        color: #14213d;
     }
 
     .stats-icon.active {
         background: rgba(52, 152, 219, 0.1);
-        color: #3498db;
+        color: #0284c7;
     }
 
     .stats-icon.inactive {
@@ -200,7 +200,7 @@
 
     .stats-icon.percentage {
         background: rgba(46, 204, 113, 0.1);
-        color: #2ecc71;
+        color: #14213d;
     }
 
     .stats-icon.fixed {
@@ -220,7 +220,7 @@
     }
 
     .quick-actions .btn.active {
-        background-color: #0d6efd;
+        background-color: #0284c7;
         color: white;
     }
 
@@ -246,7 +246,7 @@
 
     .filter-section-title {
         font-weight: 600;
-        color: #2c3e50;
+        color: #0f172a;
         margin-bottom: 15px;
         padding-bottom: 10px;
         border-bottom: 1px solid #e9ecef;
@@ -281,8 +281,8 @@
     }
 
     .usage-count.low {
-        background: #d1fae5;
-        color: #065f46;
+        background: #ebf0f8;
+        color: #14213d;
     }
 
     .empty-state {
@@ -1083,8 +1083,8 @@
                 text: `سيتم حذف الكوبون "${couponName}" بشكل دائم`,
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#14213d',
                 confirmButtonText: 'نعم، احذف',
                 cancelButtonText: 'إلغاء'
             }).then((result) => {
@@ -1224,8 +1224,8 @@
             text: `سيتم تطبيق الإجراء على ${selectedCoupons.length} كوبون`,
             icon: 'question',
             showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
+            confirmButtonColor: '#14213d',
+            cancelButtonColor: '#ef4444',
             confirmButtonText: 'تطبيق',
             cancelButtonText: 'إلغاء'
         }).then((result) => {

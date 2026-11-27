@@ -316,7 +316,7 @@
                     text: `سيتم حذف "${slideTitle}" نهائياً ولن تظهر في السلايدر.`,
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonColor: '#d33',
+                    confirmButtonColor: '#ef4444',
                     cancelButtonColor: '#6c757d',
                     confirmButtonText: 'نعم، احذف',
                     cancelButtonText: 'إلغاء'

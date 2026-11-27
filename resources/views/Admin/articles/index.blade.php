@@ -7,31 +7,31 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css">
     <style>
         :root {
-            --primary-color: #696cff;
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --success-color: #28a745;
-            --danger-color: #dc3545;
-            --warning-color: #ffc107;
-            --info-color: #17a2b8;
+            --primary-color: #14213d;
+            --primary-gradient: linear-gradient(135deg, #14213d 0%, #0c182a 100%);
+            --success-color: #14213d;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --info-color: #06b6d4;
             --light-bg: #f8f9fa;
             --border-color: #e9ecef;
             --text-muted: #6c757d;
-            --dark-bg: #1e1e2d;
-            --dark-card: #2b3b4c;
+            --dark-bg: #f6f8fb;
+            --dark-card: #ffffff;
         }
 
         body {
             font-family: "Cairo", sans-serif !important;
             background: var(--dark-bg);
-            color: #fff;
+            color: #1e293b;
         }
 
         .article-card {
             background: var(--dark-card);
             border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 5px 20px rgba(15, 23, 42, 0.05);
             padding: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
         }
 
         .article-header {
@@ -49,27 +49,27 @@
         }
 
         .status-active {
-            background: rgba(40, 167, 69, 0.2);
-            color: #28a745;
-            border: 1px solid rgba(40, 167, 69, 0.3);
+            background: rgba(30, 58, 95, 0.2);
+            color: #14213d;
+            border: 1px solid rgba(30, 58, 95, 0.3);
         }
 
         .status-inactive {
             background: rgba(220, 53, 69, 0.2);
-            color: #dc3545;
+            color: #ef4444;
             border: 1px solid rgba(220, 53, 69, 0.3);
         }
 
         .status-featured {
             background: linear-gradient(135deg, rgba(255, 193, 7, 0.2) 0%, rgba(253, 126, 20, 0.2) 100%);
-            color: #fd7e14;
+            color: #f59e0b;
             border: 1px solid rgba(253, 126, 20, 0.3);
         }
 
         .status-published {
-            background: rgba(32, 201, 151, 0.2);
-            color: #20c997;
-            border: 1px solid rgba(32, 201, 151, 0.3);
+            background: rgba(30, 58, 95, 0.2);
+            color: #14213d;
+            border: 1px solid rgba(30, 58, 95, 0.3);
         }
 
         .status-draft {
@@ -82,16 +82,16 @@
             background: var(--dark-card);
             border-radius: 12px;
             padding: 20px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 15px rgba(15, 23, 42, 0.05);
             border-top: 4px solid var(--primary-color);
             transition: transform 0.3s ease;
             margin-bottom: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
         }
 
         .stats-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 8px 25px rgba(15, 23, 42, 0.05);
         }
 
         .stats-icon {
@@ -111,20 +111,20 @@
         }
 
         .icon-active {
-            background: rgba(40, 167, 69, 0.2);
-            color: #28a745;
-            border: 1px solid rgba(40, 167, 69, 0.3);
+            background: rgba(30, 58, 95, 0.2);
+            color: #14213d;
+            border: 1px solid rgba(30, 58, 95, 0.3);
         }
 
         .icon-featured {
             background: linear-gradient(135deg, rgba(255, 193, 7, 0.2) 0%, rgba(253, 126, 20, 0.2) 100%);
-            color: #fd7e14;
+            color: #f59e0b;
             border: 1px solid rgba(253, 126, 20, 0.3);
         }
 
         .icon-views {
             background: rgba(13, 202, 240, 0.2);
-            color: #0dcaf0;
+            color: #22b8cf;
             border: 1px solid rgba(13, 202, 240, 0.3);
         }
 
@@ -132,20 +132,20 @@
             font-size: 24px;
             font-weight: 700;
             margin-bottom: 5px;
-            color: #fff;
+            color: #1e293b;
         }
 
         .stats-label {
-            color: rgba(255, 255, 255, 0.7);
+            color: #64748b;
             font-size: 14px;
         }
 
         .filter-card {
-            background: rgba(255, 255, 255, 0.05);
+            background: #f8fafc;
             border-radius: 12px;
             padding: 20px;
             margin-bottom: 25px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
         }
 
         .filter-row {
@@ -162,16 +162,16 @@
         .search-box input {
             padding-right: 40px;
             border-radius: 25px;
-            background: rgba(255, 255, 255, 0.05);
-            border-color: rgba(255, 255, 255, 0.1);
-            color: #fff;
+            background: #f8fafc;
+            border-color: #e2e8f0;
+            color: #1e293b;
         }
 
         .search-box input:focus {
             background: rgba(255, 255, 255, 0.1);
             border-color: var(--primary-color);
-            color: #fff;
-            box-shadow: 0 0 0 0.25rem rgba(105, 108, 255, 0.25);
+            color: #1e293b;
+            box-shadow: 0 0 0 0.25rem rgba(20, 33, 61, 0.25);
         }
 
         .search-box .search-icon {
@@ -179,23 +179,23 @@
             left: 15px;
             top: 50%;
             transform: translateY(-50%);
-            color: rgba(255, 255, 255, 0.5);
+            color: #64748b;
         }
 
         .article-item {
-            background: rgba(255, 255, 255, 0.05);
+            background: #f8fafc;
             border-radius: 10px;
             padding: 20px;
             margin-bottom: 15px;
             transition: all 0.3s ease;
             border-left: 4px solid transparent;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
         }
 
         .article-item:hover {
             transform: translateX(-5px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            background: rgba(105, 108, 255, 0.1);
+            box-shadow: 0 5px 15px rgba(15, 23, 42, 0.05);
+            background: rgba(20, 33, 61, 0.1);
             border-color: var(--primary-color);
         }
 
@@ -210,13 +210,13 @@
 
         .article-title {
             font-weight: 600;
-            color: rgba(255, 255, 255, 0.9);
+            color: #1e293b;
             font-size: 16px;
         }
 
         .article-date {
             font-size: 12px;
-            color: rgba(255, 255, 255, 0.7);
+            color: #64748b;
         }
 
         .article-details {
@@ -234,12 +234,12 @@
 
         .detail-label {
             font-weight: 600;
-            color: rgba(255, 255, 255, 0.8);
+            color: #1e293b;
             min-width: 80px;
         }
 
         .detail-value {
-            color: rgba(255, 255, 255, 0.9);
+            color: #1e293b;
         }
 
         .article-actions {
@@ -255,12 +255,12 @@
 
         .empty-state-icon {
             font-size: 60px;
-            color: rgba(255, 255, 255, 0.1);
+            color: #94a3b8;
             margin-bottom: 20px;
         }
 
         .empty-state-text {
-            color: rgba(255, 255, 255, 0.7);
+            color: #64748b;
             margin-bottom: 20px;
         }
 
@@ -274,9 +274,9 @@
         .status-filter-btn {
             padding: 8px 20px;
             border-radius: 25px;
-            background: rgba(255, 255, 255, 0.05);
-            color: rgba(255, 255, 255, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: #f8fafc;
+            color: #64748b;
+            border: 1px solid #e2e8f0;
             cursor: pointer;
             transition: all 0.3s ease;
             font-size: 14px;
@@ -284,7 +284,7 @@
 
         .status-filter-btn:hover {
             background: rgba(255, 255, 255, 0.1);
-            color: #fff;
+            color: #1e293b;
         }
 
         .status-filter-btn.active {
@@ -299,9 +299,9 @@
         }
 
         .sort-btn {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: rgba(255, 255, 255, 0.8);
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            color: #1e293b;
             padding: 8px 15px;
             border-radius: 25px;
             cursor: pointer;
@@ -312,7 +312,7 @@
 
         .sort-btn:hover {
             background: rgba(255, 255, 255, 0.1);
-            color: #fff;
+            color: #1e293b;
         }
 
         .sort-dropdown-content {
@@ -320,12 +320,12 @@
             position: absolute;
             background: var(--dark-card);
             min-width: 200px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 8px 16px rgba(15, 23, 42, 0.05);
             border-radius: 10px;
             z-index: 1;
             padding: 10px 0;
             margin-top: 5px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
         }
 
         .sort-dropdown:hover .sort-dropdown-content {
@@ -336,12 +336,12 @@
             padding: 10px 20px;
             cursor: pointer;
             transition: background 0.3s;
-            color: rgba(255, 255, 255, 0.8);
+            color: #1e293b;
         }
 
         .sort-item:hover {
-            background: rgba(105, 108, 255, 0.1);
-            color: #fff;
+            background: rgba(20, 33, 61, 0.1);
+            color: #1e293b;
         }
 
         .sort-item.active {
@@ -355,9 +355,9 @@
         }
 
         .btn-primary:hover {
-            background: linear-gradient(135deg, #5a6fd8 0%, #6a4a9a 100%);
+            background: linear-gradient(135deg, #14213d 0%, #1e3a5f 100%);
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(105, 108, 255, 0.4);
+            box-shadow: 0 5px 15px rgba(20, 33, 61, 0.4);
         }
 
         .article-image {
@@ -371,7 +371,7 @@
             position: absolute;
             top: 10px;
             left: 10px;
-            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+            background: linear-gradient(135deg, #f59e0b 0%, #f59e0b 100%);
             color: white;
             padding: 4px 10px;
             border-radius: 4px;
@@ -952,8 +952,8 @@
                     text: `سيتم حذف المقال "${articleTitle}" نهائياً`,
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonColor: '#d33',
-                    cancelButtonColor: '#3085d6',
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#14213d',
                     confirmButtonText: 'نعم، احذف',
                     cancelButtonText: 'إلغاء',
                     reverseButtons: true

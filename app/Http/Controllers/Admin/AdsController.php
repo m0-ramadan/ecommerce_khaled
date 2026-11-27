@@ -27,6 +27,16 @@ class AdsController extends Controller
         return view('Admin.ads.index', compact('ads', 'stats'));
     }
     
+    public function create()
+    {
+        return redirect()->route('admin.ads.index');
+    }
+
+    public function edit($id)
+    {
+        return redirect()->route('admin.ads.index');
+    }
+
     public function store(Request $request)
     {
         $request->validate([

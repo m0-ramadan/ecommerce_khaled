@@ -6,24 +6,24 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary-color: #696cff;
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --dark-bg: #1e1e2d;
-            --dark-card: #2b3b4c;
+            --primary-color: #14213d;
+            --primary-gradient: linear-gradient(135deg, #14213d 0%, #0c182a 100%);
+            --dark-bg: #f6f8fb;
+            --dark-card: #ffffff;
         }
 
         body {
             font-family: "Cairo", sans-serif !important;
             background: var(--dark-bg);
-            color: #fff;
+            color: #1e293b;
         }
 
         .form-card {
             background: var(--dark-card);
             border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 5px 20px rgba(15, 23, 42, 0.05);
             padding: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
         }
 
         .form-header {
@@ -36,15 +36,15 @@
 
         .form-label {
             font-weight: 600;
-            color: rgba(255, 255, 255, 0.9);
+            color: #1e293b;
             margin-bottom: 8px;
             display: block;
         }
 
         .form-control {
-            background: rgba(255, 255, 255, 0.05) !important;
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
-            color: #fff !important;
+            background: #f8fafc !important;
+            border: 1px solid #e2e8f0 !important;
+            color: #1e293b !important;
             border-radius: 10px !important;
             padding: 12px 15px !important;
             transition: all 0.3s ease;
@@ -53,27 +53,27 @@
         .form-control:focus {
             background: rgba(255, 255, 255, 0.1) !important;
             border-color: var(--primary-color) !important;
-            box-shadow: 0 0 0 0.25rem rgba(105, 108, 255, 0.25) !important;
+            box-shadow: 0 0 0 0.25rem rgba(20, 33, 61, 0.25) !important;
         }
 
         .form-text {
             font-size: 13px;
-            color: rgba(255, 255, 255, 0.6);
+            color: #64748b;
             margin-top: 5px;
         }
 
         .module-section {
-            background: rgba(255, 255, 255, 0.03);
+            background: #f8fafc;
             border-radius: 10px;
             padding: 20px;
             margin-bottom: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            border: 1px solid #e2e8f0;
         }
 
         .module-title {
             font-size: 16px;
             font-weight: 700;
-            color: #fff;
+            color: #1e293b;
             margin-bottom: 15px;
             display: flex;
             align-items: center;
@@ -87,28 +87,28 @@
             margin-bottom: 10px;
             padding: 8px 12px;
             border-radius: 8px;
-            background: rgba(255, 255, 255, 0.02);
+            background: #f8fafc;
             transition: all 0.3s ease;
         }
 
         .role-item:hover {
-            background: rgba(105, 108, 255, 0.1);
+            background: rgba(20, 33, 61, 0.1);
         }
 
         .role-name {
             font-weight: 500;
-            color: rgba(255, 255, 255, 0.9);
+            color: #1e293b;
         }
 
         .role-description {
             font-size: 12px;
-            color: rgba(255, 255, 255, 0.6);
+            color: #64748b;
             margin-left: 10px;
         }
 
         .select-all-btn {
-            background: rgba(105, 108, 255, 0.2);
-            border: 1px solid rgba(105, 108, 255, 0.3);
+            background: rgba(20, 33, 61, 0.2);
+            border: 1px solid rgba(20, 33, 61, 0.3);
             color: var(--primary-color);
             padding: 6px 15px;
             border-radius: 20px;
@@ -119,7 +119,7 @@
         }
 
         .select-all-btn:hover {
-            background: rgba(105, 108, 255, 0.3);
+            background: rgba(20, 33, 61, 0.3);
         }
 
         .btn-primary {
@@ -131,27 +131,27 @@
         }
 
         .btn-primary:hover {
-            background: linear-gradient(135deg, #5a6fd8 0%, #6a4a9a 100%);
+            background: linear-gradient(135deg, #14213d 0%, #1e3a5f 100%);
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(105, 108, 255, 0.4);
+            box-shadow: 0 5px 15px rgba(20, 33, 61, 0.4);
         }
 
         .btn-secondary {
             background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #fff;
+            border: 1px solid #e2e8f0;
+            color: #1e293b;
             padding: 12px 30px;
             border-radius: 10px;
             font-weight: 600;
         }
 
         .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: rgba(255, 255, 255, 0.3);
+            background: #f1f5f9;
+            border-color: #e2e8f0;
         }
 
         .error-message {
-            color: #dc3545;
+            color: #ef4444;
             font-size: 13px;
             margin-top: 5px;
         }
@@ -166,7 +166,7 @@
         }
 
         .form-check-input:checked + .form-check-label {
-            background: rgba(105, 108, 255, 0.15);
+            background: rgba(20, 33, 61, 0.15);
             border-left: 3px solid var(--primary-color);
         }
 
@@ -175,7 +175,7 @@
             align-items: center;
             gap: 10px;
             padding: 10px 15px;
-            background: rgba(255, 255, 255, 0.02);
+            background: #f8fafc;
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -184,7 +184,7 @@
 
         .form-check-label i.fa-check-circle {
             display: none;
-            color: #2ecc71;
+            color: #14213d;
         }
 
         .form-check-input:checked + .form-check-label i.fa-check-circle {
@@ -330,7 +330,7 @@
                         <!-- نصائح -->
                         <div class="module-section">
                             <h6 class="module-title"><i class="fas fa-lightbulb"></i> تذكير</h6>
-                            <ul class="list-unstyled" style="color: rgba(255, 255, 255, 0.7);">
+                            <ul class="list-unstyled" style="color: #64748b;">
                                 <li class="mb-2"><i class="fas fa-info-circle me-2 text-info"></i> تغيير الرتب يؤثر على صلاحيات الموظف فوراً.</li>
                                 <li class="mb-2"><i class="fas fa-info-circle me-2 text-info"></i> ترك كلمة المرور فارغة يعني الإبقاء على القديمة.</li>
                             </ul>

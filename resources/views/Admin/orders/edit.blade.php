@@ -6,31 +6,31 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary-color: #696cff;
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --success-color: #28a745;
-            --danger-color: #dc3545;
-            --warning-color: #ffc107;
-            --info-color: #17a2b8;
+            --primary-color: #14213d;
+            --primary-gradient: linear-gradient(135deg, #14213d 0%, #0c182a 100%);
+            --success-color: #14213d;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --info-color: #06b6d4;
             --light-bg: #f8f9fa;
             --border-color: #e9ecef;
             --text-muted: #6c757d;
-            --dark-bg: #1e1e2d;
-            --dark-card: #2b3b4c;
+            --dark-bg: #f6f8fb;
+            --dark-card: #ffffff;
         }
 
         body {
             font-family: "Cairo", sans-serif !important;
             background: var(--dark-bg);
-            color: #fff;
+            color: #1e293b;
         }
 
         .order-edit-card {
             background: var(--dark-card);
             border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 5px 20px rgba(15, 23, 42, 0.05);
             padding: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
         }
 
         .order-edit-header {
@@ -48,47 +48,47 @@
 
         .status-pending {
             background: rgba(133, 100, 4, 0.2);
-            color: #ffc107;
+            color: #f59e0b;
             border: 1px solid rgba(255, 193, 7, 0.3);
         }
 
         .status-processing {
             background: rgba(0, 64, 133, 0.2);
-            color: #0dcaf0;
+            color: #22b8cf;
             border: 1px solid rgba(13, 202, 240, 0.3);
         }
 
         .status-shipped {
             background: rgba(12, 84, 96, 0.2);
-            color: #0dcaf0;
+            color: #22b8cf;
             border: 1px solid rgba(13, 202, 240, 0.3);
         }
 
         .status-delivered {
-            background: linear-gradient(135deg, rgba(21, 87, 36, 0.2) 0%, rgba(32, 201, 151, 0.2) 100%);
-            color: #20c997;
-            border: 1px solid rgba(32, 201, 151, 0.3);
+            background: linear-gradient(135deg, rgba(20, 33, 61, 0.2) 0%, rgba(30, 58, 95, 0.2) 100%);
+            color: #14213d;
+            border: 1px solid rgba(30, 58, 95, 0.3);
         }
 
         .status-cancelled {
             background: linear-gradient(135deg, rgba(220, 53, 69, 0.2) 0%, rgba(253, 126, 20, 0.2) 100%);
-            color: #fd7e14;
+            color: #f59e0b;
             border: 1px solid rgba(253, 126, 20, 0.3);
         }
 
         .form-section {
-            background: rgba(255, 255, 255, 0.05);
+            background: #f8fafc;
             border-radius: 12px;
             padding: 20px;
             margin-bottom: 25px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
         }
 
         .form-section h6 {
             color: var(--primary-color);
             margin-bottom: 20px;
             padding-bottom: 10px;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 2px solid #e2e8f0;
         }
 
         .required::after {
@@ -118,7 +118,7 @@
         .alert-guide li {
             margin-bottom: 8px;
             font-size: 14px;
-            color: rgba(255, 255, 255, 0.8);
+            color: #1e293b;
         }
 
         .items-table {
@@ -128,23 +128,23 @@
         }
 
         .items-table th {
-            background: rgba(255, 255, 255, 0.05);
+            background: #f8fafc;
             padding: 12px;
             text-align: right;
             font-weight: 600;
-            color: rgba(255, 255, 255, 0.8);
-            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            color: #1e293b;
+            border-bottom: 2px solid #e2e8f0;
         }
 
         .items-table td {
             padding: 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid #e2e8f0;
             vertical-align: middle;
-            color: rgba(255, 255, 255, 0.9);
+            color: #1e293b;
         }
 
         .item-row:hover {
-            background: rgba(105, 108, 255, 0.1);
+            background: rgba(20, 33, 61, 0.1);
         }
 
         .product-info {
@@ -158,27 +158,27 @@
             height: 50px;
             border-radius: 8px;
             object-fit: cover;
-            border: 2px solid rgba(255, 255, 255, 0.1);
+            border: 2px solid #e2e8f0;
         }
 
         .product-details h6 {
             margin-bottom: 5px;
             font-weight: 600;
-            color: rgba(255, 255, 255, 0.9);
+            color: #1e293b;
             font-size: 14px;
         }
 
         .product-details p {
             margin: 0;
-            color: rgba(255, 255, 255, 0.7);
+            color: #64748b;
             font-size: 12px;
         }
 
         .summary-card {
-            background: rgba(255, 255, 255, 0.05);
+            background: #f8fafc;
             border-radius: 12px;
             padding: 20px;
-            border: 2px solid rgba(255, 255, 255, 0.1);
+            border: 2px solid #e2e8f0;
         }
 
         .summary-row {
@@ -187,7 +187,7 @@
             align-items: center;
             margin-bottom: 10px;
             padding-bottom: 10px;
-            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+            border-bottom: 1px dashed #e2e8f0;
         }
 
         .summary-row:last-child {
@@ -198,32 +198,32 @@
 
         .summary-label {
             font-weight: 600;
-            color: rgba(255, 255, 255, 0.8);
+            color: #1e293b;
         }
 
         .summary-value {
             font-weight: 600;
-            color: rgba(255, 255, 255, 0.9);
+            color: #1e293b;
         }
 
         .total-row {
             font-size: 18px;
-            color: #20c997;
+            color: #14213d;
         }
 
         .help-text {
             font-size: 12px;
-            color: rgba(255, 255, 255, 0.6);
+            color: #64748b;
             margin-top: 5px;
         }
 
         .info-card {
-            background: rgba(255, 255, 255, 0.05);
+            background: #f8fafc;
             border-radius: 12px;
             padding: 20px;
             margin-bottom: 25px;
             border-right: 4px solid var(--primary-color);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
         }
 
         .info-row {
@@ -231,7 +231,7 @@
             align-items: center;
             margin-bottom: 10px;
             padding-bottom: 10px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid #e2e8f0;
         }
 
         .info-row:last-child {
@@ -243,39 +243,39 @@
         .info-label {
             min-width: 120px;
             font-weight: 600;
-            color: rgba(255, 255, 255, 0.8);
+            color: #1e293b;
         }
 
         .info-value {
-            color: rgba(255, 255, 255, 0.9);
+            color: #1e293b;
             font-weight: 500;
         }
 
         .form-control {
-            background: rgba(255, 255, 255, 0.05);
-            border-color: rgba(255, 255, 255, 0.1);
-            color: #fff;
+            background: #f8fafc;
+            border-color: #e2e8f0;
+            color: #1e293b;
         }
 
         .form-control:focus {
             background: rgba(255, 255, 255, 0.1);
             border-color: var(--primary-color);
-            color: #fff;
-            box-shadow: 0 0 0 0.25rem rgba(105, 108, 255, 0.25);
+            color: #1e293b;
+            box-shadow: 0 0 0 0.25rem rgba(20, 33, 61, 0.25);
         }
 
         .form-control::placeholder {
-            color: rgba(255, 255, 255, 0.5);
+            color: #64748b;
         }
 
         .form-label {
-            color: rgba(255, 255, 255, 0.9);
+            color: #1e293b;
         }
 
         .input-group-text {
             background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.1);
-            color: #fff;
+            border-color: #e2e8f0;
+            color: #1e293b;
         }
 
         .btn-primary {
@@ -284,20 +284,20 @@
         }
 
         .btn-primary:hover {
-            background: linear-gradient(135deg, #5a6fd8 0%, #6a4a9a 100%);
+            background: linear-gradient(135deg, #14213d 0%, #1e3a5f 100%);
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(105, 108, 255, 0.4);
+            box-shadow: 0 5px 15px rgba(20, 33, 61, 0.4);
         }
 
         .btn-secondary {
             background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #fff;
+            border: 1px solid #e2e8f0;
+            color: #1e293b;
         }
 
         .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: rgba(255, 255, 255, 0.3);
+            background: #f1f5f9;
+            border-color: #e2e8f0;
         }
 
         .btn-outline-primary {
@@ -740,8 +740,8 @@
                 text: 'سيتم حذف الطلب "{{ $order->order_number }}" نهائياً',
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#14213d',
                 confirmButtonText: 'نعم، احذف',
                 cancelButtonText: 'إلغاء',
                 reverseButtons: true

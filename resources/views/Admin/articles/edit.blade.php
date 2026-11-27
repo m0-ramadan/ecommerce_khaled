@@ -12,23 +12,23 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
     <style>
         :root {
-            --primary-color: #696cff;
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --dark-bg: #1e1e2d;
-            --dark-card: #2b3b4c;
+            --primary-color: #14213d;
+            --primary-gradient: linear-gradient(135deg, #14213d 0%, #0c182a 100%);
+            --dark-bg: #f6f8fb;
+            --dark-card: #ffffff;
         }
 
         body {
             font-family: "Cairo", sans-serif !important;
             background: var(--dark-bg);
-            color: #fff;
+            color: #1e293b;
         }
 
         .card {
             background: var(--dark-card);
             border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 5px 20px rgba(15, 23, 42, 0.05);
+            border: 1px solid #e2e8f0;
             margin-bottom: 25px;
         }
 
@@ -46,15 +46,15 @@
 
         .form-label {
             font-weight: 600;
-            color: rgba(255, 255, 255, 0.9);
+            color: #1e293b;
             margin-bottom: 8px;
         }
 
         .form-control,
         .form-select {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #fff;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            color: #1e293b;
             border-radius: 10px;
             padding: 10px 15px;
             transition: all 0.3s ease;
@@ -64,47 +64,47 @@
         .form-select:focus {
             background: rgba(255, 255, 255, 0.1);
             border-color: var(--primary-color);
-            color: #fff;
-            box-shadow: 0 0 0 0.25rem rgba(105, 108, 255, 0.25);
+            color: #1e293b;
+            box-shadow: 0 0 0 0.25rem rgba(20, 33, 61, 0.25);
         }
 
         .form-control::placeholder {
-            color: rgba(255, 255, 255, 0.4);
+            color: #94a3b8;
         }
 
         .summernote {
-            background: rgba(255, 255, 255, 0.05);
+            background: #f8fafc;
             border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
         }
 
         .note-editor.note-frame {
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
             border-radius: 10px;
         }
 
         .note-toolbar {
-            background: rgba(0, 0, 0, 0.2);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
         }
 
         .note-btn {
-            color: #fff;
+            color: #1e293b;
             background: transparent;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid #e2e8f0;
         }
 
         .note-btn:hover {
-            background: rgba(105, 108, 255, 0.2);
+            background: rgba(20, 33, 61, 0.2);
         }
 
         .note-editing-area {
-            background: rgba(255, 255, 255, 0.05);
-            color: #fff;
+            background: #f8fafc;
+            color: #1e293b;
         }
 
         .note-placeholder {
-            color: rgba(255, 255, 255, 0.4);
+            color: #94a3b8;
         }
 
         .btn-primary {
@@ -117,20 +117,20 @@
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(105, 108, 255, 0.4);
+            box-shadow: 0 5px 15px rgba(20, 33, 61, 0.4);
         }
 
         .btn-secondary {
             background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #fff;
+            border: 1px solid #e2e8f0;
+            color: #1e293b;
             padding: 12px 30px;
             border-radius: 10px;
             font-weight: 600;
         }
 
         .btn-danger {
-            background: #dc3545;
+            background: #ef4444;
             border: none;
             padding: 12px 30px;
             border-radius: 10px;
@@ -144,9 +144,9 @@
         }
 
         .select2-container--default .select2-selection--multiple {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #fff;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            color: #1e293b;
             border-radius: 10px;
         }
 
@@ -154,21 +154,21 @@
             background: var(--primary-color);
             border: none;
             border-radius: 20px;
-            color: white;
+            color: #1e293b;
             padding: 3px 10px;
         }
 
         .select2-container--default .select2-selection--single {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #fff;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            color: #1e293b;
             border-radius: 10px;
             height: auto;
             padding: 8px 15px;
         }
 
         .select2-container--default .select2-selection--single .select2-selection__rendered {
-            color: #fff;
+            color: #1e293b;
         }
 
         .select2-container--default .select2-selection--single .select2-selection__arrow {
@@ -177,11 +177,11 @@
 
         .select2-dropdown {
             background: var(--dark-card);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
         }
 
         .select2-search__field {
-            color: #fff;
+            color: #1e293b;
         }
 
         .image-preview {
@@ -189,11 +189,11 @@
             height: 250px;
             object-fit: cover;
             border-radius: 10px;
-            border: 2px dashed rgba(255, 255, 255, 0.2);
+            border: 2px dashed #e2e8f0;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(255, 255, 255, 0.03);
+            background: #f8fafc;
             cursor: pointer;
             transition: all 0.3s ease;
             position: relative;
@@ -215,7 +215,7 @@
             flex-direction: column;
             align-items: center;
             gap: 10px;
-            color: rgba(255, 255, 255, 0.5);
+            color: #64748b;
         }
 
         .image-preview .placeholder i {
@@ -228,7 +228,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(15, 23, 42, 0.05);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -245,7 +245,7 @@
             top: 10px;
             right: 10px;
             background: var(--primary-color);
-            color: white;
+            color: #1e293b;
             padding: 5px 10px;
             border-radius: 20px;
             font-size: 12px;
@@ -253,7 +253,7 @@
 
         .flatpickr-calendar {
             background: var(--dark-card);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid #e2e8f0;
         }
 
         .flatpickr-day.selected {
@@ -262,18 +262,18 @@
         }
 
         .meta-card {
-            background: rgba(255, 255, 255, 0.02);
+            background: #f8fafc;
             border-radius: 10px;
             padding: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            border: 1px solid #e2e8f0;
         }
 
         .invalid-feedback {
-            color: #ff6b6b;
+            color: #f86c6b;
         }
 
         .article-stats {
-            background: rgba(255, 255, 255, 0.03);
+            background: #f8fafc;
             border-radius: 10px;
             padding: 15px;
             margin-bottom: 20px;
@@ -284,7 +284,7 @@
             justify-content: space-between;
             align-items: center;
             padding: 10px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid #e2e8f0;
         }
 
         .stat-item:last-child {
@@ -292,7 +292,7 @@
         }
 
         .stat-label {
-            color: rgba(255, 255, 255, 0.7);
+            color: #64748b;
         }
 
         .stat-value {
@@ -342,7 +342,7 @@
                             <div class="mb-3">
                                 <label class="form-label">الرابط (Slug)</label>
                                 <input type="text" class="form-control" value="{{ $article->slug }}" readonly disabled>
-                                <div class="form-text text-white-50">يتم تحديثه تلقائياً عند تغيير العنوان</div>
+                                <div class="form-text text-muted">يتم تحديثه تلقائياً عند تغيير العنوان</div>
                             </div>
 
                             <!-- المحتوى -->
@@ -358,7 +358,7 @@
                             <div class="mb-3">
                                 <label class="form-label">الملخص</label>
                                 <textarea name="excerpt" class="form-control" rows="3" placeholder="ملخص مختصر للمقال (اختياري)">{{ old('excerpt', $article->excerpt) }}</textarea>
-                                <div class="form-text text-white-50">أقصى حد 500 حرف. سيظهر في بطاقة المقال.</div>
+                                <div class="form-text text-muted">أقصى حد 500 حرف. سيظهر في بطاقة المقال.</div>
                             </div>
                         </div>
                     </div>
@@ -388,7 +388,7 @@
                                     </div>
                                     <input type="file" name="image" id="imageInput" class="d-none" accept="image/*"
                                            onchange="previewImage(event)">
-                                    <div class="form-text text-white-50 mt-2">
+                                    <div class="form-text text-muted mt-2">
                                         الصيغ المدعومة: jpeg, png, jpg, gif, webp. الحجم الأقصى 2MB
                                         @if($article->image)
                                             <br><strong>ملاحظة:</strong> ترك الحقل فارغاً يبقي الصورة الحالية.

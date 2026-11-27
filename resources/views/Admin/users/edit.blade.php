@@ -57,7 +57,7 @@
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: #696cff;
+            background: #14213d;
             color: white;
             display: flex;
             align-items: center;
@@ -68,7 +68,7 @@
 
         .avatar-upload label:hover {
             transform: scale(1.1);
-            box-shadow: 0 5px 15px rgba(105, 108, 255, 0.4);
+            box-shadow: 0 5px 15px rgba(20, 33, 61, 0.4);
         }
 
         .avatar-upload input[type="file"] {
@@ -77,19 +77,19 @@
 
         .required::after {
             content: " *";
-            color: #dc3545;
+            color: #ef4444;
         }
 
         .alert-guide {
             background: #e7f7ff;
-            border-right: 4px solid #696cff;
+            border-right: 4px solid #14213d;
             padding: 20px;
             border-radius: 10px;
             margin-bottom: 25px;
         }
 
         .alert-guide h6 {
-            color: #696cff;
+            color: #14213d;
             margin-bottom: 15px;
         }
 
@@ -124,7 +124,7 @@
         .strength-fill {
             height: 100%;
             width: 0%;
-            background: #dc3545;
+            background: #ef4444;
             transition: all 0.3s ease;
         }
 
@@ -134,7 +134,7 @@
         }
 
         .form-section {
-            background: #242f3b;
+            background: #ffffff;
             border-radius: 10px;
             padding: 20px;
             margin-bottom: 25px;
@@ -152,7 +152,7 @@
             border-radius: 12px;
             padding: 20px;
             margin-bottom: 25px;
-            border-right: 4px solid #696cff;
+            border-right: 4px solid #14213d;
         }
 
         .info-row {
@@ -176,7 +176,7 @@
         }
 
         .info-value {
-            color: #2c3e50;
+            color: #0f172a;
             font-weight: 500;
         }
 
@@ -188,7 +188,7 @@
         }
 
         .badge-social {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #14213d 0%, #1e3a5f 100%);
             color: white;
         }
 
@@ -206,7 +206,7 @@
 
         .badge-email {
             /* background: #e7f5ff; */
-            color: #0c63e4;
+            color: #0284c7;
         }
 
         .social-icons {
@@ -585,8 +585,8 @@
                 text: 'سيتم حذف الصورة الشخصية للمستخدم',
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#14213d',
                 confirmButtonText: 'نعم، احذف',
                 cancelButtonText: 'إلغاء',
                 reverseButtons: true
@@ -624,23 +624,23 @@
             let color, text;
             switch (strength) {
                 case 0:
-                    color = '#dc3545';
+                    color = '#ef4444';
                     text = 'ضعيفة جداً';
                     break;
                 case 1:
-                    color = '#dc3545';
+                    color = '#ef4444';
                     text = 'ضعيفة';
                     break;
                 case 2:
-                    color = '#ffc107';
+                    color = '#f59e0b';
                     text = 'متوسطة';
                     break;
                 case 3:
-                    color = '#28a745';
+                    color = '#14213d';
                     text = 'قوية';
                     break;
                 case 4:
-                    color = '#20c997';
+                    color = '#14213d';
                     text = 'قوية جداً';
                     break;
             }
@@ -659,8 +659,8 @@
                 text: 'سيتم حذف المستخدم "{{ $user->name }}" نهائياً',
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#14213d',
                 confirmButtonText: 'نعم، احذف',
                 cancelButtonText: 'إلغاء',
                 reverseButtons: true

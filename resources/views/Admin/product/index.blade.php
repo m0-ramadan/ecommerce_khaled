@@ -54,7 +54,7 @@
         }
 
         .badge-new {
-            background: #ff6b6b;
+            background: #f86c6b;
             color: white;
             font-size: 11px;
             padding: 3px 8px;
@@ -62,7 +62,7 @@
         }
 
         .badge-discount {
-            background: #28a745;
+            background: #14213d;
             color: white;
             font-size: 11px;
             padding: 3px 8px;
@@ -78,7 +78,7 @@
         }
 
         .badge-low-stock {
-            background: #ffc107;
+            background: #f59e0b;
             color: #212529;
             font-size: 11px;
             padding: 3px 8px;
@@ -93,7 +93,7 @@
             font-size: 16px;
             font-weight: 600;
             margin-bottom: 8px;
-            color: #2c3e50;
+            color: #0f172a;
             line-height: 1.4;
             height: 45px;
             overflow: hidden;
@@ -118,7 +118,7 @@
         .current-price {
             font-size: 18px;
             font-weight: 700;
-            color: #2ecc71;
+            color: #14213d;
         }
 
         .old-price {
@@ -153,7 +153,7 @@
         }
 
         .stock-indicator.in-stock {
-            background-color: #2ecc71;
+            background-color: #14213d;
         }
 
         .stock-indicator.low-stock {
@@ -216,7 +216,7 @@
         }
 
         .view-toggle-btn.active {
-            background: #696cff;
+            background: #14213d;
             color: white;
         }
 
@@ -237,7 +237,7 @@
             gap: 5px;
             padding: 8px 15px;
             border-radius: 5px;
-            /* background: #f8f9fa; */
+            background: #f8fafc;
             border: 1px solid #dee2e6;
             color: #495057;
             text-decoration: none;
@@ -245,9 +245,9 @@
         }
 
         .quick-action-btn:hover {
-            /* background: #696cff; */
+            background: #14213d;
             color: white;
-            border-color: #696cff;
+            border-color: #14213d;
             text-decoration: none;
         }
 
@@ -260,8 +260,8 @@
         }
 
         .status-active {
-            /* background-color: #d1fae5; */
-            color: #065f46;
+            /* background-color: #ebf0f8; */
+            color: #14213d;
         }
 
         .status-inactive {
@@ -295,10 +295,10 @@
 
         /* Statistics Cards */
         .stats-card {
-            background: #383669;
+            background: #ffffff;
             border-radius: 10px;
             padding: 20px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 5px 15px rgba(15, 23, 42, 0.04);
             margin-bottom: 20px;
             text-align: center;
         }
@@ -315,13 +315,13 @@
         }
 
         .stats-icon.total {
-            /* background: rgba(105, 108, 255, 0.1); */
-            color: #696cff;
+            background: #ebf0f8;
+            color: #14213d;
         }
 
         .stats-icon.active {
             /* background: rgba(52, 152, 219, 0.1); */
-            color: #3498db;
+            color: #0284c7;
         }
 
         .stats-icon.inactive {
@@ -368,7 +368,7 @@
 
         .filter-section-title {
             font-weight: 600;
-            color: #2c3e50;
+            color: #0f172a;
             margin-bottom: 15px;
             padding-bottom: 10px;
             border-bottom: 1px solid #e9ecef;
@@ -429,17 +429,17 @@
 
 
         .btn-outline-primary.active {
-            background-color: #0d6efd !important;
+            background-color: #0284c7 !important;
             color: #fff !important;
         }
 
         .btn-outline-warning.active {
-            background-color: #ffc107 !important;
+            background-color: #f59e0b !important;
             color: #000 !important;
         }
 
         .btn-outline-danger.active {
-            background-color: #dc3545 !important;
+            background-color: #ef4444 !important;
             color: #fff !important;
         }
 
@@ -1203,7 +1203,6 @@
 
 @endsection
 @section('js')
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
@@ -1298,8 +1297,8 @@
                     text: `سيتم حذف المنتج "${productName}" بشكل دائم`,
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonColor: '#d33',
-                    cancelButtonColor: '#3085d6',
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#14213d',
                     confirmButtonText: 'نعم، احذف',
                     cancelButtonText: 'إلغاء'
                 }).then((result) => {
@@ -1561,8 +1560,8 @@
                 text: `سيتم تطبيق الإجراء على ${selectedProducts.length} منتج`,
                 icon: 'question',
                 showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: '#14213d',
+                cancelButtonColor: '#ef4444',
                 confirmButtonText: 'تطبيق',
                 cancelButtonText: 'إلغاء'
             }).then((result) => {

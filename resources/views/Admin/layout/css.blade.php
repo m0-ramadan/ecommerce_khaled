@@ -1,6 +1,6 @@
 
 <!-- Favicon -->
-<link rel="icon" type="image/x-icon" href="#assets/img/favicon/favicon.ico" />
+<link rel="icon" type="image/png" href="{{ asset('dashboard/assets/img/logo_.png') }}" />
 
 <!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -47,20 +47,31 @@
 
 
 
+<!-- Force permanent light mode (remove any saved dark theme before render) -->
+<script>
+(function () {
+    try {
+        Object.keys(localStorage).forEach(function (k) {
+            if (k.indexOf('templateCustomizer-') === 0 && k.indexOf('--Style') !== -1) {
+                localStorage.setItem(k, 'light');
+            }
+        });
+    } catch (e) {}
+    document.documentElement.classList.remove('dark-style');
+    document.documentElement.classList.add('light-style');
+})();
+</script>
+
 <!-- Helpers -->
 <script src="{{ asset('dashboard/assets/vendor/js/helpers.js') }}"></script>
-<!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
-<!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
-
-<script src="{{ asset('dashboard/assets/vendor/js/template-customizer.js') }}"></script>
-
-
+<!-- Config -->
 <script src="{{ asset('dashboard/assets/js/config.js') }}"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&family=Noto+Kufi+Arabic:wght@100..900&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&family=Noto+Kufi+Arabic:wght@100..900&family=Tajawal:wght@400;500;700;800&display=swap"
         rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('dashboard/assets/css/tala-dashboard.css') }}" />
 <style>
 /* قوائم الاختيار (select / select2): النص أسود دائمًا */
 select,
@@ -88,6 +99,6 @@ select option,
 .select2-container--default .select2-results__option--highlighted,
 .select2-container--default .select2-results__option[aria-selected="true"] {
     color: #fff !important;
-    background-color: #0d6efd !important;
+    background-color: #14213d !important;
 }
 </style>

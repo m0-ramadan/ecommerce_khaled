@@ -51,26 +51,11 @@
 <script src="{{ asset('dashboard/assets/js/app-logistics-dashboard.js') }}"></script>
 
 <script>
-    let labelColor, cardColor, headingColor, borderColor, legendColor;
-
-
-
-
-    if (isDarkStyle) {
-        cardColor = config.colors_dark.cardColor;
-
-        labelColor = config.colors_dark.textMuted;
-        headingColor = config.colors_dark.headingColor;
-        borderColor = config.colors_dark.borderColor;
-        legendColor = config.colors_dark.bodyColor;
-    } else {
-        cardColor = config.colors.cardColor;
-
-        labelColor = config.colors.textMuted;
-        headingColor = config.colors.headingColor;
-        borderColor = config.colors.borderColor;
+    let labelColor = config.colors.textMuted,
+        cardColor = config.colors.cardColor,
+        headingColor = config.colors.headingColor,
+        borderColor = config.colors.borderColor,
         legendColor = config.colors.bodyColor;
-    }
 
 
 
@@ -551,7 +536,9 @@
 <script>
     $(function() {
         // فقط عناصر <select> — لتجنّب إعادة تهيئة حاويات Select2 نفسها
-        $('select.select2').select2();
+        if ($.fn && typeof $.fn.select2 === 'function') {
+            $('select.select2').select2();
+        }
 
         if ("") {
             console.log("")

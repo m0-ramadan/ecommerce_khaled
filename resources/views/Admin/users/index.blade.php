@@ -10,69 +10,74 @@
         }
 
         .user-avatar {
-            width: 50px;
-            height: 50px;
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
             object-fit: cover;
-            border: 3px solid #f8f9fa;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            border: 2px solid #e2e8f0;
+            box-shadow: 0 2px 5px rgba(15, 23, 42, 0.06);
         }
 
         .user-avatar-placeholder {
-            width: 50px;
-            height: 50px;
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #3b5998 0%, #14213d 100%);
             color: white;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
-            font-weight: 600;
-            border: 3px solid #f8f9fa;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            font-size: 14px;
+            font-weight: 700;
+            border: 2px solid #ebf0f8;
+            box-shadow: 0 2px 6px rgba(20, 33, 61, 0.16);
         }
 
         .badge-custom {
-            padding: 5px 12px;
+            padding: 4px 11px;
             border-radius: 20px;
-            font-size: 12px;
+            font-size: 11.5px;
             font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
         }
 
         .badge-social {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: #ebf0f8;
+            color: #1e3a5f;
+            border: 1px solid #cbd7ea;
         }
 
         .badge-email {
-            background: #e7f5ff;
-            color: #0c63e4;
+            background: #e0f2fe;
+            color: #0284c7;
+            border: 1px solid #bae6fd;
         }
 
         .badge-google {
-            background: #ea4335;
+            background: #ef4444;
             color: white;
         }
 
         .badge-facebook {
-            background: #1877f2;
+            background: #0284c7;
             color: white;
         }
 
         .badge-apple {
-            background: #000000;
+            background: #334155;
             color: white;
         }
 
         .badge-active {
-            background: #d4edda;
-            color: #155724;
+            background: #ebf0f8;
+            color: #1e3a5f;
         }
 
         .badge-inactive {
-            background: #f8d7da;
-            color: #721c24;
+            background: #fee2e2;
+            color: #b91c1c;
         }
 
         .table-card {
@@ -83,7 +88,7 @@
         }
 
         .table-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #14213d 0%, #1e3a5f 100%);
             color: white;
             padding: 20px 25px;
         }
@@ -136,17 +141,17 @@
         }
 
         .filter-tab.active {
-            background: #696cff;
+            background: #14213d;
             color: white;
-            border-color: #696cff;
+            border-color: #14213d;
         }
 
         .stats-card {
-            background: #242f3b;
+            background: #ffffff;
             border-radius: 12px;
             padding: 20px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            border-top: 4px solid #696cff;
+            border-top: 4px solid #14213d;
             transition: transform 0.3s ease;
             margin-bottom: 20px;
         }
@@ -167,13 +172,13 @@
         }
 
         .icon-users {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #14213d 0%, #1e3a5f 100%);
             color: white;
         }
 
         .icon-orders {
             background: #e7f5ff;
-            color: #0c63e4;
+            color: #0284c7;
         }
 
         .icon-reviews {
@@ -182,7 +187,7 @@
         }
 
         .icon-social {
-            background: #ff6b6b;
+            background: #f86c6b;
             color: white;
         }
 
@@ -295,7 +300,7 @@
         }
 
         input:checked+.toggle-slider {
-            background-color: #696cff;
+            background-color: #14213d;
         }
 
         input:checked+.toggle-slider:before {
@@ -363,7 +368,7 @@
         }
 
         .sort-item.active {
-            background: #696cff;
+            background: #14213d;
             color: white;
         }
 
@@ -544,7 +549,7 @@
                                                         alt="{{ $user->name }}" class="user-avatar">
                                                 @else
                                                     <div class="user-avatar-placeholder" bis_skin_checked="1">
-                                                        {{ strtoupper(substr($user->name, 0, 1)) }}
+                                                        {{ mb_strtoupper(mb_substr($user->name, 0, 1)) }}
                                                     </div>
                                                 @endif
                                                 <div class="user-details" bis_skin_checked="1">
@@ -718,7 +723,6 @@
 @endsection
 
 @section('js')
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         $(document).ready(function() {
@@ -787,8 +791,8 @@
                     text: `سيتم حذف المستخدم "${userName}" نهائياً`,
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonColor: '#d33',
-                    cancelButtonColor: '#3085d6',
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#14213d',
                     confirmButtonText: 'نعم، احذف',
                     cancelButtonText: 'إلغاء',
                     reverseButtons: true

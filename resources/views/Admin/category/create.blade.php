@@ -21,7 +21,7 @@
         }
 
         .category-image-preview:hover {
-            border-color: #696cff;
+            border-color: #14213d;
             transform: scale(1.02);
         }
 
@@ -36,7 +36,7 @@
         }
 
         .category-banner-preview:hover {
-            border-color: #696cff;
+            border-color: #14213d;
             transform: scale(1.01);
         }
 
@@ -94,8 +94,8 @@
         }
 
         .nav-tabs .nav-link.active {
-            color: #696cff;
-            border-bottom: 2px solid #696cff;
+            color: #14213d;
+            border-bottom: 2px solid #14213d;
             background-color: transparent;
         }
 
@@ -116,11 +116,11 @@
 
         .required::after {
             content: " *";
-            color: #dc3545;
+            color: #ef4444;
         }
 
         .info-icon {
-            color: #696cff;
+            color: #14213d;
             cursor: help;
         }
 
@@ -154,19 +154,19 @@
         }
 
         .type-card:hover {
-            border-color: #696cff;
+            border-color: #14213d;
             transform: translateY(-2px);
         }
 
         .type-card.active {
-            border-color: #696cff;
-            background-color: rgba(105, 108, 255, 0.1);
+            border-color: #14213d;
+            background-color: rgba(20, 33, 61, 0.1);
         }
 
         .type-card i {
             font-size: 40px;
             margin-bottom: 10px;
-            color: #696cff;
+            color: #14213d;
         }
 
         .type-card h6 {
@@ -201,20 +201,20 @@
         }
 
         .parent-category-item.selected {
-            background-color: #696cff;
-            /* color: white; */
+            background-color: #14213d;
+            color: #ffffff;
         }
 
         .quick-tips {
             /* background: #e7f7ff; */
-            border-right: 4px solid #696cff;
+            border-right: 4px solid #14213d;
             padding: 15px;
             border-radius: 5px;
             margin-bottom: 20px;
         }
 
         .quick-tips h6 {
-            color: #696cff;
+            color: #14213d;
             margin-bottom: 10px;
         }
 
@@ -994,8 +994,8 @@
             text: 'سيتم مسح جميع البيانات المدخلة',
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#14213d',
             confirmButtonText: 'نعم، امسح',
             cancelButtonText: 'إلغاء'
         }).then((result) => {

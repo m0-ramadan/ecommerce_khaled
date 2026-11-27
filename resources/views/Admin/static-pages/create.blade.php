@@ -7,23 +7,23 @@
     <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #696cff;
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --dark-bg: #1e1e2d;
-            --dark-card: #2b3b4c;
+            --primary-color: #14213d;
+            --primary-gradient: linear-gradient(135deg, #14213d 0%, #0c182a 100%);
+            --dark-bg: #f6f8fb;
+            --dark-card: #ffffff;
         }
 
         body {
             font-family: "Cairo", sans-serif !important;
             background: var(--dark-bg);
-            color: #fff;
+            color: #1e293b;
         }
 
         .card {
             background: var(--dark-card);
             border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 5px 20px rgba(15, 23, 42, 0.05);
+            border: 1px solid #e2e8f0;
         }
 
         .card-header {
@@ -36,37 +36,37 @@
 
         .form-control,
         .form-select {
-            background: rgba(255, 255, 255, 0.05);
-            border-color: rgba(255, 255, 255, 0.1);
-            color: #fff;
+            background: #f8fafc;
+            border-color: #e2e8f0;
+            color: #1e293b;
         }
 
         .form-control:focus,
         .form-select:focus {
             background: rgba(255, 255, 255, 0.1);
             border-color: var(--primary-color);
-            color: #fff;
-            box-shadow: 0 0 0 0.25rem rgba(105, 108, 255, 0.25);
+            color: #1e293b;
+            box-shadow: 0 0 0 0.25rem rgba(20, 33, 61, 0.25);
         }
 
         .form-label {
-            color: rgba(255, 255, 255, 0.9);
+            color: #1e293b;
             font-weight: 600;
             margin-bottom: 8px;
         }
 
         .slug-preview {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
             border-radius: 8px;
             padding: 10px 15px;
             margin-top: 5px;
             font-size: 14px;
-            color: rgba(255, 255, 255, 0.7);
+            color: #64748b;
         }
 
         .slug-preview code {
-            color: #20c997;
+            color: #14213d;
             font-weight: 600;
         }
 
@@ -78,95 +78,95 @@
         }
 
         .btn-primary:hover {
-            background: linear-gradient(135deg, #5a6fd8 0%, #6a4a9a 100%);
+            background: linear-gradient(135deg, #14213d 0%, #1e3a5f 100%);
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(105, 108, 255, 0.4);
+            box-shadow: 0 5px 15px rgba(20, 33, 61, 0.4);
         }
 
         .btn-secondary {
             background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #fff;
+            border: 1px solid #e2e8f0;
+            color: #1e293b;
         }
 
         .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: rgba(255, 255, 255, 0.3);
+            background: #f1f5f9;
+            border-color: #e2e8f0;
         }
 
         .note-editor {
-            background: rgba(255, 255, 255, 0.05) !important;
-            border-color: rgba(255, 255, 255, 0.1) !important;
+            background: #f8fafc !important;
+            border-color: #e2e8f0 !important;
             border-radius: 8px !important;
         }
 
         .note-toolbar {
-            background: rgba(255, 255, 255, 0.08) !important;
-            border-color: rgba(255, 255, 255, 0.1) !important;
+            background: #f8fafc !important;
+            border-color: #e2e8f0 !important;
             border-radius: 8px 8px 0 0 !important;
         }
 
         .note-editing-area {
-            background: rgba(255, 255, 255, 0.05) !important;
+            background: #f8fafc !important;
         }
 
         .note-codable {
-            background: rgba(255, 255, 255, 0.05) !important;
-            color: #fff !important;
+            background: #f8fafc !important;
+            color: #1e293b !important;
         }
 
         .note-btn {
             background: rgba(255, 255, 255, 0.1) !important;
-            border-color: rgba(255, 255, 255, 0.2) !important;
-            color: rgba(255, 255, 255, 0.9) !important;
+            border-color: #e2e8f0 !important;
+            color: #1e293b !important;
         }
 
         .note-btn:hover {
-            background: rgba(105, 108, 255, 0.2) !important;
+            background: rgba(20, 33, 61, 0.2) !important;
             border-color: var(--primary-color) !important;
         }
 
         .note-dropdown-menu {
             background: var(--dark-card) !important;
-            border-color: rgba(255, 255, 255, 0.1) !important;
+            border-color: #e2e8f0 !important;
         }
 
         .note-dropdown-item {
-            color: rgba(255, 255, 255, 0.9) !important;
+            color: #1e293b !important;
         }
 
         .note-dropdown-item:hover {
-            background: rgba(105, 108, 255, 0.1) !important;
-            color: #fff !important;
+            background: rgba(20, 33, 61, 0.1) !important;
+            color: #1e293b !important;
         }
 
         .character-count {
             text-align: left;
             font-size: 12px;
-            color: rgba(255, 255, 255, 0.6);
+            color: #64748b;
             margin-top: 5px;
         }
 
         .character-count.limit-exceeded {
-            color: #dc3545;
+            color: #ef4444;
         }
 
         .tab-content {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
             border-radius: 0 0 8px 8px;
             padding: 20px;
             margin-top: -1px;
         }
 
         .nav-tabs {
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid #e2e8f0;
         }
 
         .nav-tabs .nav-link {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: rgba(255, 255, 255, 0.7);
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            color: #64748b;
             border-radius: 8px 8px 0 0;
             margin-right: 5px;
             padding: 10px 20px;
@@ -174,7 +174,7 @@
 
         .nav-tabs .nav-link:hover {
             background: rgba(255, 255, 255, 0.1);
-            color: #fff;
+            color: #1e293b;
         }
 
         .nav-tabs .nav-link.active {
@@ -184,8 +184,8 @@
         }
 
         .preview-box {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px dashed rgba(255, 255, 255, 0.2);
+            background: #f8fafc;
+            border: 1px dashed #e2e8f0;
             border-radius: 8px;
             padding: 20px;
             min-height: 200px;
@@ -196,11 +196,11 @@
         .preview-box h1,
         .preview-box h2,
         .preview-box h3 {
-            color: #fff;
+            color: #1e293b;
         }
 
         .preview-box p {
-            color: rgba(255, 255, 255, 0.8);
+            color: #1e293b;
         }
     </style>
 @endsection
@@ -757,8 +757,8 @@
                 text: 'سيتم مسح جميع الحقول وإعادة تعيين النموذج',
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#14213d',
                 confirmButtonText: 'نعم، أعد التعيين',
                 cancelButtonText: 'إلغاء',
                 reverseButtons: true

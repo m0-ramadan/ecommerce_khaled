@@ -258,13 +258,12 @@ class CouponController extends Controller
     public function export(Request $request)
     {
         $request->validate([
-            'type' => 'required|in:excel,csv,pdf',
-            'columns' => 'nullable|array',
+            'type' => 'nullable|in:excel,csv,pdf',
+            'columns' => 'nullable',
         ]);
 
         $query = Coupon::query();
 
-        // Apply filters same as index
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
@@ -274,17 +273,26 @@ class CouponController extends Controller
             });
         }
 
-        // ... (same filters as index method)
+        $coupons = $query->orderBy('created_at', 'desc')->get();
 
-        $coupons = $query->get();
-
-        // Implementation for export based on type
-        // This is a simplified version - you'll need to implement
-        // the actual export logic based on your needs
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Export functionality will be implemented',
+        return response()->streamDownload(function () use ($coupons) {
+            $out = fopen('php://output', 'w');
+            fwrite($out, "\xEF\xBB\xBF");
+            fputcsv($out, ['#', 'الكود', 'الاسم', 'النوع', 'القيمة', 'الحالة', 'الاستخدامات']);
+            foreach ($coupons as $c) {
+                fputcsv($out, [
+                    $c->id,
+                    $c->code,
+                    $c->name,
+                    $c->type,
+                    $c->value,
+                    $c->is_active ? 'نشط' : 'غير نشط',
+                    $c->uses_count ?? 0,
+                ]);
+            }
+            fclose($out);
+        }, 'coupons-' . now()->format('Y-m-d') . '.csv', [
+            'Content-Type' => 'text/csv; charset=UTF-8',
         ]);
     }
 

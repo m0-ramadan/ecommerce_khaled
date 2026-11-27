@@ -60,7 +60,7 @@
         .product-info h6 {
             margin-bottom: 5px;
             font-weight: 600;
-            color: #2c3e50;
+            color: #0f172a;
         }
 
         .product-info p {
@@ -76,12 +76,12 @@
         }
 
         .review-rating .stars {
-            color: #ffc107;
+            color: #f59e0b;
         }
 
         .review-rating .rating-number {
             font-weight: 600;
-            color: #2c3e50;
+            color: #0f172a;
         }
 
         .review-date {
@@ -126,7 +126,7 @@
             border-radius: 12px;
             padding: 20px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            border-top: 4px solid #696cff;
+            border-top: 4px solid #14213d;
             margin-bottom: 20px;
         }
 
@@ -142,18 +142,18 @@
         }
 
         .icon-reviews {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #14213d 0%, #1e3a5f 100%);
             color: white;
         }
 
         .icon-average {
             background: #e7f5ff;
-            color: #0c63e4;
+            color: #0284c7;
         }
 
         .icon-high {
-            background: #d4edda;
-            color: #155724;
+            background: #ebf0f8;
+            color: #14213d;
         }
 
         .icon-low {
@@ -177,7 +177,7 @@
             border-radius: 12px;
             padding: 20px;
             margin-bottom: 25px;
-            border-right: 4px solid #696cff;
+            border-right: 4px solid #14213d;
         }
 
         @media (max-width: 768px) {
@@ -366,10 +366,12 @@
                                             class="btn btn-sm btn-outline-primary">
                                             <i class="fas fa-eye me-1"></i>عرض المنتج
                                         </a>
-                                        <a href="{{ route('admin.reviews.edit', $review) }}"
-                                            class="btn btn-sm btn-outline-warning">
-                                            <i class="fas fa-edit me-1"></i>تعديل التقييم
-                                        </a>
+                                        @if (Route::has('admin.reviews.edit'))
+                                            <a href="{{ route('admin.reviews.edit', $review) }}"
+                                                class="btn btn-sm btn-outline-warning">
+                                                <i class="fas fa-edit me-1"></i>تعديل التقييم
+                                            </a>
+                                        @endif
                                     </div>
                                 @endif
                             </div>

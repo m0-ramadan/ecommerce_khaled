@@ -27,14 +27,14 @@
             border-radius: 10px;
             padding: 25px;
             margin-bottom: 25px;
-            border-left: 4px solid #696cff;
+            border-left: 4px solid #14213d;
         }
 
         .step-number {
             width: 35px;
             height: 35px;
             border-radius: 50%;
-            background: #696cff;
+            background: #14213d;
             color: white;
             display: flex;
             align-items: center;
@@ -47,7 +47,7 @@
         .step-title {
             font-size: 18px;
             font-weight: 600;
-            color: #2c3e50;
+            color: #0f172a;
         }
 
         .step-description {
@@ -65,7 +65,7 @@
             border-radius: 12px;
             /* background: #f8f9fa; */
             font-size: 28px;
-            color: #696cff;
+            color: #14213d;
             margin: 10px auto;
             border: 2px dashed #dee2e6;
         }
@@ -98,13 +98,13 @@
         .icon-item:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            border-color: #696cff;
+            border-color: #14213d;
         }
 
         .icon-item.selected {
-            background: #696cff;
+            background: #14213d;
             color: white;
-            border-color: #696cff;
+            border-color: #14213d;
         }
 
         .icon-item i {
@@ -158,7 +158,7 @@
         }
 
         input:checked+.toggle-slider {
-            background-color: #696cff;
+            background-color: #14213d;
         }
 
         input:checked+.toggle-slider:before {
@@ -167,7 +167,7 @@
 
         .toggle-label {
             font-weight: 500;
-            color: #2c3e50;
+            color: #0f172a;
             flex-grow: 1;
         }
 
@@ -198,14 +198,14 @@
 
         .preview-icon {
             font-size: 48px;
-            color: #696cff;
+            color: #14213d;
             margin-bottom: 15px;
         }
 
         .preview-name {
             font-size: 20px;
             font-weight: 600;
-            color: #2c3e50;
+            color: #0f172a;
             margin-bottom: 10px;
         }
 
@@ -234,8 +234,8 @@
         }
 
         .status-active {
-            background-color: #d4edda;
-            color: #155724;
+            background-color: #ebf0f8;
+            color: #14213d;
         }
 
         .status-inactive {
@@ -252,7 +252,7 @@
 
         .type-payment {
             background-color: #e7f5ff;
-            color: #0c63e4;
+            color: #0284c7;
         }
 
         .type-method {
@@ -262,19 +262,19 @@
 
         .required::after {
             content: " *";
-            color: #dc3545;
+            color: #ef4444;
         }
 
         .alert-guide {
             background: #e7f7ff;
-            border-right: 4px solid #696cff;
+            border-right: 4px solid #14213d;
             padding: 20px;
             border-radius: 10px;
             margin-bottom: 25px;
         }
 
         .alert-guide h6 {
-            color: #696cff;
+            color: #14213d;
             margin-bottom: 15px;
         }
 
@@ -656,8 +656,8 @@
                 text: 'سيتم مسح جميع البيانات المدخلة',
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: '#14213d',
+                cancelButtonColor: '#ef4444',
                 confirmButtonText: 'نعم، امسح',
                 cancelButtonText: 'إلغاء',
                 reverseButtons: true

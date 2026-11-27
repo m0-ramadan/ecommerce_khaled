@@ -7,40 +7,40 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.css">
     <style>
         :root {
-            --primary-color: #696cff;
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --success-color: #28a745;
-            --danger-color: #dc3545;
-            --warning-color: #ffc107;
-            --info-color: #17a2b8;
+            --primary-color: #14213d;
+            --primary-gradient: linear-gradient(135deg, #14213d 0%, #0c182a 100%);
+            --success-color: #14213d;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --info-color: #06b6d4;
             --light-bg: #f8f9fa;
             --border-color: #e9ecef;
             --text-muted: #6c757d;
-            --dark-bg: #1e1e2d;
-            --dark-card: #2b3b4c;
+            --dark-bg: #f6f8fb;
+            --dark-card: #ffffff;
         }
 
         body {
             font-family: "Cairo", sans-serif !important;
             background: var(--dark-bg);
-            color: #fff;
+            color: #1e293b;
         }
 
         .stats-card {
             background: var(--dark-card);
             border-radius: 12px;
             padding: 20px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 15px rgba(15, 23, 42, 0.05);
             border-top: 4px solid var(--primary-color);
             transition: transform 0.3s ease;
             margin-bottom: 20px;
             height: 100%;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
         }
 
         .stats-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 8px 25px rgba(15, 23, 42, 0.05);
         }
 
         .stats-icon {
@@ -61,55 +61,55 @@
 
         .icon-revenue {
             background: rgba(12, 99, 228, 0.2);
-            color: #0c63e4;
+            color: #0284c7;
             border: 1px solid rgba(12, 99, 228, 0.3);
         }
 
         .icon-average {
-            background: rgba(21, 87, 36, 0.2);
-            color: #20c997;
-            border: 1px solid rgba(32, 201, 151, 0.3);
+            background: rgba(20, 33, 61, 0.2);
+            color: #14213d;
+            border: 1px solid rgba(30, 58, 95, 0.3);
         }
 
         .icon-pending {
             background: rgba(133, 100, 4, 0.2);
-            color: #ffc107;
+            color: #f59e0b;
             border: 1px solid rgba(255, 193, 7, 0.3);
         }
 
         .icon-delivered {
             background: rgba(12, 84, 96, 0.2);
-            color: #0dcaf0;
+            color: #22b8cf;
             border: 1px solid rgba(13, 202, 240, 0.3);
         }
 
         .icon-cancelled {
             background: linear-gradient(135deg, rgba(220, 53, 69, 0.2) 0%, rgba(253, 126, 20, 0.2) 100%);
-            color: #fd7e14;
+            color: #f59e0b;
             border: 1px solid rgba(253, 126, 20, 0.3);
         }
 
         .icon-today {
             background: rgba(255, 255, 255, 0.1);
-            color: rgba(255, 255, 255, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #1e293b;
+            border: 1px solid #e2e8f0;
         }
 
         .icon-week {
-            background: rgba(255, 255, 255, 0.05);
-            color: rgba(255, 255, 255, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: #f8fafc;
+            color: #64748b;
+            border: 1px solid #e2e8f0;
         }
 
         .stats-number {
             font-size: 28px;
             font-weight: 700;
             margin-bottom: 5px;
-            color: #fff;
+            color: #1e293b;
         }
 
         .stats-label {
-            color: rgba(255, 255, 255, 0.7);
+            color: #64748b;
             font-size: 14px;
             margin-bottom: 10px;
         }
@@ -123,21 +123,21 @@
         }
 
         .change-up {
-            color: #20c997;
+            color: #14213d;
         }
 
         .change-down {
-            color: #fd7e14;
+            color: #f59e0b;
         }
 
         .chart-card {
             background: var(--dark-card);
             border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 5px 20px rgba(15, 23, 42, 0.05);
             padding: 25px;
             margin-bottom: 25px;
             height: 100%;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
         }
 
         .chart-header {
@@ -160,9 +160,9 @@
         .chart-control {
             padding: 6px 15px;
             border-radius: 20px;
-            background: rgba(255, 255, 255, 0.05);
-            color: rgba(255, 255, 255, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: #f8fafc;
+            color: #64748b;
+            border: 1px solid #e2e8f0;
             cursor: pointer;
             transition: all 0.3s ease;
             font-size: 13px;
@@ -170,7 +170,7 @@
 
         .chart-control:hover {
             background: rgba(255, 255, 255, 0.1);
-            color: #fff;
+            color: #1e293b;
         }
 
         .chart-control.active {
@@ -188,10 +188,10 @@
         .table-card {
             background: var(--dark-card);
             border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 5px 20px rgba(15, 23, 42, 0.05);
             padding: 25px;
             margin-bottom: 25px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
         }
 
         .table-header {
@@ -206,7 +206,7 @@
             gap: 15px;
             margin-bottom: 15px;
             padding-bottom: 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid #e2e8f0;
         }
 
         .product-item:last-child {
@@ -219,7 +219,7 @@
             width: 30px;
             height: 30px;
             border-radius: 50%;
-            color: white;
+            color: #1e293b;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -249,38 +249,38 @@
 
         .product-name {
             font-weight: 600;
-            color: rgba(255, 255, 255, 0.9);
+            color: #1e293b;
             margin-bottom: 5px;
         }
 
         .product-sales {
-            color: rgba(255, 255, 255, 0.7);
+            color: #64748b;
             font-size: 13px;
         }
 
         .sales-count {
             font-weight: 700;
-            color: #20c997;
+            color: #14213d;
         }
 
         .empty-chart {
             text-align: center;
             padding: 50px 20px;
-            color: rgba(255, 255, 255, 0.7);
+            color: #64748b;
         }
 
         .empty-chart i {
             font-size: 60px;
             margin-bottom: 20px;
-            color: rgba(255, 255, 255, 0.1);
+            color: #94a3b8;
         }
 
         .date-filter {
-            background: rgba(255, 255, 255, 0.05);
+            background: #f8fafc;
             border-radius: 12px;
             padding: 20px;
             margin-bottom: 25px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
         }
 
         .filter-row {
@@ -291,20 +291,20 @@
         }
 
         .form-control {
-            background: rgba(255, 255, 255, 0.05);
-            border-color: rgba(255, 255, 255, 0.1);
-            color: #fff;
+            background: #f8fafc;
+            border-color: #e2e8f0;
+            color: #1e293b;
         }
 
         .form-control:focus {
             background: rgba(255, 255, 255, 0.1);
             border-color: var(--primary-color);
-            color: #fff;
-            box-shadow: 0 0 0 0.25rem rgba(105, 108, 255, 0.25);
+            color: #1e293b;
+            box-shadow: 0 0 0 0.25rem rgba(20, 33, 61, 0.25);
         }
 
         .form-control::placeholder {
-            color: rgba(255, 255, 255, 0.5);
+            color: #64748b;
         }
 
         .btn-primary {
@@ -313,20 +313,20 @@
         }
 
         .btn-primary:hover {
-            background: linear-gradient(135deg, #5a6fd8 0%, #6a4a9a 100%);
+            background: linear-gradient(135deg, #14213d 0%, #1e3a5f 100%);
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(105, 108, 255, 0.4);
+            box-shadow: 0 5px 15px rgba(20, 33, 61, 0.4);
         }
 
         .btn-secondary {
             background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #fff;
+            border: 1px solid #e2e8f0;
+            color: #1e293b;
         }
 
         .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: rgba(255, 255, 255, 0.3);
+            background: #f1f5f9;
+            border-color: #e2e8f0;
         }
 
         @media (max-width: 768px) {
@@ -538,11 +538,11 @@
                     <div class="row" bis_skin_checked="1">
                         @php
                             $statusColors = [
-                                'pending' => '#ffc107',
-                                'processing' => '#0d6efd',
-                                'shipped' => '#0dcaf0',
+                                'pending' => '#f59e0b',
+                                'processing' => '#0284c7',
+                                'shipped' => '#22b8cf',
                                 'delivered' => '#198754',
-                                'cancelled' => '#dc3545',
+                                'cancelled' => '#ef4444',
                                 'refunded' => '#6c757d',
                             ];
 
@@ -661,11 +661,11 @@
                         {{ $stats['status_counts']['cancelled'] ?? 0 }}
                     ],
                     backgroundColor: [
-                        '#ffc107',
-                        '#0d6efd',
-                        '#0dcaf0',
+                        '#f59e0b',
+                        '#0284c7',
+                        '#22b8cf',
                         '#198754',
-                        '#dc3545'
+                        '#ef4444'
                     ],
                     borderWidth: 1
                 }]
@@ -677,8 +677,8 @@
                 datasets: [{
                     label: 'الإيرادات (ر.س)',
                     data: [1200, 1900, 3000, 2500, 2200, 3000, 4000],
-                    backgroundColor: 'rgba(105, 108, 255, 0.2)',
-                    borderColor: 'rgba(105, 108, 255, 1)',
+                    backgroundColor: 'rgba(20, 33, 61, 0.2)',
+                    borderColor: 'rgba(20, 33, 61, 1)',
                     borderWidth: 2,
                     tension: 0.4,
                     fill: true

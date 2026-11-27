@@ -6,32 +6,32 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary-color: #696cff;
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --success-color: #28a745;
-            --danger-color: #dc3545;
-            --warning-color: #ffc107;
-            --info-color: #17a2b8;
+            --primary-color: #14213d;
+            --primary-gradient: linear-gradient(135deg, #14213d 0%, #0c182a 100%);
+            --success-color: #14213d;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --info-color: #06b6d4;
             --light-bg: #f8f9fa;
             --border-color: #e9ecef;
             --text-muted: #6c757d;
-            --dark-bg: #1e1e2d;
-            --dark-card: #2b3b4c;
+            --dark-bg: #f6f8fb;
+            --dark-card: #ffffff;
         }
 
         body {
             font-family: "Cairo", sans-serif !important;
             background: var(--dark-bg);
-            color: #fff;
+            color: #1e293b;
         }
 
         .detail-card {
             background: var(--dark-card);
             border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 5px 20px rgba(15, 23, 42, 0.05);
             overflow: hidden;
             margin-bottom: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
         }
 
         .detail-header {
@@ -47,9 +47,9 @@
         .info-section {
             margin-bottom: 30px;
             padding: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
             border-radius: 10px;
-            background: rgba(255, 255, 255, 0.05);
+            background: #f8fafc;
         }
 
         .info-section h5 {
@@ -66,7 +66,7 @@
             display: flex;
             margin-bottom: 15px;
             padding-bottom: 15px;
-            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+            border-bottom: 1px dashed #e2e8f0;
         }
 
         .info-item:last-child {
@@ -77,12 +77,12 @@
 
         .info-label {
             font-weight: 600;
-            color: rgba(255, 255, 255, 0.9);
+            color: #1e293b;
             min-width: 150px;
         }
 
         .info-value {
-            color: rgba(255, 255, 255, 0.7);
+            color: #64748b;
             flex: 1;
         }
 
@@ -101,14 +101,14 @@
 
         .badge-grid {
             background: rgba(12, 99, 228, 0.2);
-            color: #0c63e4;
+            color: #0284c7;
             border: 1px solid rgba(12, 99, 228, 0.3);
         }
 
         .badge-static {
-            background: rgba(21, 87, 36, 0.2);
-            color: #155724;
-            border: 1px solid rgba(21, 87, 36, 0.3);
+            background: rgba(20, 33, 61, 0.2);
+            color: #14213d;
+            border: 1px solid rgba(20, 33, 61, 0.3);
         }
 
         .badge-category {
@@ -118,12 +118,12 @@
         }
 
         .badge-active {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            background: linear-gradient(135deg, #14213d 0%, #14213d 100%);
             color: white;
         }
 
         .badge-inactive {
-            background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);
+            background: linear-gradient(135deg, #ef4444 0%, #f59e0b 100%);
             color: white;
         }
 
@@ -140,26 +140,26 @@
         }
 
         .preview-container {
-            background: rgba(255, 255, 255, 0.05);
+            background: #f8fafc;
             border-radius: 10px;
             padding: 20px;
             margin-top: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
             box-shadow: 0 3px 15px rgba(0, 0, 0, 0.2);
         }
 
         .item-card {
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
             border-radius: 10px;
             padding: 15px;
             margin-bottom: 15px;
-            background: rgba(255, 255, 255, 0.05);
+            background: #f8fafc;
             transition: all 0.3s ease;
         }
 
         .item-card:hover {
             border-color: var(--primary-color);
-            background: rgba(105, 108, 255, 0.1);
+            background: rgba(20, 33, 61, 0.1);
             box-shadow: 0 3px 15px rgba(0, 0, 0, 0.2);
         }
 
@@ -169,7 +169,7 @@
             object-fit: cover;
             border-radius: 8px;
             margin-bottom: 10px;
-            border: 2px solid rgba(255, 255, 255, 0.1);
+            border: 2px solid #e2e8f0;
         }
 
         .item-mobile-image {
@@ -178,7 +178,7 @@
             object-fit: cover;
             border-radius: 6px;
             margin-left: 10px;
-            border: 2px solid rgba(255, 255, 255, 0.1);
+            border: 2px solid #e2e8f0;
         }
 
         .item-tag {
@@ -212,7 +212,7 @@
         .empty-items i {
             font-size: 48px;
             margin-bottom: 15px;
-            color: rgba(255, 255, 255, 0.1);
+            color: #94a3b8;
         }
 
         .action-buttons {
@@ -231,20 +231,20 @@
         }
 
         .btn-primary:hover {
-            background: linear-gradient(135deg, #5a6fd8 0%, #6a4a9a 100%);
+            background: linear-gradient(135deg, #14213d 0%, #1e3a5f 100%);
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(105, 108, 255, 0.4);
+            box-shadow: 0 5px 15px rgba(20, 33, 61, 0.4);
         }
 
         .btn-secondary {
             background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #fff;
+            border: 1px solid #e2e8f0;
+            color: #1e293b;
         }
 
         .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: rgba(255, 255, 255, 0.3);
+            background: #f1f5f9;
+            border-color: #e2e8f0;
         }
 
         .btn-outline-primary {
@@ -551,7 +551,7 @@
                                                     <div class="mb-2">
                                                         @if ($item->tag_text)
                                                             <span class="item-tag"
-                                                                style="background-color: {{ $item->tag_bg_color ?? '#696cff' }}; 
+                                                                style="background-color: {{ $item->tag_bg_color ?? '#14213d' }}; 
                                                                      color: {{ $item->tag_color ?? '#ffffff' }};">
                                                                 {{ $item->tag_text }}
                                                             </span>
@@ -646,7 +646,7 @@
                                     <div class="col-md-4 mb-3">
                                         <div class="info-item flex-column">
                                             <span class="info-label">إجمالي المشاهدات</span>
-                                            <span class="info-value" style="font-size: 24px; color: #696cff;">
+                                            <span class="info-value" style="font-size: 24px; color: #14213d;">
                                                 {{ number_format($totalViews) }}
                                             </span>
                                         </div>
@@ -655,7 +655,7 @@
                                     <div class="col-md-4 mb-3">
                                         <div class="info-item flex-column">
                                             <span class="info-label">إجمالي النقرات</span>
-                                            <span class="info-value" style="font-size: 24px; color: #28a745;">
+                                            <span class="info-value" style="font-size: 24px; color: #14213d;">
                                                 {{ number_format($totalClicks) }}
                                             </span>
                                         </div>
@@ -664,7 +664,7 @@
                                     <div class="col-md-4 mb-3">
                                         <div class="info-item flex-column">
                                             <span class="info-label">معدل النقر</span>
-                                            <span class="info-value" style="font-size: 24px; color: #ff6b6b;">
+                                            <span class="info-value" style="font-size: 24px; color: #f86c6b;">
                                                 {{ number_format($clickRate, 2) }}%
                                             </span>
                                         </div>

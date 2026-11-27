@@ -15,10 +15,9 @@
     <meta name="description" content="" />
 
     @include('Admin.layout.css')
-
-
+    @yield('css')
+    <link rel="stylesheet" href="{{ asset('dashboard/assets/css/tala-dashboard.css') }}" />
 </head>
-@yield('css')
 
 <body>
     <!-- Layout wrapper -->

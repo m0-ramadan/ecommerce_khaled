@@ -199,8 +199,8 @@
                     text: "سيتم حذف رسالة " + contactName + " نهائياً",
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonColor: '#d33',
-                    cancelButtonColor: '#3085d6',
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#14213d',
                     confirmButtonText: 'نعم، احذفها',
                     cancelButtonText: 'إلغاء'
                 }).then((result) => {

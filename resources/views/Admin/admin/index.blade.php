@@ -9,48 +9,48 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css">
     <style>
         :root {
-            --primary-color: #696cff;
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --dark-bg: #1e1e2d;
-            --dark-card: #2b3b4c;
+            --primary-color: #14213d;
+            --primary-gradient: linear-gradient(135deg, #14213d 0%, #0c182a 100%);
+            --dark-bg: #f6f8fb;
+            --dark-card: #ffffff;
         }
 
         body {
             font-family: "Cairo", sans-serif !important;
             background: var(--dark-bg);
-            color: #fff;
+            color: #1e293b;
         }
 
         .card {
             background: var(--dark-card);
             border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 5px 20px rgba(15, 23, 42, 0.05);
+            border: 1px solid #e2e8f0;
         }
 
         .card-header {
-            background: var(--primary-gradient);
-            color: white;
-            padding: 15px 25px;
-            border-radius: 15px 15px 0 0;
-            border-bottom: none;
+            background: #f3f6fb;
+            color: #0f172a;
+            padding: 14px 18px;
+            border-radius: 12px 12px 0 0;
+            border-bottom: 1px solid #e4ebf5;
         }
 
         .card-body {
-            padding: 25px;
+            padding: 18px;
         }
 
         .table {
-            color: #fff;
+            color: #1e293b;
         }
 
         .table thead th {
-            background: rgba(255, 255, 255, 0.05);
-            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            background: #f8fafc;
+            border-bottom: 2px solid #e2e8f0;
         }
 
         .table tbody td {
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid #e2e8f0;
             vertical-align: middle;
         }
 
@@ -60,7 +60,7 @@
             border-radius: 20px;
             font-size: 12px;
             font-weight: 600;
-            background: rgba(105, 108, 255, 0.2);
+            background: rgba(20, 33, 61, 0.2);
             color: var(--primary-color);
             margin-right: 5px;
             margin-bottom: 5px;
@@ -89,15 +89,15 @@
 
         .modal-content {
             background: var(--dark-card);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #fff;
+            border: 1px solid #e2e8f0;
+            color: #1e293b;
         }
 
         .modal-header {
-            background: var(--primary-gradient);
-            border-bottom: none;
-            border-radius: 15px 15px 0 0;
-            padding: 20px 25px;
+            background: #f3f6fb;
+            border-bottom: 1px solid #e4ebf5;
+            border-radius: 12px 12px 0 0;
+            padding: 15px 20px;
         }
 
         .modal-body {
@@ -105,7 +105,7 @@
         }
 
         .modal-footer {
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 1px solid #e2e8f0;
             padding: 20px 25px;
         }
 
@@ -114,19 +114,19 @@
             align-items: center;
             gap: 10px;
             padding: 10px 15px;
-            background: rgba(255, 255, 255, 0.02);
+            background: #f8fafc;
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s ease;
         }
 
         .form-check-input:checked+.form-check-label {
-            background: rgba(105, 108, 255, 0.15);
+            background: rgba(20, 33, 61, 0.15);
             border-left: 3px solid var(--primary-color);
         }
 
         .form-check-label:hover {
-            background: rgba(105, 108, 255, 0.08);
+            background: rgba(20, 33, 61, 0.08);
         }
 
         .btn-close-white {
@@ -150,7 +150,8 @@
                     <h5 class="mb-0"><i class="fas fa-users-cog me-2"></i>قائمة الموظفين</h5>
                     <div class="d-flex gap-2 align-items-center">
                         @if (!auth()->user()->role || auth()->user()->hasPermissionTo('إضافة الإدمن'))
-                            <a href="{{ route('admin.admins.create') }}" class="btn btn-light">
+                            <a href="{{ route('admin.admins.create') }}" class="btn btn-primary"
+                                style="background:#ebf0f8 !important; color:#1e3a5f !important; border:1px solid #cbd7ea !important;">
                                 <i class="fas fa-plus-circle me-1"></i> إضافة موظف جديد
                             </a>
                         @endif
@@ -185,24 +186,24 @@
           
                                         <td class="d-flex gap-1 justify-content-center">
                                             @if (!auth()->user()->role || auth()->user()->hasPermissionTo('تعديل الإدمن'))
-                                                <a href="{{ route('admin.admins.edit', $admin) }}" class="btn btn-success btn-icon">
-                                                    <i class="fa fa-edit"></i>
+                                                <a href="{{ route('admin.admins.edit', $admin) }}" class="btn btn-warning btn-icon" title="تعديل">
+                                                    <i class="fas fa-edit"></i>
                                                 </a>
                                             @endif
 
                                             {{-- زر تعيين الرتب --}}
-                                            <button class="btn btn-primary btn-icon assign-roles-btn"
+                                            <button class="btn btn-info btn-icon assign-roles-btn" title="تعيين الرتب"
                                                     data-id="{{ $admin->id }}"
                                                     data-name="{{ $admin->name }}"
                                                     data-roles="{{ $admin->roles->pluck('id') }}">
-                                                <i class="fa fa-user-tag"></i>
+                                                <i class="fas fa-user-tag"></i>
                                             </button>
 
                                             @if (!auth()->user()->role || auth()->user()->hasPermissionTo('حذف الإدمن'))
-                                                <button class="btn btn-danger btn-icon delete-admin-btn"
+                                                <button class="btn btn-danger btn-icon delete-admin-btn" title="حذف"
                                                         data-id="{{ $admin->id }}"
                                                         data-name="{{ $admin->name }}">
-                                                    <i class="fa fa-trash-o"></i>
+                                                    <i class="fas fa-trash"></i>
                                                 </button>
                                             @endif
                                         </td>
@@ -359,9 +360,7 @@
                     icon: 'question',
                     showCancelButton: true,
                     confirmButtonText: 'حفظ',
-                    cancelButtonText: 'إلغاء',
-                    background: '#2b3b4c',
-                    color: '#fff'
+                    cancelButtonText: 'إلغاء'
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({
@@ -374,14 +373,14 @@
                             },
                             success: function(response) {
                                 if (response.success) {
-                                    Swal.fire({ title: 'تم!', text: response.message, icon: 'success', background: '#2b3b4c', color: '#fff' })
+                                    Swal.fire({ title: 'تم!', text: response.message, icon: 'success' })
                                         .then(() => location.reload());
                                 } else {
-                                    Swal.fire({ title: 'خطأ', text: response.message, icon: 'error', background: '#2b3b4c', color: '#fff' });
+                                    Swal.fire({ title: 'خطأ', text: response.message, icon: 'error' });
                                 }
                             },
                             error: function() {
-                                Swal.fire({ title: 'خطأ', text: 'فشل الاتصال بالخادم', icon: 'error', background: '#2b3b4c', color: '#fff' });
+                                Swal.fire({ title: 'خطأ', text: 'فشل الاتصال بالخادم', icon: 'error' });
                             }
                         });
                     }
@@ -398,12 +397,10 @@
                     text: "هل أنت متأكد من حذف " + adminName + " نهائياً؟",
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonColor: '#d33',
-                    cancelButtonColor: '#3085d6',
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#14213d',
                     confirmButtonText: 'نعم، احذف',
-                    cancelButtonText: 'إلغاء',
-                    background: '#2b3b4c',
-                    color: '#fff'
+                    cancelButtonText: 'إلغاء'
                 }).then((result) => {
                     if (result.isConfirmed) {
                         // إنشاء form مخفي وإرساله

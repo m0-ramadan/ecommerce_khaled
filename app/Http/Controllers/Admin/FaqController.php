@@ -105,9 +105,10 @@ class FaqController extends Controller
      */
     public function show(Faq $faq)
     {
-        $faq->loadCount(['views']); // if you have views relationship
-        
-        // Get related faqs (same category or similar questions)
+        if (method_exists($faq, 'views')) {
+            $faq->loadCount(['views']);
+        }
+
         $relatedFaqs = Faq::where('id', '!=', $faq->id)
             ->where('status', 1)
             ->orderBy('sort_order')

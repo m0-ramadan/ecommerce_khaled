@@ -6,31 +6,31 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary-color: #696cff;
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --success-color: #28a745;
-            --danger-color: #dc3545;
-            --warning-color: #ffc107;
-            --info-color: #17a2b8;
+            --primary-color: #14213d;
+            --primary-gradient: linear-gradient(135deg, #14213d 0%, #0c182a 100%);
+            --success-color: #14213d;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --info-color: #06b6d4;
             --light-bg: #f8f9fa;
             --border-color: #e9ecef;
             --text-muted: #6c757d;
-            --dark-bg: #1e1e2d;
-            --dark-card: #2b3b4c;
+            --dark-bg: #f6f8fb;
+            --dark-card: #ffffff;
         }
 
         body {
             font-family: "Cairo", sans-serif;
             background: var(--dark-bg);
-            color: #fff;
+            color: #1e293b;
         }
 
         .items-card {
             background: var(--dark-card);
             border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 5px 20px rgba(15, 23, 42, 0.05);
             padding: 25px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
         }
 
         .items-header {
@@ -42,30 +42,30 @@
         }
 
         .filter-section {
-            background: rgba(255, 255, 255, 0.05);
+            background: #f8fafc;
             border-radius: 12px;
             padding: 20px;
             margin-bottom: 25px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
         }
 
         .table {
-            color: #fff;
+            color: #1e293b;
         }
 
         .table thead th {
-            border-bottom-color: rgba(255, 255, 255, 0.1);
-            color: rgba(255, 255, 255, 0.8);
+            border-bottom-color: #e2e8f0;
+            color: #1e293b;
             font-weight: 600;
         }
 
         .table td {
-            border-bottom-color: rgba(255, 255, 255, 0.05);
+            border-bottom-color: #e2e8f0;
             vertical-align: middle;
         }
 
         .table tbody tr:hover {
-            background: rgba(105, 108, 255, 0.1);
+            background: rgba(20, 33, 61, 0.1);
         }
 
         .banner-item-preview {
@@ -73,7 +73,7 @@
             height: 60px;
             border-radius: 8px;
             object-fit: cover;
-            border: 2px solid rgba(255, 255, 255, 0.1);
+            border: 2px solid #e2e8f0;
         }
 
         .badge-status {
@@ -84,14 +84,14 @@
         }
 
         .badge-active {
-            background: rgba(40, 167, 69, 0.2);
-            color: #28a745;
-            border: 1px solid rgba(40, 167, 69, 0.3);
+            background: rgba(30, 58, 95, 0.2);
+            color: #14213d;
+            border: 1px solid rgba(30, 58, 95, 0.3);
         }
 
         .badge-inactive {
             background: rgba(220, 53, 69, 0.2);
-            color: #dc3545;
+            color: #ef4444;
             border: 1px solid rgba(220, 53, 69, 0.3);
         }
 
@@ -118,34 +118,34 @@
 
         .btn-view {
             background: rgba(23, 162, 184, 0.2);
-            color: #17a2b8;
+            color: #06b6d4;
             border: 1px solid rgba(23, 162, 184, 0.3);
         }
 
         .btn-view:hover {
-            background: #17a2b8;
+            background: #06b6d4;
             color: white;
         }
 
         .btn-edit {
             background: rgba(255, 193, 7, 0.2);
-            color: #ffc107;
+            color: #f59e0b;
             border: 1px solid rgba(255, 193, 7, 0.3);
         }
 
         .btn-edit:hover {
-            background: #ffc107;
+            background: #f59e0b;
             color: #000;
         }
 
         .btn-delete {
             background: rgba(220, 53, 69, 0.2);
-            color: #dc3545;
+            color: #ef4444;
             border: 1px solid rgba(220, 53, 69, 0.3);
         }
 
         .btn-delete:hover {
-            background: #dc3545;
+            background: #ef4444;
             color: white;
         }
 
@@ -156,9 +156,9 @@
         }
 
         .btn-toggle.active {
-            background: rgba(40, 167, 69, 0.2);
-            color: #28a745;
-            border-color: rgba(40, 167, 69, 0.3);
+            background: rgba(30, 58, 95, 0.2);
+            color: #14213d;
+            border-color: rgba(30, 58, 95, 0.3);
         }
 
         .empty-state {
@@ -168,7 +168,7 @@
 
         .empty-state-icon {
             font-size: 70px;
-            color: rgba(255, 255, 255, 0.1);
+            color: #94a3b8;
             margin-bottom: 20px;
         }
 
@@ -177,14 +177,14 @@
         }
 
         .page-link {
-            background: rgba(255, 255, 255, 0.05);
-            border-color: rgba(255, 255, 255, 0.1);
-            color: rgba(255, 255, 255, 0.8);
+            background: #f8fafc;
+            border-color: #e2e8f0;
+            color: #1e293b;
         }
 
         .page-link:hover {
             background: var(--primary-color);
-            color: white;
+            color: #1e293b;
             border-color: var(--primary-color);
         }
 
@@ -194,27 +194,27 @@
         }
 
         .page-item.disabled .page-link {
-            background: rgba(255, 255, 255, 0.02);
-            color: rgba(255, 255, 255, 0.3);
+            background: #f8fafc;
+            color: #94a3b8;
         }
 
         .form-control,
         .form-select {
-            background: rgba(255, 255, 255, 0.05);
-            border-color: rgba(255, 255, 255, 0.1);
-            color: #fff;
+            background: #f8fafc;
+            border-color: #e2e8f0;
+            color: #1e293b;
         }
 
         .form-control:focus,
         .form-select:focus {
             background: rgba(255, 255, 255, 0.1);
             border-color: var(--primary-color);
-            color: #fff;
-            box-shadow: 0 0 0 0.25rem rgba(105, 108, 255, 0.25);
+            color: #1e293b;
+            box-shadow: 0 0 0 0.25rem rgba(20, 33, 61, 0.25);
         }
 
         .form-control::placeholder {
-            color: rgba(255, 255, 255, 0.5);
+            color: #64748b;
         }
     </style>
 @endsection
@@ -459,7 +459,7 @@
                 text: 'هل أنت متأكد من تغيير حالة هذا العنصر؟',
                 icon: 'question',
                 showCancelButton: true,
-                confirmButtonColor: '#696cff',
+                confirmButtonColor: '#14213d',
                 cancelButtonColor: '#6c757d',
                 confirmButtonText: 'نعم، تغيير',
                 cancelButtonText: 'إلغاء'
@@ -504,7 +504,7 @@
                 text: `سيتم حذف العنصر "${name}" نهائياً`,
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#dc3545',
+                confirmButtonColor: '#ef4444',
                 cancelButtonColor: '#6c757d',
                 confirmButtonText: 'نعم، احذف',
                 cancelButtonText: 'إلغاء'

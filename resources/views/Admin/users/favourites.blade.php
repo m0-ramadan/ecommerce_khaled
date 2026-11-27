@@ -60,7 +60,7 @@
         .product-info h6 {
             margin-bottom: 10px;
             font-weight: 600;
-            color: #2c3e50;
+            color: #0f172a;
             height: 45px;
             overflow: hidden;
             display: -webkit-box;
@@ -84,7 +84,7 @@
         .current-price {
             font-size: 18px;
             font-weight: 700;
-            color: #2ecc71;
+            color: #14213d;
         }
 
         .old-price {
@@ -120,7 +120,7 @@
             border-radius: 12px;
             padding: 20px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            border-top: 4px solid #696cff;
+            border-top: 4px solid #14213d;
             margin-bottom: 20px;
         }
 
@@ -136,18 +136,18 @@
         }
 
         .icon-favourites {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #14213d 0%, #1e3a5f 100%);
             color: white;
         }
 
         .icon-categories {
             background: #e7f5ff;
-            color: #0c63e4;
+            color: #0284c7;
         }
 
         .icon-price {
-            background: #d4edda;
-            color: #155724;
+            background: #ebf0f8;
+            color: #14213d;
         }
 
         .icon-recent {
@@ -171,7 +171,7 @@
             border-radius: 12px;
             padding: 20px;
             margin-bottom: 25px;
-            border-right: 4px solid #696cff;
+            border-right: 4px solid #14213d;
         }
 
         @media (max-width: 768px) {

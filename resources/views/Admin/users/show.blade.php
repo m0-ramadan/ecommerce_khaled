@@ -17,7 +17,7 @@
         }
 
         .detail-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #14213d 0%, #1e3a5f 100%);
             color: white;
             padding: 25px 30px;
             position: relative;
@@ -61,7 +61,7 @@
         }
 
         .info-section h6 {
-            color: #696cff;
+            color: #14213d;
             margin-bottom: 20px;
             padding-bottom: 10px;
             border-bottom: 2px solid #f8f9fa;
@@ -80,7 +80,7 @@
         }
 
         .info-value {
-            color: #2c3e50;
+            color: #0f172a;
             font-weight: 500;
             flex-grow: 1;
         }
@@ -93,7 +93,7 @@
         }
 
         .badge-social {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #14213d 0%, #1e3a5f 100%);
             color: white;
         }
 
@@ -114,7 +114,7 @@
 
         .badge-email {
             background: #e7f5ff;
-            color: #0c63e4;
+            color: #0284c7;
         }
 
         .social-icons {
@@ -135,12 +135,12 @@
         }
 
         .stats-card {
-            background: #242f3b;
+            background: #ffffff;
             border-radius: 12px;
             padding: 20px;
             text-align: center;
             margin-bottom: 20px;
-            border-top: 4px solid #696cff;
+            border-top: 4px solid #14213d;
             transition: transform 0.3s ease;
         }
 
@@ -150,7 +150,7 @@
 
         .stats-icon {
             font-size: 32px;
-            color: #696cff;
+            color: #14213d;
             margin-bottom: 15px;
         }
 
@@ -177,7 +177,7 @@
             top: 0;
             bottom: 0;
             width: 3px;
-            background: #696cff;
+            background: #14213d;
         }
 
         .timeline-item {
@@ -194,7 +194,7 @@
             height: 13px;
             border-radius: 50%;
             background: white;
-            border: 3px solid #696cff;
+            border: 3px solid #14213d;
         }
 
         .timeline-content {
@@ -210,7 +210,7 @@
         }
 
         .timeline-text {
-            color: #2c3e50;
+            color: #0f172a;
             font-weight: 500;
         }
 
@@ -262,7 +262,7 @@
 
         .recent-item-title {
             font-weight: 600;
-            color: #2c3e50;
+            color: #0f172a;
         }
 
         .recent-item-date {
@@ -661,8 +661,8 @@
                 text: 'سيتم حذف المستخدم "{{ $user->name }}" نهائياً',
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#14213d',
                 confirmButtonText: 'نعم، احذف',
                 cancelButtonText: 'إلغاء',
                 reverseButtons: true

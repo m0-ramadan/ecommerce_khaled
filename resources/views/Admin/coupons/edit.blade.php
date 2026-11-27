@@ -11,7 +11,7 @@
     }
     
     .coupon-preview {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #14213d 0%, #1e3a5f 100%);
         color: white;
         border-radius: 10px;
         padding: 30px;
@@ -49,7 +49,7 @@
     .stats-number {
         font-size: 24px;
         font-weight: bold;
-        color: #696cff;
+        color: #14213d;
         margin-bottom: 5px;
     }
     

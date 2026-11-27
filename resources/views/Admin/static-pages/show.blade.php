@@ -6,23 +6,23 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary-color: #696cff;
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --dark-bg: #1e1e2d;
-            --dark-card: #2b3b4c;
+            --primary-color: #14213d;
+            --primary-gradient: linear-gradient(135deg, #14213d 0%, #0c182a 100%);
+            --dark-bg: #f6f8fb;
+            --dark-card: #ffffff;
         }
 
         body {
             font-family: "Cairo", sans-serif !important;
             background: var(--dark-bg);
-            color: #fff;
+            color: #1e293b;
         }
 
         .card {
             background: var(--dark-card);
             border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 5px 20px rgba(15, 23, 42, 0.05);
+            border: 1px solid #e2e8f0;
         }
 
         .card-header {
@@ -34,22 +34,22 @@
         }
 
         .info-card {
-            background: rgba(255, 255, 255, 0.05);
+            background: #f8fafc;
             border-radius: 12px;
             padding: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
             margin-bottom: 20px;
         }
 
         .info-label {
-            color: rgba(255, 255, 255, 0.7);
+            color: #64748b;
             font-weight: 600;
             margin-bottom: 5px;
             font-size: 14px;
         }
 
         .info-value {
-            color: #fff;
+            color: #1e293b;
             font-size: 16px;
             margin-bottom: 15px;
         }
@@ -62,22 +62,22 @@
         }
 
         .status-active {
-            background: linear-gradient(135deg, rgba(21, 87, 36, 0.2) 0%, rgba(32, 201, 151, 0.2) 100%);
-            color: #20c997;
-            border: 1px solid rgba(32, 201, 151, 0.3);
+            background: linear-gradient(135deg, rgba(20, 33, 61, 0.2) 0%, rgba(30, 58, 95, 0.2) 100%);
+            color: #14213d;
+            border: 1px solid rgba(30, 58, 95, 0.3);
         }
 
         .status-inactive {
             background: rgba(133, 100, 4, 0.2);
-            color: #ffc107;
+            color: #f59e0b;
             border: 1px solid rgba(255, 193, 7, 0.3);
         }
 
         .content-preview {
-            background: rgba(255, 255, 255, 0.05);
+            background: #f8fafc;
             border-radius: 12px;
             padding: 25px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
             margin-top: 20px;
             line-height: 1.8;
         }
@@ -85,19 +85,19 @@
         .content-preview h1,
         .content-preview h2,
         .content-preview h3 {
-            color: #fff;
+            color: #1e293b;
             margin-top: 20px;
             margin-bottom: 15px;
         }
 
         .content-preview p {
-            color: rgba(255, 255, 255, 0.8);
+            color: #1e293b;
             margin-bottom: 15px;
         }
 
         .content-preview ul,
         .content-preview ol {
-            color: rgba(255, 255, 255, 0.8);
+            color: #1e293b;
             padding-right: 20px;
             margin-bottom: 15px;
         }
@@ -112,20 +112,20 @@
         }
 
         .btn-primary:hover {
-            background: linear-gradient(135deg, #5a6fd8 0%, #6a4a9a 100%);
+            background: linear-gradient(135deg, #14213d 0%, #1e3a5f 100%);
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(105, 108, 255, 0.4);
+            box-shadow: 0 5px 15px rgba(20, 33, 61, 0.4);
         }
 
         .btn-secondary {
             background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #fff;
+            border: 1px solid #e2e8f0;
+            color: #1e293b;
         }
 
         .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: rgba(255, 255, 255, 0.3);
+            background: #f1f5f9;
+            border-color: #e2e8f0;
         }
 
         .btn-outline-primary {
@@ -171,19 +171,19 @@
         }
 
         .timeline-date {
-            color: rgba(255, 255, 255, 0.7);
+            color: #64748b;
             font-size: 12px;
             margin-bottom: 5px;
         }
 
         .timeline-content {
-            color: rgba(255, 255, 255, 0.9);
+            color: #1e293b;
             font-size: 14px;
         }
 
         .url-preview {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
             border-radius: 8px;
             padding: 10px 15px;
             display: inline-block;
@@ -191,28 +191,28 @@
         }
 
         .url-preview code {
-            color: #20c997;
+            color: #14213d;
             font-weight: 600;
         }
 
         .stats-box {
             text-align: center;
             padding: 20px;
-            background: rgba(255, 255, 255, 0.05);
+            background: #f8fafc;
             border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
             margin-bottom: 20px;
         }
 
         .stats-number {
             font-size: 24px;
             font-weight: 700;
-            color: #fff;
+            color: #1e293b;
             margin-bottom: 5px;
         }
 
         .stats-label {
-            color: rgba(255, 255, 255, 0.7);
+            color: #64748b;
             font-size: 14px;
         }
     </style>
@@ -464,8 +464,8 @@
                 text: `سيتم حذف الصفحة "${pageName}" نهائياً`,
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#14213d',
                 confirmButtonText: 'نعم، احذف',
                 cancelButtonText: 'إلغاء',
                 reverseButtons: true

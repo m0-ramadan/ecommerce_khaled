@@ -57,7 +57,7 @@ Package
                                 <form method="post" action="{{route('admin.package.destroy',$package->id)}}">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-primary"  ><i class="fa fa-trash-o"></i></button>
+                                    <button type="submit" class="btn btn-primary"  ><i class="fas fa-trash"></i></button>
                                 </form>
 
                             </td>

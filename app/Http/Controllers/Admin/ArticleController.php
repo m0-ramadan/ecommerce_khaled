@@ -342,4 +342,23 @@ class ArticleController extends Controller
 
         return back()->with('success', $message);
     }
+
+    public function statistics()
+    {
+        $stats = [
+            'total' => Article::count(),
+            'active' => Article::where('is_active', true)->count(),
+            'featured' => Article::where('is_featured', true)->count(),
+            'total_views' => Article::sum('views_count'),
+        ];
+
+        $topArticles = Article::with(['category', 'author'])
+            ->orderByDesc('views_count')
+            ->limit(10)
+            ->get();
+
+        $categoriesStats = ArticleCategory::withCount('articles')->get();
+
+        return view('Admin.articles.statistics', compact('stats', 'topArticles', 'categoriesStats'));
+    }
 }

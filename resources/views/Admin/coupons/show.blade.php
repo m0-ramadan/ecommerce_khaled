@@ -12,7 +12,7 @@
     }
     
     .coupon-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #14213d 0%, #1e3a5f 100%);
         color: white;
         border-radius: 10px;
         padding: 30px;
@@ -45,7 +45,7 @@
     .info-card-title {
         font-size: 16px;
         font-weight: 600;
-        color: #2c3e50;
+        color: #0f172a;
         margin-bottom: 15px;
         padding-bottom: 10px;
         border-bottom: 1px solid #e9ecef;
@@ -68,7 +68,7 @@
     }
     
     .info-value {
-        color: #2c3e50;
+        color: #0f172a;
         font-weight: 600;
     }
     
@@ -80,8 +80,8 @@
     }
     
     .badge-active {
-        background-color: #d1fae5;
-        color: #065f46;
+        background-color: #ebf0f8;
+        color: #14213d;
     }
     
     .badge-inactive {
@@ -105,7 +105,7 @@
     .stats-number {
         font-size: 24px;
         font-weight: bold;
-        color: #696cff;
+        color: #14213d;
         margin-bottom: 5px;
     }
     

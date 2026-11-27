@@ -7,22 +7,22 @@
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <style>
         :root {
-            --primary-color: #696cff;
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --primary-color: #14213d;
+            --primary-gradient: linear-gradient(135deg, #14213d 0%, #0c182a 100%);
         }
 
         body {
             font-family: "Cairo", sans-serif;
-            background: #1e1e2d;
-            color: #fff;
+            background: #f6f8fb;
+            color: #1e293b;
         }
 
         .form-card {
-            background: #2b3b4c;
+            background: #ffffff;
             border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 5px 20px rgba(15, 23, 42, 0.05);
             padding: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
         }
 
         .form-header {
@@ -34,16 +34,16 @@
         }
 
         .form-label {
-            color: rgba(255, 255, 255, 0.9);
+            color: #1e293b;
             font-weight: 600;
             margin-bottom: 8px;
         }
 
         .form-control,
         .form-select {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #fff;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            color: #1e293b;
             border-radius: 10px;
             padding: 10px 15px;
         }
@@ -52,12 +52,12 @@
         .form-select:focus {
             background: rgba(255, 255, 255, 0.1);
             border-color: var(--primary-color);
-            color: #fff;
-            box-shadow: 0 0 0 0.25rem rgba(105, 108, 255, 0.25);
+            color: #1e293b;
+            box-shadow: 0 0 0 0.25rem rgba(20, 33, 61, 0.25);
         }
 
         .form-control::placeholder {
-            color: rgba(255, 255, 255, 0.5);
+            color: #64748b;
         }
 
         .form-control[type="file"] {
@@ -70,8 +70,8 @@
         }
 
         .form-check-input {
-            background-color: rgba(255, 255, 255, 0.05);
-            border-color: rgba(255, 255, 255, 0.2);
+            background-color: #f8fafc;
+            border-color: #e2e8f0;
         }
 
         .form-check-input:checked {
@@ -80,7 +80,7 @@
         }
 
         .form-check-label {
-            color: rgba(255, 255, 255, 0.8);
+            color: #1e293b;
         }
 
         .btn-primary {
@@ -93,28 +93,28 @@
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(105, 108, 255, 0.4);
+            box-shadow: 0 5px 15px rgba(20, 33, 61, 0.4);
         }
 
         .btn-secondary {
             background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #fff;
+            border: 1px solid #e2e8f0;
+            color: #1e293b;
             padding: 12px 30px;
             border-radius: 10px;
             font-weight: 600;
         }
 
         .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: rgba(255, 255, 255, 0.3);
+            background: #f1f5f9;
+            border-color: #e2e8f0;
         }
 
         .image-preview {
             width: 150px;
             height: 150px;
             border-radius: 10px;
-            border: 2px dashed rgba(255, 255, 255, 0.2);
+            border: 2px dashed #e2e8f0;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -130,14 +130,14 @@
         }
 
         .image-preview .placeholder {
-            color: rgba(255, 255, 255, 0.5);
+            color: #64748b;
             text-align: center;
             font-size: 14px;
         }
 
         .select2-container--default .select2-selection--multiple {
-            background: rgba(255, 255, 255, 0.05);
-            border-color: rgba(255, 255, 255, 0.1);
+            background: #f8fafc;
+            border-color: #e2e8f0;
             border-radius: 10px;
         }
 
@@ -150,17 +150,17 @@
         }
 
         .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
-            color: white;
+            color: #1e293b;
             margin-right: 5px;
         }
 
         .select2-dropdown {
-            background: #2b3b4c;
-            border-color: rgba(255, 255, 255, 0.1);
+            background: #ffffff;
+            border-color: #e2e8f0;
         }
 
         .select2-results__option {
-            color: #fff;
+            color: #1e293b;
         }
 
         .select2-results__option--highlighted {
@@ -373,7 +373,7 @@
                         <label class="form-label">لون الخلفية</label>
                         <input type="color" name="tag_bg_color"
                             class="form-control @error('tag_bg_color') is-invalid @enderror"
-                            value="{{ old('tag_bg_color', '#696cff') }}">
+                            value="{{ old('tag_bg_color', '#14213d') }}">
                         @error('tag_bg_color')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror

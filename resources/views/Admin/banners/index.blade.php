@@ -7,17 +7,17 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sortable/0.8.0/css/sortable-theme-bootstrap.min.css">
     <style>
         :root {
-            --primary-color: #696cff;
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --success-gradient: #28a745;
-            --danger-gradient: #dc3545;
-            --warning-gradient: #ffc107;
-            --info-color: #17a2b8;
+            --primary-color: #14213d;
+            --primary-gradient: linear-gradient(135deg, #14213d 0%, #0c182a 100%);
+            --success-gradient: #14213d;
+            --danger-gradient: #ef4444;
+            --warning-gradient: #f59e0b;
+            --info-color: #06b6d4;
             --light-bg: #f8f9fa;
             --border-color: #e9ecef;
             --text-muted: #6c757d;
-            --dark-bg: #1e1e2d;
-            --dark-card: #2b3b4c;
+            --dark-bg: #f6f8fb;
+            --dark-card: #ffffff;
         }
 
         body {
@@ -47,14 +47,14 @@
 
         .stat-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(105, 108, 255, 0.15);
+            box-shadow: 0 15px 40px rgba(20, 33, 61, 0.15);
         }
 
         .stat-info h3 {
             font-size: 28px;
             font-weight: 700;
             margin-bottom: 5px;
-            color: #2c3e50;
+            color: #0f172a;
         }
 
         .stat-info p {
@@ -81,17 +81,17 @@
 
         .stat-icon.categories {
             background: var(--success-gradient);
-            color: #2c3e50;
+            color: #0f172a;
         }
 
         .stat-icon.products {
             background: var(--warning-gradient);
-            color: #2c3e50;
+            color: #0f172a;
         }
 
         .stat-icon.promos {
             background: var(--danger-gradient);
-            color: #2c3e50;
+            color: #0f172a;
         }
 
         /* شريط الأدوات المتقدم */
@@ -130,13 +130,14 @@
         }
 
         .btn-toolbar.primary {
-            background: #696cff;
-            color: white;
+            background: #14213d;
+            color: #ffffff;
             border: none;
         }
 
         .btn-toolbar.primary:hover {
-            background: #5a5cdb;
+            background: #1e3a5f;
+            color: #ffffff;
         }
 
         /* مربع البحث المتقدم */
@@ -156,8 +157,8 @@
 
         .search-advanced input:focus {
             background: white;
-            border-color: #696cff;
-            box-shadow: 0 0 0 3px rgba(105, 108, 255, 0.1);
+            border-color: #14213d;
+            box-shadow: 0 0 0 3px rgba(20, 33, 61, 0.1);
             outline: none;
         }
 
@@ -205,9 +206,9 @@
         }
 
         .filter-badge.active {
-            background: #696cff;
+            background: #14213d;
             color: white;
-            border-color: #696cff;
+            border-color: #14213d;
         }
 
         .filter-badge i {
@@ -274,7 +275,7 @@
         .banner-thumb-placeholder {
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #14213d 0%, #1e3a5f 100%);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -285,7 +286,7 @@
         .banner-info h6 {
             font-weight: 600;
             margin-bottom: 5px;
-            color: #2c3e50;
+            color: #0f172a;
         }
 
         .banner-meta {
@@ -312,8 +313,8 @@
 
         .relation-card:hover {
             background: white;
-            border-color: #696cff;
-            box-shadow: 0 5px 15px rgba(105, 108, 255, 0.1);
+            border-color: #14213d;
+            box-shadow: 0 5px 15px rgba(20, 33, 61, 0.1);
         }
 
         .relation-header {
@@ -335,12 +336,12 @@
 
         .relation-icon.category {
             background: #e7f5ff;
-            color: #0c63e4;
+            color: #0284c7;
         }
 
         .relation-icon.product {
-            background: #d4edda;
-            color: #155724;
+            background: #ebf0f8;
+            color: #14213d;
         }
 
         .relation-icon.promo {
@@ -351,7 +352,7 @@
         .relation-title {
             font-weight: 600;
             font-size: 14px;
-            color: #2c3e50;
+            color: #0f172a;
         }
 
         .relation-path {
@@ -378,8 +379,8 @@
         }
 
         .status-badge.active {
-            background: #d4edda;
-            color: #155724;
+            background: #ebf0f8;
+            color: #14213d;
         }
 
         .status-badge.inactive {
@@ -399,8 +400,8 @@
 
         /* عداد العناصر */
         .items-counter {
-            background: #696cff;
-            color: white;
+            background: #14213d;
+            color: #ffffff;
             padding: 4px 12px;
             border-radius: 20px;
             font-size: 12px;
@@ -422,18 +423,18 @@
         }
 
         .type-badge.slider {
-            background: #667eea;
-            color: white;
+            background: #14213d;
+            color: #1e293b;
         }
 
         .type-badge.grid {
-            background: #20c997;
-            color: white;
+            background: #14213d;
+            color: #1e293b;
         }
 
         .type-badge.static {
             background: #6c757d;
-            color: white;
+            color: #1e293b;
         }
 
         /* زر الإجراءات */
@@ -467,7 +468,7 @@
         }
 
         .drag-handle:hover {
-            color: #696cff;
+            color: #14213d;
         }
 
         /* القائمة المنسدلة للتصفية */
@@ -505,11 +506,11 @@
 
         .filter-item:hover {
             background: #f8f9fa;
-            color: #696cff;
+            color: #14213d;
         }
 
         .filter-item.active {
-            background: #696cff;
+            background: #14213d;
             color: white;
         }
 
@@ -541,7 +542,7 @@
         }
 
         .item-tag i {
-            color: #696cff;
+            color: #14213d;
         }
 
         /* حالة البانر حسب الوقت */
@@ -679,7 +680,7 @@
         <!-- شريط الأدوات المتقدم -->
         <div class="advanced-toolbar">
             <div class="toolbar-actions">
-                <a href="{{ route('admin.sliders.index') }}" class="btn-toolbar" style="background: #e8fadf; color: #28c76f; border: 1px solid #71dd37; font-weight: 600;">
+                <a href="{{ route('admin.sliders.index') }}" class="btn-toolbar" style="background: #ebf0f8; color: #1e3a5f; border: 1px solid #cbd7ea; font-weight: 600;">
                     <i class="ti ti-slideshow me-1"></i>
                     إدارة السلايدر الرئيسي
                 </a>
@@ -1282,8 +1283,8 @@
                     text: `سيتم حذف البانر "${bannerTitle}" وجميع عناصره`,
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonColor: '#d33',
-                    cancelButtonColor: '#3085d6',
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#14213d',
                     confirmButtonText: 'نعم، احذف',
                     cancelButtonText: 'إلغاء',
                     reverseButtons: true
@@ -1396,7 +1397,7 @@
                     text: confirmText,
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonColor: action === 'delete' ? '#d33' : '#3085d6',
+                    confirmButtonColor: action === 'delete' ? '#ef4444' : '#14213d',
                     cancelButtonColor: '#6c757d',
                     confirmButtonText: `نعم، ${actionText}`,
                     cancelButtonText: 'إلغاء'
@@ -1516,7 +1517,7 @@
         }
 
         input:checked+.slider {
-            background-color: #696cff;
+            background-color: #14213d;
         }
 
         input:checked+.slider:before {

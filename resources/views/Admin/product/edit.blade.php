@@ -8,20 +8,20 @@
     <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet" />
     <style>
         :root {
-            --primary-color: #696cff;
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --success-color: #28a745;
-            --danger-color: #dc3545;
-            --warning-color: #ffc107;
-            --info-color: #17a2b8;
-            --dark-bg: #1e1e2d;
-            --dark-card: #2b3b4c;
+            --primary-color: #14213d;
+            --primary-gradient: linear-gradient(135deg, #14213d 0%, #0c182a 100%);
+            --success-color: #14213d;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --info-color: #06b6d4;
+            --dark-bg: #f6f8fb;
+            --dark-card: #ffffff;
         }
 
         body {
             font-family: "Cairo", sans-serif !important;
             background: var(--dark-bg);
-            color: #fff;
+            color: #1e293b;
         }
 
         .select2-results__option--highlighte {
@@ -34,7 +34,7 @@
             border-radius: 15px;
             padding: 25px;
             margin-bottom: 20px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 5px 20px rgba(15, 23, 42, 0.05);
             border-left: 4px solid var(--primary-color);
         }
 
@@ -63,17 +63,17 @@
         /* Form Controls */
         .form-control,
         .form-select {
-            background: rgba(255, 255, 255, 0.05);
-            border-color: rgba(255, 255, 255, 0.1);
-            color: #fff;
+            background: #f8fafc;
+            border-color: #e2e8f0;
+            color: #1e293b;
         }
 
         .form-control:focus,
         .form-select:focus {
             background: rgba(255, 255, 255, 0.1);
             border-color: var(--primary-color);
-            color: #fff;
-            box-shadow: 0 0 0 0.25rem rgba(105, 108, 255, 0.25);
+            color: #1e293b;
+            box-shadow: 0 0 0 0.25rem rgba(20, 33, 61, 0.25);
         }
 
         /* Wizard Steps */
@@ -127,7 +127,7 @@
         /* Options Container - Very Smooth Drag & Drop */
         .options-sortable-container {
             min-height: 100px;
-            background: rgba(0, 0, 0, 0.2);
+            background: #f8fafc;
             border-radius: 12px;
             padding: 15px;
             margin-bottom: 20px;
@@ -135,33 +135,33 @@
 
         /* Option Item - Main Container */
         .option-item {
-            background: rgba(255, 255, 255, 0.05);
+            background: #f8fafc;
             border-radius: 10px;
             padding: 16px;
             margin-bottom: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
             position: relative;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: move;
         }
 
         .option-item:hover {
-            background: rgba(105, 108, 255, 0.08);
+            background: rgba(20, 33, 61, 0.08);
             border-color: var(--primary-color);
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(105, 108, 255, 0.2);
+            box-shadow: 0 8px 20px rgba(20, 33, 61, 0.2);
         }
 
         /* Drag & Drop States - Super Smooth */
         .option-item.sortable-ghost {
             opacity: 0.5;
-            background: rgba(105, 108, 255, 0.1);
+            background: rgba(20, 33, 61, 0.1);
             border: 2px dashed var(--primary-color);
             transform: scale(0.98);
         }
 
         .option-item.sortable-chosen {
-            box-shadow: 0 15px 30px rgba(105, 108, 255, 0.3);
+            box-shadow: 0 15px 30px rgba(20, 33, 61, 0.3);
             transform: scale(1.02) translateY(-3px);
             background: var(--dark-card);
             border-color: var(--primary-color);
@@ -170,7 +170,7 @@
         .option-item.sortable-drag {
             opacity: 1;
             transform: rotate(1deg) scale(1.05);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 20px 40px rgba(15, 23, 42, 0.05);
         }
 
         /* Drag Handle */
@@ -179,7 +179,7 @@
             top: 50%;
             right: 10px;
             transform: translateY(-50%);
-            color: rgba(255, 255, 255, 0.4);
+            color: #94a3b8;
             font-size: 20px;
             cursor: move;
             transition: all 0.2s;
@@ -189,7 +189,7 @@
 
         .option-drag-handle:hover {
             color: var(--primary-color);
-            background: rgba(105, 108, 255, 0.15);
+            background: rgba(20, 33, 61, 0.15);
         }
 
         /* Option Header */
@@ -219,13 +219,13 @@
 
         .badge-dependent {
             background: rgba(255, 193, 7, 0.2);
-            color: #ffc107;
+            color: #f59e0b;
             border: 1px solid rgba(255, 193, 7, 0.4);
         }
 
         .badge-required {
             background: rgba(220, 53, 69, 0.2);
-            color: #dc3545;
+            color: #ef4444;
         }
 
         /* Option Type Badges */
@@ -243,18 +243,18 @@
         }
 
         .type-quantity {
-            background: rgba(40, 167, 69, 0.2);
-            color: #28a745;
+            background: rgba(30, 58, 95, 0.2);
+            color: #14213d;
         }
 
         .type-size {
             background: rgba(23, 162, 184, 0.2);
-            color: #17a2b8;
+            color: #06b6d4;
         }
 
         .type-color {
             background: rgba(255, 193, 7, 0.2);
-            color: #ffc107;
+            color: #f59e0b;
         }
 
         /* Option Content Grid */
@@ -271,7 +271,7 @@
             border-radius: 8px;
             padding: 15px;
             margin-top: 15px;
-            border-right: 3px solid #ffc107;
+            border-right: 3px solid #f59e0b;
             display: none;
         }
 
@@ -298,11 +298,11 @@
             border-radius: 8px;
             padding: 15px;
             margin-top: 15px;
-            border-right: 3px solid #17a2b8;
+            border-right: 3px solid #06b6d4;
         }
 
         .tier-item {
-            background: rgba(0, 0, 0, 0.2);
+            background: #f8fafc;
             border-radius: 8px;
             padding: 12px;
             margin-bottom: 10px;
@@ -313,7 +313,7 @@
 
         /* Add Option Button - Fixed at Top */
         .add-option-section {
-            background: linear-gradient(135deg, rgba(105, 108, 255, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            background: linear-gradient(135deg, rgba(20, 33, 61, 0.1) 0%, rgba(21, 156, 87, 0.1) 100%);
             border-radius: 12px;
             padding: 20px;
             margin-bottom: 25px;
@@ -332,7 +332,7 @@
 
         .btn-add-option:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 15px rgba(105, 108, 255, 0.4);
+            box-shadow: 0 8px 15px rgba(20, 33, 61, 0.4);
         }
 
         /* Image Management */
@@ -348,8 +348,8 @@
             border-radius: 8px;
             overflow: hidden;
             height: 120px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(15, 23, 42, 0.05);
+            border: 1px solid #e2e8f0;
         }
 
         .image-preview-item img {
@@ -378,14 +378,14 @@
 
         /* Preview Card */
         .preview-card {
-            background: rgba(255, 255, 255, 0.05);
+            background: #f8fafc;
             border-radius: 12px;
             padding: 20px;
             margin-bottom: 20px;
             display: flex;
             align-items: center;
             gap: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
         }
 
         .preview-image {
@@ -398,7 +398,7 @@
         .preview-price {
             font-size: 22px;
             font-weight: bold;
-            color: #28a745;
+            color: #14213d;
         }
 
         /* Toggle Switch */
@@ -427,7 +427,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: rgba(255, 255, 255, 0.2);
+            background-color: #f1f5f9;
             transition: 0.3s;
             border-radius: 34px;
         }
@@ -460,7 +460,7 @@
 
         /* Alert Guide */
         .alert-guide {
-            background: rgba(105, 108, 255, 0.05);
+            background: rgba(20, 33, 61, 0.05);
             border-right: 4px solid var(--primary-color);
             border-radius: 8px;
             padding: 15px 20px;
@@ -483,11 +483,11 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
         }
 
         .badge-new {
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            background: linear-gradient(135deg, #f86c6b 0%, #ee5a52 100%);
             color: white;
             padding: 4px 12px;
             border-radius: 20px;
@@ -508,7 +508,7 @@
                 </li>
                 <li class="breadcrumb-item"><a href="{{ route('admin.products.show', $product->id) }}"
                         class="text-primary">{{ Str::limit($product->name, 30) }}</a></li>
-                <li class="breadcrumb-item active text-white">تعديل</li>
+                <li class="breadcrumb-item active text-muted">تعديل</li>
             </ol>
         </nav>
 
@@ -973,7 +973,7 @@
                 <!-- ========================================= -->
                 <div class="mt-4 p-3" style="background: rgba(255, 193, 7, 0.05); border-radius: 8px;">
                     <div class="d-flex align-items-center gap-3">
-                        <i class="fas fa-link fa-lg" style="color: #ffc107;"></i>
+                        <i class="fas fa-link fa-lg" style="color: #f59e0b;"></i>
                         <div>
                             <small class="text-muted d-block">يمكنك جعل الخيار يعتمد على خيار آخر عن طريق تحديد "يعتمد على"
                                 في إعدادات الخيار</small>
@@ -1078,9 +1078,9 @@
     <!-- Delete Confirmation Modal -->
     <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
-            <div class="modal-content" style="background: var(--dark-card);">
-                <div class="modal-header" style="border-color: rgba(255,255,255,0.1);">
-                    <h5 class="modal-title text-white">تأكيد الحذف</h5>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">تأكيد الحذف</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
@@ -1090,7 +1090,7 @@
                         <p class="text-muted">هذا الإجراء لا يمكن التراجع عنه</p>
                     </div>
                 </div>
-                <div class="modal-footer" style="border-color: rgba(255,255,255,0.1);">
+                <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
                     <form action="{{ route('admin.products.destroy', $product->id) }}" method="POST">
                         @csrf
@@ -1298,7 +1298,7 @@
             if (option.option_type === 'quantity' && option.quantity_tiers && option.quantity_tiers.length > 0) {
                 tiersHtml = `
                     <div class="tiers-section">
-                        <h6 class="mb-3" style="color: #17a2b8;"><i class="fas fa-layer-group me-2"></i>شرائح الكمية</h6>
+                        <h6 class="mb-3" style="color: #06b6d4;"><i class="fas fa-layer-group me-2"></i>شرائح الكمية</h6>
                         <div id="tiersContainer_${index}">
                             ${option.quantity_tiers.map((tier, tierIndex) => `
                                                                                         <div class="tier-item">
@@ -1777,8 +1777,8 @@
                 text: warningMessage,
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#14213d',
                 confirmButtonText: 'نعم، احذف',
                 cancelButtonText: 'إلغاء'
             }).then((result) => {
@@ -1863,7 +1863,7 @@
 
             let html = `
                 <li style="margin-bottom: 8px;">
-                    <div class="d-flex align-items-center gap-2" style="background: rgba(105, 108, 255, 0.1); padding: 8px; border-radius: 6px;">
+                    <div class="d-flex align-items-center gap-2" style="background: rgba(20, 33, 61, 0.1); padding: 8px; border-radius: 6px;">
                         <span class="badge bg-primary">${index + 1}</span>
                         <span class="fw-bold">${option.option_name}</span>
                         <span class="text-muted">(${option.option_value})</span>
@@ -2057,7 +2057,7 @@
                 // Add tiers section
                 const tiersHtml = `
                     <div class="tiers-section">
-                        <h6 class="mb-3" style="color: #17a2b8;"><i class="fas fa-layer-group me-2"></i>شرائح الكمية</h6>
+                        <h6 class="mb-3" style="color: #06b6d4;"><i class="fas fa-layer-group me-2"></i>شرائح الكمية</h6>
                         <div id="tiersContainer_${index}"></div>
                         <button type="button" class="btn btn-sm btn-outline-info mt-2" onclick="addQuantityTier(${index})">
                             <i class="fas fa-plus me-1"></i> إضافة شريحة

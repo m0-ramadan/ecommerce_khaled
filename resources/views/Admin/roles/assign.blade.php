@@ -10,23 +10,23 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css">
     <style>
         :root {
-            --primary-color: #696cff;
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --dark-bg: #1e1e2d;
-            --dark-card: #2b3b4c;
+            --primary-color: #14213d;
+            --primary-gradient: linear-gradient(135deg, #14213d 0%, #0c182a 100%);
+            --dark-bg: #f6f8fb;
+            --dark-card: #ffffff;
         }
 
         body {
             font-family: "Cairo", sans-serif !important;
             background: var(--dark-bg);
-            color: #fff;
+            color: #1e293b;
         }
 
         .card {
             background: var(--dark-card);
             border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 5px 20px rgba(15, 23, 42, 0.05);
+            border: 1px solid #e2e8f0;
         }
 
         .card-header {
@@ -42,16 +42,16 @@
         }
 
         .table {
-            color: #fff;
+            color: #1e293b;
         }
 
         .table thead th {
-            background: rgba(255, 255, 255, 0.05);
-            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            background: #f8fafc;
+            border-bottom: 2px solid #e2e8f0;
         }
 
         .table tbody td {
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid #e2e8f0;
             vertical-align: middle;
         }
 
@@ -61,7 +61,7 @@
             border-radius: 20px;
             font-size: 12px;
             font-weight: 600;
-            background: rgba(105, 108, 255, 0.2);
+            background: rgba(20, 33, 61, 0.2);
             color: var(--primary-color);
             margin-right: 5px;
             margin-bottom: 5px;
@@ -79,8 +79,8 @@
 
         .modal-content {
             background: var(--dark-card);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #fff;
+            border: 1px solid #e2e8f0;
+            color: #1e293b;
         }
 
         .modal-header {
@@ -95,7 +95,7 @@
         }
 
         .modal-footer {
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 1px solid #e2e8f0;
             padding: 20px 25px;
         }
 
@@ -104,24 +104,24 @@
             align-items: center;
             gap: 10px;
             padding: 10px 15px;
-            background: rgba(255, 255, 255, 0.02);
+            background: #f8fafc;
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s ease;
         }
 
         .form-check-input:checked + .form-check-label {
-            background: rgba(105, 108, 255, 0.15);
+            background: rgba(20, 33, 61, 0.15);
             border-left: 3px solid var(--primary-color);
         }
 
         .form-check-label:hover {
-            background: rgba(105, 108, 255, 0.08);
+            background: rgba(20, 33, 61, 0.08);
         }
 
         .permission-description {
             font-size: 13px;
-            color: rgba(255, 255, 255, 0.6);
+            color: #64748b;
         }
 
         .dataTables_wrapper .dt-buttons .btn {
@@ -151,8 +151,8 @@
                 <h5 class="mb-0"><i class="fas fa-user-tag me-2"></i>تعيين الرتب للمشرفين</h5>
                 <div class="d-flex gap-2 align-items-center">
                     <div class="position-relative">
-                        <input type="text" id="searchInput" class="form-control bg-dark text-white" 
-                               placeholder="بحث عن مشرف..." style="border: 1px solid rgba(255,255,255,0.2); min-width: 250px;">
+                        <input type="text" id="searchInput" class="form-control" 
+                               placeholder="بحث عن مشرف..." style="min-width: 250px;">
                         <i class="fas fa-search position-absolute" style="left: 12px; top: 50%; transform: translateY(-50%); color: #adb5bd;"></i>
                     </div>
                 </div>
@@ -359,9 +359,7 @@
                     icon: 'question',
                     showCancelButton: true,
                     confirmButtonText: 'نعم، احفظ',
-                    cancelButtonText: 'إلغاء',
-                    background: '#2b3b4c',
-                    color: '#fff'
+                    cancelButtonText: 'إلغاء'
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({
@@ -377,17 +375,13 @@
                                     Swal.fire({
                                         title: 'تم الحفظ!',
                                         text: response.message,
-                                        icon: 'success',
-                                        background: '#2b3b4c',
-                                        color: '#fff'
+                                        icon: 'success'
                                     }).then(() => location.reload());
                                 } else {
                                     Swal.fire({
                                         title: 'خطأ!',
                                         text: response.message,
-                                        icon: 'error',
-                                        background: '#2b3b4c',
-                                        color: '#fff'
+                                        icon: 'error'
                                     });
                                 }
                             },
@@ -395,9 +389,7 @@
                                 Swal.fire({
                                     title: 'خطأ!',
                                     text: 'حدث خطأ أثناء الاتصال بالخادم.',
-                                    icon: 'error',
-                                    background: '#2b3b4c',
-                                    color: '#fff'
+                                    icon: 'error'
                                 });
                             }
                         });

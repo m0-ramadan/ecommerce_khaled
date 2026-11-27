@@ -7,21 +7,21 @@
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #696cff;
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --success-color: #28a745;
-            --danger-color: #dc3545;
-            --warning-color: #ffc107;
-            --info-color: #17a2b8;
-            --dark-bg: #1e1e2d;
-            --dark-card: #2b3b4c;
-            --star-color: #ffc107;
+            --primary-color: #14213d;
+            --primary-gradient: linear-gradient(135deg, #14213d 0%, #0c182a 100%);
+            --success-color: #14213d;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --info-color: #06b6d4;
+            --dark-bg: #f6f8fb;
+            --dark-card: #ffffff;
+            --star-color: #f59e0b;
         }
 
         body {
             font-family: "Cairo", sans-serif !important;
             background: var(--dark-bg);
-            color: #fff;
+            color: #1e293b;
         }
 
         /* Card Styles */
@@ -30,7 +30,7 @@
             border-radius: 15px;
             padding: 25px;
             margin-bottom: 20px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 5px 20px rgba(15, 23, 42, 0.05);
             border-left: 4px solid var(--primary-color);
         }
 
@@ -59,26 +59,26 @@
         /* Form Controls */
         .form-control,
         .form-select {
-            background: rgba(255, 255, 255, 0.05);
-            border-color: rgba(255, 255, 255, 0.1);
-            color: #fff;
+            background: #f8fafc;
+            border-color: #e2e8f0;
+            color: #1e293b;
         }
 
         .form-control:focus,
         .form-select:focus {
             background: rgba(255, 255, 255, 0.1);
             border-color: var(--primary-color);
-            color: #fff;
-            box-shadow: 0 0 0 0.25rem rgba(105, 108, 255, 0.25);
+            color: #1e293b;
+            box-shadow: 0 0 0 0.25rem rgba(20, 33, 61, 0.25);
         }
 
         .form-control::placeholder {
-            color: rgba(255, 255, 255, 0.4);
+            color: #94a3b8;
         }
 
         .form-select option {
             background: var(--dark-card);
-            color: #fff;
+            color: #1e293b;
         }
 
         /* Wizard Steps */
@@ -138,7 +138,7 @@
 
         /* Alert Guide */
         .alert-guide {
-            background: rgba(105, 108, 255, 0.05);
+            background: rgba(20, 33, 61, 0.05);
             border-right: 4px solid var(--primary-color);
             border-radius: 8px;
             padding: 15px 20px;
@@ -152,7 +152,7 @@
 
         /* Info Bar */
         .info-bar {
-            background: rgba(255, 255, 255, 0.03);
+            background: #f8fafc;
             border-radius: 10px;
             padding: 15px 20px;
             margin-bottom: 25px;
@@ -160,7 +160,7 @@
             align-items: center;
             gap: 20px;
             flex-wrap: wrap;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
         }
 
         .info-item {
@@ -168,7 +168,7 @@
             align-items: center;
             gap: 8px;
             font-size: 13px;
-            color: rgba(255, 255, 255, 0.7);
+            color: #64748b;
         }
 
         .info-item i {
@@ -177,7 +177,7 @@
         }
 
         .info-item .info-value {
-            color: #fff;
+            color: #1e293b;
             font-weight: 600;
         }
 
@@ -195,15 +195,15 @@
             height: 150px;
             border-radius: 50%;
             overflow: hidden;
-            border: 4px solid rgba(255, 255, 255, 0.1);
-            background: rgba(255, 255, 255, 0.05);
+            border: 4px solid #e2e8f0;
+            background: #f8fafc;
             transition: all 0.3s ease;
             cursor: pointer;
         }
 
         .avatar-preview-wrapper:hover {
             border-color: var(--primary-color);
-            box-shadow: 0 0 25px rgba(105, 108, 255, 0.3);
+            box-shadow: 0 0 25px rgba(20, 33, 61, 0.3);
         }
 
         .avatar-preview-wrapper img {
@@ -219,7 +219,7 @@
             align-items: center;
             justify-content: center;
             font-size: 60px;
-            color: rgba(255, 255, 255, 0.3);
+            color: #94a3b8;
         }
 
         .avatar-overlay {
@@ -265,7 +265,7 @@
 
         .star-rating-input label {
             font-size: 36px;
-            color: rgba(255, 255, 255, 0.2);
+            color: #94a3b8;
             cursor: pointer;
             transition: all 0.2s ease;
         }
@@ -288,38 +288,38 @@
         }
 
         .rating-text.excellent {
-            color: #28a745;
+            color: #14213d;
         }
 
         .rating-text.good {
-            color: #17a2b8;
+            color: #06b6d4;
         }
 
         .rating-text.average {
-            color: #ffc107;
+            color: #f59e0b;
         }
 
         .rating-text.poor {
-            color: #fd7e14;
+            color: #f59e0b;
         }
 
         .rating-text.bad {
-            color: #dc3545;
+            color: #ef4444;
         }
 
         /* Preview Card */
         .preview-card {
-            background: rgba(255, 255, 255, 0.03);
+            background: #f8fafc;
             border-radius: 15px;
             padding: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
             text-align: center;
             transition: all 0.3s ease;
         }
 
         .preview-card:hover {
             border-color: var(--primary-color);
-            background: rgba(105, 108, 255, 0.03);
+            background: rgba(20, 33, 61, 0.03);
         }
 
         .preview-avatar {
@@ -329,7 +329,7 @@
             overflow: hidden;
             margin: 0 auto 15px;
             border: 3px solid var(--primary-color);
-            background: rgba(255, 255, 255, 0.05);
+            background: #f8fafc;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -343,7 +343,7 @@
 
         .preview-avatar i {
             font-size: 35px;
-            color: rgba(255, 255, 255, 0.3);
+            color: #94a3b8;
         }
 
         .preview-stars {
@@ -355,7 +355,7 @@
         }
 
         .preview-stars .star {
-            color: rgba(255, 255, 255, 0.2);
+            color: #94a3b8;
         }
 
         .preview-stars .star.filled {
@@ -363,7 +363,7 @@
         }
 
         .preview-review {
-            color: rgba(255, 255, 255, 0.8);
+            color: #1e293b;
             font-style: italic;
             line-height: 1.8;
             margin-bottom: 15px;
@@ -372,12 +372,12 @@
 
         .preview-name {
             font-weight: 600;
-            color: #fff;
+            color: #1e293b;
             font-size: 18px;
         }
 
         .preview-city {
-            color: rgba(255, 255, 255, 0.5);
+            color: #64748b;
             font-size: 14px;
         }
 
@@ -407,7 +407,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: rgba(255, 255, 255, 0.2);
+            background-color: #f1f5f9;
             transition: 0.3s;
             border-radius: 34px;
         }
@@ -434,7 +434,7 @@
 
         /* Summary Card */
         .summary-card {
-            background: rgba(255, 255, 255, 0.05);
+            background: #f8fafc;
             border-radius: 12px;
             padding: 20px;
             margin-bottom: 20px;
@@ -444,11 +444,11 @@
             display: flex;
             justify-content: space-between;
             padding: 10px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid #e2e8f0;
         }
 
         .summary-label {
-            color: rgba(255, 255, 255, 0.7);
+            color: #64748b;
         }
 
         .summary-value {
@@ -459,7 +459,7 @@
         /* Character Counter */
         .char-counter {
             font-size: 12px;
-            color: rgba(255, 255, 255, 0.5);
+            color: #64748b;
             text-align: left;
             margin-top: 5px;
         }
@@ -496,7 +496,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
         }
 
         @media (max-width: 768px) {
@@ -549,7 +549,7 @@
                 <li class="breadcrumb-item">
                     <a href="{{ route('admin.testimonials.index') }}" class="text-primary">آراء العملاء</a>
                 </li>
-                <li class="breadcrumb-item active text-white">تعديل رأي: {{ $testimonial->name }}</li>
+                <li class="breadcrumb-item active text-muted">تعديل رأي: {{ $testimonial->name }}</li>
             </ol>
         </nav>
 
@@ -615,7 +615,7 @@
 
         @if ($errors->any())
             <div class="alert alert-danger alert-dismissible fade show" role="alert"
-                style="background: rgba(220,53,69,0.1); border-color: rgba(220,53,69,0.3); color: #dc3545;">
+                style="background: rgba(220,53,69,0.1); border-color: rgba(220,53,69,0.3); color: #ef4444;">
                 <i class="fas fa-exclamation-circle me-2"></i>
                 <ul class="mb-0">
                     @foreach ($errors->all() as $error)
@@ -1007,7 +1007,7 @@
                 text: 'هل أنت متأكد من حفظ التعديلات على هذا الرأي؟',
                 icon: 'question',
                 showCancelButton: true,
-                confirmButtonColor: '#28a745',
+                confirmButtonColor: '#14213d',
                 cancelButtonColor: '#6c757d',
                 confirmButtonText: 'نعم، احفظ',
                 cancelButtonText: 'إلغاء'
@@ -1207,7 +1207,7 @@
                         text: 'هل أنت متأكد من حفظ التعديلات على هذا الرأي؟',
                         icon: 'question',
                         showCancelButton: true,
-                        confirmButtonColor: '#28a745',
+                        confirmButtonColor: '#14213d',
                         cancelButtonColor: '#6c757d',
                         confirmButtonText: 'نعم، احفظ',
                         cancelButtonText: 'إلغاء'

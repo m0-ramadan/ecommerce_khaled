@@ -13,8 +13,8 @@
         }
 
         .error-log-card:hover {
-            border-color: #696cff;
-            box-shadow: 0 5px 20px rgba(105, 108, 255, 0.1);
+            border-color: #14213d;
+            box-shadow: 0 5px 20px rgba(20, 33, 61, 0.1);
         }
 
         .log-file-icon {
@@ -26,17 +26,17 @@
             justify-content: center;
             font-size: 24px;
             margin-bottom: 15px;
-            color: #696cff;
-            background: rgba(105, 108, 255, 0.1);
+            color: #14213d;
+            background: rgba(20, 33, 61, 0.1);
         }
 
         .log-file-icon.warning {
-            color: #ff9f43;
+            color: #f59e0b;
             background: rgba(255, 159, 67, 0.1);
         }
 
         .log-file-icon.danger {
-            color: #ea5455;
+            color: #ef4444;
             background: rgba(234, 84, 85, 0.1);
         }
 
@@ -78,7 +78,7 @@
         }
 
         .log-error {
-            color: #ff6b6b;
+            color: #f86c6b;
         }
 
         .log-warning {
@@ -104,12 +104,12 @@
             background: rgba(255, 255, 255, 0.05);
             padding: 10px;
             margin: 5px 0;
-            border-left: 3px solid #ff6b6b;
+            border-left: 3px solid #f86c6b;
             border-radius: 0 5px 5px 0;
         }
 
         .timestamp {
-            color: #20c997;
+            color: #14213d;
             font-weight: 500;
         }
 
@@ -150,17 +150,17 @@
         }
 
         .badge-error {
-            background: linear-gradient(135deg, #ea5455, #e73d3e);
+            background: linear-gradient(135deg, #ef4444, #e73d3e);
             color: white;
         }
 
         .badge-warning {
-            background: linear-gradient(135deg, #ff9f43, #ff8c2e);
+            background: linear-gradient(135deg, #f59e0b, #ff8c2e);
             color: white;
         }
 
         .badge-info {
-            background: linear-gradient(135deg, #696cff, #5a5fcf);
+            background: linear-gradient(135deg, #14213d, #1e3a5f);
             color: white;
         }
 
@@ -187,13 +187,13 @@
         }
 
         .file-item.active {
-            background: rgba(105, 108, 255, 0.1);
-            border-left: 3px solid #696cff;
+            background: rgba(20, 33, 61, 0.1);
+            border-left: 3px solid #14213d;
         }
 
         .file-icon {
             margin-left: 10px;
-            color: #696cff;
+            color: #14213d;
         }
 
         .file-name {
@@ -252,7 +252,7 @@
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: #696cff;
+            background: #14213d;
             color: white;
             display: flex;
             align-items: center;
@@ -261,7 +261,7 @@
             z-index: 1000;
             opacity: 0;
             transition: opacity 0.3s ease;
-            box-shadow: 0 3px 10px rgba(105, 108, 255, 0.3);
+            box-shadow: 0 3px 10px rgba(20, 33, 61, 0.3);
         }
 
         .scroll-to-top.show {

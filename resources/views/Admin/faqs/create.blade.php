@@ -7,20 +7,20 @@
     <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #696cff;
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --success-color: #28a745;
-            --danger-color: #dc3545;
-            --warning-color: #ffc107;
-            --info-color: #17a2b8;
-            --dark-bg: #1e1e2d;
-            --dark-card: #2b3b4c;
+            --primary-color: #14213d;
+            --primary-gradient: linear-gradient(135deg, #14213d 0%, #0c182a 100%);
+            --success-color: #14213d;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --info-color: #06b6d4;
+            --dark-bg: #f6f8fb;
+            --dark-card: #ffffff;
         }
 
         body {
             font-family: "Cairo", sans-serif !important;
             background: var(--dark-bg);
-            color: #fff;
+            color: #1e293b;
         }
 
         /* Card Styles */
@@ -29,7 +29,7 @@
             border-radius: 15px;
             padding: 25px;
             margin-bottom: 20px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 5px 20px rgba(15, 23, 42, 0.05);
             border-left: 4px solid var(--primary-color);
         }
 
@@ -58,21 +58,21 @@
         /* Form Controls */
         .form-control,
         .form-select {
-            background: rgba(255, 255, 255, 0.05);
-            border-color: rgba(255, 255, 255, 0.1);
-            color: #fff;
+            background: #f8fafc;
+            border-color: #e2e8f0;
+            color: #1e293b;
         }
 
         .form-control:focus,
         .form-select:focus {
             background: rgba(255, 255, 255, 0.1);
             border-color: var(--primary-color);
-            color: #fff;
-            box-shadow: 0 0 0 0.25rem rgba(105, 108, 255, 0.25);
+            color: #1e293b;
+            box-shadow: 0 0 0 0.25rem rgba(20, 33, 61, 0.25);
         }
 
         .form-control::placeholder {
-            color: rgba(255, 255, 255, 0.5);
+            color: #64748b;
         }
 
         /* Wizard Steps */
@@ -150,7 +150,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: rgba(255, 255, 255, 0.2);
+            background-color: #f1f5f9;
             transition: 0.3s;
             border-radius: 34px;
         }
@@ -183,7 +183,7 @@
 
         /* Alert Guide */
         .alert-guide {
-            background: rgba(105, 108, 255, 0.05);
+            background: rgba(20, 33, 61, 0.05);
             border-right: 4px solid var(--primary-color);
             border-radius: 8px;
             padding: 15px 20px;
@@ -197,7 +197,7 @@
 
         /* Summary Card */
         .summary-card {
-            background: rgba(255, 255, 255, 0.05);
+            background: #f8fafc;
             border-radius: 12px;
             padding: 20px;
             margin-bottom: 20px;
@@ -207,11 +207,11 @@
             display: flex;
             justify-content: space-between;
             padding: 10px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid #e2e8f0;
         }
 
         .summary-label {
-            color: rgba(255, 255, 255, 0.7);
+            color: #64748b;
         }
 
         .summary-value {
@@ -235,20 +235,20 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
         }
 
         /* FAQ Preview Card */
         .faq-preview-card {
-            background: rgba(255, 255, 255, 0.03);
+            background: #f8fafc;
             border-radius: 12px;
             padding: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
             transition: all 0.3s ease;
         }
 
         .faq-preview-card:hover {
-            background: rgba(105, 108, 255, 0.05);
+            background: rgba(20, 33, 61, 0.05);
             border-color: var(--primary-color);
         }
 
@@ -268,7 +268,7 @@
         }
 
         .faq-preview-answer {
-            color: rgba(255, 255, 255, 0.8);
+            color: #1e293b;
             line-height: 1.8;
             padding-right: 25px;
         }
@@ -283,13 +283,13 @@
         }
 
         .status-active {
-            background: rgba(40, 167, 69, 0.2);
-            color: #28a745;
+            background: rgba(30, 58, 95, 0.2);
+            color: #14213d;
         }
 
         .status-inactive {
             background: rgba(220, 53, 69, 0.2);
-            color: #dc3545;
+            color: #ef4444;
         }
 
         @media (max-width: 768px) {
@@ -327,7 +327,7 @@
                 <li class="breadcrumb-item">
                     <a href="{{ route('admin.faqs.index') }}" class="text-primary">الأسئلة الشائعة</a>
                 </li>
-                <li class="breadcrumb-item active text-white">إضافة سؤال شائع جديد</li>
+                <li class="breadcrumb-item active text-muted">إضافة سؤال شائع جديد</li>
             </ol>
         </nav>
 
@@ -414,7 +414,7 @@
                 </div>
 
                 <!-- Quick Questions Suggestions -->
-                <div class="mt-3 p-3" style="background: rgba(105, 108, 255, 0.05); border-radius: 8px;">
+                <div class="mt-3 p-3" style="background: rgba(20, 33, 61, 0.05); border-radius: 8px;">
                     <small class="text-muted d-block mb-2">
                         <i class="fas fa-magic me-1" style="color: var(--primary-color);"></i>
                         أسئلة مقترحة (انقر للإضافة):
@@ -463,7 +463,7 @@
                 </div>
 
                 <!-- Quick Answer Templates -->
-                <div class="mt-4 p-3" style="background: rgba(40, 167, 69, 0.05); border-radius: 8px; border-right: 3px solid var(--success-color);">
+                <div class="mt-4 p-3" style="background: rgba(30, 58, 95, 0.05); border-radius: 8px; border-right: 3px solid var(--success-color);">
                     <h6 class="mb-3" style="color: var(--success-color);">
                         <i class="fas fa-file-alt me-2"></i>قوالب سريعة للإجابة
                     </h6>

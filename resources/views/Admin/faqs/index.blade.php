@@ -7,20 +7,20 @@
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #696cff;
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --success-color: #28a745;
-            --danger-color: #dc3545;
-            --warning-color: #ffc107;
-            --info-color: #17a2b8;
-            --dark-bg: #1e1e2d;
-            --dark-card: #2b3b4c;
+            --primary-color: #14213d;
+            --primary-gradient: linear-gradient(135deg, #14213d 0%, #0c182a 100%);
+            --success-color: #14213d;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --info-color: #06b6d4;
+            --dark-bg: #f6f8fb;
+            --dark-card: #ffffff;
         }
 
         body {
             font-family: "Cairo", sans-serif !important;
             background: var(--dark-bg);
-            color: #fff;
+            color: #1e293b;
         }
 
         /* Page Header */
@@ -29,7 +29,7 @@
             border-radius: 15px;
             padding: 25px;
             margin-bottom: 25px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 5px 20px rgba(15, 23, 42, 0.05);
             border-left: 4px solid var(--primary-color);
         }
 
@@ -50,7 +50,7 @@
             background: var(--dark-card);
             border-radius: 15px;
             padding: 20px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 5px 20px rgba(15, 23, 42, 0.05);
             position: relative;
             overflow: hidden;
             transition: all 0.3s ease;
@@ -58,7 +58,7 @@
 
         .stat-card:hover {
             transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
         }
 
         .stat-card .stat-icon {
@@ -76,7 +76,7 @@
         }
 
         .stat-card .stat-label {
-            color: rgba(255, 255, 255, 0.7);
+            color: #64748b;
             font-size: 14px;
         }
 
@@ -110,32 +110,32 @@
             border-radius: 15px;
             padding: 20px;
             margin-bottom: 25px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 5px 20px rgba(15, 23, 42, 0.05);
         }
 
         /* Form Controls */
         .form-control,
         .form-select {
-            background: rgba(255, 255, 255, 0.05);
-            border-color: rgba(255, 255, 255, 0.1);
-            color: #fff;
+            background: #f8fafc;
+            border-color: #e2e8f0;
+            color: #1e293b;
         }
 
         .form-control:focus,
         .form-select:focus {
             background: rgba(255, 255, 255, 0.1);
             border-color: var(--primary-color);
-            color: #fff;
-            box-shadow: 0 0 0 0.25rem rgba(105, 108, 255, 0.25);
+            color: #1e293b;
+            box-shadow: 0 0 0 0.25rem rgba(20, 33, 61, 0.25);
         }
 
         .form-control::placeholder {
-            color: rgba(255, 255, 255, 0.4);
+            color: #94a3b8;
         }
 
         .form-select option {
             background: var(--dark-card);
-            color: #fff;
+            color: #1e293b;
         }
 
         /* Table Card */
@@ -143,7 +143,7 @@
             background: var(--dark-card);
             border-radius: 15px;
             padding: 25px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 5px 20px rgba(15, 23, 42, 0.05);
         }
 
         .table-header {
@@ -159,14 +159,14 @@
 
         /* Table Styles */
         .table {
-            color: #fff;
+            color: #1e293b;
             margin-bottom: 0;
         }
 
         .table thead th {
-            background: rgba(105, 108, 255, 0.1);
+            background: rgba(20, 33, 61, 0.1);
             border-bottom: 2px solid var(--primary-color);
-            color: #fff;
+            color: #1e293b;
             font-weight: 600;
             white-space: nowrap;
             padding: 12px 15px;
@@ -175,7 +175,7 @@
         }
 
         .table thead th:hover {
-            background: rgba(105, 108, 255, 0.2);
+            background: rgba(20, 33, 61, 0.2);
         }
 
         .table thead th i {
@@ -193,7 +193,7 @@
         .table tbody td {
             padding: 15px;
             vertical-align: middle;
-            border-color: rgba(255, 255, 255, 0.05);
+            border-color: #e2e8f0;
         }
 
         .table tbody tr {
@@ -201,13 +201,13 @@
         }
 
         .table tbody tr:hover {
-            background: rgba(105, 108, 255, 0.05);
+            background: rgba(20, 33, 61, 0.05);
         }
 
         /* Drag Handle */
         .drag-handle {
             cursor: move;
-            color: rgba(255, 255, 255, 0.3);
+            color: #94a3b8;
             font-size: 18px;
             padding: 5px 10px;
             transition: all 0.2s;
@@ -219,11 +219,11 @@
 
         .sortable-ghost {
             opacity: 0.4;
-            background: rgba(105, 108, 255, 0.1) !important;
+            background: rgba(20, 33, 61, 0.1) !important;
         }
 
         .sortable-chosen {
-            background: rgba(105, 108, 255, 0.08) !important;
+            background: rgba(20, 33, 61, 0.08) !important;
         }
 
         /* FAQ Question */
@@ -233,13 +233,13 @@
 
         .faq-question-text {
             font-weight: 600;
-            color: #fff;
+            color: #1e293b;
             display: block;
             margin-bottom: 3px;
         }
 
         .faq-answer-preview {
-            color: rgba(255, 255, 255, 0.5);
+            color: #64748b;
             font-size: 12px;
             line-height: 1.4;
             display: -webkit-box;
@@ -260,9 +260,9 @@
         }
 
         .badge-active {
-            background: rgba(40, 167, 69, 0.15);
-            color: #28a745;
-            border: 1px solid rgba(40, 167, 69, 0.3);
+            background: rgba(30, 58, 95, 0.15);
+            color: #14213d;
+            border: 1px solid rgba(30, 58, 95, 0.3);
         }
 
         .badge-active::before {
@@ -270,13 +270,13 @@
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background: #28a745;
+            background: #14213d;
             animation: pulse 2s infinite;
         }
 
         .badge-inactive {
             background: rgba(220, 53, 69, 0.15);
-            color: #dc3545;
+            color: #ef4444;
             border: 1px solid rgba(220, 53, 69, 0.3);
         }
 
@@ -285,7 +285,7 @@
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background: #dc3545;
+            background: #ef4444;
         }
 
         @keyframes pulse {
@@ -306,8 +306,8 @@
             width: 35px;
             height: 35px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.05);
-            color: rgba(255, 255, 255, 0.7);
+            background: #f8fafc;
+            color: #64748b;
             font-weight: 600;
             font-size: 14px;
         }
@@ -331,7 +331,7 @@
 
         .btn-action.btn-view {
             background: rgba(23, 162, 184, 0.15);
-            color: #17a2b8;
+            color: #06b6d4;
             border: 1px solid rgba(23, 162, 184, 0.3);
         }
 
@@ -342,7 +342,7 @@
 
         .btn-action.btn-edit {
             background: rgba(255, 193, 7, 0.15);
-            color: #ffc107;
+            color: #f59e0b;
             border: 1px solid rgba(255, 193, 7, 0.3);
         }
 
@@ -353,7 +353,7 @@
 
         .btn-action.btn-delete {
             background: rgba(220, 53, 69, 0.15);
-            color: #dc3545;
+            color: #ef4444;
             border: 1px solid rgba(220, 53, 69, 0.3);
         }
 
@@ -374,20 +374,20 @@
         }
 
         .btn-action.btn-toggle {
-            background: rgba(105, 108, 255, 0.15);
+            background: rgba(20, 33, 61, 0.15);
             color: var(--primary-color);
-            border: 1px solid rgba(105, 108, 255, 0.3);
+            border: 1px solid rgba(20, 33, 61, 0.3);
         }
 
         .btn-action.btn-toggle:hover {
-            background: rgba(105, 108, 255, 0.3);
-            box-shadow: 0 5px 15px rgba(105, 108, 255, 0.2);
+            background: rgba(20, 33, 61, 0.3);
+            box-shadow: 0 5px 15px rgba(20, 33, 61, 0.2);
         }
 
         /* Checkbox */
         .form-check-input {
             background-color: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.2);
+            border-color: #e2e8f0;
             width: 18px;
             height: 18px;
             cursor: pointer;
@@ -400,14 +400,14 @@
 
         /* Bulk Actions Bar */
         .bulk-actions-bar {
-            background: rgba(105, 108, 255, 0.1);
+            background: rgba(20, 33, 61, 0.1);
             border-radius: 10px;
             padding: 12px 20px;
             margin-bottom: 15px;
             display: none;
             align-items: center;
             gap: 15px;
-            border: 1px solid rgba(105, 108, 255, 0.3);
+            border: 1px solid rgba(20, 33, 61, 0.3);
             animation: slideDown 0.3s ease;
         }
 
@@ -441,16 +441,16 @@
         }
 
         .page-item .page-link {
-            background: rgba(255, 255, 255, 0.05);
-            border-color: rgba(255, 255, 255, 0.1);
-            color: #fff;
+            background: #f8fafc;
+            border-color: #e2e8f0;
+            color: #1e293b;
             border-radius: 8px;
             padding: 8px 15px;
             transition: all 0.3s;
         }
 
         .page-item .page-link:hover {
-            background: rgba(105, 108, 255, 0.2);
+            background: rgba(20, 33, 61, 0.2);
             border-color: var(--primary-color);
         }
 
@@ -460,8 +460,8 @@
         }
 
         .page-item.disabled .page-link {
-            background: rgba(255, 255, 255, 0.02);
-            color: rgba(255, 255, 255, 0.3);
+            background: #f8fafc;
+            color: #94a3b8;
         }
 
         /* Empty State */
@@ -472,23 +472,23 @@
 
         .empty-state i {
             font-size: 80px;
-            color: rgba(255, 255, 255, 0.1);
+            color: #94a3b8;
             margin-bottom: 20px;
         }
 
         .empty-state h5 {
-            color: rgba(255, 255, 255, 0.5);
+            color: #64748b;
             margin-bottom: 10px;
         }
 
         .empty-state p {
-            color: rgba(255, 255, 255, 0.3);
+            color: #94a3b8;
         }
 
         /* Quick Edit Modal */
         .modal-content {
             background: var(--dark-card);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
         }
 
         .modal-header {
@@ -496,7 +496,7 @@
         }
 
         .modal-footer {
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 1px solid #e2e8f0;
         }
 
         .btn-close {
@@ -540,7 +540,7 @@
             border-radius: 10px;
             padding: 15px 20px;
             color: #fff;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
             border-right: 4px solid var(--success-color);
             display: flex;
             align-items: center;
@@ -580,7 +580,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: rgba(255, 255, 255, 0.2);
+            background-color: #f1f5f9;
             transition: 0.3s;
             border-radius: 34px;
         }
@@ -607,29 +607,29 @@
 
         /* FAQ Modal Details */
         .faq-modal-summary {
-            background: rgba(255, 255, 255, 0.05);
+            background: #f8fafc;
             border-radius: 12px;
             padding: 18px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            border: 1px solid #e2e8f0;
         }
 
         .faq-modal-label {
-            color: rgba(255, 255, 255, 0.55);
+            color: #64748b;
             font-size: 12px;
             margin-bottom: 6px;
         }
 
         .faq-modal-value {
-            color: #fff;
+            color: #1e293b;
             font-weight: 600;
         }
 
         .faq-answer-box {
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
             border-radius: 12px;
             padding: 18px;
-            color: rgba(255, 255, 255, 0.86);
+            color: #1e293b;
             line-height: 1.8;
             max-height: 360px;
             overflow-y: auto;
@@ -655,7 +655,7 @@
                 <li class="breadcrumb-item">
                     <a href="{{ route('admin.index') }}" class="text-primary">الرئيسية</a>
                 </li>
-                <li class="breadcrumb-item active text-white">الأسئلة الشائعة</li>
+                <li class="breadcrumb-item active text-muted">الأسئلة الشائعة</li>
             </ol>
         </nav>
 
@@ -706,7 +706,7 @@
                     <div class="col-md-4">
                         <label for="search" class="form-label small">بحث</label>
                         <div class="input-group">
-                            <span class="input-group-text" style="background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); color: rgba(255,255,255,0.5);">
+                            <span class="input-group-text bg-light text-muted">
                                 <i class="fas fa-search"></i>
                             </span>
                             <input type="text" class="form-control" id="search" name="search"
@@ -747,7 +747,7 @@
         <!-- Alert Messages -->
         @if (session('success'))
             <div class="alert alert-success alert-dismissible fade show" role="alert"
-                style="background: rgba(40,167,69,0.1); border-color: rgba(40,167,69,0.3); color: #28a745;">
+                style="background: rgba(30, 58, 95,0.1); border-color: rgba(30, 58, 95,0.3); color: #14213d;">
                 <i class="fas fa-check-circle me-2"></i>
                 {{ session('success') }}
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -756,7 +756,7 @@
 
         @if (session('error'))
             <div class="alert alert-danger alert-dismissible fade show" role="alert"
-                style="background: rgba(220,53,69,0.1); border-color: rgba(220,53,69,0.3); color: #dc3545;">
+                style="background: rgba(220,53,69,0.1); border-color: rgba(220,53,69,0.3); color: #ef4444;">
                 <i class="fas fa-exclamation-circle me-2"></i>
                 {{ session('error') }}
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -939,13 +939,13 @@
         <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title text-white">
+                    <h5 class="modal-title">
                         <i class="fas fa-eye text-info me-2"></i>
                         عرض السؤال الشائع
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body text-white">
+                <div class="modal-body">
                     <div class="row g-3 mb-4">
                         <div class="col-md-4">
                             <div class="faq-modal-summary">
@@ -969,7 +969,7 @@
 
                     <div class="mb-4">
                         <div class="faq-modal-label">السؤال</div>
-                        <h5 class="text-white mb-0" id="viewFaqQuestion"></h5>
+                        <h5 class="mb-0" id="viewFaqQuestion"></h5>
                     </div>
 
                     <div>
@@ -989,7 +989,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">إغلاق</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
                     <button type="button" class="btn btn-warning" id="viewFaqEditButton">
                         <i class="fas fa-edit me-1"></i> تعديل
                     </button>
@@ -1007,13 +1007,13 @@
                     @method('PUT')
                     <input type="hidden" name="edit_faq_id" id="editFaqId" value="{{ old('edit_faq_id') }}">
                     <div class="modal-header">
-                        <h5 class="modal-title text-white">
+                        <h5 class="modal-title">
                             <i class="fas fa-edit text-warning me-2"></i>
                             تعديل السؤال الشائع
                         </h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
-                    <div class="modal-body text-white">
+                    <div class="modal-body">
                         <div class="mb-3">
                             <label for="editFaqQuestion" class="form-label required">السؤال</label>
                             <textarea class="form-control @error('question') is-invalid @enderror" id="editFaqQuestion" name="question"
@@ -1074,13 +1074,13 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title text-white">
+                    <h5 class="modal-title">
                         <i class="fas fa-exclamation-triangle text-warning me-2"></i>
                         تأكيد الحذف
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body text-white">
+                <div class="modal-body">
                     <p>هل أنت متأكد من حذف هذا السؤال الشائع؟</p>
                     <p class="text-danger small">لا يمكن التراجع عن هذا الإجراء.</p>
                     <p class="mb-0"><strong id="deleteFaqName"></strong></p>
@@ -1301,7 +1301,7 @@
                 text: confirmText,
                 icon: confirmIcon,
                 showCancelButton: true,
-                confirmButtonColor: action === 'delete' ? '#d33' : '#3085d6',
+                confirmButtonColor: action === 'delete' ? '#ef4444' : '#14213d',
                 cancelButtonColor: '#6c757d',
                 confirmButtonText: confirmButtonText,
                 cancelButtonText: 'إلغاء'
@@ -1390,7 +1390,7 @@
                 text: 'سيتم إنشاء نسخة من هذا السؤال مع إضافة "(نسخة)" إلى العنوان',
                 icon: 'info',
                 showCancelButton: true,
-                confirmButtonColor: '#3085d6',
+                confirmButtonColor: '#14213d',
                 cancelButtonColor: '#6c757d',
                 confirmButtonText: 'نعم، انسخ',
                 cancelButtonText: 'إلغاء'

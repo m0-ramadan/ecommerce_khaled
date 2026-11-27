@@ -10,17 +10,17 @@
     <style>
         /* أنماط CSS - مرتبة حسب المكونات */
         :root {
-            --primary-color: #696cff;
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --success-color: #28a745;
-            --danger-color: #dc3545;
-            --warning-color: #ffc107;
-            --info-color: #17a2b8;
+            --primary-color: #14213d;
+            --primary-gradient: linear-gradient(135deg, #14213d 0%, #0c182a 100%);
+            --success-color: #14213d;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --info-color: #06b6d4;
             --light-bg: #f8f9fa;
             --border-color: #e9ecef;
             --text-muted: #6c757d;
-            --dark-bg: #1e1e2d;
-            --dark-card: #2b3b4c;
+            --dark-bg: #f6f8fb;
+            --dark-card: #ffffff;
         }
 
 
@@ -28,10 +28,10 @@
         .form-card {
             background: var(--dark-card);
             border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 5px 20px rgba(15, 23, 42, 0.05);
             padding: 30px;
             margin-bottom: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
         }
 
         .form-header {
@@ -50,9 +50,9 @@
         .form-section {
             margin-bottom: 30px;
             padding: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
             border-radius: 10px;
-            background: rgba(255, 255, 255, 0.05);
+            background: #f8fafc;
         }
 
         .section-title {
@@ -67,26 +67,26 @@
 
         /* بطاقات الأنواع */
         .type-card {
-            border: 2px solid rgba(255, 255, 255, 0.1);
+            border: 2px solid #e2e8f0;
             border-radius: 10px;
             padding: 20px;
             cursor: pointer;
             transition: all 0.3s ease;
             text-align: center;
-            background: rgba(255, 255, 255, 0.05);
+            background: #f8fafc;
             height: 100%;
         }
 
         .type-card:hover {
             border-color: var(--primary-color);
             transform: translateY(-5px);
-            background: rgba(105, 108, 255, 0.1);
+            background: rgba(20, 33, 61, 0.1);
         }
 
         .type-card.active {
             border-color: var(--primary-color);
-            background: rgba(105, 108, 255, 0.2);
-            box-shadow: 0 5px 15px rgba(105, 108, 255, 0.3);
+            background: rgba(20, 33, 61, 0.2);
+            box-shadow: 0 5px 15px rgba(20, 33, 61, 0.3);
         }
 
         .type-icon {
@@ -106,30 +106,30 @@
             flex: 1;
             text-align: center;
             padding: 15px;
-            border: 2px solid rgba(255, 255, 255, 0.1);
+            border: 2px solid #e2e8f0;
             border-radius: 10px;
             cursor: pointer;
             transition: all 0.3s ease;
-            background: rgba(255, 255, 255, 0.05);
+            background: #f8fafc;
         }
 
         .category-option:hover {
             border-color: var(--primary-color);
-            background: rgba(105, 108, 255, 0.1);
+            background: rgba(20, 33, 61, 0.1);
         }
 
         .category-option.active {
             border-color: var(--primary-color);
-            background: rgba(105, 108, 255, 0.2);
+            background: rgba(20, 33, 61, 0.2);
         }
 
         /* لوحات الإعدادات */
         .settings-panel {
-            background: rgba(255, 255, 255, 0.05);
+            background: #f8fafc;
             padding: 20px;
             border-radius: 10px;
             margin-top: 20px;
-            border: 2px dashed rgba(255, 255, 255, 0.1);
+            border: 2px dashed #e2e8f0;
             display: none;
         }
 
@@ -140,19 +140,19 @@
 
         /* رفع الصور */
         .image-upload-box {
-            border: 2px dashed rgba(255, 255, 255, 0.2);
+            border: 2px dashed #e2e8f0;
             border-radius: 10px;
             padding: 30px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
-            background: rgba(255, 255, 255, 0.05);
+            background: #f8fafc;
             position: relative;
         }
 
         .image-upload-box:hover {
             border-color: var(--primary-color);
-            background: rgba(105, 108, 255, 0.1);
+            background: rgba(20, 33, 61, 0.1);
         }
 
         .image-upload-box input {
@@ -166,7 +166,7 @@
             border-radius: 10px;
             margin-top: 15px;
             display: none;
-            border: 2px solid rgba(255, 255, 255, 0.1);
+            border: 2px solid #e2e8f0;
         }
 
         /* الباجات */
@@ -179,12 +179,12 @@
         }
 
         .badge-active {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            background: linear-gradient(135deg, #14213d 0%, #14213d 100%);
             color: white;
         }
 
         .badge-inactive {
-            background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);
+            background: linear-gradient(135deg, #ef4444 0%, #f59e0b 100%);
             color: white;
         }
 
@@ -240,9 +240,9 @@
             align-items: center;
             margin-bottom: 20px;
             padding: 15px;
-            background: rgba(255, 255, 255, 0.05);
+            background: #f8fafc;
             border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
         }
 
         .step-number {
@@ -272,7 +272,7 @@
         .alert-info {
             background: rgba(12, 99, 228, 0.2);
             border: 1px solid rgba(12, 99, 228, 0.5);
-            color: #0c63e4;
+            color: #0284c7;
         }
 
         .alert-warning {
@@ -283,11 +283,11 @@
 
         /* المعاينة */
         .preview-container {
-            background: rgba(255, 255, 255, 0.05);
+            background: #f8fafc;
             border-radius: 10px;
             padding: 20px;
             margin-top: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
         }
 
         .preview-wrapper {
@@ -295,7 +295,7 @@
             overflow: hidden;
             border-radius: 10px;
             margin-bottom: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
         }
 
         .preview-overlay {
@@ -325,30 +325,30 @@
 
         /* تحسينات للنموذج */
         .form-control {
-            background: rgba(255, 255, 255, 0.05);
-            border-color: rgba(255, 255, 255, 0.1);
-            color: #fff;
+            background: #f8fafc;
+            border-color: #e2e8f0;
+            color: #1e293b;
         }
 
         .form-control:focus {
             background: rgba(255, 255, 255, 0.1);
             border-color: var(--primary-color);
-            color: #fff;
-            box-shadow: 0 0 0 0.25rem rgba(105, 108, 255, 0.25);
+            color: #1e293b;
+            box-shadow: 0 0 0 0.25rem rgba(20, 33, 61, 0.25);
         }
 
         .form-control::placeholder {
-            color: rgba(255, 255, 255, 0.5);
+            color: #64748b;
         }
 
         .input-group-text {
             background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.1);
-            color: #fff;
+            border-color: #e2e8f0;
+            color: #1e293b;
         }
 
         .form-label {
-            color: rgba(255, 255, 255, 0.9);
+            color: #1e293b;
         }
 
         /* الرسوم المتحركة */
@@ -951,7 +951,7 @@
                             <small class="text-muted">معاينة الكمبيوتر (${desktop} أعمدة)</small>
                             <div class="border rounded p-3">
                                 <div class="row g-${colGap}">
-                                    ${this.generatePreviewItems(desktop, rowGap, '#696cff')}
+                                    ${this.generatePreviewItems(desktop, rowGap, '#14213d')}
                                 </div>
                             </div>
                         </div>
@@ -960,7 +960,7 @@
                             <small class="text-muted">معاينة التابلت (${tablet} أعمدة)</small>
                             <div class="border rounded p-3">
                                 <div class="row g-${colGap}">
-                                    ${this.generatePreviewItems(tablet, rowGap, '#0c63e4')}
+                                    ${this.generatePreviewItems(tablet, rowGap, '#0284c7')}
                                 </div>
                             </div>
                         </div>
@@ -969,7 +969,7 @@
                             <small class="text-muted">معاينة الموبايل (${mobile} أعمدة)</small>
                             <div class="border rounded p-3">
                                 <div class="row g-${colGap}">
-                                    ${this.generatePreviewItems(mobile, rowGap, '#28a745')}
+                                    ${this.generatePreviewItems(mobile, rowGap, '#14213d')}
                                 </div>
                             </div>
                         </div>

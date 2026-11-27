@@ -658,4 +658,33 @@ class CategoryController extends Controller
 
         return $newPath;
     }
+
+    public function export(Request $request)
+    {
+        $query = Category::with('parent')->orderBy('order');
+        if ($request->filled('ids')) {
+            $ids = is_array($request->ids) ? $request->ids : explode(',', (string) $request->ids);
+            $query->whereIn('id', array_filter($ids));
+        }
+        $categories = $query->get();
+
+        return response()->streamDownload(function () use ($categories) {
+            $out = fopen('php://output', 'w');
+            fwrite($out, "\xEF\xBB\xBF");
+            fputcsv($out, ['#', 'الاسم', 'Slug', 'القسم الرئيسي', 'الترتيب', 'الحالة']);
+            foreach ($categories as $cat) {
+                fputcsv($out, [
+                    $cat->id,
+                    $cat->name,
+                    $cat->slug,
+                    $cat->parent->name ?? '-',
+                    $cat->order ?? 0,
+                    $cat->status_id == 1 ? 'نشط' : 'غير نشط',
+                ]);
+            }
+            fclose($out);
+        }, 'categories-' . now()->format('Y-m-d') . '.csv', [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+        ]);
+    }
 }

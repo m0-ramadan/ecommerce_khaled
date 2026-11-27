@@ -16,7 +16,7 @@
         .social-media-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            border-color: #696cff;
+            border-color: #14213d;
         }
 
         .social-icon {
@@ -41,7 +41,7 @@
         .email-icon { background: linear-gradient(135deg, #EA4335, #D14836); }
         .youtube-icon { background: linear-gradient(135deg, #FF0000, #CC0000); }
         .tiktok-icon { background: linear-gradient(135deg, #000000, #69C9D0); }
-        .default-icon { background: linear-gradient(135deg, #696cff, #5a5fcf); }
+        .default-icon { background: linear-gradient(135deg, #14213d, #1e3a5f); }
 
         .social-title {
             font-weight: 600;
@@ -106,13 +106,13 @@
 
         .status-active {
             background: rgba(40, 199, 111, 0.1);
-            color: #28c76f;
+            color: #14213d;
             border: 1px solid rgba(40, 199, 111, 0.3);
         }
 
         .status-inactive {
             background: rgba(234, 84, 85, 0.1);
-            color: #ea5455;
+            color: #ef4444;
             border: 1px solid rgba(234, 84, 85, 0.3);
         }
 
@@ -139,8 +139,8 @@
         }
 
         .form-check-input:checked {
-            background-color: #696cff;
-            border-color: #696cff;
+            background-color: #14213d;
+            border-color: #14213d;
         }
 
         .bulk-actions {

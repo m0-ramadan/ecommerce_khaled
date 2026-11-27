@@ -7,7 +7,7 @@
 
     <style>
         .social-preview-card {
-            background: #26253d;
+            background: #ffffff;
             border-radius: 12px;
             padding: 30px;
             text-align: center;
@@ -25,7 +25,7 @@
             font-size: 40px;
             margin: 0 auto 20px;
             color: white;
-            background: linear-gradient(135deg, #696cff, #5a5fcf);
+            background: linear-gradient(135deg, #14213d, #1e3a5f);
         }
 
         .social-preview-title {
@@ -42,7 +42,7 @@
         }
 
         .form-section {
-            background:#26253d;
+            background:#ffffff;
             border-radius: 10px;
             padding: 25px;
             margin-bottom: 20px;
@@ -67,17 +67,17 @@
             border: 2px solid transparent;
             cursor: pointer;
             transition: all 0.3s ease;
-            background: #26253d;
+            background: #ffffff;
         }
 
         .icon-option:hover {
-            border-color: #696cff;
+            border-color: #14213d;
             transform: translateY(-2px);
         }
 
         .icon-option.selected {
-            border-color: #696cff;
-            background: rgba(105, 108, 255, 0.1);
+            border-color: #14213d;
+            background: rgba(20, 33, 61, 0.1);
         }
 
         .icon-option i {
@@ -92,8 +92,8 @@
         }
 
         .help-text {
-            background:#26253d;
-            border-right: 4px solid #696cff;
+            background:#ffffff;
+            border-right: 4px solid #14213d;
             padding: 15px;
             border-radius: 5px;
             margin-top: 20px;
@@ -112,7 +112,7 @@
         .preview-link {
             display: inline-block;
             padding: 8px 15px;
-            background: #26253d;
+            background: #ffffff;
             border-radius: 5px;
             margin-top: 10px;
             text-decoration: none;
@@ -121,8 +121,8 @@
         }
 
         .preview-link:hover {
-            background: #26253d;
-            color: #696cff;
+            background: #ffffff;
+            color: #14213d;
         }
     </style>
 @endsection

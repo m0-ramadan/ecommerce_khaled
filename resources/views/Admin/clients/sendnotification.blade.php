@@ -10,12 +10,12 @@
         }
 
         .form-control.is-invalid {
-            border-color: #dc3545;
+            border-color: #ef4444;
         }
 
         .invalid-feedback {
             font-family: 'Cairo', sans-serif;
-            color: #dc3545;
+            color: #ef4444;
             font-weight: bold;
         }
     </style>

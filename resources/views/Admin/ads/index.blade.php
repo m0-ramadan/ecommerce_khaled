@@ -7,31 +7,31 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary-color: #696cff;
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --success-color: #28a745;
-            --danger-color: #dc3545;
-            --warning-color: #ffc107;
-            --info-color: #17a2b8;
+            --primary-color: #14213d;
+            --primary-gradient: linear-gradient(135deg, #14213d 0%, #0c182a 100%);
+            --success-color: #14213d;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --info-color: #06b6d4;
             --light-bg: #f8f9fa;
             --border-color: #e9ecef;
             --text-muted: #6c757d;
-            --dark-bg: #1e1e2d;
-            --dark-card: #2b3b4c;
+            --dark-bg: #f6f8fb;
+            --dark-card: #ffffff;
         }
 
         body {
             font-family: "Cairo", sans-serif !important;
             background: var(--dark-bg);
-            color: #fff;
+            color: #1e293b;
         }
 
         .ads-card {
             background: var(--dark-card);
             border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 5px 20px rgba(15, 23, 42, 0.05);
             padding: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
         }
 
         .ads-header {
@@ -45,16 +45,16 @@
             background: var(--dark-card);
             border-radius: 12px;
             padding: 20px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 15px rgba(15, 23, 42, 0.05);
             border-top: 4px solid var(--primary-color);
             transition: transform 0.3s ease;
             margin-bottom: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
         }
 
         .stats-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 8px 25px rgba(15, 23, 42, 0.05);
         }
 
         .stats-icon {
@@ -75,7 +75,7 @@
 
         .icon-types {
             background: rgba(12, 99, 228, 0.2);
-            color: #0c63e4;
+            color: #0284c7;
             border: 1px solid rgba(12, 99, 228, 0.3);
         }
 
@@ -83,20 +83,20 @@
             font-size: 24px;
             font-weight: 700;
             margin-bottom: 5px;
-            color: #fff;
+            color: #1e293b;
         }
 
         .stats-label {
-            color: rgba(255, 255, 255, 0.7);
+            color: #64748b;
             font-size: 14px;
         }
 
         .filter-card {
-            background: rgba(255, 255, 255, 0.05);
+            background: #f8fafc;
             border-radius: 12px;
             padding: 20px;
             margin-bottom: 25px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
         }
 
         .search-box {
@@ -106,16 +106,16 @@
         .search-box input {
             padding-right: 40px;
             border-radius: 25px;
-            background: rgba(255, 255, 255, 0.05);
-            border-color: rgba(255, 255, 255, 0.1);
-            color: #fff;
+            background: #f8fafc;
+            border-color: #e2e8f0;
+            color: #1e293b;
         }
 
         .search-box input:focus {
             background: rgba(255, 255, 255, 0.1);
             border-color: var(--primary-color);
-            color: #fff;
-            box-shadow: 0 0 0 0.25rem rgba(105, 108, 255, 0.25);
+            color: #1e293b;
+            box-shadow: 0 0 0 0.25rem rgba(20, 33, 61, 0.25);
         }
 
         .search-box .search-icon {
@@ -123,36 +123,37 @@
             left: 15px;
             top: 50%;
             transform: translateY(-50%);
-            color: rgba(255, 255, 255, 0.5);
+            color: #64748b;
         }
 
         .ads-item {
-            background: rgba(255, 255, 255, 0.05);
+            background: #f8fafc;
             border-radius: 10px;
             padding: 20px;
             margin-bottom: 15px;
             transition: all 0.3s ease;
             border-right: 4px solid transparent;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
         }
 
         .ads-item:hover {
             transform: translateX(-5px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            background: rgba(105, 108, 255, 0.1);
+            box-shadow: 0 5px 15px rgba(15, 23, 42, 0.05);
+            background: rgba(20, 33, 61, 0.1);
             border-color: var(--primary-color);
         }
 
         .ads-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 12px;
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 28px;
-            background: var(--primary-gradient);
-            color: white;
+            font-size: 20px;
+            background: #ebf0f8;
+            color: #1e3a5f;
+            border: 1px solid #cbd7ea;
         }
 
         .ads-type {
@@ -164,26 +165,26 @@
         }
 
         .type-banner {
-            background: rgba(105, 108, 255, 0.2);
-            color: #696cff;
-            border: 1px solid rgba(105, 108, 255, 0.3);
+            background: rgba(20, 33, 61, 0.2);
+            color: #14213d;
+            border: 1px solid rgba(20, 33, 61, 0.3);
         }
 
         .type-popup {
-            background: rgba(40, 167, 69, 0.2);
-            color: #28a745;
-            border: 1px solid rgba(40, 167, 69, 0.3);
+            background: rgba(30, 58, 95, 0.2);
+            color: #14213d;
+            border: 1px solid rgba(30, 58, 95, 0.3);
         }
 
         .type-sidebar {
             background: rgba(255, 193, 7, 0.2);
-            color: #ffc107;
+            color: #f59e0b;
             border: 1px solid rgba(255, 193, 7, 0.3);
         }
 
         .type-footer {
             background: rgba(23, 162, 184, 0.2);
-            color: #17a2b8;
+            color: #06b6d4;
             border: 1px solid rgba(23, 162, 184, 0.3);
         }
 
@@ -197,7 +198,7 @@
         }
 
         .ads-description {
-            color: rgba(255, 255, 255, 0.9);
+            color: #1e293b;
             line-height: 1.6;
             margin: 15px 0;
         }
@@ -215,12 +216,12 @@
 
         .empty-state-icon {
             font-size: 60px;
-            color: rgba(255, 255, 255, 0.1);
+            color: #94a3b8;
             margin-bottom: 20px;
         }
 
         .empty-state-text {
-            color: rgba(255, 255, 255, 0.7);
+            color: #64748b;
             margin-bottom: 20px;
         }
 
@@ -230,59 +231,59 @@
         }
 
         .btn-primary:hover {
-            background: linear-gradient(135deg, #5a6fd8 0%, #6a4a9a 100%);
+            background: linear-gradient(135deg, #14213d 0%, #1e3a5f 100%);
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(105, 108, 255, 0.4);
+            box-shadow: 0 5px 15px rgba(20, 33, 61, 0.4);
         }
 
         .btn-secondary {
             background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #fff;
+            border: 1px solid #e2e8f0;
+            color: #1e293b;
         }
 
         .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: rgba(255, 255, 255, 0.3);
+            background: #f1f5f9;
+            border-color: #e2e8f0;
         }
 
         .btn-info {
             background: rgba(23, 162, 184, 0.2);
             border: 1px solid rgba(23, 162, 184, 0.3);
-            color: #17a2b8;
+            color: #06b6d4;
         }
 
         .btn-info:hover {
-            background: #17a2b8;
+            background: #06b6d4;
             color: white;
         }
 
         .btn-warning {
             background: rgba(255, 193, 7, 0.2);
             border: 1px solid rgba(255, 193, 7, 0.3);
-            color: #ffc107;
+            color: #f59e0b;
         }
 
         .btn-warning:hover {
-            background: #ffc107;
+            background: #f59e0b;
             color: #000;
         }
 
         .btn-danger {
             background: rgba(220, 53, 69, 0.2);
             border: 1px solid rgba(220, 53, 69, 0.3);
-            color: #dc3545;
+            color: #ef4444;
         }
 
         .btn-danger:hover {
-            background: #dc3545;
+            background: #ef4444;
             color: white;
         }
 
         /* Modal Styles */
         .modal-content {
             background: var(--dark-card);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
             border-radius: 15px;
         }
 
@@ -294,7 +295,7 @@
         }
 
         .modal-title {
-            color: white;
+            color: #1e293b;
         }
 
         .btn-close {
@@ -302,19 +303,19 @@
         }
 
         .modal-body {
-            color: #fff;
+            color: #1e293b;
         }
 
         .form-label {
-            color: rgba(255, 255, 255, 0.9);
+            color: #1e293b;
             font-weight: 600;
             margin-bottom: 8px;
         }
 
         .form-control, .form-select {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #fff;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            color: #1e293b;
             border-radius: 10px;
             padding: 10px 15px;
         }
@@ -322,17 +323,17 @@
         .form-control:focus, .form-select:focus {
             background: rgba(255, 255, 255, 0.1);
             border-color: var(--primary-color);
-            color: #fff;
-            box-shadow: 0 0 0 0.25rem rgba(105, 108, 255, 0.25);
+            color: #1e293b;
+            box-shadow: 0 0 0 0.25rem rgba(20, 33, 61, 0.25);
         }
 
         .form-control::placeholder {
-            color: rgba(255, 255, 255, 0.5);
+            color: #64748b;
         }
 
         .form-select option {
             background: var(--dark-card);
-            color: #fff;
+            color: #1e293b;
         }
 
         textarea.form-control {
@@ -405,7 +406,7 @@
 
             <div class="col-lg-4 col-md-6 mb-4" bis_skin_checked="1">
                 <div class="stats-card" bis_skin_checked="1">
-                    <div class="stats-icon" style="background: rgba(40, 167, 69, 0.2); color: #28a745;" bis_skin_checked="1">
+                    <div class="stats-icon" style="background: rgba(30, 58, 95, 0.2); color: #14213d;" bis_skin_checked="1">
                         <i class="fas fa-icons"></i>
                     </div>
                     <div class="stats-number" bis_skin_checked="1">
@@ -464,7 +465,13 @@
                                     <div class="ads-header-info" bis_skin_checked="1">
                                         <div class="d-flex align-items-center gap-3" bis_skin_checked="1">
                                             <div class="ads-icon" bis_skin_checked="1">
-                                                <i class="{{ $ad->icon }}"></i>
+                                                @php
+                                                    $adIcon = trim($ad->icon ?? 'fas fa-bullhorn');
+                                                    if (!str_contains($adIcon, 'fa ') && !str_starts_with($adIcon, 'fas ') && !str_starts_with($adIcon, 'far ') && !str_starts_with($adIcon, 'fab ') && !str_starts_with($adIcon, 'ti ')) {
+                                                        $adIcon = 'fas ' . $adIcon;
+                                                    }
+                                                @endphp
+                                                <i class="{{ $adIcon }}"></i>
                                             </div>
                                             <div bis_skin_checked="1">
                                                 <span class="ads-type type-{{ $ad->type }}">
@@ -663,7 +670,7 @@
                             <i class="fas fa-ad"></i>
                         </div>
                     </div>
-                    <table class="table table-borderless text-white">
+                    <table class="table table-borderless">
                         <tr>
                             <th width="30%">نوع الإعلان:</th>
                             <td>
@@ -742,8 +749,8 @@
                     text: `سيتم حذف الإعلان "${adDescription}" نهائياً`,
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonColor: '#d33',
-                    cancelButtonColor: '#3085d6',
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#14213d',
                     confirmButtonText: 'نعم، احذف',
                     cancelButtonText: 'إلغاء',
                     reverseButtons: true

@@ -85,14 +85,12 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
     // Ads Management Routes
     Route::prefix('ads')->name('ads.')->group(function () {
         Route::get('/', [AdsController::class, 'index'])->name('index');           // List all ads
+        Route::get('/create', [AdsController::class, 'create'])->name('create');   // Show create form
         Route::post('/', [AdsController::class, 'store'])->name('store');          // Store new ad
+        Route::get('/{id}/edit', [AdsController::class, 'edit'])->name('edit');    // Show edit form
         Route::get('/{id}', [AdsController::class, 'show'])->name('show');         // Show single ad (AJAX)
         Route::put('/{id}', [AdsController::class, 'update'])->name('update');     // Update ad
         Route::delete('/{id}', [AdsController::class, 'destroy'])->name('destroy'); // Delete ad
-
-        // Optional: Additional useful routes
-        Route::get('/create', [AdsController::class, 'create'])->name('create');   // Show create form (if needed)
-        Route::get('/{id}/edit', [AdsController::class, 'edit'])->name('edit');    // Show edit form (if needed)
     });
 
     Route::prefix('admins')->name('admins.')->group(function () {
@@ -124,27 +122,21 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
         // Listing & CRUD
         Route::get('/', [TestimonialController::class, 'index'])->name('index');
         Route::get('/create', [TestimonialController::class, 'create'])->name('create');
+        Route::get('/export', [TestimonialController::class, 'export'])->name('export');
+        Route::get('/search', [TestimonialController::class, 'search'])->name('search');
         Route::post('/', [TestimonialController::class, 'store'])->name('store');
-        Route::get('/{testimonial}', [TestimonialController::class, 'show'])->name('show');
+        Route::post('/bulk-action', [TestimonialController::class, 'bulkAction'])->name('bulk-action');
+        Route::post('/update-order', [TestimonialController::class, 'updateOrder'])->name('update-order');
         Route::get('/{testimonial}/edit', [TestimonialController::class, 'edit'])->name('edit');
+        Route::get('/{testimonial}', [TestimonialController::class, 'show'])->name('show');
         Route::put('/{testimonial}', [TestimonialController::class, 'update'])->name('update');
         Route::delete('/{testimonial}', [TestimonialController::class, 'destroy'])->name('destroy');
-
-        // Bulk Actions
-        Route::post('/bulk-action', [TestimonialController::class, 'bulkAction'])->name('bulk-action');
 
         // Duplicate
         Route::post('/{testimonial}/duplicate', [TestimonialController::class, 'duplicate'])->name('duplicate');
 
-        // Export CSV
-        Route::get('/export', [TestimonialController::class, 'export'])->name('export');
-
         // AJAX Actions
         Route::patch('/{testimonial}/toggle-status', [TestimonialController::class, 'toggleStatus'])->name('toggle-status');
-        Route::post('/update-order', [TestimonialController::class, 'updateOrder'])->name('update-order');
-
-        // Search (AJAX Autocomplete)
-        Route::get('/search', [TestimonialController::class, 'search'])->name('search');
     });
 
     // Faqs
@@ -178,19 +170,18 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
 
     // coupons
     Route::prefix('coupons')->name('coupons.')->group(function () {
-        //  Route::resource('/', CouponController::class);
         Route::get('/', [CouponController::class, 'index'])->name('index');
         Route::get('/create', [CouponController::class, 'create'])->name('create');
+        Route::get('export', [CouponController::class, 'export'])->name('export');
         Route::post('/', [CouponController::class, 'store'])->name('store');
+        Route::post('bulk-action', [CouponController::class, 'bulkAction'])->name('bulk-action');
+        Route::post('generate-code', [CouponController::class, 'generateCode'])->name('generate-code');
+        Route::post('validate-code', [CouponController::class, 'validateCode'])->name('validate-code');
         Route::get('/{coupon}/edit', [CouponController::class, 'edit'])->name('edit');
         Route::put('/{coupon}', [CouponController::class, 'update'])->name('update');
         Route::delete('/{coupon}', [CouponController::class, 'destroy'])->name('destroy');
         Route::get('/{coupon}', [CouponController::class, 'show'])->name('show');
-        Route::post('bulk-action', [CouponController::class, 'bulkAction'])->name('bulk-action');
         Route::post('{coupon}/duplicate', [CouponController::class, 'duplicate'])->name('duplicate');
-        Route::post('generate-code', [CouponController::class, 'generateCode'])->name('generate-code');
-        Route::post('validate-code', [CouponController::class, 'validateCode'])->name('validate-code');
-        Route::get('export', [CouponController::class, 'export'])->name('export');
     });
 
     // errors
@@ -213,8 +204,8 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
 
     // Users
     Route::prefix('users')->as('user.')->group(function () {
-        Route::get('/', [UserController::class, 'index'])->name('index')->withoutMiddleware('admin:1')->middleware('admin:1,0');
-        Route::get('show/{id}', [UserController::class, 'show'])->name('show')->withoutMiddleware('admin:1')->middleware('admin:1,0');
+        Route::get('/', [UserController::class, 'index'])->name('index');
+        Route::get('show/{user}', [UserController::class, 'show'])->name('show');
         Route::get('verify/email/{id}', [UserController::class, 'verifyEmail'])->name('verify-email');
         Route::get('verify/{id}', [UserController::class, 'verify'])->name('verify');
         Route::post('reject/{id}', [UserController::class, 'reject'])->name('reject');
@@ -222,7 +213,7 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
         Route::get('archive', [UserController::class, 'archive'])->name('archive');
         Route::get('restore/{id}', [UserController::class, 'restore'])->name('restore');
         Route::delete('force-delete/{id}', [UserController::class, 'forceDelete'])->name('forcedelete');
-        Route::post('wallet-control', [UserController::class, 'walletControl'])->name('walletcontrol')->withoutMiddleware('admin:1')->middleware('admin:1,0');
+        Route::post('wallet-control', [UserController::class, 'walletControl'])->name('walletcontrol');
         Route::post('package-control', [UserController::class, 'packageControl'])->name('package-control');
     });
 
@@ -230,13 +221,13 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
     Route::prefix('categories')->as('categories.')->group(function () {
         Route::get('/', [CategoryController::class, 'index'])->name('index');
         Route::get('/create', [CategoryController::class, 'create'])->name('create');
+        Route::get('/export', [CategoryController::class, 'export'])->name('export');
         Route::post('/', [CategoryController::class, 'store'])->name('store');
+        Route::post('/update-order', [CategoryController::class, 'updateOrder'])->name('updateOrder');
         Route::get('/{category}/edit', [CategoryController::class, 'edit'])->name('edit');
         Route::put('/{category}', [CategoryController::class, 'update'])->name('update');
         Route::delete('/{category}', [CategoryController::class, 'destroy'])->name('destroy');
         Route::get('/{category}', [CategoryController::class, 'show'])->name('show');
-        Route::post('/update-order', [CategoryController::class, 'updateOrder'])->name('updateOrder');
-        Route::get('/export', [CategoryController::class, 'export'])->name('export');
         Route::post('/{category}/duplicate', [CategoryController::class, 'duplicate'])->name('duplicate');
     });
 
@@ -291,12 +282,18 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
 
     // Users
     Route::prefix('users')->as('users.')->group(function () {
-        Route::resource('/', UserController::class);
+        Route::get('/', [UserController::class, 'index'])->name('index');
+        Route::get('/create', [UserController::class, 'create'])->name('create');
+        Route::post('/', [UserController::class, 'store'])->name('store');
+        Route::get('/{user}/edit', [UserController::class, 'edit'])->name('edit');
+        Route::put('/{user}', [UserController::class, 'update'])->name('update');
+        Route::delete('/{user}', [UserController::class, 'destroy'])->name('destroy');
         Route::post('/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('toggle-status');
         Route::get('/{user}/orders', [UserController::class, 'orders'])->name('orders');
         Route::get('/{user}/reviews', [UserController::class, 'reviews'])->name('reviews');
         Route::get('/{user}/favourites', [UserController::class, 'favourites'])->name('favourites');
         Route::get('/{user}/activities', [UserController::class, 'activities'])->name('activities');
+        Route::get('/{user}', [UserController::class, 'show'])->name('show');
     });
 
     // Slider Routes (السلايدر الرئيسي)
@@ -315,15 +312,15 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
     Route::prefix('banners')->name('banners.')->group(function () {
         Route::get('/', [BannerController::class, 'index'])->name('index');
         Route::get('/create', [BannerController::class, 'create'])->name('create');
+        Route::get('export', [BannerController::class, 'export'])->name('export');
         Route::post('/', [BannerController::class, 'store'])->name('store');
-        Route::get('/{banner}', [BannerController::class, 'show'])->name('show');
+        Route::post('/update-order', [BannerController::class, 'updateOrder'])->name('update-order');
+        Route::post('bulk-actions', [BannerController::class, 'bulkActions'])->name('bulk-actions');
         Route::get('/{banner}/edit', [BannerController::class, 'edit'])->name('edit');
+        Route::get('/{banner}', [BannerController::class, 'show'])->name('show');
         Route::put('/{banner}', [BannerController::class, 'update'])->name('update');
         Route::delete('/{banner}', [BannerController::class, 'destroy'])->name('destroy');
         Route::post('/{banner}/toggle-status', [BannerController::class, 'toggleStatus'])->name('toggle-status');
-        Route::post('/update-order', [BannerController::class, 'updateOrder'])->name('update-order');
-        Route::get('export', [BannerController::class, 'export'])->name('export');
-        Route::post('bulk-actions', [BannerController::class, 'bulkActions'])->name('bulk-actions');
 
         // Banner Items Routes - إضافة route للعرض
         // Route::get('/items/{bannerItem}', [BannerItemController::class, 'show'])->name('items.show'); // أضف هذا السطر
@@ -347,18 +344,17 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
     });
     // Orders
     Route::prefix('orders')->as('orders.')->group(function () {
-        // Route::resource('/', OrderController::class);
         Route::get('/', [OrderController::class, 'index'])->name('index');
         Route::get('/create', [OrderController::class, 'create'])->name('create');
+        Route::get('/export', [OrderController::class, 'export'])->name('export');
         Route::post('/', [OrderController::class, 'store'])->name('store');
-        Route::get('/{id}', [OrderController::class, 'show'])->name('show');
         Route::get('/{order}/edit', [OrderController::class, 'edit'])->name('edit');
+        Route::get('/{order}/print', [OrderController::class, 'print'])->name('print');
+        Route::get('/{id}', [OrderController::class, 'show'])->name('show');
         Route::put('/{order}', [OrderController::class, 'update'])->name('update');
         Route::delete('/{order}', [OrderController::class, 'destroy'])->name('destroy');
 
         Route::post('/{order}/update-status', [OrderController::class, 'updateStatus'])->name('update-status');
-        Route::get('/{order}/print', [OrderController::class, 'print'])->name('print');
-        Route::get('/export', [OrderController::class, 'export'])->name('export');
     });
 
     // Routes for Roles and Permissions
@@ -385,22 +381,18 @@ Route::prefix('admin')->as('admin.')->middleware('auth:admin')->group(function (
     });
 
     Route::prefix('articles')->name('articles.')->group(function () {
-        // مقالات
-        // Route::resource('/', ArticleController::class);
         Route::get('/', [ArticleController::class, 'index'])->name('index');
         Route::get('/create', [ArticleController::class, 'create'])->name('create');
+        Route::get('/statistics', [ArticleController::class, 'statistics'])->name('statistics');
         Route::post('/', [ArticleController::class, 'store'])->name('store');
-        Route::get('/{article}', [ArticleController::class, 'show'])->name('show');
+        Route::post('/bulk-actions', [ArticleController::class, 'bulkActions'])->name('bulk-actions');
         Route::get('/{article}/edit', [ArticleController::class, 'edit'])->name('edit');
+        Route::get('/{article}', [ArticleController::class, 'show'])->name('show');
         Route::put('/{article}', [ArticleController::class, 'update'])->name('update');
         Route::delete('/{article}', [ArticleController::class, 'destroy'])->name('destroy');
-        Route::post('/bulk-actions', [ArticleController::class, 'bulkActions'])->name('bulk-actions');
         Route::patch('/{article}/toggle-status', [ArticleController::class, 'toggleStatus'])->name('toggle-status');
         Route::patch('/{article}/toggle-featured', [ArticleController::class, 'toggleFeatured'])->name('toggle-featured');
     });
-
-    // إحصائيات المقالات
-    Route::get('/articles/statistics', [ArticleController::class, 'statistics'])->name('articles.statistics');
 
     Route::prefix('assign-roles')->name('roles.')->group(function () {
         Route::get('/', [RoleController::class, 'assignIndex'])->name('assign.index');

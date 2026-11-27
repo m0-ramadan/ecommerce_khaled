@@ -6,18 +6,18 @@
 
     /* متغيرات الألوان - تيم مظلم */
     :root {
-        --primary-color: #696cff;
-        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        --success-color: #28a745;
-        --danger-color: #dc3545;
-        --warning-color: #ffc107;
-        --info-color: #17a2b8;
+        --primary-color: #14213d;
+        --primary-gradient: linear-gradient(135deg, #14213d 0%, #0c182a 100%);
+        --success-color: #14213d;
+        --danger-color: #ef4444;
+        --warning-color: #f59e0b;
+        --info-color: #06b6d4;
         --light-bg: #f8f9fa;
         --border-color: #e9ecef;
         --text-muted: #6c757d;
-        --dark-bg: #1e1e2d;
-        --dark-card: #2b3b4c;
-        --light-text: #fff;
+        --dark-bg: #f6f8fb;
+        --dark-card: #ffffff;
+        --light-text: #1e293b;
         --dark-text: #212529;
     }
 
@@ -32,10 +32,10 @@
     .form-card {
         background: var(--dark-card);
         border-radius: 15px;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 5px 20px rgba(15, 23, 42, 0.05);
         padding: 30px;
         margin-bottom: 30px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        border: 1px solid #e2e8f0;
     }
 
     .form-header {
@@ -49,9 +49,9 @@
     .form-section {
         margin-bottom: 30px;
         padding: 20px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        border: 1px solid #e2e8f0;
         border-radius: 10px;
-        background: rgba(255, 255, 255, 0.05);
+        background: #f8fafc;
     }
 
     .form-section h5 {
@@ -75,21 +75,21 @@
         flex: 1;
         text-align: center;
         padding: 15px;
-        border: 2px solid rgba(255, 255, 255, 0.1);
+        border: 2px solid #e2e8f0;
         border-radius: 10px;
         cursor: pointer;
         transition: all 0.3s ease;
-        background: rgba(255, 255, 255, 0.05);
+        background: #f8fafc;
     }
 
     .category-option:hover {
         border-color: var(--primary-color);
-        background: rgba(105, 108, 255, 0.1);
+        background: rgba(20, 33, 61, 0.1);
     }
 
     .category-option.active {
         border-color: var(--primary-color);
-        background: rgba(105, 108, 255, 0.2);
+        background: rgba(20, 33, 61, 0.2);
     }
 
     .category-option i {
@@ -109,26 +109,26 @@
 
     /* بطاقات الأنواع */
     .type-card {
-        border: 2px solid rgba(255, 255, 255, 0.1);
+        border: 2px solid #e2e8f0;
         border-radius: 10px;
         padding: 20px;
         cursor: pointer;
         transition: all 0.3s ease;
         text-align: center;
-        background: rgba(255, 255, 255, 0.05);
+        background: #f8fafc;
         height: 100%;
     }
 
     .type-card:hover {
         border-color: var(--primary-color);
         transform: translateY(-5px);
-        background: rgba(105, 108, 255, 0.1);
+        background: rgba(20, 33, 61, 0.1);
     }
 
     .type-card.active {
         border-color: var(--primary-color);
-        background: rgba(105, 108, 255, 0.2);
-        box-shadow: 0 5px 15px rgba(105, 108, 255, 0.3);
+        background: rgba(20, 33, 61, 0.2);
+        box-shadow: 0 5px 15px rgba(20, 33, 61, 0.3);
     }
 
     .type-icon {
@@ -146,27 +146,27 @@
     /* إعدادات السلايدر والشبكة */
     .grid-settings,
     .slider-settings {
-        background: rgba(255, 255, 255, 0.05);
+        background: #f8fafc;
         padding: 20px;
         border-radius: 10px;
         margin-top: 20px;
-        border: 2px dashed rgba(255, 255, 255, 0.1);
+        border: 2px dashed #e2e8f0;
     }
 
     /* رفع الصور */
     .image-upload-box {
-        border: 2px dashed rgba(255, 255, 255, 0.2);
+        border: 2px dashed #e2e8f0;
         border-radius: 10px;
         padding: 30px;
         text-align: center;
         cursor: pointer;
         transition: all 0.3s ease;
-        background: rgba(255, 255, 255, 0.05);
+        background: #f8fafc;
     }
 
     .image-upload-box:hover {
         border-color: var(--primary-color);
-        background: rgba(105, 108, 255, 0.1);
+        background: rgba(20, 33, 61, 0.1);
     }
 
     .image-upload-box i {
@@ -186,7 +186,7 @@
         border-radius: 10px;
         margin-top: 15px;
         display: none;
-        border: 2px solid rgba(255, 255, 255, 0.1);
+        border: 2px solid #e2e8f0;
     }
 
     .mobile-image-preview {
@@ -195,7 +195,7 @@
         object-fit: cover;
         border-radius: 8px;
         margin-top: 10px;
-        border: 2px solid rgba(255, 255, 255, 0.1);
+        border: 2px solid #e2e8f0;
     }
 
     /* الباجات */
@@ -208,29 +208,29 @@
     }
 
     .badge-active {
-        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        background: linear-gradient(135deg, #14213d 0%, #14213d 100%);
         color: white;
     }
 
     .badge-inactive {
-        background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);
+        background: linear-gradient(135deg, #ef4444 0%, #f59e0b 100%);
         color: white;
     }
 
     /* باجات الأنواع */
     .badge-slider {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #14213d 0%, #1e3a5f 100%);
         color: white;
     }
 
     .badge-grid {
         background: #e7f5ff;
-        color: #0c63e4;
+        color: #0284c7;
     }
 
     .badge-static {
-        background: #d4edda;
-        color: #155724;
+        background: #ebf0f8;
+        color: #14213d;
     }
 
     .badge-category {
@@ -299,17 +299,17 @@
     }
 
     .item-card {
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        border: 1px solid #e2e8f0;
         border-radius: 10px;
         padding: 15px;
         margin-bottom: 15px;
-        background: rgba(255, 255, 255, 0.05);
+        background: #f8fafc;
         transition: all 0.3s ease;
     }
 
     .item-card:hover {
         border-color: var(--primary-color);
-        background: rgba(105, 108, 255, 0.1);
+        background: rgba(20, 33, 61, 0.1);
     }
 
     .item-image {
@@ -317,7 +317,7 @@
         height: 60px;
         object-fit: cover;
         border-radius: 8px;
-        border: 2px solid rgba(255, 255, 255, 0.1);
+        border: 2px solid #e2e8f0;
     }
 
     .item-actions {
@@ -344,14 +344,14 @@
     .empty-items i {
         font-size: 48px;
         margin-bottom: 15px;
-        color: rgba(255, 255, 255, 0.1);
+        color: #94a3b8;
     }
 
     /* ===== أنماط صفحة العرض (show) ===== */
     .detail-card {
         background: var(--dark-card);
         border-radius: 15px;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 5px 20px rgba(15, 23, 42, 0.05);
         overflow: hidden;
         margin-bottom: 30px;
     }
@@ -369,9 +369,9 @@
     .info-section {
         margin-bottom: 30px;
         padding: 20px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        border: 1px solid #e2e8f0;
         border-radius: 10px;
-        background: rgba(255, 255, 255, 0.05);
+        background: #f8fafc;
     }
 
     .info-section h5 {
@@ -385,7 +385,7 @@
         display: flex;
         margin-bottom: 15px;
         padding-bottom: 15px;
-        border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+        border-bottom: 1px dashed #e2e8f0;
     }
 
     .info-item:last-child {
@@ -406,18 +406,18 @@
     }
 
     .preview-container {
-        background: rgba(255, 255, 255, 0.05);
+        background: #f8fafc;
         border-radius: 10px;
         padding: 20px;
         margin-top: 20px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        border: 1px solid #e2e8f0;
     }
 
     /* ===== أنماط صفحة الفهرس (index) ===== */
     .table-card {
         background: var(--dark-card);
         border-radius: 15px;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 5px 20px rgba(15, 23, 42, 0.05);
         overflow: hidden;
         margin-bottom: 30px;
     }
@@ -435,13 +435,13 @@
     .search-box input {
         padding-right: 40px;
         border-radius: 25px;
-        border: 1px solid rgba(255, 255, 255, 0.3);
+        border: 1px solid #e2e8f0;
         background: rgba(255, 255, 255, 0.1);
-        color: white;
+        color: #1e293b;
     }
 
     .search-box input::placeholder {
-        color: rgba(255, 255, 255, 0.7);
+        color: #64748b;
     }
 
     .search-box .search-icon {
@@ -449,7 +449,7 @@
         left: 15px;
         top: 50%;
         transform: translateY(-50%);
-        color: white;
+        color: #1e293b;
     }
 
     .filter-tabs {
@@ -463,8 +463,8 @@
         padding: 8px 20px;
         border-radius: 25px;
         background: rgba(255, 255, 255, 0.1);
-        color: rgba(255, 255, 255, 0.8);
-        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: #1e293b;
+        border: 1px solid #e2e8f0;
         cursor: pointer;
         transition: all 0.3s ease;
         font-size: 14px;
@@ -472,7 +472,7 @@
     }
 
     .filter-tab:hover {
-        background: rgba(255, 255, 255, 0.2);
+        background: #f1f5f9;
     }
 
     .filter-tab.active {
@@ -482,7 +482,7 @@
     }
 
     .stats-card {
-        background: rgba(255, 255, 255, 0.05);
+        background: #f8fafc;
         border-radius: 12px;
         padding: 20px;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
@@ -513,7 +513,7 @@
 
     .icon-slider {
         background: rgba(231, 245, 255, 0.1);
-        color: #0c63e4;
+        color: #0284c7;
     }
 
     .icon-grid {
@@ -523,18 +523,18 @@
 
     .icon-active {
         background: rgba(212, 237, 218, 0.1);
-        color: #20c997;
+        color: #14213d;
     }
 
     .stats-number {
         font-size: 24px;
         font-weight: 700;
         margin-bottom: 5px;
-        color: white;
+        color: #1e293b;
     }
 
     .stats-label {
-        color: rgba(255, 255, 255, 0.7);
+        color: #64748b;
         font-size: 14px;
     }
 
@@ -543,8 +543,8 @@
         height: 60px;
         object-fit: cover;
         border-radius: 8px;
-        border: 2px solid rgba(255, 255, 255, 0.1);
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        border: 2px solid #e2e8f0;
+        box-shadow: 0 2px 5px rgba(15, 23, 42, 0.05);
     }
 
     .banner-preview-placeholder {
@@ -569,13 +569,13 @@
     .banner-details h6 {
         margin-bottom: 5px;
         font-weight: 600;
-        color: white;
+        color: #1e293b;
     }
 
     .banner-details p {
         margin: 0;
         font-size: 13px;
-        color: rgba(255, 255, 255, 0.7);
+        color: #64748b;
     }
 
     .type-icons {
@@ -592,26 +592,26 @@
         align-items: center;
         justify-content: center;
         font-size: 12px;
-        color: white;
+        color: #1e293b;
     }
 
     .icon-slider-type {
-        background: #667eea;
+        background: #14213d;
     }
 
     .icon-grid-type {
-        background: #0c63e4;
+        background: #0284c7;
     }
 
     .icon-static-type {
-        background: #28a745;
+        background: #14213d;
     }
 
     .category-badge {
         display: inline-block;
         padding: 4px 12px;
         background: rgba(231, 245, 255, 0.1);
-        color: #0c63e4;
+        color: #0284c7;
         border-radius: 15px;
         font-size: 12px;
         margin-top: 5px;
@@ -624,7 +624,7 @@
         width: 24px;
         height: 24px;
         background: var(--primary-color);
-        color: white;
+        color: #1e293b;
         border-radius: 50%;
         font-size: 12px;
         font-weight: 600;
@@ -636,9 +636,9 @@
     }
 
     .sort-btn {
-        background: rgba(255, 255, 255, 0.2);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        color: white;
+        background: #f1f5f9;
+        border: 1px solid #e2e8f0;
+        color: #1e293b;
         padding: 8px 15px;
         border-radius: 25px;
         cursor: pointer;
@@ -652,12 +652,12 @@
         position: absolute;
         background: var(--dark-card);
         min-width: 200px;
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 8px 16px rgba(15, 23, 42, 0.05);
         border-radius: 10px;
         z-index: 1;
         padding: 10px 0;
         margin-top: 5px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        border: 1px solid #e2e8f0;
     }
 
     .sort-dropdown:hover .sort-dropdown-content {
@@ -668,7 +668,7 @@
         padding: 10px 20px;
         cursor: pointer;
         transition: background 0.3s;
-        color: rgba(255, 255, 255, 0.8);
+        color: #1e293b;
     }
 
     .sort-item:hover {
@@ -683,47 +683,47 @@
     .empty-state {
         text-align: center;
         padding: 50px 20px;
-        color: rgba(255, 255, 255, 0.7);
+        color: #64748b;
     }
 
     .empty-state-icon {
         font-size: 60px;
-        color: rgba(255, 255, 255, 0.1);
+        color: #94a3b8;
         margin-bottom: 20px;
     }
 
     .empty-state-text {
-        color: rgba(255, 255, 255, 0.7);
+        color: #64748b;
         margin-bottom: 20px;
     }
 
     /* ===== أنماط عامة للمكونات ===== */
     .form-control {
-        background: rgba(255, 255, 255, 0.05);
-        border-color: rgba(255, 255, 255, 0.1);
-        color: #fff;
+        background: #f8fafc;
+        border-color: #e2e8f0;
+        color: #1e293b;
     }
 
     .form-control:focus {
         background: rgba(255, 255, 255, 0.1);
         border-color: var(--primary-color);
-        color: #fff;
-        box-shadow: 0 0 0 0.25rem rgba(105, 108, 255, 0.25);
+        color: #1e293b;
+        box-shadow: 0 0 0 0.25rem rgba(20, 33, 61, 0.25);
     }
 
     .form-control::placeholder {
-        color: rgba(255, 255, 255, 0.5);
+        color: #64748b;
     }
 
     .input-group-text {
         background: rgba(255, 255, 255, 0.1);
-        border-color: rgba(255, 255, 255, 0.1);
-        color: #fff;
+        border-color: #e2e8f0;
+        color: #1e293b;
     }
 
     .form-check-input {
         background-color: rgba(255, 255, 255, 0.1);
-        border-color: rgba(255, 255, 255, 0.3);
+        border-color: #e2e8f0;
     }
 
     .form-check-input:checked {
@@ -732,7 +732,7 @@
     }
 
     .form-check-label {
-        color: #fff;
+        color: #1e293b;
     }
 
     .btn-primary {
@@ -741,20 +741,20 @@
     }
 
     .btn-primary:hover {
-        background: linear-gradient(135deg, #5a6fd8 0%, #6a4a9a 100%);
+        background: linear-gradient(135deg, #14213d 0%, #1e3a5f 100%);
         transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(105, 108, 255, 0.4);
+        box-shadow: 0 5px 15px rgba(20, 33, 61, 0.4);
     }
 
     .btn-secondary {
         background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        color: #fff;
+        border: 1px solid #e2e8f0;
+        color: #1e293b;
     }
 
     .btn-secondary:hover {
-        background: rgba(255, 255, 255, 0.2);
-        border-color: rgba(255, 255, 255, 0.3);
+        background: #f1f5f9;
+        border-color: #e2e8f0;
     }
 
     .btn-outline-primary {
@@ -768,7 +768,7 @@
     }
 
     .breadcrumb {
-        background: rgba(255, 255, 255, 0.05);
+        background: #f8fafc;
         border-radius: 10px;
         padding: 15px;
     }
@@ -785,29 +785,29 @@
     /* Select2 أنماط */
     .select2-container--default .select2-selection--multiple,
     .select2-container--default .select2-selection--single {
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
         border-radius: 0.375rem;
         min-height: 38px;
-        color: #fff;
+        color: #1e293b;
     }
 
     .select2-container--default .select2-selection--multiple .select2-selection__choice {
         background: var(--primary-color);
-        color: white;
+        color: #1e293b;
         border: none;
         border-radius: 15px;
         padding: 2px 10px;
     }
 
     .select2-container--default .select2-selection__rendered {
-        color: #fff !important;
+        color: #1e293b !important;
     }
 
     /* Modal أنماط */
     .modal-content {
         background: var(--dark-card);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        border: 1px solid #e2e8f0;
     }
 
     .modal-header {
@@ -815,7 +815,7 @@
     }
 
     .modal-title {
-        color: #fff;
+        color: #1e293b;
     }
 
     .btn-close {
@@ -823,7 +823,7 @@
     }
 
     .modal-footer {
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        border-top: 1px solid #e2e8f0;
     }
 
     /* المساعدات */

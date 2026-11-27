@@ -6,27 +6,27 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary-color: #696cff;
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --success-color: #28a745;
-            --danger-color: #dc3545;
-            --warning-color: #ffc107;
-            --dark-bg: #1e1e2d;
-            --dark-card: #2b3b4c;
+            --primary-color: #14213d;
+            --primary-gradient: linear-gradient(135deg, #14213d 0%, #0c182a 100%);
+            --success-color: #14213d;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --dark-bg: #f6f8fb;
+            --dark-card: #ffffff;
         }
 
         body {
             font-family: "Cairo", sans-serif !important;
             background: var(--dark-bg);
-            color: #fff;
+            color: #1e293b;
         }
 
         .form-card {
             background: var(--dark-card);
             border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 5px 20px rgba(15, 23, 42, 0.05);
             padding: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #e2e8f0;
         }
 
         .form-header {
@@ -39,7 +39,7 @@
 
         .form-label {
             font-weight: 600;
-            color: rgba(255, 255, 255, 0.9);
+            color: #1e293b;
             margin-bottom: 8px;
             display: block;
         }
@@ -51,9 +51,9 @@
 
         .form-control,
         .form-select {
-            background: rgba(255, 255, 255, 0.05) !important;
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
-            color: #fff !important;
+            background: #f8fafc !important;
+            border: 1px solid #e2e8f0 !important;
+            color: #1e293b !important;
             border-radius: 10px !important;
             padding: 12px 15px !important;
             transition: all 0.3s ease;
@@ -63,36 +63,36 @@
         .form-select:focus {
             background: rgba(255, 255, 255, 0.1) !important;
             border-color: var(--primary-color) !important;
-            box-shadow: 0 0 0 0.25rem rgba(105, 108, 255, 0.25) !important;
+            box-shadow: 0 0 0 0.25rem rgba(20, 33, 61, 0.25) !important;
         }
 
         .form-control::placeholder {
-            color: rgba(255, 255, 255, 0.4);
+            color: #94a3b8;
         }
 
         .form-select option {
             background: var(--dark-card);
-            color: #fff;
+            color: #1e293b;
         }
 
         .form-text {
             font-size: 13px;
-            color: rgba(255, 255, 255, 0.6);
+            color: #64748b;
             margin-top: 5px;
         }
 
         .module-section {
-            background: rgba(255, 255, 255, 0.03);
+            background: #f8fafc;
             border-radius: 10px;
             padding: 20px;
             margin-bottom: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            border: 1px solid #e2e8f0;
         }
 
         .module-title {
             font-size: 16px;
             font-weight: 700;
-            color: #fff;
+            color: #1e293b;
             margin-bottom: 15px;
             display: flex;
             align-items: center;
@@ -110,22 +110,22 @@
             margin-bottom: 10px;
             padding: 8px 12px;
             border-radius: 8px;
-            background: rgba(255, 255, 255, 0.02);
+            background: #f8fafc;
             transition: all 0.3s ease;
         }
 
         .role-item:hover {
-            background: rgba(105, 108, 255, 0.1);
+            background: rgba(20, 33, 61, 0.1);
         }
 
         .role-name {
             font-weight: 500;
-            color: rgba(255, 255, 255, 0.9);
+            color: #1e293b;
         }
 
         .role-description {
             font-size: 12px;
-            color: rgba(255, 255, 255, 0.6);
+            color: #64748b;
             margin-right: 10px;
             display: block;
         }
@@ -140,15 +140,15 @@
         }
 
         .btn-primary:hover {
-            background: linear-gradient(135deg, #5a6fd8 0%, #6a4a9a 100%);
+            background: linear-gradient(135deg, #14213d 0%, #1e3a5f 100%);
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(105, 108, 255, 0.4);
+            box-shadow: 0 5px 15px rgba(20, 33, 61, 0.4);
         }
 
         .btn-secondary {
             background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #fff;
+            border: 1px solid #e2e8f0;
+            color: #1e293b;
             padding: 12px 30px;
             border-radius: 10px;
             font-weight: 600;
@@ -156,8 +156,8 @@
         }
 
         .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: rgba(255, 255, 255, 0.3);
+            background: #f1f5f9;
+            border-color: #e2e8f0;
         }
 
         .btn-outline-primary {
@@ -172,7 +172,7 @@
         }
 
         .btn-outline-primary:hover {
-            background: rgba(105, 108, 255, 0.15);
+            background: rgba(20, 33, 61, 0.15);
             color: #fff;
         }
 
@@ -189,12 +189,12 @@
             object-fit: cover;
             border: 3px solid var(--primary-color);
             margin-bottom: 15px;
-            background: rgba(255, 255, 255, 0.05);
+            background: #f8fafc;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 50px;
-            color: rgba(255, 255, 255, 0.3);
+            color: #94a3b8;
         }
 
         .avatar-upload-wrapper {
@@ -235,21 +235,21 @@
             align-items: center;
             gap: 10px;
             padding: 12px 15px;
-            background: rgba(255, 255, 255, 0.02);
+            background: #f8fafc;
             border-radius: 10px;
             cursor: pointer;
             transition: all 0.3s ease;
             width: 100%;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            border: 1px solid #e2e8f0;
         }
 
         .form-check-label:hover {
-            background: rgba(105, 108, 255, 0.08);
-            border-color: rgba(105, 108, 255, 0.2);
+            background: rgba(20, 33, 61, 0.08);
+            border-color: rgba(20, 33, 61, 0.2);
         }
 
         .form-check-input:checked+.form-check-label {
-            background: rgba(105, 108, 255, 0.12);
+            background: rgba(20, 33, 61, 0.12);
             border-color: var(--primary-color);
             border-right: 3px solid var(--primary-color);
         }
@@ -258,7 +258,7 @@
             width: 22px;
             height: 22px;
             border-radius: 50%;
-            border: 2px solid rgba(255, 255, 255, 0.3);
+            border: 2px solid #e2e8f0;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -270,7 +270,7 @@
         .form-check-input:checked+.form-check-label .check-icon {
             background: var(--success-color);
             border-color: var(--success-color);
-            color: #fff;
+            color: #1e293b;
         }
 
         /* Password Strength */
@@ -298,7 +298,7 @@
             width: 50%;
         }
         .strength-good {
-            background: #17a2b8;
+            background: #06b6d4;
             width: 75%;
         }
         .strength-strong {
@@ -312,7 +312,7 @@
             left: 10px;
             top: 50%;
             transform: translateY(-50%);
-            background: rgba(105, 108, 255, 0.2);
+            background: rgba(20, 33, 61, 0.2);
             border: none;
             color: var(--primary-color);
             width: 35px;
@@ -326,8 +326,8 @@
         }
 
         .generate-password-btn:hover {
-            background: rgba(105, 108, 255, 0.4);
-            color: #fff;
+            background: rgba(20, 33, 61, 0.4);
+            color: #1e293b;
         }
 
         .password-wrapper {
@@ -346,13 +346,13 @@
             transform: translateY(-50%);
             background: none;
             border: none;
-            color: rgba(255, 255, 255, 0.5);
+            color: #64748b;
             cursor: pointer;
             transition: all 0.3s ease;
         }
 
         .toggle-password:hover {
-            color: #fff;
+            color: #1e293b;
         }
 
         /* is-invalid */
@@ -391,14 +391,14 @@
                 <li class="breadcrumb-item">
                     <a href="{{ route('admin.admins.index') }}" class="text-primary">الموظفين</a>
                 </li>
-                <li class="breadcrumb-item active text-white">إضافة موظف جديد</li>
+                <li class="breadcrumb-item active text-muted">إضافة موظف جديد</li>
             </ol>
         </nav>
 
         <!-- Alert Messages -->
         @if ($errors->any())
             <div class="alert alert-danger alert-dismissible fade show" role="alert"
-                style="background: rgba(220,53,69,0.1); border-color: rgba(220,53,69,0.3); color: #dc3545;">
+                style="background: rgba(220,53,69,0.1); border-color: rgba(220,53,69,0.3); color: #ef4444;">
                 <i class="fas fa-exclamation-circle me-2"></i>
                 <ul class="mb-0">
                     @foreach ($errors->all() as $error)
@@ -597,7 +597,7 @@
                                 <i class="fas fa-lightbulb"></i>
                                 إرشادات هامة
                             </h6>
-                            <ul class="list-unstyled" style="color: rgba(255, 255, 255, 0.7); font-size: 14px; line-height: 1.8;">
+                            <ul class="list-unstyled" style="color: #64748b; font-size: 14px; line-height: 1.8;">
                                 <li class="mb-2">
                                     <i class="fas fa-shield-alt me-2" style="color: var(--warning-color);"></i>
                                     استخدم كلمة مرور قوية تحتوي على أحرف وأرقام ورموز.
@@ -627,7 +627,7 @@
                             <div style="max-height: 200px; overflow-y: auto;">
                                 @foreach ($roles as $role)
                                     <div class="d-flex justify-content-between align-items-center mb-2 p-2"
-                                        style="background: rgba(255,255,255,0.02); border-radius: 6px;">
+                                        style="background: #f8fafc; border-radius: 6px; border: 1px solid #edf0f5;">
                                         <span style="font-size: 13px;">{{ $role->display_name ?? $role->name }}</span>
                                         <span class="badge bg-primary rounded-pill" style="font-size: 11px;">
                                             {{ $role->permissions_count ?? 0 }} صلاحية
@@ -745,7 +745,7 @@
             if (password.length === 0) {
                 bar.css('width', '0');
                 text.text('يجب أن تكون 6 أحرف على الأقل');
-                text.css('color', 'rgba(255, 255, 255, 0.6)');
+                text.css('color', '#64748b');
                 return;
             }
             
@@ -767,19 +767,19 @@
             if (strength <= 2) {
                 strengthClass = 'strength-weak';
                 strengthText = 'ضعيفة جداً';
-                text.css('color', '#dc3545');
+                text.css('color', '#ef4444');
             } else if (strength <= 3) {
                 strengthClass = 'strength-fair';
                 strengthText = 'متوسطة';
-                text.css('color', '#ffc107');
+                text.css('color', '#f59e0b');
             } else if (strength <= 5) {
                 strengthClass = 'strength-good';
                 strengthText = 'جيدة';
-                text.css('color', '#17a2b8');
+                text.css('color', '#06b6d4');
             } else {
                 strengthClass = 'strength-strong';
                 strengthText = 'قوية جداً';
-                text.css('color', '#28a745');
+                text.css('color', '#14213d');
             }
             
             bar.addClass(strengthClass);
@@ -825,7 +825,7 @@
                 
                 // Highlight the roles section
                 $('.module-section:has(input[name="role"])').css({
-                    'border-color': '#dc3545',
+                    'border-color': '#ef4444',
                     'animation': 'shake 0.5s ease'
                 });
                 
@@ -843,7 +843,7 @@
                 
                 // Remove highlight after animation
                 setTimeout(() => {
-                    $('.module-section:has(input[name="role"])').css('border-color', 'rgba(255, 255, 255, 0.05)');
+                    $('.module-section:has(input[name="role"])').css('border-color', '#e2e8f0');
                 }, 2000);
             }
         });
@@ -851,7 +851,7 @@
         // Remove error on role selection
         $(document).on('change', 'input[name="role"]', function() {
             $('#role-error').remove();
-            $('.module-section:has(input[name="role"])').css('border-color', 'rgba(255, 255, 255, 0.05)');
+            $('.module-section:has(input[name="role"])').css('border-color', '#e2e8f0');
         });
 
         // ============================================

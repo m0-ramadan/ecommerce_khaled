@@ -11,7 +11,7 @@
         }
 
         .category-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #14213d 0%, #1e3a5f 100%);
             color: white;
             border-radius: 15px;
             padding: 30px;
@@ -79,12 +79,12 @@
 
         .stat-card.products .stat-icon {
             background: rgba(52, 152, 219, 0.1);
-            color: #3498db;
+            color: #0284c7;
         }
 
         .stat-card.subcategories .stat-icon {
             background: rgba(46, 204, 113, 0.1);
-            color: #2ecc71;
+            color: #14213d;
         }
 
         .stat-card.status .stat-icon {
@@ -117,7 +117,7 @@
         }
 
         .info-card h5 {
-            color: #2c3e50;
+            color: #0f172a;
             /* border-bottom: 2px solid #f8f9fa; */
             padding-bottom: 10px;
             margin-bottom: 20px;
@@ -146,7 +146,7 @@
         }
 
         .info-value {
-            color: #2c3e50;
+            color: #0f172a;
             font-weight: 600;
         }
 
@@ -157,8 +157,8 @@
         }
 
         .badge-status.active {
-            /* background: #d4edda; */
-            color: #155724;
+            /* background: #ebf0f8; */
+            color: #14213d;
         }
 
         .badge-status.inactive {
@@ -238,7 +238,7 @@
             font-size: 16px;
             font-weight: bold;
             margin-bottom: 5px;
-            color: #2c3e50;
+            color: #0f172a;
         }
 
         .child-meta {
@@ -249,7 +249,7 @@
 
         .child-products {
             font-size: 12px;
-            color: #3498db;
+            color: #0284c7;
             font-weight: 500;
         }
 
@@ -285,7 +285,7 @@
             width: 16px;
             height: 16px;
             border-radius: 50%;
-            background: #3498db;
+            background: #0284c7;
             border: 3px solid white;
             box-shadow: 0 0 0 3px #e0e0e0;
         }
@@ -305,7 +305,7 @@
         .timeline-title {
             font-weight: 600;
             margin-bottom: 5px;
-            color: #2c3e50;
+            color: #0f172a;
         }
 
         .action-buttons {
@@ -347,7 +347,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #2c3e50;
+            color: #0f172a;
         }
 
         .seo-preview {

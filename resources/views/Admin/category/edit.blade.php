@@ -21,7 +21,7 @@
         }
 
         .category-image-preview:hover {
-            /* border-color: #696cff; */
+            /* border-color: #14213d; */
             transform: scale(1.02);
         }
 
@@ -94,8 +94,8 @@
         }
 
         .nav-tabs .nav-link.active {
-            /* color: #696cff;
-            border-bottom: 2px solid #696cff; */
+            /* color: #14213d;
+            border-bottom: 2px solid #14213d; */
             background-color: transparent;
         }
 
@@ -116,11 +116,11 @@
 
         .required::after {
             content: " *";
-            color: #dc3545;
+            color: #ef4444;
         }
 
         .info-icon {
-            /* color: #696cff; */
+            /* color: #14213d; */
             cursor: help;
         }
 
@@ -134,7 +134,7 @@
         }
 
         .slug-preview a {
-            /* color: #696cff; */
+            /* color: #14213d; */
             text-decoration: none;
         }
 
@@ -941,7 +941,7 @@
                 showCancelButton: true,
                 confirmButtonText: 'نعم، احذف',
                 cancelButtonText: 'إلغاء',
-                confirmButtonColor: '#d33'
+                confirmButtonColor: '#ef4444'
             }).then((result) => {
                 if (result.isConfirmed) {
                     fetch(`/admin/categories/${childId}`, {

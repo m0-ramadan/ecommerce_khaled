@@ -27,7 +27,7 @@
             border-radius: 12px;
             padding: 20px;
             margin-bottom: 25px;
-            border-right: 4px solid #696cff;
+            border-right: 4px solid #14213d;
         }
 
         .user-avatar {
@@ -43,7 +43,7 @@
             width: 60px;
             height: 60px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #14213d 0%, #1e3a5f 100%);
             color: white;
             display: flex;
             align-items: center;
@@ -72,8 +72,8 @@
         }
 
         .status-shipped {
-            background: #d4edda;
-            color: #155724;
+            background: #ebf0f8;
+            color: #14213d;
         }
 
         .status-delivered {
@@ -115,7 +115,7 @@
 
         .order-item-title {
             font-weight: 600;
-            color: #2c3e50;
+            color: #0f172a;
         }
 
         .order-item-date {
@@ -142,7 +142,7 @@
         }
 
         .detail-value {
-            color: #2c3e50;
+            color: #0f172a;
         }
 
         .empty-state {
@@ -166,7 +166,7 @@
             border-radius: 12px;
             padding: 20px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            border-top: 4px solid #696cff;
+            border-top: 4px solid #14213d;
             margin-bottom: 20px;
         }
 
@@ -182,13 +182,13 @@
         }
 
         .icon-orders {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #14213d 0%, #1e3a5f 100%);
             color: white;
         }
 
         .icon-total {
             background: #e7f5ff;
-            color: #0c63e4;
+            color: #0284c7;
         }
 
         .icon-pending {
@@ -197,8 +197,8 @@
         }
 
         .icon-delivered {
-            background: #d4edda;
-            color: #155724;
+            background: #ebf0f8;
+            color: #14213d;
         }
 
         .stats-number {
@@ -251,7 +251,7 @@
                         <img src="{{ asset('storage/' . $user->image) }}" alt="{{ $user->name }}" class="user-avatar">
                     @else
                         <div class="user-avatar-placeholder" bis_skin_checked="1">
-                            {{ strtoupper(substr($user->name, 0, 1)) }}
+                            {{ mb_strtoupper(mb_substr($user->name, 0, 1)) }}
                         </div>
                     @endif
                 </div>

@@ -17,8 +17,8 @@
         }
 
         .status-active {
-            /* background-color: #d4edda; */
-            color: #155724;
+            /* background-color: #ebf0f8; */
+            color: #14213d;
         }
 
         .status-inactive {
@@ -35,7 +35,7 @@
 
         .type-payment {
             /* background-color: #e7f5ff; */
-            color: #0c63e4;
+            color: #0284c7;
         }
 
         .type-method {
@@ -52,7 +52,7 @@
             border-radius: 8px;
             background: #f8f9fa;
             font-size: 20px;
-            color: #696cff;
+            color: #14213d;
         }
 
         .action-buttons {
@@ -106,7 +106,7 @@
         }
 
         input:checked+.toggle-slider {
-            background-color: #696cff;
+            background-color: #14213d;
         }
 
         input:checked+.toggle-slider:before {
@@ -121,7 +121,7 @@
         }
 
         .table-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #14213d 0%, #1e3a5f 100%);
             /* color: white; */
             padding: 20px 25px;
         }
@@ -155,7 +155,7 @@
             border-radius: 12px;
             padding: 20px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            border-top: 4px solid #696cff;
+            border-top: 4px solid #14213d;
             transition: transform 0.3s ease;
         }
 
@@ -175,7 +175,7 @@
         }
 
         .icon-active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #14213d 0%, #1e3a5f 100%);
             color: white;
         }
 
@@ -186,7 +186,7 @@
 
         .icon-payment {
             background: #e7f5ff;
-            color: #0c63e4;
+            color: #0284c7;
         }
 
         .icon-method {
@@ -503,8 +503,8 @@
                     text: `سيتم حذف وسيلة الدفع "${methodName}" نهائياً`,
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonColor: '#d33',
-                    cancelButtonColor: '#3085d6',
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#14213d',
                     confirmButtonText: 'نعم، احذف',
                     cancelButtonText: 'إلغاء',
                     reverseButtons: true
